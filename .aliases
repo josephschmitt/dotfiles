@@ -32,7 +32,7 @@ alias gco="git checkout"
 alias gb="git checkout -b"
 alias gbl="git branch"
 alias ga="git add"
-alias gca="git commit -am"
+alias gca="git commit -a"
 alias gci="git commit"
 alias pub="git stash save && git checkout master && git merge dev && git push && git checkout dev && git stash apply"
 
