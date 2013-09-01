@@ -3,14 +3,12 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
-alias ~="cd ~" # `cd` is probably faster to type though
-alias -- -="cd -"
 
 # Shortcuts
-alias d="cd ~/Documents/Dropbox"
+alias d="cd ~/Dropbox"
 alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
-alias p="cd ~/Projects"
+alias p="cd ~/Dropbox/Documents/Projects"
 alias g="git"
 alias h="history"
 alias j="jobs"
@@ -19,6 +17,26 @@ alias m="mate ."
 alias s="subl ."
 alias o="open"
 alias oo="open ."
+alias la="ls la"
+alias cl="clear"
+
+alias joe.sh="cd ~/Dropbox/Documents/Projects/joe.sh"
+alias bashr="source ~/.bash_profile"
+
+# Git Aliases
+alias gpl="git pull"
+alias gpu="git push"
+alias gs="git status"
+alias gco="git checkout"
+alias gb="git checkout -b"
+alias gbl="git branch"
+alias ga="git add"
+alias gca="git commit -am"
+alias gci="git commit"
+alias pub="git stash save && git checkout master && git merge dev && git push && git checkout dev && git stash apply"
+
+# Alias for starting sass watch on joe.sh directory
+alias jsass='sass --watch ~/Dropbox/Documents/Projects/joe.sh/site/sass:~/Dropbox/Documents/Projects/joe.sh/assets/styles'
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
