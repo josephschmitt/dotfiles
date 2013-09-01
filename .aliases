@@ -22,6 +22,7 @@ alias cl="clear"
 
 alias joe.sh="cd ~/Dropbox/Documents/Projects/joe.sh"
 alias bashr="source ~/.bash_profile"
+alias gruntsave="npm install grunt --save-dev"
 
 # Git Aliases
 alias gpl="git pull"
