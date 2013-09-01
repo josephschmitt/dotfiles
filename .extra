@@ -1,0 +1,19 @@
+# Git credentials
+GIT_AUTHOR_NAME="Joseph Schmitt"
+GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+git config --global user.name "$GIT_AUTHOR_NAME"
+GIT_AUTHOR_EMAIL="me@joe.sh"
+GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+git config --global user.email "$GIT_AUTHOR_EMAIL"
+
+
+
+###############################################################################
+# General UI/UX                                                               #
+###############################################################################
+
+# Set computer name (as done via System Preferences → Sharing)
+# sudo scutil --set ComputerName "jBook"
+# sudo scutil --set HostName "jBook"
+# sudo scutil --set LocalHostName "jBook"
+# sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "jBook"
