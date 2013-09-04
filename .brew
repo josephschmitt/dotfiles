@@ -75,6 +75,7 @@ installcask instacast
 installcask keyboard-maestro
 # installcask macvim
 # installcask miro-video-converter
+installcask omni-graffle-pro
 installcask rdio
 installcask reveal
 installcask shiori
@@ -88,6 +89,9 @@ installcask textmate
 # installcask ukelele
 # installcask virtualbox
 # installcask vlc
+
+# add cask folder to alfred search
+brew cask alfred link
 
 # Remove outdated versions from the cellar
 brew cleanup
