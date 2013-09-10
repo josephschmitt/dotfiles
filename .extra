@@ -17,3 +17,10 @@ git config --global user.email "$GIT_AUTHOR_EMAIL"
 # sudo scutil --set HostName "jBook"
 # sudo scutil --set LocalHostName "jBook"
 # sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "jBook"
+
+
+
+###############################################################################
+# Add Hosts                                                                   #
+###############################################################################
+sudo cat /etc/hosts >> "173.230.151.220 krang"
