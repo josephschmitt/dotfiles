@@ -7,20 +7,14 @@ GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 git config --global user.email "$GIT_AUTHOR_EMAIL"
 
 
-
 ###############################################################################
-# General UI/UX                                                               #
+# Basic Setup                                                                 #
 ###############################################################################
+# Install homebrew
+ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
 
-# Set computer name (as done via System Preferences → Sharing)
-# sudo scutil --set ComputerName "jBook"
-# sudo scutil --set HostName "jBook"
-# sudo scutil --set LocalHostName "jBook"
-# sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "jBook"
+# Create SSH public/private keys
+ssh-keygen -t rsa -C "me@joe.sh"
 
-
-
-###############################################################################
-# Add Hosts                                                                   #
-###############################################################################
-sudo cat /etc/hosts >> "173.230.151.220 krang"
+# Add common hosts
+echo "173.230.151.220 krang" | sudo tee -a /etc/hosts >/dev/null
