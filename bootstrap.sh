@@ -16,3 +16,18 @@ else
 	fi
 fi
 unset doIt
+
+###############################################################################
+# Basic Setup                                                                 #
+###############################################################################
+# Install homebrew
+ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+
+# Create SSH public/private keys
+ssh-keygen -t rsa -C "me@joe.sh"
+
+# Add common hosts
+echo "173.230.151.220 krang" | sudo tee -a /etc/hosts >/dev/null
+
+# Install Cask and native apps
+source .brew-cask
