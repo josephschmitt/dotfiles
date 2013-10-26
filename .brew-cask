@@ -11,33 +11,22 @@ installcask airfoil
 installcask cloudapp
 installcask dropbox
 installcask evernote
-# installcask fantastical
 installcask github
 installcask google-chrome
-# installcask google-chrome-canary
 installcask google-hangouts
 installcask hip-chat
 installcask imagealpha
 installcask imageoptim
 installcask instacast
-# installcask iterm2
 installcask keyboard-maestro
-# installcask macvim
-# installcask miro-video-converter
 installcask omni-graffle-pro
 installcask rdio
 installcask reveal
 installcask shiori
 installcask skype
-# installcask sparrow
 installcask sublime-text
 installcask textmate
-# installcask the-unarchiver
-# installcask tor-browser
-# installcask transmission
-# installcask ukelele
-# installcask virtualbox
-# installcask vlc
+installcask fn-flip
 
 # add cask folder to alfred search
 brew cask alfred link
