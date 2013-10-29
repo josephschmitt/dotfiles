@@ -13,6 +13,8 @@ echo "Don’t forget to add $(brew --prefix coreutils)/libexec/gnubin to \$PATH.
 brew install findutils
 # Install Bash 4
 brew install bash
+# Install Fish Shell
+brew install fish
 
 # Install wget with IRI support
 brew install wget --enable-iri
@@ -34,8 +36,8 @@ brew install php55
 
 # Install other useful binaries
 # brew install ack
-#brew install exiv2
-brew install git
+# brew install exiv2
+# brew install git
 #brew install imagemagick
 # brew install lynx
 brew install node
