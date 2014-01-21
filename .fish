@@ -19,3 +19,8 @@ alias gci="git commit"
 
 # Alias for starting sass watch on joe.sh directory
 alias jsass='sass --watch ~/Dropbox/Documents/Projects/joe.sh/site/sass:~/Dropbox/Documents/Projects/joe.sh/assets/styles'
+
+#Start a simple python HTTP server
+function serve --description 'Start a simple python HTTP server'
+	python -m SimpleHTTPServer $argv
+end
