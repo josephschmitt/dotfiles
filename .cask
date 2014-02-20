@@ -8,25 +8,26 @@ function installcask() {
 
 installcask alfred
 installcask airfoil
-installcask cloudapp
+installcask charles
 installcask dropbox
 installcask evernote
+installcask fn-flip
 installcask github
 installcask google-chrome
-installcask google-hangouts
-installcask hip-chat
 installcask imagealpha
 installcask imageoptim
 installcask instacast
 installcask keyboard-maestro
-installcask omni-graffle-pro
 installcask rdio
 installcask reveal
 installcask shiori
 installcask skype
-installcask sublime-text
+installcask sublime-text-3
 installcask textmate
-installcask fn-flip
+installcask total-finder
+installcask unrarx
+installcask virtualbox
+installcask vlc
 
 # add cask folder to alfred search
 brew cask alfred link
