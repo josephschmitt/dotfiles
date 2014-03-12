@@ -25,6 +25,7 @@ installcask skype
 installcask sublime-text-3
 installcask textmate
 installcask total-finder
+installcask total-terminal
 installcask unrarx
 installcask virtualbox
 installcask vlc
