@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Install homebrew
-ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+#ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 # Create SSH public/private keys
 ssh-keygen -t rsa -C "me@joe.sh"
