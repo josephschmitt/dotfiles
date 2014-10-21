@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Install grunt
-sudo npm install -g grunt-cli
-sudo npm install -g grunt-init
+npm install -g grunt-cli
+npm install -g grunt-init
 
 # Install bower
 npm install -g bower
