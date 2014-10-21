@@ -18,6 +18,7 @@ installcask google-chrome
 #installcask imageoptim
 #installcask instacast
 installcask keyboard-maestro
+installcask node
 installcask pixel-winch
 installcask rdio
 #installcask reveal
