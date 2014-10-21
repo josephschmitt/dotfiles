@@ -10,9 +10,6 @@ ssh-keygen -t rsa -C "me@joe.sh"
 # Add common hosts
 echo "173.230.151.220 krang" | sudo tee -a /etc/hosts >/dev/null
 
-# Install Cask and native apps
-source .brew-cask
-
 # Configure Bash
 cd "$(dirname "${BASH_SOURCE}")"
 git pull origin master
@@ -35,3 +32,10 @@ unset doIt
 
 # Configure Fish
 cp .fish ~/.config/fish/config.fish
+
+# Install Cask and native apps
+source .brew
+source .cask
+
+# Install node packages
+souce .npm
