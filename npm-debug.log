@@ -1,0 +1,39 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', '-g', 'grunt-cli' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.32
+4 verbose cache add [ 'grunt-cli', null ]
+5 verbose cache add name=undefined spec="grunt-cli" args=["grunt-cli",null]
+6 verbose parsed url { protocol: null,
+6 verbose parsed url   slashes: null,
+6 verbose parsed url   auth: null,
+6 verbose parsed url   host: null,
+6 verbose parsed url   port: null,
+6 verbose parsed url   hostname: null,
+6 verbose parsed url   hash: null,
+6 verbose parsed url   search: null,
+6 verbose parsed url   query: null,
+6 verbose parsed url   pathname: 'grunt-cli',
+6 verbose parsed url   path: 'grunt-cli',
+6 verbose parsed url   href: 'grunt-cli' }
+7 error getCacheStat invalid cache dir "/Users/josephschmitt/.npm"
+8 silly lockFile 671ef8ac-grunt-cli grunt-cli
+9 verbose lock grunt-cli /Users/josephschmitt/.npm/671ef8ac-grunt-cli.lock
+10 silly lockFile 671ef8ac-grunt-cli grunt-cli
+11 error Error: Attempt to unlock grunt-cli, which hasn't been locked
+11 error     at unlock (/usr/local/lib/node_modules/npm/lib/utils/locker.js:44:11)
+11 error     at cb (/usr/local/lib/node_modules/npm/lib/cache/add-local.js:30:5)
+11 error     at /usr/local/lib/node_modules/npm/lib/cache/add-local.js:47:20
+11 error     at /usr/local/lib/node_modules/npm/lib/utils/locker.js:30:7
+11 error     at cb (/usr/local/lib/node_modules/npm/node_modules/lockfile/lockfile.js:149:38)
+11 error     at /usr/local/lib/node_modules/npm/node_modules/lockfile/lockfile.js:177:38
+11 error     at Object.oncomplete (fs.js:107:15)
+12 error If you need help, you may report this *entire* log,
+12 error including the npm and node versions, at:
+12 error     <http://github.com/npm/npm/issues>
+13 error System Darwin 14.0.0
+14 error command "node" "/usr/local/bin/npm" "install" "-g" "grunt-cli"
+15 error cwd /Users/josephschmitt/Dropbox/Documents/Projects/dotfiles
+16 error node -v v0.10.32
+17 error npm -v 1.4.28
+18 verbose exit [ 1, true ]
