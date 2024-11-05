@@ -1,0 +1,10 @@
+---
+"pane_group:add_right": none
+"pane_group:add_left": none
+"workspace:toggle_navigation_palette": shift-cmd-O
+"editor_view:insert_autosuggestion": tab
+"pane_group:add_up": none
+"pane_group:add_down": none
+"workspace:toggle_command_palette": shift-cmd-P
+"terminal:copy_commands": none
+"input:open_completion_suggestions": ctrl-space
