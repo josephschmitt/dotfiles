@@ -1,9 +1,0 @@
-host: https://circleci.com
-endpoint: graphql-unstable
-rest_endpoint: api/v2
-tls_cert: ""
-tls_insecure: false
-orb_publishing:
-    default_namespace: compass
-    default_vcs_provider: github
-    default_owner: UrbanCompass
