@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
+
+palette:
+  blue: "#8CAAEE"
+  closer: p:os
+  lavender: "#BABBF1"
+  os: "#ACB0BE"
+  pink: "#F4B8E4"
+blocks:
+- type: prompt
+  alignment: left
+  newline: true
+  segments:
+  - template: "{{.Icon}} "
+    foreground: p:os
+    type: os
+    style: plain
+  - template: "{{ .UserName }}@{{ .HostName }} "
+    foreground: p:blue
+    type: session
+    style: plain
+  - properties:
+      folder_icon: ....
+      home_icon: "~"
+      style: agnoster_short
+    template: "{{ .Path }} "
+    foreground: p:pink
+    type: path
+    style: plain
+  - properties:
+      branch_icon: "\ue725 "
+      cherry_pick_icon: "\ue29b "
+      commit_icon: "\uf417 "
+      fetch_status: false
+      fetch_upstream_icon: false
+      merge_icon: "\ue727 "
+      no_commits_icon: "\uf0c3 "
+      rebase_icon: "\ue728 "
+      revert_icon: "\uf0e2 "
+      tag_icon: "\uf412 "
+    template: "{{ .HEAD }} "
+    foreground: p:lavender
+    type: git
+    style: plain
+- type: prompt
+  alignment: left
+  newline: true
+  style: plain
+  segments:
+  - template: 
+    foreground: p:closer
+    type: text
+    style: plain
+    foreground_templates:
+      - "{{if gt .Code 0}}red{{end}}"
+      - "{{if eq .Code 0}}p:closer{{end}}"
+version: 3
+final_space: true
+transient_prompt:
+  background: transparent
+  foreground: "p:closer"
+  template: " "
+secondary_prompt:
+  background: transparent
+  foreground: "p:closer"
+  template: " "
