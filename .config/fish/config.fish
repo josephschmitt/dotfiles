@@ -14,6 +14,11 @@ end
 set -gx PATH $basher $PATH
 status --is-interactive; and . (basher init - fish|psub)
 
+switch_brew (uname -m)
+
+# Initialize oh-my-posh
+oh-my-posh init fish --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml | source
+
 # Add some more bin paths to PATH for custom bin scripts
 set -gx PATH "$HOME/bin" $PATH
 set -gx PATH "$HOME/go/bin" $PATH
@@ -51,7 +56,6 @@ set -x IGNORE_PYTHON_VERSION_REQUIREMENT 1  ##compass5ea843
 set -x VIRTUALENVWRAPPER_PYTHON /usr/bin/python2.7  ##compass5ea843
 set -x GITROOT /Users/josephschmitt/development  ##compass5ea843
 
-switch_brew (uname -m)
 set -gx PATH "$HOME/.jenv/bin" $PATH
 # jenv init -
 set -x GOPROXY (compass config get artifact-store --name go_proxy)  ##compass5ea843
