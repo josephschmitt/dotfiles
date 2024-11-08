@@ -48,27 +48,6 @@ alias gss="gs stack"
 alias gssr="gs stack restack"
 alias gsss="gs stack submit"
 
-#
-# Compass-specific Config
-#
-
-set -x IGNORE_PYTHON_VERSION_REQUIREMENT 1  ##compass5ea843
-set -x VIRTUALENVWRAPPER_PYTHON /usr/bin/python2.7  ##compass5ea843
-set -x GITROOT /Users/josephschmitt/development  ##compass5ea843
-
-set -gx PATH "$HOME/.jenv/bin" $PATH
-# jenv init -
-set -x GOPROXY (compass config get artifact-store --name go_proxy)  ##compass5ea843
-set -x GONOSUMDB "*"  ##compass5ea843
-
-alias cx="compass"
-alias cw="compass workspace"
-
-alias grpcreq="$HOME/development/urbancompass/scripts/grpcreq"
-
-# banyanproxy
-fish_add_path /Applications/Banyan.app/Contents/Resources/bin
-
 # pnpm
 set -gx PNPM_HOME "/Users/josephschmitt/Library/pnpm"
 if not string match -q -- $PNPM_HOME $PATH
@@ -76,4 +55,4 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-setenv DD_LOGS_INJECTION false
+replay "source ~/.bashrc"

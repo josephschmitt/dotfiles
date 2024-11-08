@@ -1,0 +1,11 @@
+export IGNORE_PYTHON_VERSION_REQUIREMENT="1"  ##compass5ea843
+export VIRTUALENVWRAPPER_PYTHON="/usr/bin/python2.7"  ##compass5ea843
+export GITROOT="/Users/josephschmitt/development"  ##compass5ea843
+export PATH="$PATH:/Applications/Banyan.app/Contents/Resources/bin"  ##compass5ea843
+export GOPROXY=$(compass config get artifact-store --name go_proxy)  # compass5ea843
+export GONOSUMDB="*"  # compass5ea843
+export DD_LOGS_INJECTION="false"
+
+alias cx='compass'
+alias cw='compass workspace'
+alias grpcreq="$HOME/development/urbancompass/scripts/grpcreq"
