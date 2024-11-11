@@ -32,6 +32,8 @@ blocks:
       folder_icon: ....
       home_icon: "~"
       style: agnoster_short
+      mapped_locations:
+        ~/development:  /
   - template: "{{ .HEAD }} "
     foreground: p:lavender
     type: git
