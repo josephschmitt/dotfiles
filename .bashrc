@@ -2,9 +2,13 @@ if [ -f $HOME/.compassrc ]; then
   source $HOME/.compassrc
 fi
 
-# Source oh-my-posh if we're in a bash shell
+# Configure bash shell if we're in bash
 if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
   eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml)"
+
+  # Setup basher
+  export PATH="$HOME/.basher/bin:$PATH"
+  eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
 fi
 
 # This function is for use on Macs with multiple brew installations (usually M1/arm64) Macs. This
