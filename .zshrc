@@ -3,7 +3,7 @@ if [ -f $HOME/.bashrc ]; then
 fi
 
 if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
-  eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml)"
+  eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
 # Setup basher

@@ -23,6 +23,9 @@ blocks:
     foreground: p:blue
     type: session
     style: plain
+    properties:
+      host_name_map:
+        W2TD37NJKN: "work-laptop"
   - properties:
       folder_icon: ....
       home_icon: "~"

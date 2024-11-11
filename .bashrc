@@ -4,7 +4,7 @@ fi
 
 # Configure bash shell if we're in bash
 if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
-  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml)"
+  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 
   # Setup basher
   export PATH="$HOME/.basher/bin:$PATH"

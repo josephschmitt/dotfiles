@@ -8,7 +8,7 @@ set -gx PATH $basher $PATH
 
 if status is-interactive
   # Initialize oh-my-posh
-  oh-my-posh init fish --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml | source
+  oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
 
   # Suppress the greeting
   set fish_greeting
