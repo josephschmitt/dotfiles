@@ -37,3 +37,25 @@ function switch_brew {
 
 switch_brew
 complete -C /usr/local/bin/compass compass
+
+# Git-spice aliases
+alias gsb="gs branch"
+alias gsbc="gs branch checkout"
+alias gsbcr="gs branch create"
+alias gsbs="gs branch submit"
+alias gsbt="gs branch track"
+
+alias gsc="gs commit"
+alias gsca="gs commit amend"
+alias gscc="gs commit commit"
+
+alias gsl="gs log long -a"
+alias gsll="gs log long"
+alias gsls="gs log short"
+
+alias gsr="gs repo"
+alias gsrs="gs repo sync"
+
+alias gss="gs stack"
+alias gssr="gs stack restack"
+alias gsss="gs stack submit"
