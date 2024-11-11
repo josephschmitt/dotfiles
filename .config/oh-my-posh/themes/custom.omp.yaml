@@ -19,22 +19,24 @@ blocks:
     foreground: p:os
     type: os
     style: plain
-  - template: "{{ .UserName }}@{{ .HostName }} "
+  # - template: "{{ .UserName }}@{{ .HostName }} "
+  - template: "{{ if .SSHSession }} {{ .UserName }}@{{ .HostName }} {{ end }}"
     foreground: p:blue
     type: session
     style: plain
-    properties:
-      host_name_map:
-        W2TD37NJKN: "work-laptop"
-  - properties:
-      folder_icon: ....
-      home_icon: "~"
-      style: agnoster_short
-    template: "{{ .Path }} "
+  - template: "{{ .Path }} "
     foreground: p:pink
     type: path
     style: plain
-  - properties:
+    properties:
+      folder_icon: ....
+      home_icon: "~"
+      style: agnoster_short
+  - template: "{{ .HEAD }} "
+    foreground: p:lavender
+    type: git
+    style: plain
+    properties:
       branch_icon: "\ue725 "
       cherry_pick_icon: "\ue29b "
       commit_icon: "\uf417 "
@@ -45,10 +47,13 @@ blocks:
       rebase_icon: "\ue728 "
       revert_icon: "\uf0e2 "
       tag_icon: "\uf412 "
-    template: "{{ .HEAD }} "
-    foreground: p:lavender
-    type: git
+  - template: "󰈆 {{ .Code }} {{ reason .Code }}"
+    foreground: p:closer
+    type: status
     style: plain
+    foreground_templates:
+      - "{{if gt .Code 0}}red{{end}}"
+      - "{{if eq .Code 0}}p:closer{{end}}"
 - type: prompt
   alignment: left
   newline: true
@@ -61,8 +66,6 @@ blocks:
     foreground_templates:
       - "{{if gt .Code 0}}red{{end}}"
       - "{{if eq .Code 0}}p:closer{{end}}"
-version: 3
-final_space: true
 transient_prompt:
   background: transparent
   foreground: "p:closer"
@@ -71,3 +74,5 @@ secondary_prompt:
   background: transparent
   foreground: "p:closer"
   template: " "
+version: 3
+final_space: true
