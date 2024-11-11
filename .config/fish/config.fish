@@ -55,4 +55,4 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-replay "source ~/.bashrc"
+replay "source $HOME/.compassrc"
