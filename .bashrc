@@ -1,4 +1,11 @@
-source ~/.compassrc
+if [ -f $HOME/.compassrc ]; then
+  source $HOME/.compassrc
+fi
+
+# Source oh-my-posh if we're in a bash shell
+if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
+  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml)"
+fi
 
 # This function is for use on Macs with multiple brew installations (usually M1/arm64) Macs. This
 # function will attempt to set your brew PATH to point to the correct brew based on the system arch.
@@ -25,3 +32,4 @@ function switch_brew {
 }
 
 switch_brew
+complete -C /usr/local/bin/compass compass
