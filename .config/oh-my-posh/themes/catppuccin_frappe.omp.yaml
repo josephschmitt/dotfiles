@@ -15,6 +15,10 @@ blocks:
     foreground: p:os
     type: os
     style: plain
+  - template: "{{.Shell}} "
+    foreground: p:os
+    type: os
+    style: plain
   - template: "{{ .UserName }}@{{ .HostName }} "
     foreground: p:blue
     type: session
