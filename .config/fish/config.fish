@@ -1,23 +1,23 @@
-if status is-interactive
-    # Commands to run in interactive sessions can go here
-end
-
-# Suppress the greeting
-set fish_greeting
-
-setenv EDITOR micro
+switch_brew (uname -m)
 
 # Configure basher https://github.com/basherpm/basher
 if test -d ~/.basher
   set basher ~/.basher/bin
 end
 set -gx PATH $basher $PATH
-status --is-interactive; and . (basher init - fish|psub)
 
-switch_brew (uname -m)
+if status is-interactive
+  # Initialize oh-my-posh
+  oh-my-posh init fish --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml | source
 
-# Initialize oh-my-posh
-oh-my-posh init fish --config ~/.config/oh-my-posh/themes/catppuccin_frappe.omp.yaml | source
+  # Suppress the greeting
+  set fish_greeting
+
+  # Initialize basher
+  . (basher init - fish | psub)
+end
+
+setenv EDITOR micro
 
 # Add some more bin paths to PATH for custom bin scripts
 set -gx PATH "$HOME/bin" $PATH
