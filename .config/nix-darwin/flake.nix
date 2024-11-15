@@ -13,11 +13,12 @@
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
       environment.systemPackages =
-        [ 
-          pkgs.gh
+        [
           pkgs.fish
           pkgs.fzf
-          pkgs.stow 
+          pkgs.gh
+          pkgs.iTerm2
+          pkgs.stow
           pkgs.neovim
         ];
 
