@@ -21,6 +21,7 @@
           pkgs.oh-my-posh
           pkgs.stow
           pkgs.neovim
+          pkgs.vscode
         ];
 
       system.activationScripts.applications.text = let
