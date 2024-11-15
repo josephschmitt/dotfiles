@@ -18,6 +18,7 @@
           pkgs.fzf
           pkgs.gh
           pkgs.iterm2
+          pkgs.oh-my-posh
           pkgs.stow
           pkgs.neovim
         ];
