@@ -8,7 +8,7 @@ fi
 
 # Setup basher
 export PATH="$HOME/.basher/bin:$PATH"
-eval "$(basher init - zsh)" # replace `bash` with `zsh` if you use zsh
+[ -s "$HOME/.basher/bin/basher" ] && eval "$(basher init - zsh)"
 
 # Add more bin paths to PATH for custom bin scripts
 export PATH="$HOME/bin:$PATH"
