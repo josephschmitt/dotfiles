@@ -15,10 +15,11 @@
       environment.systemPackages =
         [ 
           pkgs.gh
-	  pkgs.fzf
-	  pkgs.stow 
-	  pkgs.neovim
-	];
+          pkgs.fish
+          pkgs.fzf
+          pkgs.stow 
+          pkgs.neovim
+        ];
 
       # Auto upgrade nix package and the daemon service.
       services.nix-daemon.enable = true;
