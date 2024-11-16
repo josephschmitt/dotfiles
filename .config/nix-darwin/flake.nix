@@ -21,6 +21,8 @@
           pkgs.fzf
           pkgs.gh
           pkgs.oh-my-posh
+          pkgs.pipx
+          pkgs.shell-gpt
           pkgs.stow
           pkgs.neovim
         ];
