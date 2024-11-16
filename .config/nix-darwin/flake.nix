@@ -20,11 +20,9 @@
           pkgs.fish
           pkgs.fzf
           pkgs.gh
-          pkgs.iterm2
           pkgs.oh-my-posh
           pkgs.stow
           pkgs.neovim
-          pkgs.vscode
         ];
 
       environment.shells = [pkgs.fish];
@@ -32,6 +30,13 @@
       homebrew = {
         enable = true;
         casks = [
+          "1password"
+          "arc"
+          "iterm2"
+          "raycast"
+          "setapp"
+          "screens-connect"
+          "visual-studio-code"
         ];
         onActivation.cleanup = "zap"; # only packages declared here are installed
         onActivation.autoUpdate = true;
@@ -57,6 +62,25 @@
           ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
         done
             '';
+
+      system.defaults = {
+        dock.orientation = "left";
+        dock.persistent-apps = [
+          "/Applications/Arc.app"
+          # "/Applications/Sparrow.app"
+        ];
+        dock.show-process-indicators = true;
+        dock.tilesize = 64;
+        
+        finder.AppleShowAllExtensions = true;
+        finder.FXDefaultSearchScope = "SCcf"; # Default search in current folder
+        finder.FXPreferredViewStyle = "Nlsv"; # List view
+        
+        NSGlobalDomain."com.apple.mouse.tapBehavior" = 1; # Enable tap to click
+        NSGlobalDomain.AppleKeyboardUIMode = 3; # Enable full keyboard control
+        NSGlobalDomain.NSDisableAutomaticTermination = true;
+        NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
+      };
 
       # Auto upgrade nix package and the daemon service.
       services.nix-daemon.enable = true;
