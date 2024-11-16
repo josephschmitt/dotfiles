@@ -72,15 +72,17 @@
         dock.orientation = "left";
         dock.persistent-apps = [
           "/Applications/Arc.app"
-          # "/Applications/Sparrow.app"
+          "/Applications/ChatGPT.app"
+          "/Applications/iTerm.app"
+          "/Applications/Visual Studio Code.app"
         ];
         dock.show-process-indicators = true;
         dock.tilesize = 64;
-        
+
         finder.AppleShowAllExtensions = true;
         finder.FXDefaultSearchScope = "SCcf"; # Default search in current folder
         finder.FXPreferredViewStyle = "Nlsv"; # List view
-        
+
         NSGlobalDomain."com.apple.mouse.tapBehavior" = 1; # Enable tap to click
         NSGlobalDomain.AppleKeyboardUIMode = 3; # Enable full keyboard control
         NSGlobalDomain.NSDisableAutomaticTermination = true;
@@ -112,8 +114,8 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#mac-mini
     darwinConfigurations."mac-mini" = nix-darwin.lib.darwinSystem {
-      modules = [ 
-        configuration 
+      modules = [
+        configuration
         nix-homebrew.darwinModules.nix-homebrew
         {
           nix-homebrew = {
