@@ -14,7 +14,9 @@ if status is-interactive
   set fish_greeting
 
   # Initialize basher
-  . (basher init - fish | psub)
+  if type -q basher
+    . (basher init - fish | psub)
+  end
 end
 
 setenv EDITOR micro
@@ -55,4 +57,7 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-replay "source $HOME/.compassrc"
+if type -q replay
+  replay "source $HOME/.compassrc"
+end
+
