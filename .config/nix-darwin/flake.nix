@@ -34,6 +34,9 @@
         casks = [
           "1password"
           "arc"
+          "adobe-creative-cloud"
+          "chatgpt"
+          "docker"
           "iterm2"
           "raycast"
           "setapp"
