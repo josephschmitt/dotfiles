@@ -34,6 +34,8 @@
         casks = [
         ];
         onActivation.cleanup = "zap"; # only packages declared here are installed
+        onActivation.autoUpdate = true;
+        onActivation.upgrade = true;
       };
 
       system.activationScripts.applications.text = let
