@@ -26,6 +26,8 @@
           pkgs.vscode
         ];
 
+      environment.shells = [pkgs.fish];
+
       system.activationScripts.applications.text = let
         env = pkgs.buildEnv {
           name = "system-applications";
