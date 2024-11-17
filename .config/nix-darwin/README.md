@@ -19,11 +19,11 @@ $ darwin-rebuild switch --flake ~/.config/nix-darwin
 ## Usage
 Make changes to [`flake.nix`](./flake.nix), and then apply in `nix-darwin`:
 ```
-$ darwin-rebuild switch --flake ~/.config/nix-darwin
+$ darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin
 ```
 
 To upgrade package dependencies,
 ```
 $ nix flake update
-$ darwin-rebuild switch --flake ~/.config/nix-darwin
+$ darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin
 ```
