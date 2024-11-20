@@ -71,11 +71,22 @@
         done
             '';
 
-      system.activationScripts.dockerCompose = ''
-        echo "Starting docker-compose..." >&2
-        cd /Volumes/Docker/hbojoe
-        ${pkgs.docker-compose}/bin/docker-compose up -d
-      '';
+      # Add a launchd agent to start docker-compose on boot
+      launchd = {
+        user = {
+          agents = {
+            hbojoe-docker-compose = {
+              command = "${pkgs.docker-compose}/bin/docker-compose up -d";
+              serviceConfig = {
+                KeepAlive = true;
+                RunAtLoad = true;
+                StandardOutPath = "/tmp/docker-compose.out";
+                StandardErrorPath = "/tmp/docker-compose.err";
+              };
+            };
+          };
+        };
+      };
 
       system.defaults = {
         loginwindow.autoLoginUser = "josephschmitt";
