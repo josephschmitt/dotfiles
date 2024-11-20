@@ -78,6 +78,7 @@
       '';
 
       system.defaults = {
+        loginwindow.autoLoginUser = "josephschmitt";
         dock.orientation = "left";
         dock.persistent-apps = [
           "/Applications/Arc.app"
