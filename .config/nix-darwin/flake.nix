@@ -39,6 +39,7 @@
           "adobe-creative-cloud"
           "chatgpt"
           "docker"
+          "hyperkey"
           "iterm2"
           "logi-options+"
           "raycast"
