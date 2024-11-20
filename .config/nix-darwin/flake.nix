@@ -17,6 +17,8 @@
       # $ nix-env -qaP | grep wget
       environment.systemPackages =
         [
+          pkgs.docker
+          pkgs.docker-compose
           pkgs.fish
           pkgs.fzf
           pkgs.gh
@@ -67,6 +69,12 @@
           ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
         done
             '';
+
+      system.activationScripts.dockerCompose = ''
+        echo "Starting docker-compose..." >&2
+        cd /Volumes/Docker/hbojoe
+        ${pkgs.docker-compose}/bin/docker-compose up -d
+      '';
 
       system.defaults = {
         dock.orientation = "left";
