@@ -1,5 +1,5 @@
 {
-  description = "Example nix-darwin system flake";
+  description = "Mac mini nix-darwin system flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -40,6 +40,7 @@
           "chatgpt"
           "docker"
           "iterm2"
+          "logi-options+"
           "raycast"
           "setapp"
           "screens-connect"
@@ -95,6 +96,7 @@
         NSGlobalDomain.AppleKeyboardUIMode = 3; # Enable full keyboard control
         NSGlobalDomain.NSDisableAutomaticTermination = true;
         NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
+        NSGlobalDomain."com.apple.sound.beep.volume" = 0.0; # Disable system beep
       };
 
       # Auto upgrade nix package and the daemon service.
