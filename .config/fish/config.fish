@@ -19,7 +19,7 @@ if status is-interactive
   end
 end
 
-setenv EDITOR micro
+setenv EDITOR hx
 
 # Add some more bin paths to PATH for custom bin scripts
 set -gx PATH "$HOME/bin" $PATH
