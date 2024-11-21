@@ -22,6 +22,7 @@
           pkgs.fish
           pkgs.fzf
           pkgs.gh
+          pkgs.helix
           pkgs.oh-my-posh
           pkgs.pipx
           pkgs.shell-gpt
