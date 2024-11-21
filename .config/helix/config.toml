@@ -1,0 +1,23 @@
+theme = "dracula"
+
+[editor]
+true-color = true
+line-number = "relative"
+cursorline = true
+mouse = false
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.file-picker]
+hidden = false
+
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+nbsp = "none"
+nnbsp = "none"
+newline = "none"
+
+[editor.indent-guides]
+render = true
