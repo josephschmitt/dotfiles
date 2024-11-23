@@ -23,10 +23,12 @@
           pkgs.fzf
           pkgs.gh
           pkgs.helix
+          pkgs.mosh
           pkgs.oh-my-posh
           pkgs.pipx
           pkgs.shell-gpt
           pkgs.stow
+          pkgs.tmux
           pkgs.neovim
         ];
 
