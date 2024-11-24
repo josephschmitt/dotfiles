@@ -4,7 +4,7 @@ theme = "dracula"
 true-color = true
 line-number = "relative"
 cursorline = true
-mouse = false
+mouse = true
 
 [editor.cursor-shape]
 insert = "bar"
