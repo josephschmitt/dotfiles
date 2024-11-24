@@ -40,6 +40,7 @@
           "1password"
           "arc"
           "adobe-creative-cloud"
+          "backblaze"
           "chatgpt"
           "docker"
           "hyperkey"
