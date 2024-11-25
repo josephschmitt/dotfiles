@@ -77,17 +77,15 @@
 
       # Add a launchd agent to start docker-compose on boot
       launchd = {
-        user = {
-          agents = {
-            hbojoe-docker-compose = {
-              command = "${pkgs.docker-compose}/bin/docker-compose up -d";
-              serviceConfig = {
-                KeepAlive = true;
-                RunAtLoad = true;
-                StandardOutPath = "/tmp/docker-compose.out";
-                StandardErrorPath = "/tmp/docker-compose.err";
-                WorkingDirectory = "/Volumes/Docker/hbojoe";
-              };
+        daemons = {
+          hbojoe-docker-compose = {
+            command = "${pkgs.docker-compose}/bin/docker-compose up -d";
+            serviceConfig = {
+              KeepAlive = true;
+              RunAtLoad = true;
+              StandardOutPath = "/tmp/docker-compose.out";
+              StandardErrorPath = "/tmp/docker-compose.err";
+              WorkingDirectory = "/Volumes/Docker/hbojoe";
             };
           };
         };
