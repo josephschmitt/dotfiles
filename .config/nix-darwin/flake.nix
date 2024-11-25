@@ -17,6 +17,7 @@
       # $ nix-env -qaP | grep wget
       environment.systemPackages =
         [
+          pkgs.bun
           pkgs.docker
           pkgs.docker-compose
           pkgs.fish
