@@ -49,6 +49,7 @@
           "raycast"
           "setapp"
           "screens-connect"
+          "tailscale"
           "visual-studio-code"
         ];
         onActivation.cleanup = "zap"; # only packages declared here are installed
