@@ -38,7 +38,6 @@
         enable = true;
         casks = [
           "1password"
-          "arc"
           "adobe-creative-cloud"
           "backblaze"
           "chatgpt"
@@ -98,7 +97,7 @@
         loginwindow.autoLoginUser = "josephschmitt";
         dock.orientation = "left";
         dock.persistent-apps = [
-          "/Applications/Arc.app"
+          "/Applications/Safari.app"
           "/Applications/ChatGPT.app"
           "/Applications/iTerm.app"
           "/Applications/Visual Studio Code.app"
