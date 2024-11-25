@@ -48,7 +48,6 @@
           "logi-options+"
           "raycast"
           "setapp"
-          "screens-connect"
           "tailscale"
           "visual-studio-code"
         ];
