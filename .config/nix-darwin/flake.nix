@@ -115,6 +115,16 @@
         NSGlobalDomain.NSDisableAutomaticTermination = true;
         NSGlobalDomain.NSNavPanelExpandedStateForSaveMode = true;
         NSGlobalDomain."com.apple.sound.beep.volume" = 0.0; # Disable system beep
+
+        CustomUserPreferences = {
+          "com.microsoft.VSCode" = {
+            ApplePressAndHoldEnabled = false; # Enable key repeating
+          };
+
+          "com.apple.desktopservices" = {
+            DSDontWriteNetworkStores = true; # Don't create .DS_Store files on network drives
+          };
+        };
       };
 
       # Auto upgrade nix package and the daemon service.
