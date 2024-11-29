@@ -83,7 +83,7 @@
           hbojoe-docker-compose = {
             command = "${pkgs.docker-compose}/bin/docker-compose up -d";
             serviceConfig = {
-              KeepAlive = true;
+              KeepAlive = false;
               RunAtLoad = true;
               StandardOutPath = "/tmp/docker-compose.out";
               StandardErrorPath = "/tmp/docker-compose.err";
