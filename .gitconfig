@@ -32,7 +32,7 @@
 [branch]
   autosetuprebase = always
 [core]
-  editor = micro
+	editor = hx
 [color]
   ui = auto
 [diff]
