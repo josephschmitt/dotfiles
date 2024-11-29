@@ -20,6 +20,7 @@ if status is-interactive
 end
 
 setenv EDITOR hx
+setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
 
 # Add some more bin paths to PATH for custom bin scripts
 set -gx PATH "$HOME/bin" $PATH

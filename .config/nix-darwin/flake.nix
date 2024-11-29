@@ -31,6 +31,7 @@
           pkgs.shell-gpt
           pkgs.stow
           pkgs.tmux
+          pkgs.zellij
         ];
 
       environment.shells = [pkgs.fish];
