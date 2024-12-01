@@ -18,8 +18,6 @@
       environment.systemPackages =
         [
           pkgs.bun
-          pkgs.docker
-          pkgs.docker-compose
           pkgs.fish
           pkgs.fzf
           pkgs.gh
@@ -43,10 +41,10 @@
           "adobe-creative-cloud"
           "backblaze"
           "chatgpt"
-          "docker"
           "hyperkey"
           "iterm2"
           "logi-options+"
+          "orbstack"
           "raycast"
           "setapp"
           "tailscale"
