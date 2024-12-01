@@ -7,7 +7,9 @@ cursorline = true
 mouse = true
 
 [editor.cursor-shape]
+normal = "block"
 insert = "bar"
+select = "underline"
 
 [editor.file-picker]
 hidden = false
@@ -21,3 +23,9 @@ newline = "none"
 
 [editor.indent-guides]
 render = true
+
+[keys.normal]
+y = "yank_to_clipboard"
+Y = "yank_main_selection_to_clipboard"
+p = "paste_clipboard_after"
+P = "paste_clipboard_before"
