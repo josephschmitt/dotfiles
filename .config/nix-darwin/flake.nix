@@ -22,6 +22,7 @@
           pkgs.fzf
           pkgs.gh
           pkgs.helix
+          pkgs.lazygit
           pkgs.mosh
           pkgs.neovim
           pkgs.oh-my-posh
@@ -30,6 +31,7 @@
           pkgs.stow
           pkgs.tmux
           pkgs.zellij
+          pkgs.yazi
         ];
 
       environment.shells = [pkgs.fish];

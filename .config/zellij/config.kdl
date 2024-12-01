@@ -25,6 +25,11 @@ keybinds clear-defaults=true {
         bind "r" { NewPane "right"; SwitchToMode "normal"; }
         bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
         bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
+        bind "g" {
+          Run "zellij" "run" "--floating" "--close-on-exit" "--" "lazygit" {
+            close_on_exit true
+          }
+        }
     }
     tab {
         bind "left" { GoToPreviousTab; }
