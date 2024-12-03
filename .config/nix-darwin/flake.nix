@@ -127,7 +127,7 @@
       };
 
       fonts.packages = [
-        (pkgs.nerdfonts.override { fonts = [ "Meslo" ]; })
+        pkgs.nerd-fonts.meslo-lg
       ];
 
       # Auto upgrade nix package and the daemon service.
