@@ -29,6 +29,7 @@
       "logi-options+"
       "raycast"
       "setapp"
+      "tailscale"
       "visual-studio-code"
     ];
 

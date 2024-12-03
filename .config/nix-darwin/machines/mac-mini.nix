@@ -10,7 +10,6 @@
     casks = [
       "backblaze"
       "orbstack"
-      "tailscale"
     ];
 
     onActivation.cleanup = "zap";
