@@ -10,7 +10,7 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
   let
-    globalConfig = import ./global.nix;
+    darwinConfig = import ./darwin.nix;
     nixHomebrewConfig = {
       nix-homebrew = {
         # Install Homebrew under the default prefix
@@ -32,7 +32,7 @@
       # Personal Mac mini server
       "mac-mini" = nix-darwin.lib.darwinSystem {
         modules = [
-          globalConfig
+          darwinConfig
           (import ./machines/mac-mini.nix)
           nix-homebrew.darwinModules.nix-homebrew
           nixHomebrewConfig
@@ -42,7 +42,7 @@
       # Compass M1 MacBook Pro
       "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
         modules = [
-          globalConfig
+          darwinConfig
           (import ./machines/W2TD37NJKN.nix)
           nix-homebrew.darwinModules.nix-homebrew
           nixHomebrewConfig
