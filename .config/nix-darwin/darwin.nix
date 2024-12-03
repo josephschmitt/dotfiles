@@ -40,7 +40,6 @@
   system.defaults = {
     dock.orientation = "left";
     dock.show-process-indicators = true;
-    dock.tilesize = 64;
 
     finder.AppleShowAllExtensions = true;
     finder.FXDefaultSearchScope = "SCcf"; # Default search in current folder

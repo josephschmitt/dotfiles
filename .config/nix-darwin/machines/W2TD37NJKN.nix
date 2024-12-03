@@ -25,6 +25,10 @@
     ];
   };
 
+  system.defaults = {
+    dock.tilesize = 56;
+  };
+
   # The platform the configuration will be used on.
   nixpkgs.hostPlatform = "aarch64-darwin";
 }

@@ -52,6 +52,8 @@
   };
 
   system.defaults = {
+    dock.tilesize = 64;
+
     dock.persistent-apps = [
       "/Applications/Safari.app"
       "/Applications/ChatGPT.app"
