@@ -1,5 +1,10 @@
 switch_brew (uname -m)
 
+# Set nix paths first to resolve before other paths (like homebrew)
+set -gx PATH "$HOME/.nix-profile/bin" $PATH
+set -gx PATH "/run/current-system/sw/bin" $PATH
+set -gx PATH "/nix/var/nix/profiles/default/bin" $PATH
+
 # Configure basher https://github.com/basherpm/basher
 if test -d ~/.basher
   set basher ~/.basher/bin

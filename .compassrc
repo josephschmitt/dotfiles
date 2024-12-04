@@ -9,3 +9,8 @@ export DD_LOGS_INJECTION="false"
 alias cx='compass'
 alias cw='compass workspace'
 alias grpcreq="$HOME/development/urbancompass/scripts/grpcreq"
+
+# Set nix paths first to resolve before other paths (like homebrew)
+export PATH="$HOME/.nix-profile/bin:$PATH"
+export PATH="/run/current-system/sw/bin:$PATH"
+export PATH="/nix/var/nix/profiles/default/bin:$PATH"

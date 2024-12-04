@@ -1,16 +1,3 @@
-if [ -f $HOME/.compassrc ]; then
-  source $HOME/.compassrc
-fi
-
-# Configure bash shell if we're in bash
-if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
-  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
-
-  # Setup basher
-  export PATH="$HOME/.basher/bin:$PATH"
-  eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
-fi
-
 # This function is for use on Macs with multiple brew installations (usually M1/arm64) Macs. This
 # function will attempt to set your brew PATH to point to the correct brew based on the system arch.
 #
@@ -27,15 +14,29 @@ function switch_brew {
   armBrewPath="/opt/homebrew/bin"
   switch_to=${1:-"$(uname -m)"}
 
+  PATH=${PATH/":$armBrewPath"/} # delete any instances in the middle or at the end
+  PATH=${PATH/"$armBrewPath:"/} # delete any instances at the beginning
+
   if [ "${switch_to}" = "arm64" ]; then
     PATH="${armBrewPath}:$PATH"
-  else
-    PATH=${PATH/":$armBrewPath"/} # delete any instances in the middle or at the end
-    PATH=${PATH/"$armBrewPath:"/} # delete any instances at the beginning
   fi
 }
 
 switch_brew
+
+if [ -f $HOME/.compassrc ]; then
+  source $HOME/.compassrc
+fi
+
+# Configure bash shell if we're in bash
+if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
+  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
+
+  # Setup basher
+  export PATH="$HOME/.basher/bin:$PATH"
+  eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
+fi
+
 complete -C /usr/local/bin/compass compass
 
 # Git-spice aliases
