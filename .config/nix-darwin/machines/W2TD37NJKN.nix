@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   environment.systemPackages = [
     pkgs.bazel
+    pkgs.bazel-buildtools
     pkgs.circleci-cli
     pkgs.colima
     pkgs.docker
