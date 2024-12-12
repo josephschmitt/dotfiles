@@ -2,30 +2,35 @@ switch_brew (uname -m)
 
 # Set nix paths first to resolve before other paths (like homebrew)
 set -gx PATH "$HOME/.nix-profile/bin" $PATH
-set -gx PATH "/run/current-system/sw/bin" $PATH
-set -gx PATH "/nix/var/nix/profiles/default/bin" $PATH
+set -gx PATH /run/current-system/sw/bin $PATH
+set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 
 # Configure basher https://github.com/basherpm/basher
 if test -d ~/.basher
-  set basher ~/.basher/bin
+    set basher ~/.basher/bin
 end
 set -gx PATH $basher $PATH
 
-if status is-interactive
-  # Initialize oh-my-posh
-  oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
-
-  # Suppress the greeting
-  set fish_greeting
-
-  # Initialize basher
-  if type -q basher
-    . (basher init - fish | psub)
-  end
-end
-
 setenv EDITOR hx
-setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
+
+if status is-interactive
+    # Initialize oh-my-posh
+    oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
+
+    # Suppress the greeting
+    set fish_greeting
+
+    # Initialize basher
+    if type -q basher
+        . (basher init - fish | psub)
+    end
+
+    # Set up fzf
+    fzf --fish | source
+    setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude={.git,OrbStack}"
+
+    setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
+end
 
 # Add some more bin paths to PATH for custom bin scripts
 set -gx PATH "$HOME/bin" $PATH
@@ -57,13 +62,12 @@ alias gssr="gs stack restack"
 alias gsss="gs stack submit"
 
 # pnpm
-set -gx PNPM_HOME "/Users/josephschmitt/Library/pnpm"
+set -gx PNPM_HOME /Users/josephschmitt/Library/pnpm
 if not string match -q -- $PNPM_HOME $PATH
-  set -gx PATH "$PNPM_HOME" $PATH
+    set -gx PATH "$PNPM_HOME" $PATH
 end
 # pnpm end
 
 if type -q replay
-  replay "source $HOME/.compassrc"
+    replay "source $HOME/.compassrc"
 end
-
