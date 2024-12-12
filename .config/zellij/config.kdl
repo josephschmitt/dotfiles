@@ -145,6 +145,12 @@ keybinds clear-defaults=true {
         bind "Alt i" { MoveTab "left"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
+        bind "Alt g" {
+          Run "zellij" "run" "--floating" "--close-on-exit" "--" "lazygit" {
+            close_on_exit true
+          }
+        }
+
     }
     shared_except "scroll" {
         bind "Alt left" { MoveFocusOrTab "left"; }
@@ -292,7 +298,7 @@ theme "catppuccin-mocha"
 // Choose the base input mode of zellij.
 // Default: normal
 // 
-default_mode "normal"
+default_mode "locked"
  
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
