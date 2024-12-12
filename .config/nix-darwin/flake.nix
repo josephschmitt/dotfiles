@@ -18,6 +18,7 @@
       environment.systemPackages =
         [
           pkgs.bun
+          pkgs.fd
           pkgs.fish
           pkgs.fzf
           pkgs.gh
