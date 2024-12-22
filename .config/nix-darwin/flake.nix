@@ -27,8 +27,6 @@
           pkgs.mosh
           pkgs.neovim
           pkgs.oh-my-posh
-          pkgs.pipx
-          pkgs.shell-gpt
           pkgs.stow
           pkgs.tmux
           pkgs.zellij
