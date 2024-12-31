@@ -102,7 +102,7 @@
             };
           };
           finergifs-docker-compose = {
-            command = "${pkgs.docker-compose}/bin/docker-compose --env-file .env.prod up -d";
+            command = "${pkgs.docker-compose}/bin/docker-compose --env-file .env.prod up --build -d";
             serviceConfig = {
               KeepAlive = false;
               RunAtLoad = true;
