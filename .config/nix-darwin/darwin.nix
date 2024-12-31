@@ -29,6 +29,7 @@
       "iterm2"
       "logi-options+"
       "raycast"
+      "runjs"
       "setapp"
       "tailscale"
       "visual-studio-code"
