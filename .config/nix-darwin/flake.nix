@@ -26,7 +26,9 @@
           pkgs.lazygit
           pkgs.mosh
           pkgs.neovim
+          pkgs.nodejs
           pkgs.oh-my-posh
+          pkgs.pnpm
           pkgs.stow
           pkgs.tmux
           pkgs.zellij
