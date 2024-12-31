@@ -91,6 +91,26 @@
               WorkingDirectory = "/Volumes/Docker/hbojoe";
             };
           };
+          joe-sh-docker-compose = {
+            command = "${pkgs.docker-compose}/bin/docker-compose up -d";
+            serviceConfig = {
+              KeepAlive = false;
+              RunAtLoad = true;
+              StandardOutPath = "/tmp/docker-compose.out";
+              StandardErrorPath = "/tmp/docker-compose.err";
+              WorkingDirectory = "/Volumes/Docker/joe.sh";
+            };
+          };
+          finergifs-docker-compose = {
+            command = "${pkgs.docker-compose}/bin/docker-compose --env-file .env.prod up -d";
+            serviceConfig = {
+              KeepAlive = false;
+              RunAtLoad = true;
+              StandardOutPath = "/tmp/docker-compose.out";
+              StandardErrorPath = "/tmp/docker-compose.err";
+              WorkingDirectory = "/Volumes/Docker/hbojoe";
+            };
+          };
         };
       };
 
