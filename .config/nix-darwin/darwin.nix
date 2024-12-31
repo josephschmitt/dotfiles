@@ -23,6 +23,7 @@
     casks = [
       "1password"
       "adobe-creative-cloud"
+      "arc"
       "chatgpt"
       "hyperkey"
       "iterm2"
