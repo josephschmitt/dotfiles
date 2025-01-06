@@ -6,7 +6,6 @@
     pkgs.fish
     pkgs.fzf
     pkgs.gh
-    pkgs.helix
     pkgs.lazygit
     pkgs.neovim
     pkgs.oh-my-posh
@@ -20,6 +19,9 @@
 
   homebrew = {
     enable = true;
+    brews = [
+      "helix"
+    ];
     casks = [
       "1password"
       "adobe-creative-cloud"
