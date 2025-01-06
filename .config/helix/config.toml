@@ -5,6 +5,17 @@ true-color = true
 line-number = "relative"
 cursorline = true
 mouse = true
+text-width = 100
+bufferline = "multiple"
+end-of-line-diagnostics = "hint"
+
+[editor.inline-diagnostics]
+cursor-line = "error"
+other-lines = "error"
+
+[editor.soft-wrap]
+enable = true
+wrap-at-text-width = true
 
 [editor.cursor-shape]
 normal = "block"
@@ -24,8 +35,26 @@ newline = "none"
 [editor.indent-guides]
 render = true
 
+[editor.lsp]
+# display-inlay-hints = true
+
+[editor.statusline]
+left = ["mode", "spinner"]
+center = ["file-name", "read-only-indicator", "file-modification-indicator"]
+right = ["diagnostics", "selections", "register", "position", "file-encoding"]
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
 [keys.normal]
-y = "yank_to_clipboard"
-Y = "yank_main_selection_to_clipboard"
-p = "paste_clipboard_after"
-P = "paste_clipboard_before"
+C-r = ":config-reload"
+S-h = "goto_previous_buffer"
+S-l = "goto_next_buffer"
+W = 'move_next_sub_word_start'
+B = 'move_prev_sub_word_start'
+E = 'move_next_sub_word_end'
+
+[keys.select]
+W = 'extend_next_sub_word_start'
+B = 'extend_prev_sub_word_start'
+E = 'extend_next_sub_word_end'
