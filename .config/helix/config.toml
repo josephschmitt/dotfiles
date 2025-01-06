@@ -54,6 +54,9 @@ W = 'move_next_sub_word_start'
 B = 'move_prev_sub_word_start'
 E = 'move_next_sub_word_end'
 
+[keys.normal."space"]
+x = ":buffer-close"
+
 [keys.select]
 W = 'extend_next_sub_word_start'
 B = 'extend_prev_sub_word_start'
