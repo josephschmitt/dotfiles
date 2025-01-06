@@ -1,0 +1,4 @@
+font-family = "Monaco Nerd Font Mono"
+font-size = "13"
+theme = dracula
+cursor-style = bar
