@@ -45,7 +45,7 @@
           RunAtLoad = true;
           StandardOutPath = "/tmp/docker-compose.out";
           StandardErrorPath = "/tmp/docker-compose.err";
-          WorkingDirectory = "/Volumes/Docker/hbojoe";
+          WorkingDirectory = "/Volumes/Docker/thefinergifs.club";
         };
       };
     };
