@@ -1,13 +1,15 @@
 theme = "catppuccin_mocha"
 
 [editor]
-true-color = true
-line-number = "relative"
-cursorline = true
-mouse = true
-text-width = 100
 bufferline = "multiple"
+color-modes = true
+cursorline = true
 end-of-line-diagnostics = "hint"
+line-number = "relative"
+mouse = true
+rulers = [100]
+text-width = 100
+true-color = true
 
 [editor.inline-diagnostics]
 cursor-line = "error"
@@ -18,19 +20,19 @@ enable = true
 wrap-at-text-width = true
 
 [editor.cursor-shape]
-normal = "block"
 insert = "bar"
+normal = "block"
 select = "underline"
 
 [editor.file-picker]
 hidden = false
 
 [editor.whitespace.render]
+nbsp = "none"
+newline = "none"
+nnbsp = "none"
 space = "all"
 tab = "all"
-nbsp = "none"
-nnbsp = "none"
-newline = "none"
 
 [editor.indent-guides]
 render = true
@@ -40,24 +42,23 @@ render = true
 
 [editor.statusline]
 left = ["mode", "spinner"]
-center = ["file-name", "read-only-indicator", "file-modification-indicator"]
-right = ["diagnostics", "selections", "register", "position", "file-encoding"]
-mode.normal = "NORMAL"
-mode.insert = "INSERT"
-mode.select = "SELECT"
+center = ["file-name", "read-only-indicator", "file-modification-indicator", "version-control"]
+right = ["diagnostics", "selections", "register", "position", "file-type"]
 
 [keys.normal]
 C-r = ":config-reload"
 S-h = "goto_previous_buffer"
 S-l = "goto_next_buffer"
-W = 'move_next_sub_word_start'
-B = 'move_prev_sub_word_start'
-E = 'move_next_sub_word_end'
+A-w = "move_next_sub_word_start"
+A-b = "move_prev_sub_word_start"
+A-e = "move_next_sub_word_end"
+A-E = "move_prev_sub_word_end"
 
 [keys.normal."space"]
 x = ":buffer-close"
 
 [keys.select]
-W = 'extend_next_sub_word_start'
-B = 'extend_prev_sub_word_start'
-E = 'extend_next_sub_word_end'
+A-w = "extend_next_sub_word_start"
+A-b = "extend_prev_sub_word_start"
+A-e = "extend_next_sub_word_end"
+A-E = "extend_prev_sub_word_end"
