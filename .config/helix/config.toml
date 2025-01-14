@@ -53,6 +53,7 @@ A-w = "move_next_sub_word_start"
 A-b = "move_prev_sub_word_start"
 A-e = "move_next_sub_word_end"
 A-E = "move_prev_sub_word_end"
+X = "extend_line_above"
 
 [keys.select]
 A-w = "extend_next_sub_word_start"
