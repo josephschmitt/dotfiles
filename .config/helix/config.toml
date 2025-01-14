@@ -11,14 +11,6 @@ rulers = [100]
 text-width = 100
 true-color = true
 
-[editor.inline-diagnostics]
-cursor-line = "error"
-other-lines = "error"
-
-[editor.soft-wrap]
-enable = true
-wrap-at-text-width = true
-
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"
@@ -27,23 +19,31 @@ select = "underline"
 [editor.file-picker]
 hidden = false
 
+[editor.indent-guides]
+render = true
+
+[editor.inline-diagnostics]
+cursor-line = "error"
+other-lines = "error"
+
+[editor.lsp]
+# display-inlay-hints = true
+
+[editor.soft-wrap]
+enable = true
+wrap-at-text-width = true
+
+[editor.statusline]
+left = ["mode", "spinner"]
+center = ["file-name", "read-only-indicator", "file-modification-indicator", "version-control"]
+right = ["diagnostics", "selections", "register", "position", "file-type"]
+
 [editor.whitespace.render]
 nbsp = "none"
 newline = "none"
 nnbsp = "none"
 space = "all"
 tab = "all"
-
-[editor.indent-guides]
-render = true
-
-[editor.lsp]
-# display-inlay-hints = true
-
-[editor.statusline]
-left = ["mode", "spinner"]
-center = ["file-name", "read-only-indicator", "file-modification-indicator", "version-control"]
-right = ["diagnostics", "selections", "register", "position", "file-type"]
 
 [keys.normal]
 C-r = ":config-reload"
@@ -54,11 +54,12 @@ A-b = "move_prev_sub_word_start"
 A-e = "move_next_sub_word_end"
 A-E = "move_prev_sub_word_end"
 
-[keys.normal."space"]
-x = ":buffer-close"
-
 [keys.select]
 A-w = "extend_next_sub_word_start"
 A-b = "extend_prev_sub_word_start"
 A-e = "extend_next_sub_word_end"
 A-E = "extend_prev_sub_word_end"
+
+[keys.normal."space"]
+x = ":buffer-close"
+
