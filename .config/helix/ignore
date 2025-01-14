@@ -1,3 +1,17 @@
 .DS_Store
+.adobe
+.bash_history
+.bun
 .bzvol
+.cache
+.cargo
+.config/raycast/extensions
+.docker
+.local
+.npm
+.orbstack
 .pnpm-store
+.vscode-server
+.vscode/cli/servers
+.vscode/extensions
+.zsh_sessions
