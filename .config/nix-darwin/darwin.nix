@@ -11,8 +11,8 @@
     pkgs.oh-my-posh
     pkgs.stow
     pkgs.tmux
-    pkgs.zellij
     pkgs.yazi
+    pkgs.zellij
   ];
 
   environment.shells = [pkgs.fish];
