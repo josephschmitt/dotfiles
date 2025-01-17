@@ -145,6 +145,7 @@ keybinds clear-defaults=true {
         bind "Alt k" { MoveFocus "up"; }
         bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
+        bind "Alt t" { NewTab; }
         bind "Alt o" { MoveTab "right"; }
         bind "Alt g" {
           Run "zellij" "run" "--floating" "--width=90%" "--height=90%" "--x=5%" "--y=5%" "--close-on-exit" "--" "lazygit" {
