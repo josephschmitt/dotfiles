@@ -1,19 +1,28 @@
 layout {
-    pane split_direction="Vertical" {
-        pane size=40 name="yazi" {
-          name "yazi"
-          command "~/.config/zellij/layouts/yazi-single.sh"
-          args "open"
-          close_on_exit false
-        }
-        pane name="helix" {
-          command "hx"
-        }
-        pane split_direction="Horizontal" size=100 {
-          pane name="shell" {}
-        }
-    }
-    pane size=1 borderless=true {
-        plugin location="compact-bar"
+	tab hide_floating_panes=true {
+		floating_panes hide_floating_panes=true {
+			pane command="lazygit" {
+				x "10%"
+				y "5%"
+				width "80%"
+				height "80%"
+			}
+		}
+	    pane split_direction="Vertical" {
+	        pane size=40 name="yazi" {
+	          name "yazi"
+	          command "~/.config/zellij/layouts/yazi-single.sh"
+	          args "open"
+	        }
+	        pane name="editor" {
+	          command "$EDITOR"
+	        }
+	        pane split_direction="Horizontal" size=100 {
+	          pane name="shell" {}
+	        }
+	    }
+	    pane size=1 borderless=true {
+	        plugin location="compact-bar"
+	    }
     }
 }
