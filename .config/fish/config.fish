@@ -63,8 +63,6 @@ alias gss="gs stack"
 alias gssr="gs stack restack"
 alias gsss="gs stack submit"
 
-# Zellij aliases
-alias zide="zellij --layout helix_ide"
 # pnpm
 set -gx PNPM_HOME /Users/josephschmitt/Library/pnpm
 if not string match -q -- $PNPM_HOME $PATH
