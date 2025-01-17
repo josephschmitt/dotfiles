@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-# env "YAZI_CONFIG_HOME=~/.config/yazi-single"
-
-cwd=${1}
-paths=$(env "YAZI_CONFIG_HOME=~/.config/yazi-single" yazi $1 --chooser-file=/dev/stdout | while read -r; do printf "%q " "$REPLY"; done)
+paths=$(env "YAZI_CONFIG_HOME=~/.config/yazi-single" yazi $2 --chooser-file=/dev/stdout | while read -r; do printf "%q " "$REPLY"; done)
 
 if [[ -n "$paths" ]]; then
 	zellij action focus-next-pane
@@ -19,4 +16,4 @@ path=${paths[0]}
 dir=$path
 [[ -f "$path" ]] && dir=$(dirname "$path")
 
-"$0" $dir
+"$0" $1 $dir
