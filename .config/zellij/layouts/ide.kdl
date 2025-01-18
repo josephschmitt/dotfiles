@@ -1,6 +1,6 @@
 layout {
 	tab hide_floating_panes=true {
-		floating_panes hide_floating_panes=true {
+		floating_panes {
 			pane command="lazygit" start_suspended=true close_on_exit=true {
 				x "10%"
 				y "5%"
@@ -21,6 +21,13 @@ layout {
 	          pane name="shell" {}
 	        }
 	    }
+	    pane size=1 borderless=true {
+	        plugin location="compact-bar"
+	    }
+    }
+
+    new_tab_template {
+    	pane
 	    pane size=1 borderless=true {
 	        plugin location="compact-bar"
 	    }

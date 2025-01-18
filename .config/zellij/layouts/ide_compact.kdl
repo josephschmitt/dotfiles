@@ -22,4 +22,11 @@ layout {
 	        plugin location="compact-bar"
 	    }
     }
+
+    new_tab_template {
+    	pane
+	    pane size=1 borderless=true {
+	        plugin location="compact-bar"
+	    }
+    }
 }
