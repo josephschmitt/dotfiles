@@ -26,6 +26,35 @@ layout {
 	    }
     }
 
+	swap_tiled_layout name="horizontal" {
+		tab hide_floating_panes=true {
+			floating_panes {
+				pane command="lazygit" start_suspended=true close_on_exit=true {
+					x "10%"
+					y "5%"
+					width "80%"
+					height "80%"
+				}
+			}
+		    pane split_direction="horizontal" {
+		        pane size=20 name="yazi" {
+		          name "yazi"
+		          command "~/.config/zellij/layouts/yazi-picker.sh"
+		          args "open" "~/.config/yazi-single"
+		        }
+				pane split_direction="vertical" {
+			        pane name="editor" {
+			          command "$EDITOR"
+			        }
+			        pane name="shell" {}
+				}
+		    }
+		    pane size=1 borderless=true {
+		        plugin location="compact-bar"
+		    }
+		}
+	}
+
     new_tab_template {
     	pane
 	    pane size=1 borderless=true {
