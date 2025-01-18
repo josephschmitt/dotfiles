@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+#
+# This script turns yazi into a side-bar style file picker (think VS Code) when using Zellij. It
+# works by assuming you have a Zellij layout that has yazi on the left, and your editor on the
+# right. When you open a file or directory in yazi, it switches to the next pane (which is
+# hopefully your editor) and types the :open command to open the file or directory in the editor.
+# Once done opening the file(s) in your editor, yazi will re-open (and if you chose a directory,
+# that directory will be the new working dir).
 
 command=${1:-"open"} # Command to perform on the paths, one of "open" (default), "vsplit", "hsplit"
 config=${2:-"~/.config/yazi"} # Yazi picker config location
