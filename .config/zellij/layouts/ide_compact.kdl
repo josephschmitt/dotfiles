@@ -1,6 +1,6 @@
 layout {
 	tab hide_floating_panes=true {
-		floating_panes hide_floating_panes=true {
+		floating_panes {
 			pane command="lazygit" start_suspended=true {
 				x "10%"
 				y "5%"
