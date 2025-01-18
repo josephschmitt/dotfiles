@@ -8,6 +8,7 @@ set -gx PATH /run/current-system/sw/bin $PATH
 set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 
 set -gx PATH "$HOME/.bun/bin" $PATH
+set -gx PATH "$HOME/.config/zide/bin" $PATH
 
 # Configure basher https://github.com/basherpm/basher
 if test -d ~/.basher
