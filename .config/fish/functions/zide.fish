@@ -1,3 +1,3 @@
 function zide
-    ~/.config/zellij/layouts/open-zellij-ide.sh $argv
+    ~/.config/zellij/layouts/zellij-layout.sh $argv
 end

@@ -8,22 +8,14 @@ layout {
 				height "80%"
 			}
 		}
-	    pane split_direction="Vertical" {
+	    pane split_direction="vertical" {
 	        pane size=40 name="yazi" {
 	          name "yazi"
 	          command "~/.config/zellij/layouts/yazi-picker.sh"
 	          args "open" "~/.config/yazi-single"
 	        }
-	        pane size=40 name="yazi" {
-	          name "yazi"
-	          command "~/.config/zellij/layouts/yazi-single.sh"
-	          args "open"
-	        }
 	        pane name="editor" {
 	          command "$EDITOR"
-	        }
-	        pane split_direction="Horizontal" size=100 {
-	          pane name="shell" {}
 	        }
 	    }
 	    pane size=1 borderless=true {

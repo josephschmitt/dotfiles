@@ -147,16 +147,17 @@ keybinds clear-defaults=true {
         bind "Alt n" { NewPane; }
         bind "Alt t" { NewTab; }
         bind "Alt o" { MoveTab "right"; }
-        bind "Alt g" {
-          Run "zellij" "run" "--floating" "--width=90%" "--height=90%" "--x=5%" "--y=5%" "--close-on-exit" "--" "lazygit" {
-            close_on_exit true
-          }
-        }
-        bind "Alt y" {
-          Run "zellij" "run" "--floating" "--width=75%" "--height=75%" "--x=12%" "--y=12%" "--close-on-exit" "--" "yazi" {
-            close_on_exit true
-          }
-        }
+        // bind "Alt g" {
+        //   Run "zellij" "run" "--floating" "--width=90%" "--height=90%" "--x=5%" "--y=5%" "--close-on-exit" "--" "lazygit" {
+        //     close_on_exit true
+        //   }
+        // }
+        // bind "Alt y" {
+        //   Run "zellij" "run" "--floating" "--width=75%" "--height=75%" "--x=12%" "--y=12%" "--close-on-exit" "--" "yazi" {
+        //     close_on_exit true
+        //   }
+        // }
+        // bind "Ctrl y" { LaunchOrFocusPlugin "workspace" }
         bind "Alt 1" { GoToTab 1; SwitchToMode "locked"; }
         bind "Alt 2" { GoToTab 2; SwitchToMode "locked"; }
         bind "Alt 3" { GoToTab 3; SwitchToMode "locked"; }
