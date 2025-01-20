@@ -30,6 +30,7 @@
       "hyperkey"
       "iterm2"
       "logi-options+"
+      "ghostty"
       "raycast"
       "runjs"
       "setapp"
