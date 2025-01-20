@@ -10,10 +10,11 @@ set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 set -gx PATH "$HOME/.bun/bin" $PATH
 
 # Configure basher https://github.com/basherpm/basher
-if test -d ~/.basher
-    set basher ~/.basher/bin
-end
-set -gx PATH $basher $PATH
+if test -d ~/.basher ##basher5ea843
+    set basher ~/.basher/bin ##basher5ea843
+end ##basher5ea843
+set -gx PATH $basher $PATH ##basher5ea843
+status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
 setenv EDITOR hx
 
