@@ -8,7 +8,6 @@ set -gx PATH /run/current-system/sw/bin $PATH
 set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 
 set -gx PATH "$HOME/.bun/bin" $PATH
-set -gx PATH "$HOME/development/zide/bin" $PATH
 
 # Configure basher https://github.com/basherpm/basher
 if test -d ~/.basher
@@ -41,6 +40,7 @@ end
 set -gx PATH "$HOME/bin" $PATH
 set -gx PATH "$HOME/go/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
+set -gx PATH "$HOME/development/zide/bin" $PATH
 
 alias gr="cd (git rev-parse --show-toplevel)"
 
