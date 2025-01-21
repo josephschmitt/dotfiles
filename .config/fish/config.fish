@@ -34,8 +34,7 @@ if status is-interactive
     setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude={.git,OrbStack}"
 
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
-    setenv ZIDE_USE_YAZI_CONFIG false
-    setenv ZIDE_FILE_PICKER "env YAZI_CONFIG_HOME=$HOME/.config/yazi-zide yazi"
+    setenv ZIDE_USE_YAZI_CONFIG "$HOME/.config/yazi-zide"
 end
 
 # Add some more bin paths to PATH for custom bin scripts
