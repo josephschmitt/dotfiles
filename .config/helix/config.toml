@@ -23,8 +23,8 @@ hidden = false
 render = true
 
 [editor.inline-diagnostics]
-cursor-line = "error"
-other-lines = "error"
+cursor-line = "hint"
+other-lines = "hint"
 
 [editor.lsp]
 # display-inlay-hints = true
@@ -54,6 +54,16 @@ A-b = "move_prev_sub_word_start"
 A-e = "move_next_sub_word_end"
 A-E = "move_prev_sub_word_end"
 X = "extend_line_above"
+C-h="jump_view_left"
+C-j="jump_view_down"
+C-k="jump_view_up"
+C-l="jump_view_right"
+
+[keys.insert]
+C-h="jump_view_left"
+C-j="jump_view_down"
+C-k="jump_view_up"
+C-l="jump_view_right"
 
 [keys.select]
 A-w = "extend_next_sub_word_start"
