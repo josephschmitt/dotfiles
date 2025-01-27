@@ -2,3 +2,15 @@
 name = "go"
 auto-format = true
 formatter = { command = "goimports" }
+
+[language-server.ts]
+command = "typescript-language-server"
+args = ["--stdio"]
+language-id = "javascript"
+
+[[language]]
+name = "typescript"
+language-servers = [
+    "ts",
+    "gpt"
+]

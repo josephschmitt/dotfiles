@@ -35,6 +35,8 @@ if status is-interactive
     setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude={.git,OrbStack}"
 
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
+
+    alias zj="zellij -l welcome"
 end
 
 # Add some more bin paths to PATH for custom bin scripts
