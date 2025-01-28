@@ -79,3 +79,9 @@ end
 if type -q replay
     replay "source $HOME/.compassrc"
 end
+
+# direnv
+if type -q direnv
+    # If installed, source the direnv hook for Fish
+    direnv hook fish | source
+end
