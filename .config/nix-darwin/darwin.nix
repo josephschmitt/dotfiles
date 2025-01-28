@@ -2,12 +2,14 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
+    direnv
     fd
     fish
     fzf
     gh
     lazygit
     neovim
+    nix-direnv
     oh-my-posh
     stow
     tmux
