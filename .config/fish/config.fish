@@ -1,5 +1,3 @@
-switch_brew (uname -m)
-
 setenv XDG_CONFIG_HOME "$HOME/.config"
 
 # Set nix paths first to resolve before other paths (like homebrew)
