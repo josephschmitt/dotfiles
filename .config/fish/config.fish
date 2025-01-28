@@ -19,8 +19,10 @@ status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 setenv EDITOR hx
 
 if status is-interactive
-    # Initialize oh-my-posh
-    oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
+    if type -q oh-my-posh
+        # Initialize oh-my-posh
+        oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
+    end
 
     # Suppress the greeting
     set fish_greeting
