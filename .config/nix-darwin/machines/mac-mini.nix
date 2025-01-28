@@ -1,9 +1,14 @@
 { pkgs, config, ... }: {
-  environment.systemPackages = [
-    pkgs.bun
-    pkgs.mosh
-    pkgs.nodejs
-    pkgs.pnpm
+  environment.systemPackages = with pkgs; [
+    broot
+    bun
+    git
+    lf
+    mosh
+    (nnn.override { withNerdIcons = true; })
+    nodejs
+    pnpm
+    rustup
   ];
 
   homebrew = {

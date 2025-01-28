@@ -1,19 +1,19 @@
 { pkgs, ... }: {
-  environment.systemPackages = [
-    pkgs.bazel
-    pkgs.bazel-buildtools
-    pkgs.circleci-cli
-    pkgs.colima
-    pkgs.docker
-    pkgs.docker-compose
-    pkgs.gh
-    pkgs.git-spice
-    pkgs.go
-    pkgs.jq
-    pkgs.kubectl
-    pkgs.lima
-    pkgs.shellcheck
-    pkgs.yq
+  environment.systemPackages = with pkgs; [
+    bazel
+    bazel-buildtools
+    circleci-cli
+    colima
+    docker
+    docker-compose
+    gh
+    git-spice
+    go
+    jq
+    kubectl
+    lima
+    shellcheck
+    yq
   ];
 
   homebrew = {

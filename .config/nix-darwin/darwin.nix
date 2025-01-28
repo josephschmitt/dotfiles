@@ -1,18 +1,18 @@
 { pkgs, config, ... }: {
   nixpkgs.config.allowUnfree = true;
 
-  environment.systemPackages = [
-    pkgs.fd
-    pkgs.fish
-    pkgs.fzf
-    pkgs.gh
-    pkgs.lazygit
-    pkgs.neovim
-    pkgs.oh-my-posh
-    pkgs.stow
-    pkgs.tmux
-    pkgs.yazi
-    pkgs.zellij
+  environment.systemPackages = with pkgs; [
+    fd
+    fish
+    fzf
+    gh
+    lazygit
+    neovim
+    oh-my-posh
+    stow
+    tmux
+    yazi
+    zellij
   ];
 
   environment.shells = [pkgs.fish];
