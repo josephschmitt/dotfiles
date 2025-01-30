@@ -48,6 +48,9 @@ set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/development/zide/bin" $PATH
 
 alias gr="cd (git rev-parse --show-toplevel)"
+alias zellij_clear="zellij list-sessions --no-formatting | awk '/EXITED/ {print \$1}' | xargs -n 1 zellij delete-session"
+alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
+alias nix_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
 
 # Git-spice aliases
 alias gsb="gs branch"
