@@ -38,6 +38,7 @@ if status is-interactive
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
 
     alias zj="zellij -l welcome"
+    setenv ZIDE_ALWAYS_NAME true
 end
 
 # Add some more bin paths to PATH for custom bin scripts
