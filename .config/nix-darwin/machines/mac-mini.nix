@@ -33,16 +33,6 @@
           WorkingDirectory = "/Volumes/Docker/hbojoe";
         };
       };
-      finergifs-docker-compose = {
-        command = "${pkgs.docker-compose}/bin/docker-compose --env-file .env.prod up --build -d";
-        serviceConfig = {
-          KeepAlive = false;
-          RunAtLoad = true;
-          StandardOutPath = "/tmp/docker-compose.out";
-          StandardErrorPath = "/tmp/docker-compose.err";
-          WorkingDirectory = "/Volumes/Docker/thefinergifs.club";
-        };
-      };
     };
   };
 
