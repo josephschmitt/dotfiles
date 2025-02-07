@@ -19,6 +19,10 @@ gui:
       - '#cdd6f4'
     searchingActiveBorderColor:
       - '#f9e2af'
-
   authorColors:
     '*': '#b4befe'
+customCommands:
+  - key: 'G'
+    context: 'global'
+    description: 'Open repository in GitHub'
+    command: 'git remote get-url origin | sed -E "s/git@github.com:(.*).git/https:\/\/github.com\/\1/" | xargs open'
