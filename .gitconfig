@@ -15,7 +15,7 @@
   ca = "!f() { git add .; git c \"$1\"; }; f"
   cam = "!f() { git add .; git commit --amend --no-edit; }; f"
   # Clean up and delete any branches with :gone remotes
-  cl = "!f() { remote=${1:-origin}; git fetch $remote; git remote prune $remote; git branch -vv | grep $remote'/.*: gone]' | awk '{print $1}' | xargs git branch -df; }; f"
+  cl = "!f() { remote=${1:-origin}; git fetch $remote; git remote prune $remote; git branch -vv | grep $remote'/.*: gone]' | awk '{print $1}' | xargs git branch -df; git prune; }; f"
   co = checkout
   d = diff HEAD .
   lg = log --oneline --color --graph --decorate --all
