@@ -36,6 +36,7 @@ if status is-interactive
     setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude={.git,OrbStack}"
 
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
+    setenv ZIDE_DEFAULT_LAYOUT compact_lazygit_focus
 
     alias zj="zellij -l welcome"
     setenv ZIDE_ALWAYS_NAME true
