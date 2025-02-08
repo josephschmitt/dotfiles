@@ -18,3 +18,5 @@ map({ "n" }, "<A-k>", "<C-w>k", { desc = "Go to the up window" })
 map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch windows" })
 map({ "n" }, "<A-s>", "<C-w>s", { desc = "Split window" })
 map({ "n" }, "<A-v>", "<C-w>v", { desc = "Split window vertically" })
+
+map({ "n" }, "<C-a>", "ggVG", { desc = "Select all" })
