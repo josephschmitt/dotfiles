@@ -10,6 +10,7 @@ map({ "n", "v" }, "U", "<C-r>", { desc = "Redo" })
 map({ "n", "v" }, "gs", "^", { desc = "Go to line first non-blank character" })
 map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
 map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
+map({ "n", "v" }, "ge", "G", { desc = "Go to last line" })
 
 -- Window commands
 -- map({ "n" }, "<A-h>", "<C-w>h", { desc = "Go to the left window" })
