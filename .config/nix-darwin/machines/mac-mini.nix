@@ -9,6 +9,7 @@
     nodejs
     pnpm
     rustup
+    smartmontools
   ];
 
   homebrew = {
