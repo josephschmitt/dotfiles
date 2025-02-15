@@ -1,3 +1,6 @@
+git:
+  commit:
+    autoWrapCommitMessage: false
 gui:
   theme:
     activeBorderColor:
