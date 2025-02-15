@@ -17,6 +17,9 @@ status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
 setenv EDITOR hx
 
+setenv DEBUG 1
+setenv BASHLOG_FILE 1
+
 if status is-interactive
     if type -q oh-my-posh
         # Initialize oh-my-posh
