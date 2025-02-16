@@ -44,6 +44,7 @@ if status is-interactive
     alias zj="zellij -l welcome"
     setenv ZIDE_ALWAYS_NAME true
     setenv ZIDE_DEFAULT_LAYOUT default_lazygit
+    setenv ZIDE_USE_YAZI_CONFIG false
 end
 
 # Add some more bin paths to PATH for custom bin scripts
