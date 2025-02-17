@@ -1,3 +1,9 @@
 [manager]
 ratio = [2, 3, 5]
 show_hidden = true
+
+[opener]
+edit = [
+  { run = '$EDITOR "$@"', block = false, for = "unix" },
+  { run = "%EDITOR% %*",  block = false, for = "windows" },
+]
