@@ -45,6 +45,7 @@ if status is-interactive
     setenv ZIDE_ALWAYS_NAME true
     setenv ZIDE_DEFAULT_LAYOUT default_lazygit
     setenv ZIDE_USE_YAZI_CONFIG false
+    setenv ZIDE_USE_FOCUS_PLUGIN true
 end
 
 # Add some more bin paths to PATH for custom bin scripts
