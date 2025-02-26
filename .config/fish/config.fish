@@ -40,6 +40,7 @@ if status is-interactive
 
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
     setenv ZIDE_DEFAULT_LAYOUT compact_lazygit_focus
+    setenv ZIDE_LAYOUT_DIR "$ZELLIJ_CONFIG_DIR/layouts/zide"
 
     alias zj="zellij -l welcome"
     setenv ZIDE_ALWAYS_NAME true
