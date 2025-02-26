@@ -224,13 +224,6 @@ keybinds clear-defaults=true {
 // Plugin aliases - can be used to change the implementation of Zellij
 // changing these requires a restart to take effect
 plugins {
-    autolock location="https://github.com/fresh2dev/zellij-autolock/releases/latest/download/zellij-autolock.wasm" {
-        is_enabled true
-        reaction_seconds "0.3"
-        triggers "nvim|vim|v|nv|hx"
-        watch_interval "1.0"
-        watch_triggers "fzf|zoxide|atuin|atac"
-    }
     compact-bar location="zellij:compact-bar"
     configuration location="zellij:configuration"
     filepicker location="zellij:strider" {
@@ -243,6 +236,25 @@ plugins {
     tab-bar location="zellij:tab-bar"
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
+    }
+    zjstatus location="https://github.com/dj95/zjstatus/releases/download/v0.20.2/zjstatus.wasm" {
+        format_left  "{mode}#[fg=#89B4FA,bg=#181825,bold] {session}#[bg=#181825] {tabs}"
+        format_right "#[fg=#9399B2,bg=#181825]{swap_layout}#[fg=#424554,bg=#181825] ::{datetime}"
+        format_space "#[bg=#181825]"
+
+        mode_normal          "#[bg=#89B4FA] "
+        mode_tmux            "#[bg=#ffc387] "
+        mode_default_to_mode "tmux"
+
+        tab_normal               "#[fg=#6C7086,bg=#181825] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
+        tab_active               "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
+        tab_fullscreen_indicator "□ "
+        tab_sync_indicator       "  "
+        tab_floating_indicator   "󰉈 "
+
+        datetime          "#[fg=#9399B2,bg=#181825] {format} "
+        datetime_format   "%A, %d %b %Y %H:%M"
+        datetime_timezone "Americas/NewYork"
     }
 }
 
