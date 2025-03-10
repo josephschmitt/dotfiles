@@ -79,6 +79,8 @@ y = [
     ':insert-output echo "\x1b[?1049h" > /dev/tty',
     ':open %sh{cat $TMPDIR/yazi-hx-path}',
     ':redraw',
+    ':set mouse false',
+    ':set mouse true',
 ]
 Y = [
     ':sh rm -f $TMPDIR/yazi-hx-path',
@@ -86,6 +88,8 @@ Y = [
     ':insert-output echo "\x1b[?1049h" > /dev/tty',
     ':open %sh{cat $TMPDIR/yazi-hx-path}',
     ':redraw',
+    ':set mouse false',
+    ':set mouse true',
 ]
 l = [
     ':new',
