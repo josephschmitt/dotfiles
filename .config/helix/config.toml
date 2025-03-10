@@ -73,11 +73,23 @@ A-E = "extend_prev_sub_word_end"
 
 [keys.normal."space"]
 x = ":buffer-close"
-
-[keys.normal.C-y]
-# Open the file(s) in the current window
-y = ":sh zellij run -n 'yazi' -c -f -x 25% -y 25% --width 50% --height 50% -- bash ~/.config/helix/yazi-picker.sh open"
-# Open the file(s) in a vertical pane
-v = ":sh zellij run -n 'yazi' -c -f -x 25% -y 25% --width 50% --height 50% -- bash ~/.config/helix/yazi-picker.sh vsplit"
-# Open the file(s) in a horizontal pane
-h = ":sh zellij run -n 'yazi' -c -f -x 25% -y 25% --width 50% --height 50% -- bash ~/.config/helix/yazi-picker.sh hsplit"
+y = [
+    ':sh rm -f $TMPDIR/yazi-hx-path',
+    ':insert-output yazi %{buffer_name} --chooser-file=$TMPDIR/yazi-hx-path',
+    ':insert-output echo "\x1b[?1049h" > /dev/tty',
+    ':open %sh{cat $TMPDIR/yazi-hx-path}',
+    ':redraw',
+]
+Y = [
+    ':sh rm -f $TMPDIR/yazi-hx-path',
+    ':insert-output yazi %sh{git rev-parse --show-toplevel} --chooser-file=$TMPDIR/yazi-hx-path',
+    ':insert-output echo "\x1b[?1049h" > /dev/tty',
+    ':open %sh{cat $TMPDIR/yazi-hx-path}',
+    ':redraw',
+]
+l = [
+    ':new',
+    ':insert-output lazygit',
+    ':buffer-close!',
+    ':redraw',
+]
