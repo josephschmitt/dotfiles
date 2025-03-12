@@ -73,7 +73,7 @@ A-E = "extend_prev_sub_word_end"
 
 [keys.normal."space"]
 x = ":buffer-close"
-y = [
+a = [
     ':sh rm -f $TMPDIR/yazi-hx-path',
     ':insert-output yazi %{buffer_name} --chooser-file=$TMPDIR/yazi-hx-path',
     ':insert-output echo "\x1b[?1049h" > /dev/tty',
@@ -82,7 +82,7 @@ y = [
     ':set mouse false',
     ':set mouse true',
 ]
-Y = [
+A = [
     ':sh rm -f $TMPDIR/yazi-hx-path',
     ':insert-output yazi %sh{git rev-parse --show-toplevel} --chooser-file=$TMPDIR/yazi-hx-path',
     ':insert-output echo "\x1b[?1049h" > /dev/tty',
