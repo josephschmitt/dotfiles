@@ -1,7 +1,34 @@
-font-family = "Monaco Nerd Font Mono"
-font-size = "13"
+theme = catppuccin-mocha
+font-family = Monaco Nerd Font Mono
+font-size = 13
 font-thicken = true
-theme = dracula
 cursor-style = bar
-adjust-cell-height=10%
-auto-update=download
+adjust-cell-height = 10%
+auto-update = download
+shell-integration = fish
+
+# Keybindings
+# Pane movement
+keybind = alt+h=goto_split:left
+keybind = alt+j=goto_split:down
+keybind = alt+k=goto_split:up
+keybind = alt+l=goto_split:right
+
+# Pane resize
+keybind = ctrl+alt+h=resize_split:left,10
+keybind = ctrl+alt+j=resize_split:down,10
+keybind = ctrl+alt+k=resize_split:up,10
+keybind = ctrl+alt+l=resize_split:right,10
+
+# New pane commands
+keybind = ctrl+cmd+h=new_split:left
+keybind = ctrl+cmd+j=new_split:down
+keybind = ctrl+cmd+k=new_split:up
+keybind = ctrl+cmd+l=new_split:right
+
+# Misc. pane commands
+keybind = ctrl+alt+z=toggle_split_zoom
+
+# Tab switch commands
+keybind = cmd+shift+h=previous_tab
+keybind = cmd+shift+l=next_tab
