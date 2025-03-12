@@ -95,5 +95,6 @@ l = [
     ':new',
     ':insert-output lazygit',
     ':buffer-close!',
+    ':reload',
     ':redraw',
 ]
