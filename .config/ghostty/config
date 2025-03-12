@@ -32,6 +32,7 @@ keybind = ctrl+cmd+l=new_split:right
 keybind = ctrl+alt+z=toggle_split_zoom
 keybind = cmd+shift+w=close_tab
 
-# Tab switch commands
+# Tab commands
 keybind = cmd+shift+h=previous_tab
 keybind = cmd+shift+l=next_tab
+keybind = cmd+shift+w=close_tab
