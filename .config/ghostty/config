@@ -30,6 +30,7 @@ keybind = ctrl+cmd+l=new_split:right
 
 # Misc. pane commands
 keybind = ctrl+alt+z=toggle_split_zoom
+keybind = cmd+shift+w=close_tab
 
 # Tab switch commands
 keybind = cmd+shift+h=previous_tab
