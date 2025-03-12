@@ -98,4 +98,6 @@ l = [
     ':buffer-close!',
     ':reload',
     ':redraw',
+    ':set mouse false',
+    ':set mouse true',
 ]
