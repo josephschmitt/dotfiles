@@ -8,6 +8,8 @@ auto-update = download
 shell-integration = fish
 
 # Keybindings
+keybind = global:ctrl+`=toggle_quick_terminal
+
 # Pane movement
 keybind = alt+h=goto_split:left
 keybind = alt+j=goto_split:down
