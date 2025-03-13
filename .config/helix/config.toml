@@ -101,3 +101,4 @@ l = [
     ':set mouse false',
     ':set mouse true',
 ]
+L = ":sh ~/.config/helix/get_git_permalink.sh %{buffer_name} %{cursor_line} | pbcopy"
