@@ -6,10 +6,9 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    nix-direnv.url = "github:nix-community/nix-direnv";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, nix-direnv }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
   let
     darwinConfig = import ./darwin.nix;
     nixHomebrewConfig = {

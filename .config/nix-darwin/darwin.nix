@@ -2,14 +2,12 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    direnv
     fd
     fish
     fzf
     gh
     lazygit
     neovim
-    nix-direnv
     oh-my-posh
     stow
     tmux
@@ -73,8 +71,6 @@
     pkgs.nerd-fonts.fira-code
   ];
 
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = "nix-command flakes";
 
