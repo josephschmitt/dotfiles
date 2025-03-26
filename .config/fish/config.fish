@@ -55,7 +55,7 @@ set -gx PATH "$HOME/go/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/development/zide/bin" $PATH
 
-alias gr="cd (git rev-parse --show-toplevel)"
+alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
 alias zellij_clear="zellij list-sessions --no-formatting | awk '/EXITED/ {print \$1}' | xargs -n 1 zellij delete-session"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
 alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
@@ -91,10 +91,4 @@ end
 
 if type -q replay
     replay "source $HOME/.compassrc"
-end
-
-# direnv
-if type -q direnv
-    # If installed, source the direnv hook for Fish
-    direnv hook fish | source
 end

@@ -13,7 +13,6 @@
     oh-my-posh
     stow
     tmux
-    yazi
     zellij
   ];
 
@@ -71,11 +70,11 @@
 
   fonts.packages = [
     pkgs.nerd-fonts.meslo-lg
+    pkgs.nerd-fonts.fira-code
   ];
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
-
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = "nix-command flakes";
 

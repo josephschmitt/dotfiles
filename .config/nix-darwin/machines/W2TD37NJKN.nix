@@ -7,13 +7,13 @@
     docker
     docker-compose
     gh
-    git-spice
+    # git-spice
     go
     jq
     kubectl
     lima
+    mosh
     shellcheck
-    yq
   ];
 
   homebrew = {
@@ -23,6 +23,8 @@
 
     brews = [
       "hnvm"
+      "git-spice"
+      "scooter"
     ];
   };
 
