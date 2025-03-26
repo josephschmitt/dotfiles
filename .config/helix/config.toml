@@ -74,31 +74,32 @@ A-E = "extend_prev_sub_word_end"
 
 [keys.normal."space"]
 x = ":buffer-close"
-a = [
-    ':sh rm -f $TMPDIR/yazi-hx-path',
-    ':insert-output yazi %{buffer_name} --chooser-file=$TMPDIR/yazi-hx-path',
-    ':insert-output echo "\x1b[?1049h" > /dev/tty',
-    ':open %sh{cat $TMPDIR/yazi-hx-path}',
-    ':redraw',
-    ':set mouse false',
-    ':set mouse true',
+e = [
+    ":sh rm -f $TMPDIR/yazi-hx-path",
+    ":insert-output yazi '%{buffer_name}' --chooser-file=$TMPDIR/yazi-hx-path",
+    ":insert-output echo \"x1b[?1049h\" > /dev/tty",
+    ":open %sh{cat $TMPDIR/yazi-hx-path}",
+    ":redraw",
+    ":set mouse false",
+    ":set mouse true",
 ]
-A = [
-    ':sh rm -f $TMPDIR/yazi-hx-path',
-    ':insert-output yazi %sh{git rev-parse --show-toplevel} --chooser-file=$TMPDIR/yazi-hx-path',
-    ':insert-output echo "\x1b[?1049h" > /dev/tty',
-    ':open %sh{cat $TMPDIR/yazi-hx-path}',
-    ':redraw',
-    ':set mouse false',
-    ':set mouse true',
+E = [
+    ":sh rm -f $TMPDIR/yazi-hx-path",
+    ":insert-output yazi '%{workspace_directory}' --chooser-file=$TMPDIR/yazi-hx-path",
+    ":insert-output echo \"x1b[?1049h\" > /dev/tty",
+    ":open %sh{cat $TMPDIR/yazi-hx-path}",
+    ":redraw",
+    ":set mouse false",
+    ":set mouse true",
 ]
 l = [
-    ':new',
-    ':insert-output lazygit',
-    ':buffer-close!',
-    ':reload',
-    ':redraw',
-    ':set mouse false',
-    ':set mouse true',
+    ":write-all",
+    ":new",
+    ":insert-output lazygit -p '%sh{workspace_directory}'",
+    ":buffer-close!",
+    ":redraw",
+    ":reload-all",
+    ":set mouse false",
+    ":set mouse true",
 ]
 L = ":sh ~/.config/helix/get_git_permalink.sh %{buffer_name} %{cursor_line} | pbcopy"
