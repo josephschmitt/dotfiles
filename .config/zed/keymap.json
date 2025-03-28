@@ -113,5 +113,11 @@
       // "cmd-ctrl-y": "git::StageAll",
       // "cmd-ctrl-shift-y": "git::UnstageAll"
     }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-t": "workspace::NewTerminal"
+    }
   }
 ]

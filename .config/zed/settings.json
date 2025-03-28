@@ -7,6 +7,14 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "edit_predictions": {
+    "mode": "subtle",
+    "copilot": {
+      "proxy": null,
+      "proxy_no_verify": null
+    },
+    "enabled_in_assistant": false
+  },
   "features": {
     "edit_prediction_provider": "zed"
   },
@@ -50,6 +58,6 @@
   "vim.visual_mode_cursor": "underscore", // Closest to Helix 'select' = "underline"
 
   // --- Other UI/Editor Settings (Adjust as needed) ---
-  "format_on_save": "on" // Or "off" / "language_server"
+  "format_on_save": "off" // Or "off" / "language_server"
   // Add other Zed-specific settings you like here...
 }
