@@ -1,0 +1,55 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "features": {
+    "edit_prediction_provider": "zed"
+  },
+  "assistant": {
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-4o"
+    },
+    "version": "2"
+  },
+  "ui_font_size": 16,
+  "buffer_font_size": 13,
+  "buffer_font_family": "Monaco Nerd Font Mono",
+  "terminal": {
+    "font_family": "Monaco Nerd Font Mono"
+  },
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Catppuccin Mocha - No Italics"
+  },
+  "base_keymap": "VSCode",
+
+  "vim_mode": true,
+  "vim.leader": " ", // Set leader key to space, matching your Helix config
+
+  // --- Mimicking [editor] settings ---
+  "relative_line_numbers": true, // Equivalent to line-number = "relative"
+  "cursor_line": true, // Equivalent to cursorline = true
+  "rulers": [100], // Equivalent to rulers = [100]
+  "soft_wrap": "editor_width", // Equivalent to enable = true + wrap-at-text-width = true
+  "preferred_line_length": 100, // Used by soft_wrap = "preferred_line_length" or "editor_width" if text-width is set
+  "render_whitespace": "all", // Simplest equivalent for space = "all", tab = "all". Zed has finer controls too.
+  "show_hidden_files": true, // Equivalent to [editor.file-picker] hidden = false (controls file finder)
+  "show_indent_guides": true, // Equivalent to [editor.indent-guides] render = true
+
+  // --- Mimicking [editor.cursor-shape] ---
+  // Note: Zed uses 'visual' mode where Helix uses 'select'
+  "vim.normal_mode_cursor": "block",
+  "vim.insert_mode_cursor": "bar",
+  "vim.visual_mode_cursor": "underscore", // Closest to Helix 'select' = "underline"
+
+  // --- Other UI/Editor Settings (Adjust as needed) ---
+  "format_on_save": "on" // Or "off" / "language_server"
+  // Add other Zed-specific settings you like here...
+}

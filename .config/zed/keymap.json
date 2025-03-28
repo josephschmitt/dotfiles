@@ -1,0 +1,117 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // Navigation
+      "alt-h": "workspace::ActivatePaneLeft",
+      "alt-j": "workspace::ActivatePaneDown",
+      "alt-k": "workspace::ActivatePaneUp",
+      "alt-l": "workspace::ActivatePaneRight",
+
+      // Leader keys (Space) - Simplified versions
+      // "space x": "pane::CloseActiveItem",
+      // "space e": "file_finder::Toggle",
+      "ctrl-~": "terminal_panel::ToggleFocus"
+      // "space /": "project_search::ToggleFocus"
+    }
+  },
+  {
+    "context": "VimControl && !menu && (vim_mode == visual || vim_mode == visual_line || vim_mode == visual_block)",
+    "bindings": {
+      "v": "editor::SelectDown",
+      "shift-v": "editor::SelectUp"
+    }
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "shift-u": "vim::Redo",
+
+      // Go-to
+      "g e": "editor::MoveToEnd",
+      "g h": [
+        "editor::MoveToBeginningOfLine",
+        { "stop_at_soft_wraps": true, "stop_at_indent": true }
+      ],
+      "g l": ["editor::MoveToEndOfLine", { "stop_at_soft_wraps": true }],
+
+      // Indentation
+      "<": "editor::Outdent",
+      ">": "editor::Indent",
+      "ctrl-c": ["editor::ToggleComments", { "advance_downwards": false }],
+
+      // Subword Motions (Using Zed's built-in subword actions)
+      "alt-w": "editor::MoveToNextSubwordEnd",
+      "alt-b": "editor::MoveToPreviousSubwordStart",
+      "alt-e": "editor::MoveToNextSubwordEnd",
+
+      // Multi-cursor
+      "shift-k": "editor::AddSelectionAbove",
+      "shift-j": "editor::AddSelectionBelow"
+    }
+  },
+  {
+    "context": "vim_mode == visual || vim_mode == visual_line || vim_mode == visual_block",
+    "bindings": {
+      // Go-to
+      "g e": "editor::SelectToEnd",
+      "g h": [
+        "editor::SelectToBeginningOfLine",
+        { "stop_at_soft_wraps": true, "stop_at_indent": true }
+      ],
+      "g l": ["editor::SelectToEndOfLine", { "stop_at_soft_wraps": true }],
+
+      // Indentation
+      "<": "editor::Outdent",
+      ">": "editor::Indent",
+      "ctrl-c": ["editor::ToggleComments", { "advance_downwards": false }],
+
+      // Subword Motions (Using Zed's built-in subword actions)
+      "alt-w": "editor::SelectToNextSubwordEnd",
+      "alt-b": "editor::SelectToPreviousSubwordStart",
+      "alt-e": "editor::SelectToNextSubwordEnd"
+    }
+  },
+  {
+    "context": "GitPanel && ChangesList",
+    "bindings": {
+      // "up": "menu::SelectPrevious",
+      // "down": "menu::SelectNext",
+      "gg": "menu::SelectFirst",
+      "ge": "menu::SelectLast",
+      // "enter": "menu::Confirm",
+      // "cmd-alt-y": "git::ToggleStaged",
+      "space": "git::ToggleStaged",
+      // "cmd-y": "git::StageFile",
+      // "cmd-shift-y": "git::UnstageFile",
+      // "alt-down": "git_panel::FocusEditor",
+      // "tab": "git_panel::FocusEditor",
+      // "shift-tab": "git_panel::FocusEditor",
+      // "escape": "git_panel::ToggleFocus",
+      "c": "git::Commit",
+      "d": "git::RestoreFile"
+    }
+  },
+  {
+    "context": "GitPanel",
+    "use_key_equivalents": true,
+    "bindings": {
+      // "ctrl-g ctrl-g": "git::Fetch",
+      "P": "git::Push",
+      "p": "git::Pull",
+      // "ctrl-g shift-up": "git::ForcePush",
+      "enter": "git::Diff"
+      // "ctrl-g backspace": "git::RestoreTrackedFiles",
+      // "ctrl-g shift-backspace": "git::TrashUntrackedFiles",
+      // "cmd-ctrl-y": "git::StageAll",
+      // "cmd-ctrl-shift-y": "git::UnstageAll"
+    }
+  }
+]
