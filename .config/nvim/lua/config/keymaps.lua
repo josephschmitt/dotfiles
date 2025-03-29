@@ -7,8 +7,8 @@ local map = vim.keymap.set
 map({ "n", "v" }, "U", "<C-r>", { desc = "Redo" })
 
 -- Comment line
-map({ "n" }, "<C-c>", "gcc", { desc = "Comment line" })
-map({ "v" }, "<C-c>", "gc", { desc = "Comment line" })
+map({ "n" }, "<C-c>", "gcc", { remap = true, desc = "Comment line" })
+map({ "v" }, "<C-c>", "gc", { remap = true, desc = "Comment line" })
 
 -- Goto commands
 map({ "n", "v" }, "gs", "^", { desc = "Go to line first non-blank character" })
@@ -26,12 +26,13 @@ map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch window" })
 
 -- Helix-like line selection and delete
 map({ "n" }, "<C-a>", "ggVG", { desc = "Select all" })
-map({ "n" }, "x", "V", { desc = "Select line" })
-map({ "n" }, "d", "x", { desc = "Delete character" })
+-- map({ "n" }, "x", "V", { desc = "Select line" })
+-- map({ "n" }, "d", "x", { desc = "Delete character" })
 
-map({ "v" }, "x", "j", { desc = "Select next line" })
-map({ "v" }, "X", "k", { desc = "Select prev line" })
+-- map({ "v" }, "x", "j", { desc = "Select next line" })
+-- map({ "v" }, "X", "k", { desc = "Select prev line" })
 
 -- Exit insert mode
 map({ "i" }, "jk", "<esc>", { desc = "Exit insert mode" })
+map({ "i" }, "kj", "<esc>", { desc = "Exit insert mode" })
 map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
