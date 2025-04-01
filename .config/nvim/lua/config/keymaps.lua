@@ -6,6 +6,22 @@ local map = vim.keymap.set
 -- Undo/redo
 map({ "n", "v" }, "U", "<C-r>", { desc = "Redo" })
 
+-- Allow clipboard copy paste in neovim
+if vim.g.neovide then
+  map("n", "<D-s>", ":w<CR>") -- Save
+  map("v", "<D-c>", '"+y') -- Copy
+  map("n", "<D-v>", '"+P') -- Paste normal mode
+  map("v", "<D-v>", '"+P') -- Paste visual mode
+  map("c", "<D-v>", "<C-R>+") -- Paste command mode
+  map("i", "<D-v>", '<ESC>l"+Pli') -- Paste insert mode
+end
+
+-- Allow clipboard copy paste in neovim
+vim.api.nvim_set_keymap("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "<D-v>", "<C-R>+", { noremap = true, silent = true })
+
 -- Comment line
 map({ "n" }, "<C-c>", "gcc", { remap = true, desc = "Comment line" })
 map({ "v" }, "<C-c>", "gc", { remap = true, desc = "Comment line" })
@@ -26,6 +42,8 @@ map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch window" })
 
 -- Helix-like line selection and delete
 map({ "n" }, "<C-a>", "ggVG", { desc = "Select all" })
+map({ "v" }, "<S-v>", "j", { desc = "Select down" })
+
 -- map({ "n" }, "x", "V", { desc = "Select line" })
 -- map({ "n" }, "d", "x", { desc = "Delete character" })
 
