@@ -88,10 +88,6 @@ keybinds clear-defaults=true {
         bind "tab" { MovePane; }
     }
     scroll {
-        // bind "Alt left" { MoveFocusOrTab "left"; SwitchToMode "locked"; }
-        // bind "Alt down" { MoveFocus "down"; SwitchToMode "locked"; }
-        // bind "Alt up" { MoveFocus "up"; SwitchToMode "locked"; }
-        // bind "Alt right" { MoveFocusOrTab "right"; SwitchToMode "locked"; }
         bind "e" { EditScrollback; SwitchToMode "locked"; }
         bind "f" { SwitchToMode "entersearch"; SearchInput 0; }
         bind "Alt h" { MoveFocusOrTab "left"; SwitchToMode "locked"; }
@@ -135,6 +131,15 @@ keybinds clear-defaults=true {
     shared_among "normal" "locked" {
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
+        bind "Alt 1" { GoToTab 1; SwitchToMode "locked"; }
+        bind "Alt 2" { GoToTab 2; SwitchToMode "locked"; }
+        bind "Alt 3" { GoToTab 3; SwitchToMode "locked"; }
+        bind "Alt 4" { GoToTab 4; SwitchToMode "locked"; }
+        bind "Alt 5" { GoToTab 5; SwitchToMode "locked"; }
+        bind "Alt 6" { GoToTab 6; SwitchToMode "locked"; }
+        bind "Alt 7" { GoToTab 7; SwitchToMode "locked"; }
+        bind "Alt 8" { GoToTab 8; SwitchToMode "locked"; }
+        bind "Alt 9" { GoToTab 9; SwitchToMode "locked"; }
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
@@ -146,19 +151,10 @@ keybinds clear-defaults=true {
         bind "Alt k" { MoveFocus "up"; }
         bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
-        bind "Alt t" { NewTab; }
         bind "Alt o" { MoveTab "right"; }
+        bind "Alt t" { NewTab; }
         bind "Alt {" { GoToPreviousTab; }
         bind "Alt }" { GoToNextTab; }
-        bind "Alt 1" { GoToTab 1; SwitchToMode "locked"; }
-        bind "Alt 2" { GoToTab 2; SwitchToMode "locked"; }
-        bind "Alt 3" { GoToTab 3; SwitchToMode "locked"; }
-        bind "Alt 4" { GoToTab 4; SwitchToMode "locked"; }
-        bind "Alt 5" { GoToTab 5; SwitchToMode "locked"; }
-        bind "Alt 6" { GoToTab 6; SwitchToMode "locked"; }
-        bind "Alt 7" { GoToTab 7; SwitchToMode "locked"; }
-        bind "Alt 8" { GoToTab 8; SwitchToMode "locked"; }
-        bind "Alt 9" { GoToTab 9; SwitchToMode "locked"; }
     }
     shared_except "locked" "renametab" "renamepane" {
         bind "Ctrl g" { SwitchToMode "locked"; }
@@ -185,7 +181,7 @@ keybinds clear-defaults=true {
     shared_among "normal" "resize" "tab" "scroll" "prompt" "tmux" {
         bind "p" { SwitchToMode "pane"; }
     }
-    shared_except "locked" "resize" "pane" "tab" "entersearch" "renametab" "renamepane" {
+    shared_among "normal" "scroll" "session" "prompt" "tmux" {
         bind "n" { SwitchToMode "resize"; }
     }
     shared_among "scroll" "search" {
@@ -224,6 +220,7 @@ keybinds clear-defaults=true {
 // Plugin aliases - can be used to change the implementation of Zellij
 // changing these requires a restart to take effect
 plugins {
+    about location="zellij:about"
     compact-bar location="zellij:compact-bar"
     configuration location="zellij:configuration"
     filepicker location="zellij:strider" {
@@ -238,23 +235,20 @@ plugins {
         welcome_screen true
     }
     zjstatus location="https://github.com/dj95/zjstatus/releases/download/v0.20.2/zjstatus.wasm" {
-        format_left  "{mode}#[fg=#89B4FA,bg=#181825,bold] {session}#[bg=#181825] {tabs}"
+        datetime "#[fg=#9399B2,bg=#181825] {format} "
+        datetime_format "%A, %d %b %Y %H:%M"
+        datetime_timezone "Americas/NewYork"
+        format_left "{mode}#[fg=#89B4FA,bg=#181825,bold] {session}#[bg=#181825] {tabs}"
         format_right "#[fg=#9399B2,bg=#181825]{swap_layout}#[fg=#424554,bg=#181825] ::{datetime}"
         format_space "#[bg=#181825]"
-
-        mode_normal          "#[bg=#89B4FA] "
-        mode_tmux            "#[bg=#ffc387] "
         mode_default_to_mode "tmux"
-
-        tab_normal               "#[fg=#6C7086,bg=#181825] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
-        tab_active               "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
+        mode_normal "#[bg=#89B4FA] "
+        mode_tmux "#[bg=#ffc387] "
+        tab_active "#[fg=#9399B2,bg=#181825,bold,italic] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
+        tab_floating_indicator "󰉈 "
         tab_fullscreen_indicator "□ "
-        tab_sync_indicator       "  "
-        tab_floating_indicator   "󰉈 "
-
-        datetime          "#[fg=#9399B2,bg=#181825] {format} "
-        datetime_format   "%A, %d %b %Y %H:%M"
-        datetime_timezone "Americas/NewYork"
+        tab_normal "#[fg=#6C7086,bg=#181825] {index} {name} {fullscreen_indicator}{sync_indicator}{floating_indicator}"
+        tab_sync_indicator "  "
     }
 }
 
@@ -274,7 +268,7 @@ load_plugins {
 // Choose the theme that is specified in the themes section.
 // Default: default
 // 
-theme "catppuccin-mocha"
+theme "catppuccin-macchiato"
  
 // Choose the base input mode of zellij.
 // Default: normal
@@ -440,3 +434,18 @@ default_layout "compact"
 // Default: true (if the host terminal supports it)
 // 
 // support_kitty_keyboard_protocol false
+ 
+// Whether to stack panes when resizing beyond a certain size
+// Default: true
+// 
+// stacked_resize false
+ 
+// Whether to show tips on startup
+// Default: true
+// 
+show_startup_tips false
+ 
+// Whether to show release notes on first version run
+// Default: true
+// 
+// show_release_notes false
