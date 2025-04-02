@@ -10,6 +10,8 @@ set -euo pipefail
 SCRIPT_NAME="$(basename "$0")"
 # Default layout used ONLY when no directory and no layout/name flag are specified.
 DEFAULT_LAYOUT="welcome"
+# Default layout used ONLY when a directory is specified, but no layout/name flag.
+DIR_DEFAULT_LAYOUT="nvim"
 
 # --- Helper Functions ---
 
@@ -39,8 +41,8 @@ usage() {
     echo ""
     echo "Behavior:"
     echo "  - $SCRIPT_NAME:                             Launches 'zellij -l $DEFAULT_LAYOUT'"
-    echo "  - $SCRIPT_NAME <dir>:                       Changes to <dir>, launches 'zellij'"
-    echo "  - $SCRIPT_NAME -l <layout>:                 Launches 'zellij -l <layout>' (unless <dir> also given)"
+    echo "  - $SCRIPT_NAME <dir>:                       Changes to <dir>, launches 'zellij -l $DIR_DEFAULT_LAYOUT'" # Changed default
+    echo "  - $SCRIPT_NAME -l <layout>:                 Launches 'zellij -l <layout>'"
     echo "  - $SCRIPT_NAME -l <layout> <dir>:           Changes to <dir>, launches 'zellij -l <layout>'"
     echo "  - $SCRIPT_NAME -n <name> [<dir>]:           Changes to <dir> (if given), runs 'zellij attach --create <name>'"
     echo "  - $SCRIPT_NAME -n [<dir>]:                  Requires <dir>. Changes to <dir>, runs 'zellij attach --create <dir_basename>'"
@@ -181,12 +183,13 @@ else
     final_layout="$ZELLIJ_LAYOUT"
     msg "Using layout specified via flag: $final_layout"
   elif [[ -z "$TARGET_DIR" ]]; then
-    # No directory provided AND no layout flag, use default
-    final_layout="$DEFAULT_LAYOUT"
-    msg "Using default layout: $final_layout"
+    # No directory provided AND no layout flag, use global default
+    final_layout="$DEFAULT_LAYOUT" # e.g., "welcome"
+    msg "Using global default layout: $final_layout"
   else
-    # Directory provided, but no layout flag
-    msg "Using Zellij's default layout behavior in target directory."
+    # Directory provided, but no layout flag -> Use directory default layout
+    final_layout="$DIR_DEFAULT_LAYOUT" # e.g., "nvim"
+    msg "Directory provided and no layout specified, using default layout for directories: $final_layout"
   fi
 
   # Add layout flag to command if determined
