@@ -1,6 +1,6 @@
 {
   "LazyVim": { "branch": "main", "commit": "3f034d0a7f58031123300309f2efd3bb0356ee21" },
-  "auto-session": { "branch": "main", "commit": "317412742990371f8e4709074da5c378456a27ff" },
+  "auto-session": { "branch": "main", "commit": "0a1318557c03845f2e0dde347bc54507d1d8c34d" },
   "blink.cmp": { "branch": "main", "commit": "49f211fe5d729df53df4c042d7c3464cf47d199e" },
   "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
   "catppuccin": { "branch": "main", "commit": "5b5e3aef9ad7af84f463d17b5479f06b87d5c429" },
@@ -22,8 +22,8 @@
   "noice.nvim": { "branch": "main", "commit": "0427460c2d7f673ad60eb02b35f5e9926cf67c59" },
   "nui.nvim": { "branch": "main", "commit": "8d3bce9764e627b62b07424e0df77f680d47ffdb" },
   "nvim-lint": { "branch": "master", "commit": "93b8040115c9114dac1047311763bef275e752dc" },
-  "nvim-lspconfig": { "branch": "master", "commit": "ff6471d4f837354d8257dfa326b031dd8858b16e" },
-  "nvim-treesitter": { "branch": "master", "commit": "4b390e1e46ca2e6220f14641cb840bbf9ad5446f" },
+  "nvim-lspconfig": { "branch": "master", "commit": "40f120c10ea4b87311175539a183c3b75eab95a3" },
+  "nvim-treesitter": { "branch": "master", "commit": "30654ee72a69e7c76a54b66d748dae088429e863" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "9937e5e356e5b227ec56d83d0a9d0a0f6bc9cad4" },
   "nvim-ts-autotag": { "branch": "main", "commit": "a1d526af391f6aebb25a8795cbc05351ed3620b5" },
   "persistence.nvim": { "branch": "main", "commit": "166a79a55bfa7a4db3e26fc031b4d92af71d0b51" },
@@ -35,5 +35,6 @@
   "ts-comments.nvim": { "branch": "main", "commit": "1bd9d0ba1d8b336c3db50692ffd0955fe1bb9f0c" },
   "which-key.nvim": { "branch": "main", "commit": "370ec46f710e058c9c1646273e6b225acf47cbed" },
   "yanky.nvim": { "branch": "main", "commit": "98b9c21d3c06d79f68fd9d471dcc28fc6d2d72ef" },
-  "yazi.nvim": { "branch": "main", "commit": "aae26f6794c2afe2054a0782fb0ff07b2cd2876c" }
+  "yazi.nvim": { "branch": "main", "commit": "da2357b27799cd111f5564c23e16b290ef176e5a" },
+  "zellij-nav.nvim": { "branch": "main", "commit": "91cc2a642d8927ebde50ced5bf71ba470a0fc116" }
 }
