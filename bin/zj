@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+
+# zj - Helper script to launch Zellij with specific configurations
+# Modeled after the style of https://github.com/josephschmitt/zide/blob/main/bin/zide
+
+# Strict mode: exit on error, exit on unset variable, exit on pipe failure
+set -euo pipefail
+
+# --- Globals ---
+SCRIPT_NAME="$(basename "$0")"
+# Default layout used ONLY when no directory and no layout flag are specified.
+DEFAULT_LAYOUT="welcome"
+
+# --- Helper Functions ---
+
+# Print usage message and exit.
+# usage [error_message]
+usage() {
+  local exit_code=0
+  if [[ $# -gt 0 ]]; then
+    echo "Error: $1" >&2
+    exit_code=1
+  fi
+  {
+    echo "Usage: $SCRIPT_NAME [options] [directory_path]"
+    echo ""
+    echo "  Launches Zellij, optionally changing to a specific directory and/or using a specific layout."
+    echo ""
+    echo "Options:"
+    echo "  -l, --layout LAYOUT   Specify the Zellij layout file/name to use."
+    echo "  -h, --help            Show this help message and exit."
+    echo ""
+    echo "Arguments:"
+    echo "  [directory_path]      Optional path to a directory to change into before launching Zellij."
+    echo ""
+    echo "Behavior:"
+    echo "  - $SCRIPT_NAME:                             Launches 'zellij -l $DEFAULT_LAYOUT'"
+    echo "  - $SCRIPT_NAME <dir>:                       Changes to <dir>, launches 'zellij'"
+    echo "  - $SCRIPT_NAME -l <layout>:                 Launches 'zellij -l <layout>'"
+    echo "  - $SCRIPT_NAME -l <layout> <dir>:           Changes to <dir>, launches 'zellij -l <layout>'"
+    echo "  - $SCRIPT_NAME <dir> -l <layout>:           (Same as above)"
+    echo ""
+    echo "Debugging:"
+    echo "  Set DEBUG=1 environment variable to see verbose messages."
+    echo "  Example: DEBUG=1 $SCRIPT_NAME <dir>"
+  } >&2 # Always print usage to stderr for consistency
+  exit "$exit_code"
+}
+
+# Print an error message and exit.
+# die <error_message>
+die() {
+  echo "Error: $1" >&2
+  exit 1
+}
+
+# Print a status message to stderr, only if DEBUG=1.
+# msg <message>
+msg() {
+  # Check if DEBUG is set and equals 1. Default to 0 if unset/empty.
+  if [[ "${DEBUG:-0}" -eq 1 ]]; then
+    echo "Debug: $1" >&2
+  fi
+}
+
+# --- Check Dependencies ---
+if ! command -v zellij &>/dev/null; then
+  die "Zellij command not found. Please ensure Zellij is installed and in your PATH."
+fi
+
+# --- Parse Arguments ---
+TARGET_DIR=""
+ZELLIJ_LAYOUT=""
+
+# Parse options first
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -h | --help)
+    usage # Show usage and exit successfully
+    ;;
+  -l | --layout)
+    if [[ -z "${2:-}" ]]; then # Check if $2 is missing or empty
+      usage "Option '$1' requires an argument (layout name)."
+    fi
+    ZELLIJ_LAYOUT="$2"
+    shift 2 # Consume option and argument
+    ;;
+  -*) # Handle unknown options
+    usage "Unknown option: $1"
+    ;;
+  *) # Stop processing options, the rest are positional arguments
+    break
+    ;;
+  esac
+done
+
+# Handle positional arguments (expecting 0 or 1: the directory)
+if [[ $# -gt 1 ]]; then
+  usage "Too many arguments provided. Expected at most one directory path."
+elif [[ $# -eq 1 ]]; then
+  TARGET_DIR="$1"
+  # Check if the positional argument looks like an option (heuristic)
+  if [[ "$TARGET_DIR" == -* ]]; then
+    usage "Directory path '$TARGET_DIR' looks like an option. Place options before the directory path."
+  fi
+  # Check if the directory exists
+  if [[ ! -d "$TARGET_DIR" ]]; then
+    die "Target directory '$TARGET_DIR' does not exist or is not a directory."
+  fi
+fi
+
+# --- Main Logic ---
+
+zellij_cmd=("zellij") # Start building the command array
+
+# Determine the final layout argument, if any
+final_layout=""
+if [[ -n "$ZELLIJ_LAYOUT" ]]; then
+  # Layout explicitly provided via flag
+  final_layout="$ZELLIJ_LAYOUT"
+  msg "Using layout specified via flag: $final_layout"
+elif [[ -z "$TARGET_DIR" ]]; then
+  # No directory provided AND no layout flag, use default
+  final_layout="$DEFAULT_LAYOUT"
+  msg "Using default layout: $final_layout"
+else
+  # Directory provided, but no layout flag
+  msg "Using Zellij's default layout behavior in target directory."
+fi
+
+# Add layout flag to command if determined
+if [[ -n "$final_layout" ]]; then
+  zellij_cmd+=("--layout" "$final_layout")
+fi
+
+# Execute Zellij
+if [[ -n "$TARGET_DIR" ]]; then
+  # Change directory required
+  msg "Changing to directory '$TARGET_DIR'..."
+  if ! pushd "$TARGET_DIR" >/dev/null; then
+    die "Failed to change directory to '$TARGET_DIR'."
+  fi
+
+  msg "Launching Zellij: ${zellij_cmd[*]}" # Show the command being run
+  # Use exec to replace the script process with zellij, avoids leaving the script running
+  # Only do this if not debugging, otherwise popd won't run if DEBUG=1
+  if [[ "${DEBUG:-0}" -ne 1 ]]; then
+    exec "${zellij_cmd[@]}"
+  else
+    # Run normally if debugging, so popd can execute
+    "${zellij_cmd[@]}"
+    zellij_exit_code=$? # Capture exit code
+    # Return to original directory
+    popd >/dev/null
+    exit "$zellij_exit_code"
+  fi
+  # Note: code below exec is only reachable if exec fails or if DEBUG=1 and zellij exits
+  zellij_exit_code=$?
+  # If we are here because DEBUG=1, popd needs to run
+  if [[ "${DEBUG:-0}" -eq 1 ]]; then
+    popd >/dev/null
+  fi
+  exit "$zellij_exit_code"
+
+else
+  # No directory change needed
+  msg "Launching Zellij: ${zellij_cmd[*]}"
+  # Use exec to replace the script process with zellij
+  exec "${zellij_cmd[@]}"
+  # Note: code below exec is only reachable if exec fails
+  exit $? # Exit with Zellij's exit code (or exec's failure code)
+fi
