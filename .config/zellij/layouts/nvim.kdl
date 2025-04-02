@@ -2,22 +2,23 @@ pane_frames false
 
 layout {
     tab {
+        compact_bar size=1
         pane split_direction="vertical" {
             editor
         }
-        compact_bar size=1
     }
 
     swap_tiled_layout name="compact" {
         tab exact_panes=3 {
+            compact_bar size=1
             pane split_direction="horizontal" {
                 editor size="75%"
                 pane
             }
-            compact_bar size=1
         }
 
         tab min_panes=4 {
+            compact_bar size=1
             pane split_direction="horizontal" {
                 editor size="50%"
                 pane split_direction="vertical" {
@@ -25,26 +26,25 @@ layout {
                     pane
                 }
             }
-            compact_bar size=1
         }
     }
 
     swap_tiled_layout name="wide" {
         tab exact_panes=4 {
+            compact_bar size=1
             editor
             pane split_direction="horizontal" size=80 {
                 pane
             }
-            compact_bar size=1
         }
 
         tab min_panes=4 {
+            compact_bar size=1
             editor
             pane split_direction="horizontal" size=80 {
                 pane
                 pane
             }
-            compact_bar size=1
         }
     }
 
@@ -55,11 +55,11 @@ layout {
 
     pane_template name="compact_bar" {
         borderless true
-        plugin location="compact-bar"
+        plugin location="zjstatus"
     }
 
     new_tab_template {
-        pane
         compact_bar size=1
+        pane
     }
 }
