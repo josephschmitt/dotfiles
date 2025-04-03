@@ -27,8 +27,8 @@ map({ "n" }, "<C-c>", "gcc", { remap = true, desc = "Comment line" })
 map({ "v" }, "<C-c>", "gc", { remap = true, desc = "Comment line" })
 
 -- Indent line
-map({ "n", "v" }, "<", "<<", { remap = true, desc = "Unindent line" })
-map({ "n", "v" }, ">", ">>", { remap = true, desc = "Indent line" })
+map({ "n" }, "<", "<<", { remap = true, desc = "Unindent line" })
+map({ "n" }, ">", ">>", { remap = true, desc = "Indent line" })
 
 -- Goto commands
 map({ "n", "v" }, "gs", "^", { desc = "Go to line first non-blank character" })
