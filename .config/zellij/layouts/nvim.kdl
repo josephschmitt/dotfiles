@@ -30,7 +30,7 @@ layout {
     }
 
     swap_tiled_layout name="wide" {
-        tab exact_panes=4 {
+        tab exact_panes=3 {
             compact_bar size=1
             editor
             pane split_direction="horizontal" size=80 {
@@ -54,8 +54,8 @@ layout {
     }
 
     pane_template name="compact_bar" {
-        borderless true
-        plugin location="zjstatus"
+      borderless true
+      plugin location="zjstatus"
     }
 
     new_tab_template {
