@@ -9,6 +9,7 @@
     lazygit
     neovim
     oh-my-posh
+    ripgrep
     stow
     tmux
     zellij
