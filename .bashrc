@@ -1,29 +1,3 @@
-# This function is for use on Macs with multiple brew installations (usually M1/arm64) Macs. This
-# function will attempt to set your brew PATH to point to the correct brew based on the system arch.
-#
-# Usage:
-#   # will automatically set brew based on architecture
-#   $ switch_brew
-#
-#   # will set brew for arm64
-#   $ switch_brew arm64
-#
-#   # will set brew for x86_64
-#   $ switch_brew x86_64
-function switch_brew {
-  armBrewPath="/opt/homebrew/bin"
-  switch_to=${1:-"$(uname -m)"}
-
-  PATH=${PATH/":$armBrewPath"/} # delete any instances in the middle or at the end
-  PATH=${PATH/"$armBrewPath:"/} # delete any instances at the beginning
-
-  if [ "${switch_to}" = "arm64" ]; then
-    PATH="${armBrewPath}:$PATH"
-  fi
-}
-
-switch_brew
-
 if [ -f $HOME/.compassrc ]; then
   source $HOME/.compassrc
 fi
@@ -38,6 +12,21 @@ if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
 fi
 
 complete -C /usr/local/bin/compass compass
+
+export EDITOR="nvim"
+
+# Add more bin paths to PATH for custom bin scripts
+export PATH="$HOME/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/development/zide/bin:$PATH"
+
+# Add some common aliases
+alias groot="echo 'I am Groot!' && cd $(git rev-parse --show-toplevel)"
+alias zellij_clear="zellij list-sessions --no-formatting | awk '/EXITED/ {print \$1}' | xargs -n 1 zellij delete-session"
+alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
+alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
+alias lg="lazygit"
 
 # Git-spice aliases
 alias gsb="gs branch"

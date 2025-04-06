@@ -15,7 +15,7 @@ end ##basher5ea843
 set -gx PATH $basher $PATH ##basher5ea843
 status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
-setenv EDITOR hx
+setenv EDITOR nvim
 
 setenv DEBUG 1
 setenv BASHLOG_FILE 1
