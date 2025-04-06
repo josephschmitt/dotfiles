@@ -30,10 +30,10 @@ blocks:
     style: plain
     properties:
       folder_icon: ....
-      home_icon: "~"
+      home_icon: 
       style: agnoster_short
       mapped_locations:
-        ~/development:  /
+        ~/development:  
   - template: "{{ .HEAD }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }} "
     foreground: p:lavender
     type: git
