@@ -22,6 +22,9 @@ vim.api.nvim_set_keymap("!", "<D-v>", "<C-R>+", { noremap = true, silent = true 
 vim.api.nvim_set_keymap("t", "<D-v>", "<C-R>+", { noremap = true, silent = true })
 vim.api.nvim_set_keymap("v", "<D-v>", "<C-R>+", { noremap = true, silent = true })
 
+-- Leader
+map({ "n", "v" }, "<leader>X", "<cmd>:LazyExtras<CR>", { desc = "Open Lazy Extras" })
+
 -- Comment line
 map({ "n" }, "<C-c>", "gcc", { remap = true, desc = "Comment line" })
 map({ "v" }, "<C-c>", "gc", { remap = true, desc = "Comment line" })
@@ -31,10 +34,8 @@ map({ "n" }, "<", "<<", { remap = true, desc = "Unindent line" })
 map({ "n" }, ">", ">>", { remap = true, desc = "Indent line" })
 
 -- Goto commands
-map({ "n", "v" }, "gs", "^", { desc = "Go to line first non-blank character" })
 map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
 map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
-map({ "n", "v" }, "ge", "G", { desc = "Go to last line" })
 
 -- Window commands
 map({ "n", "v" }, "gw", "<C-w>", { desc = "Window mode" })
