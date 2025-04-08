@@ -3,7 +3,7 @@ pane_frames false
 layout {
     tab {
         compact_bar size=1
-        pane split_direction="vertical" {
+        pane split_direction="horizontal" {
             editor
         }
     }
@@ -32,18 +32,22 @@ layout {
     swap_tiled_layout name="wide" {
         tab exact_panes=3 {
             compact_bar size=1
-            editor
-            pane split_direction="horizontal" size=80 {
-                pane
+            pane split_direction="vertical" {
+                editor
+                pane split_direction="horizontal" size=80 {
+                    pane
+                }
             }
         }
 
         tab min_panes=4 {
             compact_bar size=1
-            editor
-            pane split_direction="horizontal" size=80 {
-                pane
-                pane
+            pane split_direction="vertical" {
+                editor
+                pane split_direction="horizontal" size=80 {
+                    pane
+                    pane
+                }
             }
         }
     }
