@@ -304,8 +304,8 @@ plugins {
         command_git_branch_rendermode  "static"
 
         datetime        "#[fg=#6C7086,bold] {format} "
-        datetime_format "%A, %d %b %Y %H:%M"
-        datetime_timezone "Americas/New_York"
+        datetime_format "%A, %d %b %Y %I:%M%P"
+        datetime_timezone "America/New_York"
     }
 }
 
