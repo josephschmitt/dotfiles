@@ -21,5 +21,12 @@ return {
         },
       },
     },
+    terminal = {
+      win = {
+        style = {
+          height = 0.3,
+        },
+      },
+    },
   },
 }
