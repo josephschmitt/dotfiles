@@ -17,7 +17,6 @@ status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
 setenv EDITOR nvim
 
-setenv DEBUG 1
 setenv BASHLOG_FILE 1
 
 if status is-interactive
@@ -47,6 +46,9 @@ if status is-interactive
     setenv ZIDE_DEFAULT_LAYOUT default_lazygit
     setenv ZIDE_USE_YAZI_CONFIG false
     setenv ZIDE_USE_FOCUS_PLUGIN true
+
+    setenv ZJ_ALWAYS_NAME true
+    setenv ZJ_DEFAULT_LAYOUT nvim
 end
 
 # Add some more bin paths to PATH for custom bin scripts
