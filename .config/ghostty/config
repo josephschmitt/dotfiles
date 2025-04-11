@@ -16,28 +16,28 @@ working-directory = $HOME/development
 keybind = global:ctrl+`=toggle_quick_terminal
 
 # Pane movement
-# keybind = alt+h=goto_split:left
-# keybind = alt+j=goto_split:down
-# keybind = alt+k=goto_split:up
-# keybind = alt+l=goto_split:right
+keybind = cmd+alt+h=goto_split:left
+keybind = cmd+alt+j=goto_split:down
+keybind = cmd+alt+k=goto_split:up
+keybind = cmd+alt+l=goto_split:right
 
 # Pane resize
-# keybind = ctrl+alt+h=resize_split:left,10
-# keybind = ctrl+alt+j=resize_split:down,10
-# keybind = ctrl+alt+k=resize_split:up,10
-# keybind = ctrl+alt+l=resize_split:right,10
+keybind = ctrl+alt+h=resize_split:left,10
+keybind = ctrl+alt+j=resize_split:down,10
+keybind = ctrl+alt+k=resize_split:up,10
+keybind = ctrl+alt+l=resize_split:right,10
 
 # New pane commands
-# keybind = ctrl+cmd+h=new_split:left
-# keybind = ctrl+cmd+j=new_split:down
-# keybind = ctrl+cmd+k=new_split:up
-# keybind = ctrl+cmd+l=new_split:right
+keybind = ctrl+cmd+h=new_split:left
+keybind = ctrl+cmd+j=new_split:down
+keybind = ctrl+cmd+k=new_split:up
+keybind = ctrl+cmd+l=new_split:right
 
 # Misc. pane commands
-# keybind = ctrl+alt+z=toggle_split_zoom
-# keybind = cmd+shift+w=close_tab
+keybind = ctrl+alt+z=toggle_split_zoom
+keybind = cmd+shift+w=close_tab
 
 # Tab commands
-# keybind = cmd+shift+h=previous_tab
-# keybind = cmd+shift+l=next_tab
-# keybind = cmd+shift+w=close_tab
+keybind = cmd+shift+h=previous_tab
+keybind = cmd+shift+l=next_tab
+keybind = cmd+shift+w=close_tab
