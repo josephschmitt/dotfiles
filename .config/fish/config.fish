@@ -41,7 +41,6 @@ if status is-interactive
     setenv ZIDE_DEFAULT_LAYOUT compact_lazygit_focus
     setenv ZIDE_LAYOUT_DIR "$ZELLIJ_CONFIG_DIR/layouts/zide"
 
-    # alias zj="zellij -l welcome"
     setenv ZIDE_ALWAYS_NAME true
     setenv ZIDE_DEFAULT_LAYOUT default_lazygit
     setenv ZIDE_USE_YAZI_CONFIG false
