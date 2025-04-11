@@ -59,3 +59,6 @@ map({ "v" }, "<S-v>", "j", { desc = "Select down" })
 map({ "i" }, "jk", "<esc>", { desc = "Exit insert mode" })
 map({ "i" }, "kj", "<esc>", { desc = "Exit insert mode" })
 map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
+
+-- Buffers
+map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
