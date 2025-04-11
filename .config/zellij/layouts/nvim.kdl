@@ -57,7 +57,7 @@ layout {
 
     // TEMPLATES
     pane_template name="editor" {
-        command "nvim"
+        command "$EDITOR"
     }
 
     pane_template name="compact_bar" {
