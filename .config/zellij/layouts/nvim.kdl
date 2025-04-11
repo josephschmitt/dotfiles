@@ -1,7 +1,10 @@
 pane_frames false
 
 layout {
-    tab {
+    tab hide_floating_panes=true {
+        floating_panes {
+            zj_tab_rename close_on_exit=true
+        }
         compact_bar size=1
         pane split_direction="horizontal" {
             editor
@@ -62,7 +65,11 @@ layout {
       plugin location="zjstatus"
     }
 
-    new_tab_template {
+    pane_template name="zj_tab_rename" {
+      command "zj_tab_rename" 
+    }
+
+    new_tab_template hide_floating_panes=true {
         compact_bar size=1
         pane
     }
