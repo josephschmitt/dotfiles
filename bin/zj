@@ -94,10 +94,14 @@ if [[ "${name}" == "__basename__" ]]; then
   name="$(basename "${cwd}")"
 fi
 
-if zellij list-sessions | grep -q "$name"; then
+if [ -n "${name}" ] && zellij list-sessions | grep -q "$name"; then
   zellij attach --force-run-commands "$name"
 else
   pushd "$cwd" >/dev/null || exit 0
-  zellij --new-session-with-layout "$layout" --session "$name"
+  if [ -n "${name}" ]; then
+    zellij --new-session-with-layout "$layout" --session "$name"
+  else
+    zellij --new-session-with-layout "$layout"
+  fi
   popd >/dev/null || exit 0
 fi
