@@ -1,239 +1,103 @@
 #!/usr/bin/env bash
 
-# zj - Helper script to launch Zellij with specific configurations
-# Modeled after the style of https://github.com/josephschmitt/zide/blob/main/bin/zide
+read -r -d '' HELP_TEXT <<EOF
+Usage: $(basename "$0") [OPTIONS] <working_dir>
 
-# Strict mode: exit on error, exit on unset variable, exit on pipe failure
-set -euo pipefail
+Optional Parameters:
+  <working_dir>        Working directory to open in, defaults to $(pwd)
 
-# --- Globals ---
-SCRIPT_NAME="$(basename "$0")"
-# Default layout used ONLY when no directory and no layout/name flag are specified.
-DEFAULT_LAYOUT="welcome"
-# Default layout used ONLY when a directory is specified, but no layout/name flag.
-DIR_DEFAULT_LAYOUT="nvim"
+Options:
+  -h, --help           Show this help message and exit.
+  -l, --layout         Optional zellij layout name to use when creating a new 
+                       session. If not provided, will use the default layout set
+                       in ZJ_DEFAULT_LAYOUT environment variable (or "welcome").
+  -n, --name           Optional name to give the newly opened session or tab.
+                       Will name the session when starting Zide from outside an
+                       existing Zellij session, or name a tab if launching from
+                       inside an existing session.
+  -N                   Name newly opened session or tab using the cwd basename.
+                       Ignored if the -n, --name flag is used. if you want this
+                       behavior by default, set ZJ_ALWAYS_NAME env var to true.
 
-# --- Helper Functions ---
+Environment Variables:
+  ZJ_DEFAULT_LAYOUT    Default zellij layout to use.
+  ZJ_ALWAYS_NAME       If true, will always use the basename of the target
+                       directory as the name of the tab/session when starting.
 
-# Print usage message and exit.
-# usage [error_message]
-usage() {
-  local exit_code=0
-  if [[ $# -gt 0 ]]; then
-    echo "Error: $1" >&2
-    exit_code=1
-  fi
-  {
-    echo "Usage: $SCRIPT_NAME [options] [directory_path]"
-    echo ""
-    echo "  Launches or attaches to a Zellij session, optionally changing directory."
-    echo "  Options and directory_path can be in any order."
-    echo ""
-    echo "Options:"
-    echo "  -l, --layout LAYOUT   Specify the Zellij layout file/name to use (ignored if -n/--name is used)."
-    echo "  -n, --name [NAME]     Attach to session NAME or create it if it doesn't exist."
-    echo "                        If NAME is omitted, it defaults to the basename of [directory_path]."
-    echo "                        Requires [directory_path] if NAME is omitted."
-    echo "  -h, --help            Show this help message and exit."
-    echo ""
-    echo "Arguments:"
-    echo "  [directory_path]      Optional path to a directory to change into before launching/attaching."
-    echo ""
-    echo "Behavior:"
-    echo "  - $SCRIPT_NAME:                             Launches 'zellij -l $DEFAULT_LAYOUT'"
-    echo "  - $SCRIPT_NAME <dir>:                       Changes to <dir>, launches 'zellij -l $DIR_DEFAULT_LAYOUT'" # Changed default
-    echo "  - $SCRIPT_NAME -l <layout>:                 Launches 'zellij -l <layout>'"
-    echo "  - $SCRIPT_NAME -l <layout> <dir>:           Changes to <dir>, launches 'zellij -l <layout>'"
-    echo "  - $SCRIPT_NAME -n <name> [<dir>]:           Changes to <dir> (if given), runs 'zellij attach --create <name>'"
-    echo "  - $SCRIPT_NAME -n [<dir>]:                  Requires <dir>. Changes to <dir>, runs 'zellij attach --create <dir_basename>'"
-    echo ""
-    echo "Debugging:"
-    echo "  Set DEBUG=1 environment variable to see verbose messages."
-    echo "  Example: DEBUG=1 $SCRIPT_NAME <dir>"
-  } >&2 # Always print usage to stderr for consistency
-  exit "$exit_code"
+Description:
+  Starts Zellij at a given working directory, and optionally with a given
+  layout. Will also optioally name the session or tab using the basename of the
+  working directory. If the session already exists, it will attach to it and
+  force run the commands.
+EOF
+
+# Function to display the help text
+show_help() {
+  echo "$HELP_TEXT"
 }
 
-# Print an error message and exit.
-# die <error_message>
-die() {
-  echo "Error: $1" >&2
-  exit 1
-}
-
-# Print a status message to stderr, only if DEBUG=1.
-# msg <message>
-msg() {
-  # Check if DEBUG is set and equals 1. Default to 0 if unset/empty.
-  if [[ "${DEBUG:-0}" -eq 1 ]]; then
-    echo "Debug: $1" >&2
-  fi
-}
-
-# --- Check Dependencies ---
-if ! command -v zellij &>/dev/null; then
-  die "Zellij command not found. Please ensure Zellij is installed and in your PATH."
-fi
-
-# --- Parse Arguments ---
-TARGET_DIR=""
-ZELLIJ_LAYOUT=""
-SESSION_NAME=""
-ATTACH_MODE=false
-
-# Loop through all arguments to handle mixed options and positional args
+# Parse command-line options
+name=""
+layout="${ZJ_DEFAULT_LAYOUT:-"welcome"}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
   -h | --help)
-    usage # Show usage and exit successfully
+    show_help
+    exit 0
     ;;
   -l | --layout)
-    if [[ -z "${2:-}" ]]; then # Check if $2 is missing or empty
-      usage "Option '$1' requires an argument (layout name)."
+    if [[ -n "$2" && "$2" != -* ]]; then
+      layout=${2:-$layout}
+      shift 2
+    else
+      echo "Error: --layout requires a non-empty value."
+      exit 1
     fi
-    if [[ -n "$ZELLIJ_LAYOUT" ]]; then
-      msg "Warning: overriding previous layout '$ZELLIJ_LAYOUT' with '$2'."
-    fi
-    ZELLIJ_LAYOUT="$2"
-    shift 2 # Consume option and argument
     ;;
   -n | --name)
-    if $ATTACH_MODE && [[ -n "$SESSION_NAME" ]]; then
-      # If -n was already specified with a name, subsequent -n might override or be an error
-      # Let's treat subsequent -n without value as no-op, with value as override
-      msg "Warning: processing subsequent -n/--name flag."
-    fi
-    ATTACH_MODE=true
-    # Check if the next argument exists and does NOT start with '-' (optional value)
-    if [[ -n "${2:-}" && "${2:0:1}" != "-" ]]; then
-      if [[ -n "$SESSION_NAME" ]]; then
-        msg "Warning: overriding previous session name '$SESSION_NAME' with '$2'."
-      fi
-      SESSION_NAME="$2"
-      shift 2 # Consume flag and value
+    if [[ -n "$2" && "$2" != -* ]]; then
+      name="$2"
+      shift 2
     else
-      # Flag provided without a value, name will be derived later (if not already set)
-      shift 1 # Consume flag only
+      echo "Error: --name requires a non-empty value."
+      exit 1
     fi
     ;;
-  -*) # Handle unknown options
-    usage "Unknown option: $1"
-    ;;
-  *) # Handle positional arguments (potential directory)
-    if [[ -n "$TARGET_DIR" ]]; then
-      # We already found a directory argument
-      usage "Too many directory arguments provided ('$TARGET_DIR' and '$1'). Expected at most one."
+  -N)
+    if [[ -z "${name}" ]]; then
+      name="__basename__"
     fi
-    # Assume this is the target directory
-    TARGET_DIR="$1"
-    shift 1 # Consume the directory argument
+    shift
+    ;;
+  -*)
+    echo "Unknown option: $1"
+    echo "Use --help or -h for usage information."
+    exit 1
+    ;;
+  *)
+    # Stop processing options when a positional parameter is encountered
+    break
     ;;
   esac
 done
 
-# --- Validate Arguments Post-Parsing ---
-# Check if the identified directory actually exists (if provided)
-if [[ -n "$TARGET_DIR" ]] && [[ ! -d "$TARGET_DIR" ]]; then
-  die "Target directory '$TARGET_DIR' does not exist or is not a directory."
+if [[ -z "${name}" && "${ZJ_ALWAYS_NAME:-false}" == "true" ]]; then
+  name="__basename__"
 fi
 
-# --- Main Logic ---
-
-zellij_cmd=() # Initialize command array
-
-if $ATTACH_MODE; then
-  # --- Attach/Create Mode ---
-  msg "Attach/Create mode enabled."
-
-  # If layout was also specified, warn that it's ignored (in debug mode)
-  if [[ -n "$ZELLIJ_LAYOUT" ]]; then
-    msg "Ignoring --layout flag ('$ZELLIJ_LAYOUT') because --name/-n is specified."
-  fi
-
-  # Determine session name if not explicitly provided
-  if [[ -z "$SESSION_NAME" ]]; then
-    msg "Session name not provided explicitly with -n/--name."
-    if [[ -z "$TARGET_DIR" ]]; then
-      die "--name/-n used without an explicit name requires a directory argument to derive the name."
-    fi
-    if [[ "$TARGET_DIR" == "/" ]]; then
-      die "Cannot derive session name from root directory '/'."
-    fi
-    # Derive name from directory basename
-    # Resolve potential relative paths or symlinks before taking basename
-    resolved_dir=$(cd "$TARGET_DIR" && pwd -P)
-    SESSION_NAME=$(basename "$resolved_dir")
-    msg "Derived session name from directory: '$SESSION_NAME'"
-    if [[ -z "$SESSION_NAME" ]]; then
-      die "Failed to derive a valid session name from directory '$TARGET_DIR'."
-    fi
-  fi
-
-  zellij_cmd=("zellij" "attach" "--create" "$SESSION_NAME")
-
-else
-  # --- Standard Launch Mode ---
-  msg "Standard launch mode."
-  zellij_cmd=("zellij") # Start building the command array
-
-  # Determine the final layout argument, if any
-  final_layout=""
-  if [[ -n "$ZELLIJ_LAYOUT" ]]; then
-    # Layout explicitly provided via flag
-    final_layout="$ZELLIJ_LAYOUT"
-    msg "Using layout specified via flag: $final_layout"
-  elif [[ -z "$TARGET_DIR" ]]; then
-    # No directory provided AND no layout flag, use global default
-    final_layout="$DEFAULT_LAYOUT" # e.g., "welcome"
-    msg "Using global default layout: $final_layout"
-  else
-    # Directory provided, but no layout flag -> Use directory default layout
-    final_layout="$DIR_DEFAULT_LAYOUT" # e.g., "nvim"
-    msg "Directory provided and no layout specified, using default layout for directories: $final_layout"
-  fi
-
-  # Add layout flag to command if determined
-  if [[ -n "$final_layout" ]]; then
-    zellij_cmd+=("--layout" "$final_layout")
-  fi
+# Optional params
+#
+# Working directory to open in, defaults to pwd
+cwd="$(cd "${1:-$(pwd)}" && pwd)"
+# Default session/tab name to the basename of the provided dir if -N flag set
+if [[ "${name}" == "__basename__" ]]; then
+  name="$(basename "${cwd}")"
 fi
 
-# --- Execute Zellij ---
-if [[ -n "$TARGET_DIR" ]]; then
-  # Change directory required
-  msg "Changing to directory '$TARGET_DIR'..."
-  if ! pushd "$TARGET_DIR" >/dev/null; then
-    die "Failed to change directory to '$TARGET_DIR'."
-  fi
-
-  msg "Executing: ${zellij_cmd[*]}" # Show the command being run
-  # Use exec to replace the script process with zellij, avoids leaving the script running
-  # Only do this if not debugging, otherwise popd won't run if DEBUG=1
-  if [[ "${DEBUG:-0}" -ne 1 ]]; then
-    exec "${zellij_cmd[@]}"
-  else
-    # Run normally if debugging, so popd can execute
-    "${zellij_cmd[@]}"
-    zellij_exit_code=$? # Capture exit code
-    # Return to original directory
-    msg "Returning to original directory."
-    popd >/dev/null
-    exit "$zellij_exit_code"
-  fi
-  # Note: code below exec is only reachable if exec fails or if DEBUG=1 and zellij exits
-  zellij_exit_code=$?
-  # If we are here because DEBUG=1, popd needs to run
-  if [[ "${DEBUG:-0}" -eq 1 ]]; then
-    msg "Returning to original directory (after command finished in debug mode)."
-    popd >/dev/null
-  fi
-  exit "$zellij_exit_code"
-
+if zellij list-sessions | grep -q "$name"; then
+  zellij attach --force-run-commands "$name"
 else
-  # No directory change needed
-  msg "Executing: ${zellij_cmd[*]}"
-  # Use exec to replace the script process with zellij
-  exec "${zellij_cmd[@]}"
-  # Note: code below exec is only reachable if exec fails
-  exit $? # Exit with Zellij's exit code (or exec's failure code)
+  pushd "$cwd" >/dev/null || exit 0
+  zellij --new-session-with-layout "$layout" --session "$name"
+  popd >/dev/null || exit 0
 fi
