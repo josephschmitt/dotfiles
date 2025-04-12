@@ -1,5 +1,5 @@
-if [ -f $HOME/.compassrc ]; then
-  source $HOME/.compassrc
+if [ -f "$HOME/.compassrc" ]; then
+  source "$HOME/.compassrc"
 fi
 
 # Configure bash shell if we're in bash
@@ -22,11 +22,14 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/development/zide/bin:$PATH"
 
 # Add some common aliases
-alias groot="echo 'I am Groot!' && cd $(git rev-parse --show-toplevel)"
-alias zellij_clear="zellij list-sessions --no-formatting | awk '/EXITED/ {print \$1}' | xargs -n 1 zellij delete-session"
+alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
 alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
 alias lg="lazygit"
+
+zellij_clear() {
+  zellij list-sessions --no-formatting | awk '/EXITED/ {print $1}' | xargs -n 1 zellij delete-session
+}
 
 # Git-spice aliases
 alias gsb="gs branch"
