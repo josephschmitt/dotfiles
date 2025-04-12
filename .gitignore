@@ -3,3 +3,4 @@
 .circleci/telemetry.yml
 .config/fish/completions/docker.fish
 .config/fish/completions/kubectl.fish
+.config/helix/runtime
