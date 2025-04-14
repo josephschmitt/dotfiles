@@ -15,6 +15,7 @@
   homebrew = {
     casks = [
       "backblaze"
+      "jump-desktop-connect"
       "orbstack"
     ];
 
