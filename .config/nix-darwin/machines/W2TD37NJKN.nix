@@ -14,6 +14,16 @@
     lima
     mosh
     shellcheck
+
+    # Language Servers
+    bash-language-server
+    docker-compose-language-service
+    dockerfile-language-server-nodejs
+    fish-lsp
+    lua-language-server
+    typescript-language-server
+    yaml-language-server
+    vscode-langservers-extracted
   ];
 
   homebrew = {
