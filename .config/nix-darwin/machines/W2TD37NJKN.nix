@@ -7,7 +7,6 @@
     docker
     docker-compose
     gh
-    # git-spice
     go
     jq
     kubectl

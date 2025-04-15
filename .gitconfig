@@ -32,7 +32,7 @@
 [branch]
   autosetuprebase = always
 [core]
-	editor = hx
+	editor = $EDITOR
 [color]
   ui = auto
 [diff]
