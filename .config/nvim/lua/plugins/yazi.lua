@@ -1,19 +1,34 @@
 return {
   "mikavilpas/yazi.nvim",
-  event = "VeryLazy",
+  dependencies = {
+    "folke/snacks.nvim",
+  },
   keys = {
     {
       "<leader>fy",
       mode = { "n", "v" },
       "<cmd>Yazi<cr>",
-      desc = "Open yazi at the current file",
+      desc = "Yazi (current file)",
+    },
+    {
+      "<leader>y",
+      mode = { "n", "v" },
+      "<cmd>Yazi<cr>",
+      desc = "Yazi (current file)",
     },
     {
       "<leader>fY",
       "<cmd>Yazi cwd<cr>",
-      desc = "Open the file manager in nvim's working directory",
+      desc = "Yazi (cwd)",
+    },
+    {
+      "<leader>Y",
+      "<cmd>Yazi cwd<cr>",
+      desc = "Yazi (cwd)",
     },
   },
   ---@type YaziConfig
-  opts = {},
+  opts = {
+    floating_window_scaling_factor = 0.8,
+  },
 }
