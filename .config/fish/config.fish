@@ -16,8 +16,7 @@ set -gx PATH $basher $PATH ##basher5ea843
 status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
 setenv EDITOR nvim
-
-setenv BASHLOG_FILE 1
+setenv OPENAI_API_KEY "op://Private/OPENAI_API_KEY/credential"
 
 if status is-interactive
     if type -q oh-my-posh

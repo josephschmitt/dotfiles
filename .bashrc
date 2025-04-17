@@ -14,6 +14,7 @@ fi
 complete -C /usr/local/bin/compass compass
 
 export EDITOR="nvim"
+export OPENAI_API_KEY="op://Private/OPENAI_API_KEY/credential"
 
 # Add more bin paths to PATH for custom bin scripts
 export PATH="$HOME/bin:$PATH"
