@@ -44,7 +44,7 @@
     dock.persistent-apps = [
       "/Applications/Safari.app"
       "/Applications/ChatGPT.app"
-      "/Applications/iTerm.app"
+      "/Applications/Ghostty.app"
       "/Applications/Visual Studio Code.app"
     ];
   };
