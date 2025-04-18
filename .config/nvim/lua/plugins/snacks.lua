@@ -108,7 +108,8 @@ return {
               },
             },
           },
-          -- auto_close = true,
+          auto_close = true,
+          include = { "node_modules" },
         },
         files = {
           hidden = true,
