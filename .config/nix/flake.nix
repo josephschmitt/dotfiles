@@ -25,7 +25,6 @@
         oh-my-posh
         ripgrep
         stow
-        tailscale
         zellij
         zsh
       ];
