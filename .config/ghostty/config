@@ -1,6 +1,8 @@
 adjust-cell-height = 10%
 auto-update = download
 auto-update = download
+clipboard-read = allow
+clipboard-write = allow
 cursor-style = bar
 font-family = Monaco Nerd Font Mono
 font-size = 13
