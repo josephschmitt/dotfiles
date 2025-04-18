@@ -16,6 +16,7 @@
         fd
         fish
         fzf
+        gcc
         gh
         git      
         lazygit
