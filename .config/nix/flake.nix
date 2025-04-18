@@ -26,6 +26,7 @@
         stow
         tailscale
         zellij
+        zsh
       ];
     };
   };
