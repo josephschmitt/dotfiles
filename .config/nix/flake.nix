@@ -13,9 +13,19 @@
     packages.${system}.default = pkgs.buildEnv {
       name  = "server-env";
       paths = with pkgs; [
+        fd
         fish
+        fzf
+        gh
         git      
+        lazygit
+        mosh
+        neovim
+        oh-my-posh
+        ripgrep
+        stow
         tailscale
+        zellij
       ];
     };
   };
