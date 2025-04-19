@@ -22,6 +22,7 @@
         lazygit
         mosh
         neovim
+        nodejs
         oh-my-posh
         ripgrep
         stow
