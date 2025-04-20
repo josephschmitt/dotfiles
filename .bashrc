@@ -26,6 +26,9 @@ export PATH="$HOME/development/zide/bin:$PATH"
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
 alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
+alias nix_rebuild="nix profile upgrade --all"
+alias nix_update="nix flake update --flake ~/dotfiles/.config/nix"
+
 alias lg="lazygit"
 
 zellij_clear() {

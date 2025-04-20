@@ -59,6 +59,8 @@ alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
 alias zellij_clear="zellij list-sessions --no-formatting | awk '/EXITED/ {print \$1}' | xargs -n 1 zellij delete-session"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
 alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
+alias nix_rebuild="nix profile upgrade --all"
+alias nix_update="nix flake update --flake ~/dotfiles/.config/nix"
 alias lg="lazygit"
 
 # Git-spice aliases
