@@ -13,6 +13,7 @@
     packages.${system}.default = pkgs.buildEnv {
       name  = "server-env";
       paths = with pkgs; [
+        docker
         fd
         fish
         fzf
