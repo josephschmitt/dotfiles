@@ -47,6 +47,22 @@ if status is-interactive
 
     setenv ZJ_ALWAYS_NAME true
     setenv ZJ_DEFAULT_LAYOUT nvim
+
+    # VIM mode keybindings
+    fish_vi_key_bindings
+
+    # My custom movement bindings
+    bind shift-u redo
+    bind gh beginning-of-line
+    bind gl end-of-line
+
+    # Customize block based on mode
+    set fish_cursor_default block
+    set fish_cursor_insert line
+    set fish_cursor_replace_one underscore
+    set fish_cursor_replace underscore
+    set fish_cursor_external line
+    set fish_cursor_visual block
 end
 
 # Add some more bin paths to PATH for custom bin scripts
