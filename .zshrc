@@ -35,6 +35,11 @@ zinit snippet OMZP::sudo
 zinit snippet OMZP::aws
 zinit snippet OMZP::command-not-found
 
+# ZVM keybindings
+bindkey -M vicmd 'U' redo
+bindkey -M vicmd 'gh' beginning-of-line
+bindkey -M vicmd 'gl' end-of-line
+
 # Load completions
 autoload -Uz compinit && compinit
 
