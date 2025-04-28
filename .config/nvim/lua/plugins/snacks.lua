@@ -105,6 +105,25 @@ return {
                 ["y"] = "copy_file_path",
                 ["S"] = "search_in_directory",
                 ["D"] = "diff",
+                ["<A-c>"] = {
+                  desc = "toggle_auto_close",
+                  function()
+                    local current = Snacks.config.picker.sources.explorer.auto_close
+                    Snacks.config.picker.sources.explorer.auto_close = not current
+
+                    -- Refresh the view by closing and reopening the explorer
+                    vim.cmd("lua Snacks.picker.explorer()")
+                    vim.cmd("lua Snacks.picker.explorer()")
+
+                    local message = "Explorer auto_close: "
+                      .. (Snacks.config.picker.sources.explorer.auto_close and "Enabled" or "Disabled")
+                    if vim.notify then
+                      vim.notify(message, vim.log.levels.INFO, { title = "Snacks Explorer" })
+                    else
+                      vim.api.nvim_echo({ { message, "None" } }, false, {})
+                    end
+                  end,
+                },
               },
             },
           },
