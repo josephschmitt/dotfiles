@@ -31,10 +31,6 @@ alias nix_update="nix flake update --flake ~/dotfiles/.config/nix"
 
 alias lg="lazygit"
 
-zellij_clear() {
-  zellij list-sessions --no-formatting | awk '/EXITED/ {print $1}' | xargs -n 1 zellij delete-session
-}
-
 # Git-spice aliases
 alias gsb="gs branch"
 alias gsbc="gs branch checkout"

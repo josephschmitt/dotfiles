@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+read -r -d '' HELP_TEXT <<EOF
+Usage: $(basename "$0") [OPTIONS] <session_name>
+
+Optional Parameters:
+  <session_name>       Session name to delete. If not provided, all sessions 
+                       will be deleted.
+
+Options:
+  -h, --help           Show this help message and exit.
+
+Description:
+  Deletes a specific Zellij session or all sessions, including ones that
+  have been exited.
+EOF
+
+# Function to display the help text
+show_help() {
+  echo "$HELP_TEXT"
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -h | --help)
+    show_help
+    exit 0
+    ;;
+
+  -*)
+    echo "Unknown option: $1"
+    echo "Use --help or -h for usage information."
+    exit 1
+    ;;
+  *)
+    # Stop processing options when a positional parameter is encountered
+    break
+    ;;
+  esac
+done
+
+if [ "$1" == "" ]; then
+  zellij list-sessions --no-formatting | awk '/EXITED/ {print $1}' | xargs -n 1 zellij delete-session
+else
+  zellij delete-session "$1"
+fi
