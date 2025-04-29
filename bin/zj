@@ -94,14 +94,18 @@ if [[ "${name}" == "__basename__" ]]; then
   name="$(basename "${cwd}")"
 fi
 
-pushd "$cwd" >/dev/null || exit 0
-if [ -n "${name}" ] && zellij list-sessions | grep -q "$name"; then
-  zellij attach --force-run-commands "$name"
+if [ -n "$ZELLIJ" ]; then
+  zellij action new-tab --cwd "$cwd" --layout "${layout}"
 else
-  if [ -n "${name}" ]; then
-    zellij --new-session-with-layout "$layout" --session "$name"
+  pushd "$cwd" >/dev/null || exit 0
+  if [ -n "${name}" ] && zellij list-sessions | grep -q "$name"; then
+    zellij attach --force-run-commands "$name"
   else
-    zellij --new-session-with-layout "$layout"
+    if [ -n "${name}" ]; then
+      zellij --new-session-with-layout "$layout" --session "$name"
+    else
+      zellij --new-session-with-layout "$layout"
+    fi
   fi
+  popd >/dev/null || exit 0
 fi
-popd >/dev/null || exit 0
