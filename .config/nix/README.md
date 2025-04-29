@@ -11,5 +11,3 @@ $ cd ~/dotfiles/.config/nix
 $ nix flake update           # refresh nixpkgs revision in flake.lock
 $ nix profile upgrade --all  # rebuild your profile to the new lock file
 ```
-```
-```
