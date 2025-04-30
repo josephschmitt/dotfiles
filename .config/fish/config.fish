@@ -72,6 +72,13 @@ set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/development/zide/bin" $PATH
 set -gx PATH "$HOME/development/zj/bin" $PATH
 
+# Configure asdf 
+if test -z $ASDF_DATA_DIR
+    set _asdf_shims "$HOME/.asdf/shims"
+else
+    set _asdf_shims "$ASDF_DATA_DIR/shims"
+end
+
 alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
 alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"

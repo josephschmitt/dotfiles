@@ -23,6 +23,9 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/development/zide/bin:$PATH"
 export PATH="$HOME/development/zj/bin:$PATH"
 
+# Configure asdf
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
 # Add some common aliases
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
