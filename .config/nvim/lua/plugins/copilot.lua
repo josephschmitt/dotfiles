@@ -1,3 +1,10 @@
+if vim.g.neovide then
+  return {
+    "zbirenbaum/copilot.lua",
+    enabled = false,
+  }
+end
+
 local LazyVim = require("lazyvim.util")
 return {
   "zbirenbaum/copilot.lua",
