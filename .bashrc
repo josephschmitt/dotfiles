@@ -21,6 +21,7 @@ export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/development/zide/bin:$PATH"
+export PATH="$HOME/development/zj/bin:$PATH"
 
 # Add some common aliases
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"

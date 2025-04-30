@@ -70,6 +70,7 @@ set -gx PATH "$HOME/bin" $PATH
 set -gx PATH "$HOME/go/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/development/zide/bin" $PATH
+set -gx PATH "$HOME/development/zj/bin" $PATH
 
 alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
