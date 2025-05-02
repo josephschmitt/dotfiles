@@ -4,14 +4,14 @@ return {
   keys = {
     -- Add or skip cursor above/below the main cursor.
     {
-      "<C-k>",
+      "<up>",
       function()
         require("multicursor-nvim").lineAddCursor(-1)
       end,
       mode = { "n", "x" },
     },
     {
-      "<C-j>",
+      "<down>",
       function()
         require("multicursor-nvim").lineAddCursor(1)
       end,
