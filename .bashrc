@@ -18,6 +18,9 @@ export OPENAI_API_KEY="op://Private/OPENAI_API_KEY/credential"
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="nvim"
 
+setenv COPILOT_API_KEY ghu_FOECC8KoI4ZvAKfu4ozTJm4LHYJcKr19PiVr
+# setenv OPENAI_API_KEY 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
+
 # Add more bin paths to PATH for custom bin scripts
 export PATH="$HOME/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
