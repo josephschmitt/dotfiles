@@ -1,10 +1,12 @@
+local colors = require("tokyonight.colors").setup({ style = "night" })
+
 return {
   "mvllow/modes.nvim",
   opts = {
     colors = {
-      copy = "#f5c359",
-      delete = "#c75c6a",
-      insert = "#78ccc5",
+      copy = colors.orange,
+      delete = colors.red,
+      insert = colors.green,
       visual = "#e178fa",
     },
 
