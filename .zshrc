@@ -6,10 +6,6 @@ if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
   eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
-# Setup basher
-export PATH="$HOME/.basher/bin:$PATH"
-[ -s "$HOME/.basher/bin/basher" ] && eval "$(basher init - zsh)"
-
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 

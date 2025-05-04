@@ -19,6 +19,7 @@
         fzf
         gcc
         gh
+        ghostty
         git      
         lazygit
         mosh
