@@ -5,7 +5,7 @@ return {
       hidden = true, -- Show hidden files by default
       sources = {
         explorer = {
-          layout = { preset = "sidebar", preview = "main" }, -- Show a preview as browsing files
+          layout = { preset = "sidebar" }, -- Show a preview as browsing files
           actions = {
             explorer_focus = function(picker)
               vim.cmd("cd " .. picker:dir())
