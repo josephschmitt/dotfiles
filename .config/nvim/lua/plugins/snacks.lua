@@ -5,11 +5,23 @@ return {
       hidden = true, -- Show hidden files by default
       sources = {
         explorer = {
-          layout = { preset = "sidebar" }, -- Show a preview as browsing files
+          layout = { preset = "sidebar" },
           actions = {
-            explorer_focus = function(picker)
-              vim.cmd("cd " .. picker:dir())
-            end,
+            toggle_preview = {
+              action = function(picker)
+                local current = picker.layout.preview
+                if current then
+                  picker:set_layout({ preview = false })
+                else
+                  picker:set_layout("sidebar")
+                end
+              end,
+            },
+            explorer_focus = {
+              action = function(picker)
+                vim.cmd("cd " .. picker:dir())
+              end,
+            },
             copy_file_path = {
               action = function(_, item)
                 if not item then
