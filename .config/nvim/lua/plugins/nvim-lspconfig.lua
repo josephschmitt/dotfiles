@@ -1,6 +1,11 @@
 return {
   "neovim/nvim-lspconfig",
   opts = {
+    -- Using tiny-inline-diagnostics
+    diagnostics = {
+      virtual_text = false,
+      virtual_lines = false,
+    },
     servers = { eslint = {} },
     setup = {
       eslint = function()
