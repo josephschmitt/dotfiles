@@ -1,5 +1,4 @@
 {
-  "AniMotion.nvim": { "branch": "main", "commit": "a1adf214e276fa8c3f439ce3fa13a6f647744dab" },
   "CopilotChat.nvim": { "branch": "main", "commit": "75653259442a8eb895abfc70d7064e07aeb7134c" },
   "LazyVim": { "branch": "main", "commit": "3f034d0a7f58031123300309f2efd3bb0356ee21" },
   "SchemaStore.nvim": { "branch": "main", "commit": "ea5687d7e8af3ce6678dd03d3a1bd109b5c618b7" },
