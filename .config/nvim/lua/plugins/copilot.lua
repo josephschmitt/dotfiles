@@ -1,13 +1,7 @@
-if vim.g.neovide then
-  return {
-    "zbirenbaum/copilot.lua",
-    enabled = false,
-  }
-end
-
 local LazyVim = require("lazyvim.util")
 return {
   "zbirenbaum/copilot.lua",
+  enabled = not vim.g.neovide,
   opts = function()
     LazyVim.cmp.actions.ai_accept = function()
       if require("copilot.suggestion").is_visible() then
