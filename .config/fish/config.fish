@@ -16,7 +16,6 @@ set -gx PATH "$HOME/.cargo/bin" $PATH
 # status --is-interactive; and . (basher init - fish | psub) ##basher5ea843
 
 setenv EDITOR nvim
-setenv OPENAI_API_KEY "op://Private/OPENAI_API_KEY/credential"
 
 if status is-interactive
     if type -q oh-my-posh

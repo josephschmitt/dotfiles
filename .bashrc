@@ -7,8 +7,8 @@ if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
   eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 
   # Setup basher
-  export PATH="$HOME/.basher/bin:$PATH"
-  eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
+  # export PATH="$HOME/.basher/bin:$PATH"
+  # eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
 fi
 
 complete -C /usr/local/bin/compass compass
@@ -17,9 +17,6 @@ export EDITOR="nvim"
 export OPENAI_API_KEY="op://Private/OPENAI_API_KEY/credential"
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="nvim"
-
-setenv COPILOT_API_KEY ghu_FOECC8KoI4ZvAKfu4ozTJm4LHYJcKr19PiVr
-# setenv OPENAI_API_KEY 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
 
 # Add more bin paths to PATH for custom bin scripts
 export PATH="$HOME/bin:$PATH"
