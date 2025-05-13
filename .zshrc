@@ -9,6 +9,23 @@ fi
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
+# ZVM keybindings
+function zvm_after_lazy_keybindings() {
+  bindkey -M vicmd 'U' redo
+  bindkey -M vicmd 'gh' beginning-of-line
+  bindkey -M vicmd 'gl' end-of-line
+}
+
+# ZVM Config
+function zvm_config() {
+  ZVM_INIT_MODE=$ZVM_MODE_NORMAL
+  ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLOCK
+  ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BEAM
+  ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_UNDERLINE
+  ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLOCK
+  ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_USER_DEFAULT
+}
+
 # Download Zinit, if it's not there yet
 if [ ! -d "$ZINIT_HOME" ]; then
    mkdir -p "$(dirname $ZINIT_HOME)"
@@ -30,11 +47,6 @@ zinit light jeffreytse/zsh-vi-mode
 zinit snippet OMZP::sudo
 zinit snippet OMZP::aws
 zinit snippet OMZP::command-not-found
-
-# ZVM keybindings
-bindkey -M vicmd 'U' redo
-bindkey -M vicmd 'gh' beginning-of-line
-bindkey -M vicmd 'gl' end-of-line
 
 # Load completions
 autoload -Uz compinit && compinit
@@ -74,6 +86,7 @@ alias c='clear'
 cdd() {
   cd ~/development/"$1"
 }
+
 
 # Shell integrations
 eval "$(fzf --zsh)"

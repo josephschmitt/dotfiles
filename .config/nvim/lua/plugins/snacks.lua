@@ -5,6 +5,7 @@ return {
       hidden = true, -- Show hidden files by default
       sources = {
         explorer = {
+          ignored = true,
           layout = { preset = "sidebar" },
           actions = {
             toggle_preview = {
@@ -144,7 +145,6 @@ return {
         },
         files = {
           hidden = true,
-          ignored = true,
         },
       },
     },
