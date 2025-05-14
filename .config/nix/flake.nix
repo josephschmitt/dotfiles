@@ -9,28 +9,30 @@
     system = "x86_64-linux";
     pkgs   = import nixpkgs { inherit system; };
   in {
-    # Everything you want to appear on the machine goes in this list ↓
-    packages.${system}.default = pkgs.buildEnv {
-      name  = "server-env";
-      paths = with pkgs; [
-        docker
-        fd
-        fish
-        fzf
-        gcc
-        gh
-        ghostty
-        git      
-        lazygit
-        mosh
-        neovim
-        nodejs
-        oh-my-posh
-        ripgrep
-        stow
-        zellij
-        zsh
-      ];
+    packages.${system} = {
+      # Everything you want to appear on the machine goes in this list ↓
+      default = pkgs.buildEnv {
+        name = "server-env";
+        paths = with pkgs; [
+          fd
+          fish
+          fzf
+          gcc
+          gh
+          ghostty
+          git
+          lazygit
+          mosh
+          neovim
+          nodejs
+          oh-my-posh
+          ripgrep
+          stow
+          yazi
+          zellij
+          zsh
+        ];
+      };
     };
   };
 }
