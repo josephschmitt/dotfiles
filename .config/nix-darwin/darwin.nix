@@ -14,6 +14,7 @@
     ripgrep
     stow
     tmux
+    volta
     zellij
   ];
 

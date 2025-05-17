@@ -25,11 +25,10 @@
           lazygit
           mosh
           neovim
-          nodejs
           oh-my-posh
           ripgrep
           stow
-          yazi
+          volta
           zellij
           zsh
         ];
