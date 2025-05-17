@@ -19,11 +19,16 @@ function zvm_after_lazy_keybindings() {
 # ZVM Config
 function zvm_config() {
   ZVM_INIT_MODE=$ZVM_MODE_NORMAL
+  ZVM_VI_INSERT_ESCAPE_BINDKEY=kj
   ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLOCK
   ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BEAM
   ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_UNDERLINE
   ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLOCK
   ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_USER_DEFAULT
+}
+
+function zvm_after_init() {
+  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 }
 
 # Download Zinit, if it's not there yet
