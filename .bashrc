@@ -11,8 +11,6 @@ if [[ "$(ps -p $$ -o comm=)" = *"bash"* ]]; then
   # eval "$(basher init - bash)" # replace `bash` with `zsh` if you use zsh
 fi
 
-complete -C /usr/local/bin/compass compass
-
 # Add some common aliases
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias darwin_rebuild="darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"

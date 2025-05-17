@@ -15,3 +15,5 @@ export PATH="$HOME/.nix-profile/bin:$PATH"
 export PATH="/run/current-system/sw/bin:$PATH"
 export PATH="/nix/var/nix/profiles/default/bin:$PATH"
 export HNVM_QUIET=true
+
+complete -C /usr/local/bin/compass compass
