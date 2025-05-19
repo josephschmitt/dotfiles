@@ -62,3 +62,9 @@ map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
 
 -- Buffers
 map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
+
+-- CodeCompanion
+map({ "n", "v" }, "<leader>C", "", { noremap = true, silent = true, desc = "+codecompanion" })
+map({ "n", "v" }, "<leader>Cc", "<cmd>CodeCompanion<cr>", { desc = "Code Companion" })
+map({ "n", "v" }, "<leader>CC", "<cmd>CodeCompanionChat<cr>", { desc = "Code Companion" })
+map({ "n", "v" }, "<leader>Ca", "<cmd>CodeCompanionActions<cr>", { desc = "Code Companion" })
