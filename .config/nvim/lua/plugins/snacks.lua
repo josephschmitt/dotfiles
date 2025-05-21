@@ -164,5 +164,12 @@ return {
       end,
       desc = "Smart Find Files",
     },
+    {
+      "<leader>:",
+      function()
+        Snacks.picker.commands()
+      end,
+      desc = "Commands",
+    },
   },
 }
