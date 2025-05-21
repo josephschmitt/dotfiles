@@ -23,44 +23,44 @@ return {
                 vim.cmd("cd " .. picker:dir())
               end,
             },
-            copy_file_path = {
-              action = function(_, item)
-                if not item then
-                  return
-                end
-
-                local vals = {
-                  ["BASENAME"] = vim.fn.fnamemodify(item.file, ":t:r"),
-                  ["EXTENSION"] = vim.fn.fnamemodify(item.file, ":t:e"),
-                  ["FILENAME"] = vim.fn.fnamemodify(item.file, ":t"),
-                  ["PATH"] = item.file,
-                  ["PATH (CWD)"] = vim.fn.fnamemodify(item.file, ":."),
-                  ["PATH (HOME)"] = vim.fn.fnamemodify(item.file, ":~"),
-                  ["URI"] = vim.uri_from_fname(item.file),
-                }
-
-                local options = vim.tbl_filter(function(val)
-                  return vals[val] ~= ""
-                end, vim.tbl_keys(vals))
-                if vim.tbl_isempty(options) then
-                  vim.notify("No values to copy", vim.log.levels.WARN)
-                  return
-                end
-                table.sort(options)
-                vim.ui.select(options, {
-                  prompt = "Choose to copy to clipboard:",
-                  format_item = function(list_item)
-                    return ("%s: %s"):format(list_item, vals[list_item])
-                  end,
-                }, function(choice)
-                  local result = vals[choice]
-                  if result then
-                    vim.fn.setreg("+", result)
-                    Snacks.notify.info("Yanked `" .. result .. "`")
-                  end
-                end)
-              end,
-            },
+            -- copy_file_path = {
+            --   action = function(_, item)
+            --     if not item then
+            --       return
+            --     end
+            --
+            --     local vals = {
+            --       ["BASENAME"] = vim.fn.fnamemodify(item.file, ":t:r"),
+            --       ["EXTENSION"] = vim.fn.fnamemodify(item.file, ":t:e"),
+            --       ["FILENAME"] = vim.fn.fnamemodify(item.file, ":t"),
+            --       ["PATH"] = item.file,
+            --       ["PATH (CWD)"] = vim.fn.fnamemodify(item.file, ":."),
+            --       ["PATH (HOME)"] = vim.fn.fnamemodify(item.file, ":~"),
+            --       ["URI"] = vim.uri_from_fname(item.file),
+            --     }
+            --
+            --     local options = vim.tbl_filter(function(val)
+            --       return vals[val] ~= ""
+            --     end, vim.tbl_keys(vals))
+            --     if vim.tbl_isempty(options) then
+            --       vim.notify("No values to copy", vim.log.levels.WARN)
+            --       return
+            --     end
+            --     table.sort(options)
+            --     vim.ui.select(options, {
+            --       prompt = "Choose to copy to clipboard:",
+            --       format_item = function(list_item)
+            --         return ("%s: %s"):format(list_item, vals[list_item])
+            --       end,
+            --     }, function(choice)
+            --       local result = vals[choice]
+            --       if result then
+            --         vim.fn.setreg("+", result)
+            --         Snacks.notify.info("Yanked `" .. result .. "`")
+            --       end
+            --     end)
+            --   end,
+            -- },
             search_in_directory = {
               action = function(_, item)
                 if not item then
@@ -154,6 +154,15 @@ return {
           height = 0.3,
         },
       },
+    },
+  },
+  keys = {
+    {
+      "<leader><space>",
+      function()
+        require("snacks").picker.files({ follow = true })
+      end,
+      desc = "Smart Find Files",
     },
   },
 }
