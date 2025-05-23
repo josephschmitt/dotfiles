@@ -146,6 +146,15 @@ return {
         files = {
           hidden = true,
         },
+        git_status = {
+          win = {
+            input = {
+              keys = {
+                ["<Tab>"] = "select_and_next",
+              },
+            },
+          },
+        },
       },
     },
     terminal = {
@@ -165,7 +174,7 @@ return {
       desc = "Smart Find Files",
     },
     {
-      "<leader>:",
+      "<leader>;",
       function()
         Snacks.picker.commands()
       end,
