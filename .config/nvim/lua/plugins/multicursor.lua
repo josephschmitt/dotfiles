@@ -20,7 +20,7 @@ return {
 
     -- Add or skip adding a new cursor by matching word/selection
     {
-      "<leader>mn",
+      "<M-Down>",
       function()
         require("multicursor-nvim").matchAddCursor(1)
       end,
@@ -28,27 +28,11 @@ return {
       mode = { "n", "x" },
     },
     {
-      "<leader>ms",
-      function()
-        require("multicursor-nvim").matchSkipCursor(1)
-      end,
-      desc = "Skip cursor for word/selection",
-      mode = { "n", "x" },
-    },
-    {
-      "<leader>mN",
+      "<M-Up>",
       function()
         require("multicursor-nvim").matchAddCursor(-1)
       end,
       desc = "Add cursor for word/selection backwards",
-      mode = { "n", "x" },
-    },
-    {
-      "<leader>mS",
-      function()
-        require("multicursor-nvim").matchSkipCursor(-1)
-      end,
-      desc = "Skip cursor for word/selection backwards",
       mode = { "n", "x" },
     },
 
