@@ -1,0 +1,33 @@
+# /etc/systemd/system/docker-compose@.service
+[Unit]
+Description=Docker Compose stack %i
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+PartOf=docker.service          # tie life-cycle to dockerd
+BindsTo=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/josephschmitt/%i
+
+# ----- run root-less -------------------------------------------------
+User=josephschmitt
+
+# Make sure systemd can find the CLI in your nix profile
+Environment="PATH=/home/josephschmitt/.nix-profile/bin:/usr/local/bin:/usr/bin"
+
+# ----- Compose commands ---------------------------------------------
+ExecStart=/usr/bin/env docker compose up -d
+ExecStop=/usr/bin/env docker compose down
+ExecReload=/usr/bin/env sh -c 'docker compose pull --quiet && docker compose up -d'
+
+# ----- reliability knobs --------------------------------------------
+TimeoutStartSec=0
+Restart=on-failure
+StartLimitIntervalSec=30       # give it room to retry
+StartLimitBurst=20
+
+[Install]
+WantedBy=multi-user.target
