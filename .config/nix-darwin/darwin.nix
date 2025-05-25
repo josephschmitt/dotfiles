@@ -16,6 +16,7 @@
     tmux
     volta
     zellij
+    zoxide
   ];
 
   environment.shells = [pkgs.fish];

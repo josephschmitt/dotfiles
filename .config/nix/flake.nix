@@ -30,6 +30,7 @@
           stow
           volta
           zellij
+          zoxide
           zsh
         ];
       };

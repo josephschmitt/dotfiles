@@ -58,6 +58,11 @@ if status is-interactive
     set fish_cursor_replace underscore
     set fish_cursor_external line
     set fish_cursor_visual block
+
+    if type -q zoxide
+        zoxide init fish | source
+    end
+
     # Add some more bin paths to PATH for custom bin scripts
     set -gx PATH "$HOME/bin" $PATH
     set -gx PATH "$HOME/go/bin" $PATH
