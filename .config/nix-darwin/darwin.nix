@@ -35,6 +35,7 @@
       "hyperkey"
       "iterm2"
       "logi-options+"
+      "neovide"
       "raycast"
       "runjs"
       "setapp"
