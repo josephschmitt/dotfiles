@@ -1,0 +1,24 @@
+{
+  "actions" : [
+    {
+      "actions" : [
+        {
+          "key" : "t",
+          "label" : "My Tasks",
+          "type" : "url",
+          "value" : "raycast://extensions/reboot/hypersonic/index"
+        },
+        {
+          "key" : "n",
+          "label" : "New Task from Arc Tab",
+          "type" : "url",
+          "value" : "shortcuts://run-shortcut?name=Notion: Create Task of Arc Window"
+        }
+      ],
+      "key" : "t",
+      "label" : "Tasks",
+      "type" : "group"
+    }
+  ],
+  "type" : "group"
+}

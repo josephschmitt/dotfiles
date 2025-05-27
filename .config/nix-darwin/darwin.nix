@@ -34,6 +34,7 @@
       "ghostty"
       "hyperkey"
       "iterm2"
+      "leader-key"
       "logi-options+"
       "neovide"
       "raycast"
