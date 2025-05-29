@@ -63,8 +63,8 @@ map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
 -- Buffers
 map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
 -- Switch buffer that also works in insert mode
-map({ "n", "i", "v" }, "<A-h>", "<Cmd>bprevious<CR>", { desc = "Previous buffer" })
-map({ "n", "i", "v" }, "<A-l>", "<Cmd>bnext<CR>", { desc = "Next buffer" })
+-- map({ "n", "i", "v" }, "<A-h>", "<Cmd>bprevious<CR>", { desc = "Previous buffer" })
+-- map({ "n", "i", "v" }, "<A-l>", "<Cmd>bnext<CR>", { desc = "Next buffer" })
 
 -- CodeCompanion
 map({ "n", "v" }, "<leader>C", "", { noremap = true, silent = true, desc = "+codecompanion" })

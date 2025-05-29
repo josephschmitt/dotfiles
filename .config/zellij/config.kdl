@@ -152,6 +152,8 @@ keybinds clear-defaults=true {
     shared_among "normal" "locked" {
         bind "Ctrl q" { Quit; }
         bind "Ctrl d" { Detach; }
+        bind "Alt h" { MoveFocusOrTab "Left"; }
+        bind "Alt l" { MoveFocusOrTab "Right"; }
     }
     shared_except "locked" {
         bind "Alt +" { Resize "Increase"; }
