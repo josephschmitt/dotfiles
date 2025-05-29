@@ -65,6 +65,16 @@ map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers
 -- Switch buffer that also works in insert mode
 -- map({ "n", "i", "v" }, "<A-h>", "<Cmd>bprevious<CR>", { desc = "Previous buffer" })
 -- map({ "n", "i", "v" }, "<A-l>", "<Cmd>bnext<CR>", { desc = "Next buffer" })
+-- Map Ctrl-0 to go to the last visible buffer
+map({ "n", "i", "v" }, "<C-0>", function()
+  local count = #vim.fn.getbufinfo({ buflisted = 1 })
+  vim.cmd(("BufferLineGoToBuffer %d"):format(count))
+end, { desc = "Go to last buffer" })
+for i = 1, 9 do
+  map({ "n", "i", "v" }, ("<C-%d>"):format(i), ("<Cmd>BufferLineGoToBuffer %d<CR>"):format(i), {
+    desc = ("Go to buffer %d"):format(i),
+  })
+end
 
 -- CodeCompanion
 map({ "n", "v" }, "<leader>C", "", { noremap = true, silent = true, desc = "+codecompanion" })
