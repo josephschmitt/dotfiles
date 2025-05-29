@@ -152,8 +152,33 @@ keybinds clear-defaults=true {
     shared_among "normal" "locked" {
         bind "Ctrl q" { Quit; }
         bind "Ctrl d" { Detach; }
-        bind "Alt h" { MoveFocusOrTab "Left"; }
-        bind "Alt l" { MoveFocusOrTab "Right"; }
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt 1" { GoToTab 1; SwitchToMode "locked"; }
+        bind "Alt 2" { GoToTab 2; SwitchToMode "locked"; }
+        bind "Alt 3" { GoToTab 3; SwitchToMode "locked"; }
+        bind "Alt 4" { GoToTab 4; SwitchToMode "locked"; }
+        bind "Alt 5" { GoToTab 5; SwitchToMode "locked"; }
+        bind "Alt 6" { GoToTab 6; SwitchToMode "locked"; }
+        bind "Alt 7" { GoToTab 7; SwitchToMode "locked"; }
+        bind "Alt 8" { GoToTab 8; SwitchToMode "locked"; }
+        bind "Alt 9" { GoToTab 9; SwitchToMode "locked"; }
+        bind "Alt =" { Resize "Increase"; }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt z" { ToggleFocusFullscreen; }
+        bind "Alt g" { ToggleFloatingPanes; }
+        bind "Alt h" { MoveFocusOrTab "left"; }
+        bind "Alt i" { MoveTab "left"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt p" { NewPane; }
+        bind "Alt o" { MoveTab "right"; }
+        bind "Alt t" { NewTab; }
+        bind "Alt {" { GoToPreviousTab; }
+        bind "Alt }" { GoToNextTab; }
+        bind "Alt x" { CloseFocus; }
     }
     shared_except "locked" {
         bind "Alt +" { Resize "Increase"; }
