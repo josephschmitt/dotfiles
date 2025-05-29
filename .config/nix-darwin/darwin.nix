@@ -1,5 +1,6 @@
 { pkgs, config, ... }: {
   nixpkgs.config.allowUnfree = true;
+  system.primaryUser = "josephschmitt";
 
   environment.systemPackages = with pkgs; [
     _1password-cli
