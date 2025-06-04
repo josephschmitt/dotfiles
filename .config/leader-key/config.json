@@ -52,6 +52,11 @@
           "key" : "b",
           "type" : "application",
           "value" : "/Applications/Brave Browser.app"
+        },
+        {
+          "key" : "z",
+          "type" : "application",
+          "value" : "/Applications/Zen.app"
         }
       ],
       "key" : "b",
