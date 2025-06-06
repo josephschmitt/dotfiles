@@ -35,6 +35,10 @@
       "git-spice"
       "scooter"
     ];
+
+    casks = [
+      "betterdisplay"
+    ]
   };
 
   system.defaults = {
