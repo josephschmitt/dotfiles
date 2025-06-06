@@ -3,25 +3,6 @@
     {
       "actions": [
         {
-          "key": "t",
-          "label": "My Tasks",
-          "type": "url",
-          "value": "raycast://extensions/reboot/hypersonic/index"
-        },
-        {
-          "key": "n",
-          "label": "New Task from Arc Tab",
-          "type": "url",
-          "value": "shortcuts://run-shortcut?name=Notion: Create Task of Arc Window"
-        }
-      ],
-      "key": "t",
-      "label": "Tasks",
-      "type": "group"
-    },
-    {
-      "actions": [
-        {
           "key": "c",
           "type": "application",
           "value": "/Applications/ChatGPT.app"
@@ -44,14 +25,14 @@
           "value": "/Applications/Arc.app"
         },
         {
-          "key": "s",
-          "type": "application",
-          "value": "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
-        },
-        {
           "key": "b",
           "type": "application",
           "value": "/Applications/Brave Browser.app"
+        },
+        {
+          "key": "s",
+          "type": "application",
+          "value": "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
         },
         {
           "key": "z",
@@ -66,14 +47,14 @@
     {
       "actions": [
         {
-          "key": "s",
-          "type": "application",
-          "value": "/Applications/Slack.app"
-        },
-        {
           "key": "m",
           "type": "application",
           "value": "/System/Applications/Messages.app"
+        },
+        {
+          "key": "s",
+          "type": "application",
+          "value": "/Applications/Slack.app"
         }
       ],
       "key": "c",
@@ -83,16 +64,61 @@
     {
       "actions": [
         {
-          "key": "p",
-          "label": "Pause/Play",
-          "type": "url",
-          "value": "raycast://extensions/fedevitaledev/music/toggle-play-pause"
+          "key": "b",
+          "type": "application",
+          "value": "/Applications/BBEdit.app"
         },
         {
-          "key": "m",
-          "label": "Open Music",
+          "key": "n",
+          "label": "Neovide",
+          "type": "command",
+          "value": "neovide"
+        },
+        {
+          "key": "v",
+          "label": "VS Code",
           "type": "application",
-          "value": "/System/Applications/Music.app"
+          "value": "/Applications/Visual Studio Code.app"
+        },
+        {
+          "key": "z",
+          "type": "application",
+          "value": "/Applications/Zed.app"
+        }
+      ],
+      "key": "e",
+      "label": "Editors",
+      "type": "group"
+    },
+    {
+      "actions": [
+        {
+          "key": "a",
+          "type": "folder",
+          "value": "/Applications"
+        },
+        {
+          "key": "d",
+          "type": "folder",
+          "value": "/Users/josephschmitt/development"
+        },
+        {
+          "key": "D",
+          "type": "folder",
+          "value": "/Users/josephschmitt/Downloads"
+        }
+      ],
+      "key": "f",
+      "label": "Finder",
+      "type": "group"
+    },
+    {
+      "actions": [
+        {
+          "key": "<",
+          "label": "Previous Track",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/previous-track"
         },
         {
           "key": ">",
@@ -101,16 +127,22 @@
           "value": "raycast://extensions/fedevitaledev/music/next-track"
         },
         {
-          "key": "<",
-          "label": "Previous Track",
-          "type": "url",
-          "value": "raycast://extensions/fedevitaledev/music/previous-track"
-        },
-        {
           "key": "@",
           "label": "Ask Music",
           "type": "url",
           "value": "raycast://extensions/fedevitaledev/music/ask-music{id=2bfe94cd-50ab-4e48-a6cd-f1ff47a72706}__generated"
+        },
+        {
+          "key": "m",
+          "label": "Open Music",
+          "type": "application",
+          "value": "/System/Applications/Music.app"
+        },
+        {
+          "key": "p",
+          "label": "Pause/Play",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/toggle-play-pause"
         }
       ],
       "key": "m",
@@ -120,27 +152,36 @@
     {
       "actions": [
         {
-          "key": "D",
-          "type": "folder",
-          "value": "/Users/josephschmitt/Downloads"
+          "key": "n",
+          "label": "New Task from Arc Tab",
+          "type": "url",
+          "value": "shortcuts://run-shortcut?name=Notion: Create Task of Arc Window"
         },
         {
-          "key": "d",
-          "type": "folder",
-          "value": "/Users/josephschmitt/development"
-        },
-        {
-          "key": "a",
-          "type": "folder",
-          "value": "/Applications"
+          "key": "t",
+          "label": "My Tasks",
+          "type": "url",
+          "value": "raycast://extensions/reboot/hypersonic/index"
         }
       ],
-      "key": "f",
-      "label": "Finder",
+      "key": "t",
+      "label": "Tasks",
       "type": "group"
     },
     {
       "actions": [
+        {
+          "key": "1",
+          "label": "Laptop Layout",
+          "type": "url",
+          "value": "raycast://customWindowManagementCommand?&name=Laptop%20Screen"
+        },
+        {
+          "key": "2",
+          "label": "External Layout",
+          "type": "url",
+          "value": "raycast://customWindowManagementCommand?&name=External%20Monitor"
+        },
         {
           "key": "h",
           "label": "Left Half",
@@ -164,51 +205,10 @@
           "label": "Right Half",
           "type": "url",
           "value": "raycast://extensions/raycast/window-management/right-half"
-        },
-        {
-          "key": "2",
-          "label": "External Layout",
-          "type": "url",
-          "value": "raycast://customWindowManagementCommand?&name=External%20Monitor"
-        },
-        {
-          "key": "1",
-          "label": "Laptop Layout",
-          "type": "url",
-          "value": "raycast://customWindowManagementCommand?&name=Laptop%20Screen"
         }
       ],
       "key": "w",
       "label": "Window",
-      "type": "group"
-    },
-    {
-      "actions": [
-        {
-          "key": "n",
-          "label": "Neovide",
-          "type": "command",
-          "value": "neovide"
-        },
-        {
-          "key": "v",
-          "label": "VS Code",
-          "type": "application",
-          "value": "/Applications/Visual Studio Code.app"
-        },
-        {
-          "key": "b",
-          "type": "application",
-          "value": "/Applications/BBEdit.app"
-        },
-        {
-          "key": "z",
-          "type": "application",
-          "value": "/Applications/Zed.app"
-        }
-      ],
-      "key": "e",
-      "label": "Editors",
       "type": "group"
     }
   ],
