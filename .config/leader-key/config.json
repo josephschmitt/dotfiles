@@ -1,216 +1,216 @@
 {
-  "actions" : [
+  "actions": [
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "t",
-          "label" : "My Tasks",
-          "type" : "url",
-          "value" : "raycast://extensions/reboot/hypersonic/index"
+          "key": "t",
+          "label": "My Tasks",
+          "type": "url",
+          "value": "raycast://extensions/reboot/hypersonic/index"
         },
         {
-          "key" : "n",
-          "label" : "New Task from Arc Tab",
-          "type" : "url",
-          "value" : "shortcuts://run-shortcut?name=Notion: Create Task of Arc Window"
+          "key": "n",
+          "label": "New Task from Arc Tab",
+          "type": "url",
+          "value": "shortcuts://run-shortcut?name=Notion: Create Task of Arc Window"
         }
       ],
-      "key" : "t",
-      "label" : "Tasks",
-      "type" : "group"
+      "key": "t",
+      "label": "Tasks",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "c",
-          "type" : "application",
-          "value" : "/Applications/ChatGPT.app"
+          "key": "c",
+          "type": "application",
+          "value": "/Applications/ChatGPT.app"
         },
         {
-          "key" : "g",
-          "type" : "application",
-          "value" : "/Users/josephschmitt/Applications/Brave Browser Apps.localized/Google Gemini.app"
+          "key": "g",
+          "type": "application",
+          "value": "/Users/josephschmitt/Applications/Brave Browser Apps.localized/Google Gemini.app"
         }
       ],
-      "key" : "a",
-      "label" : "AI",
-      "type" : "group"
+      "key": "a",
+      "label": "AI",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "a",
-          "type" : "application",
-          "value" : "/Applications/Arc.app"
+          "key": "a",
+          "type": "application",
+          "value": "/Applications/Arc.app"
         },
         {
-          "key" : "s",
-          "type" : "application",
-          "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+          "key": "s",
+          "type": "application",
+          "value": "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
         },
         {
-          "key" : "b",
-          "type" : "application",
-          "value" : "/Applications/Brave Browser.app"
+          "key": "b",
+          "type": "application",
+          "value": "/Applications/Brave Browser.app"
         },
         {
-          "key" : "z",
-          "type" : "application",
-          "value" : "/Applications/Zen.app"
+          "key": "z",
+          "type": "application",
+          "value": "/Applications/Zen.app"
         }
       ],
-      "key" : "b",
-      "label" : "Browsers",
-      "type" : "group"
+      "key": "b",
+      "label": "Browsers",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "s",
-          "type" : "application",
-          "value" : "/Applications/Slack.app"
+          "key": "s",
+          "type": "application",
+          "value": "/Applications/Slack.app"
         },
         {
-          "key" : "m",
-          "type" : "application",
-          "value" : "/System/Applications/Messages.app"
+          "key": "m",
+          "type": "application",
+          "value": "/System/Applications/Messages.app"
         }
       ],
-      "key" : "c",
-      "label" : "Chat",
-      "type" : "group"
+      "key": "c",
+      "label": "Chat",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "p",
-          "label" : "Pause/Play",
-          "type" : "url",
-          "value" : "raycast://extensions/fedevitaledev/music/toggle-play-pause"
+          "key": "p",
+          "label": "Pause/Play",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/toggle-play-pause"
         },
         {
-          "key" : "m",
-          "label" : "Open Music",
-          "type" : "application",
-          "value" : "/System/Applications/Music.app"
+          "key": "m",
+          "label": "Open Music",
+          "type": "application",
+          "value": "/System/Applications/Music.app"
         },
         {
-          "key" : ">",
-          "label" : "Next Track",
-          "type" : "url",
-          "value" : "raycast://extensions/fedevitaledev/music/next-track"
+          "key": ">",
+          "label": "Next Track",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/next-track"
         },
         {
-          "key" : "<",
-          "label" : "Previous Track",
-          "type" : "url",
-          "value" : "raycast://extensions/fedevitaledev/music/previous-track"
+          "key": "<",
+          "label": "Previous Track",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/previous-track"
         },
         {
-          "key" : "@",
-          "label" : "Ask Music",
-          "type" : "url",
-          "value" : "raycast://extensions/fedevitaledev/music/ask-music{id=2bfe94cd-50ab-4e48-a6cd-f1ff47a72706}__generated"
+          "key": "@",
+          "label": "Ask Music",
+          "type": "url",
+          "value": "raycast://extensions/fedevitaledev/music/ask-music{id=2bfe94cd-50ab-4e48-a6cd-f1ff47a72706}__generated"
         }
       ],
-      "key" : "m",
-      "label" : "Music",
-      "type" : "group"
+      "key": "m",
+      "label": "Music",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "D",
-          "type" : "folder",
-          "value" : "/Users/josephschmitt/Downloads"
+          "key": "D",
+          "type": "folder",
+          "value": "/Users/josephschmitt/Downloads"
         },
         {
-          "key" : "d",
-          "type" : "folder",
-          "value" : "/Users/josephschmitt/development"
+          "key": "d",
+          "type": "folder",
+          "value": "/Users/josephschmitt/development"
         },
         {
-          "key" : "a",
-          "type" : "folder",
-          "value" : "/Applications"
+          "key": "a",
+          "type": "folder",
+          "value": "/Applications"
         }
       ],
-      "key" : "f",
-      "label" : "Finder",
-      "type" : "group"
+      "key": "f",
+      "label": "Finder",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "h",
-          "label" : "Left Half",
-          "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/left-half"
+          "key": "h",
+          "label": "Left Half",
+          "type": "url",
+          "value": "raycast://extensions/raycast/window-management/left-half"
         },
         {
-          "key" : "j",
-          "label" : "Restore",
-          "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/restore"
+          "key": "j",
+          "label": "Restore",
+          "type": "url",
+          "value": "raycast://extensions/raycast/window-management/restore"
         },
         {
-          "key" : "k",
-          "label" : "Center",
-          "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/center"
+          "key": "k",
+          "label": "Center",
+          "type": "url",
+          "value": "raycast://extensions/raycast/window-management/center"
         },
         {
-          "key" : "l",
-          "label" : "Right Half",
-          "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/right-half"
+          "key": "l",
+          "label": "Right Half",
+          "type": "url",
+          "value": "raycast://extensions/raycast/window-management/right-half"
         },
         {
-          "key" : "E",
-          "label" : "External Layout",
-          "type" : "url",
-          "value" : "raycast://customWindowManagementCommand?&name=External%20Monitor"
+          "key": "2",
+          "label": "External Layout",
+          "type": "url",
+          "value": "raycast://customWindowManagementCommand?&name=External%20Monitor"
         },
         {
-          "key" : "L",
-          "label" : "Laptop Layout",
-          "type" : "url",
-          "value" : "raycast://customWindowManagementCommand?&name=Laptop%20Screen"
+          "key": "1",
+          "label": "Laptop Layout",
+          "type": "url",
+          "value": "raycast://customWindowManagementCommand?&name=Laptop%20Screen"
         }
       ],
-      "key" : "w",
-      "label" : "Window",
-      "type" : "group"
+      "key": "w",
+      "label": "Window",
+      "type": "group"
     },
     {
-      "actions" : [
+      "actions": [
         {
-          "key" : "n",
-          "label" : "Neovide",
-          "type" : "command",
-          "value" : "neovide"
+          "key": "n",
+          "label": "Neovide",
+          "type": "command",
+          "value": "neovide"
         },
         {
-          "key" : "v",
-          "label" : "VS Code",
-          "type" : "application",
-          "value" : "/Applications/Visual Studio Code.app"
+          "key": "v",
+          "label": "VS Code",
+          "type": "application",
+          "value": "/Applications/Visual Studio Code.app"
         },
         {
-          "key" : "b",
-          "type" : "application",
-          "value" : "/Applications/BBEdit.app"
+          "key": "b",
+          "type": "application",
+          "value": "/Applications/BBEdit.app"
         },
         {
-          "key" : "z",
-          "type" : "application",
-          "value" : "/Applications/Zed.app"
+          "key": "z",
+          "type": "application",
+          "value": "/Applications/Zed.app"
         }
       ],
-      "key" : "e",
-      "label" : "Editors",
-      "type" : "group"
+      "key": "e",
+      "label": "Editors",
+      "type": "group"
     }
   ],
-  "type" : "group"
+  "type": "group"
 }
