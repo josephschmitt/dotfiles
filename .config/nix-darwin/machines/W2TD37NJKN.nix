@@ -38,7 +38,7 @@
 
     casks = [
       "betterdisplay"
-    ]
+    ];
   };
 
   system.defaults = {
