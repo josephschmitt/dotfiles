@@ -41,7 +41,8 @@ if status is-interactive
     setenv ZIDE_USE_FOCUS_PLUGIN true
 
     setenv ZJ_ALWAYS_NAME true
-    setenv ZJ_DEFAULT_LAYOUT $HOME/development/zj/layouts/ide
+    setenv ZJ_LAYOUTS_DIR $HOME/development/zj/layouts
+    setenv ZJ_DEFAULT_LAYOUT ide
 
     # VIM mode keybindings
     fish_vi_key_bindings
