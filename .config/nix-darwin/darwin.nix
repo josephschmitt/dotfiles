@@ -5,6 +5,7 @@
   environment.systemPackages = with pkgs; [
     _1password-cli
     asdf-vm 
+    atuin
     fd
     fish
     fzf
