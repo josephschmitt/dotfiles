@@ -2,6 +2,8 @@ export EDITOR="nvim"
 export OPENAI_API_KEY="op://Private/OPENAI_API_KEY/credential"
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="$HOME/development/zj/layouts/ide"
+export ZJ_LAYOUTS_DIR="$HOME/development/zj/layouts"
+export ZJ_DEFAULT_LAYOUT="ide"
 
 # Add more bin paths to PATH for custom bin scripts
 export PATH="/opt/homebrew/bin:$PATH"

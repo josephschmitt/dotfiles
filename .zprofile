@@ -1,5 +1,5 @@
 if [ -f $HOME/.bashrc ]; then
-  source .bash_profile
+  source $HOME/.bash_profile
 fi
 
 if [ -f ~/.orbstack/shell/init.zsh ]; then
