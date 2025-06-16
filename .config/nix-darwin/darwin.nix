@@ -44,6 +44,7 @@
       "setapp"
       "tailscale"
       "visual-studio-code"
+      "vimr"
     ];
 
     onActivation.autoUpdate = true;
