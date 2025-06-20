@@ -30,8 +30,8 @@ return {
   },
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    -- enabled = false,
-    enabled = not vim.g.vscode,
+    enabled = false,
+    -- enabled = not vim.g.vscode,
     opts = {
       question_header = "## User ",
       answer_header = "## Copilot ",

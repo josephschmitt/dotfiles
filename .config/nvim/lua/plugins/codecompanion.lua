@@ -1,6 +1,7 @@
 return {
   "olimorris/codecompanion.nvim",
-  enabled = not vim.g.vscode,
+  -- enabled = not vim.g.vscode,
+  enabled = false,
   opts = {
     copilot = function()
       return require("codecompanion.adapters").extend("copilot", {
