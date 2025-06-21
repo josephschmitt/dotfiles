@@ -1,0 +1,15 @@
+[Unit]
+Description=Auto-restart Docker Compose services after Docker daemon restart
+After=docker.service
+Requires=docker.service
+BindsTo=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/local/bin/restart-docker-compose.sh
+User=josephschmitt
+Group=josephschmitt
+
+[Install]
+WantedBy=docker.service
