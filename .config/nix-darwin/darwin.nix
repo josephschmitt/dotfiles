@@ -6,6 +6,7 @@
     _1password-cli
     asdf-vm 
     atuin
+    claude-code
     fd
     fish
     fzf
