@@ -11,7 +11,7 @@ quick-terminal-animation-duration = 0.15
 quick-terminal-position = right
 quick-terminal-screen = macos-menu-bar
 shell-integration = fish
-theme = catppuccin-mocha
+theme = tokyo-night-default
 working-directory = $HOME/development
 
 # Keybindings
