@@ -8,7 +8,7 @@ $ sh <(curl -L https://nixos.org/nix/install)
 
 2. Install [`nix-darwin`](https://github.com/LnL7/nix-darwin) using `nix`
 ```
-$ nix run nix-darwin -- switch --flake ~/dotfiles/.config/nix-darwin
+$ sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/.config/nix-darwin
 ```
 
 3. Apply nix-darwin
