@@ -48,6 +48,16 @@
           nixHomebrewConfig
         ];
       };
+
+      # Compass M4 MacBook Pro
+      "G5FXQQ0D00" = nix-darwin.lib.darwinSystem {
+        modules = [
+          darwinConfig
+          (import ./machines/G5FXQQ0D00.nix)
+          nix-homebrew.darwinModules.nix-homebrew
+          nixHomebrewConfig
+        ];
+      };
     };
   };
 }
