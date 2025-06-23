@@ -1,7 +1,9 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
+    amp-cli
     bazel
     bazel-buildtools
+    bun
     circleci-cli
     colima
     docker
@@ -38,6 +40,8 @@
 
     casks = [
       "betterdisplay"
+      "fantastical"
+      "notion"
       "Slack"
       "zen"
     ];
