@@ -34,6 +34,7 @@
       "adobe-creative-cloud"
       "arc"
       "chatgpt"
+      "claude"
       "ghostty"
       "hyperkey"
       "iterm2"
