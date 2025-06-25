@@ -117,4 +117,9 @@ end
 
 if type -q replay
     replay "source $HOME/.compassrc"
+
+    # Source .env file if it exists
+    if test -f "$HOME/.env"
+        replay "source $HOME/.env"
+    end
 end

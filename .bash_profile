@@ -19,3 +19,8 @@ export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 # Configure volta
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
+
+# Source .env file if it exists
+if [ -f "$HOME/.env" ]; then
+  source "$HOME/.env"
+fi
