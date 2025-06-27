@@ -7,6 +7,7 @@
     asdf-vm 
     atuin
     claude-code
+    codex
     fd
     fish
     fzf
@@ -28,6 +29,7 @@
     enable = true;
     brews = [
       "helix"
+      "sst/tap/opencode"
     ];
     casks = [
       "1password"
