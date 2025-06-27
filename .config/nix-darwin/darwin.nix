@@ -47,6 +47,7 @@
       "visual-studio-code"
       "vimr"
     ];
+    taps = ["sst/tap"];
 
     onActivation.autoUpdate = true;
     onActivation.upgrade = true;
