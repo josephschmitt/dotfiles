@@ -1,6 +1,5 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
-    amp-cli
     bazel
     bazel-buildtools
     bun
