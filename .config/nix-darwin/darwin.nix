@@ -44,7 +44,7 @@
       "raycast"
       "runjs"
       "setapp"
-      "tailscale"
+      "tailscale-app"
       "visual-studio-code"
       "vimr"
     ];
