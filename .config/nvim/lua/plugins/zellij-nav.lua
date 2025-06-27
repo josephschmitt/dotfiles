@@ -1,5 +1,8 @@
 return {
   "swaits/zellij-nav.nvim",
+  enabled = function()
+    return os.getenv("TMUX") ~= nil
+  end,
   lazy = true,
   event = "VeryLazy",
   keys = {
