@@ -47,6 +47,9 @@ if status is-interactive
     # VIM mode keybindings
     fish_vi_key_bindings
 
+    # Reduce escape timeout for faster tmux navigation
+    set fish_escape_delay_ms 10
+
     # My custom movement bindings
     bind shift-u redo
     bind gh beginning-of-line
