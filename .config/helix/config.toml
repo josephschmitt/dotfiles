@@ -1,98 +1,119 @@
+# Helix Editor Configuration
+# Modern modal text editor with LSP support
+
 theme = "catppuccin_mocha"
 
 [editor]
-bufferline = "multiple"
-color-modes = true
-cursorline = true
-end-of-line-diagnostics = "hint"
-line-number = "relative"
-mouse = true
-rulers = [100]
-text-width = 100
-true-color = true
+bufferline = "multiple"          # Show multiple buffers in tab line
+color-modes = true               # Color mode indicator
+cursorline = true                # Highlight current line
+end-of-line-diagnostics = "hint" # Show diagnostics at line end
+line-number = "relative"         # Relative line numbers for vi-style navigation
+mouse = true                     # Enable mouse support
+rulers = [100]                   # Show ruler at 100 characters
+text-width = 100                 # Wrap text at 100 characters
+true-color = true                # Enable 24-bit color support
 
+# Cursor appearance for different modes
 [editor.cursor-shape]
-insert = "bar"
-normal = "block"
-select = "underline"
+insert = "bar"        # Thin bar cursor in insert mode
+normal = "block"      # Block cursor in normal mode
+select = "underline"  # Underline cursor in select mode
 
+# File picker configuration
 [editor.file-picker]
-hidden = false
+hidden = false  # Show hidden files in picker
 
+# Visual guides
 [editor.indent-guides]
-render = true
+render = true  # Show indentation guides
 
+# Diagnostic display
 [editor.inline-diagnostics]
-cursor-line = "hint"
-other-lines = "hint"
+cursor-line = "hint"  # Show hints on current line
+other-lines = "hint"  # Show hints on other lines
 
+# Language Server Protocol
 [editor.lsp]
-# display-inlay-hints = true
+# display-inlay-hints = true  # Uncomment to show type hints
 
+# Text wrapping
 [editor.soft-wrap]
-enable = true
-wrap-at-text-width = true
+enable = true              # Enable soft wrapping
+wrap-at-text-width = true  # Wrap at configured text width
 
+# Status line layout
 [editor.statusline]
 left = ["mode", "spinner"]
 center = ["file-name", "read-only-indicator", "file-modification-indicator", "version-control"]
 right = ["diagnostics", "selections", "register", "position", "file-type"]
 
+# Whitespace visualization
 [editor.whitespace.render]
-nbsp = "none"
-newline = "none"
-nnbsp = "none"
-space = "all"
-tab = "all"
+nbsp = "none"     # Don't show non-breaking spaces
+newline = "none"  # Don't show newline characters
+nnbsp = "none"    # Don't show narrow non-breaking spaces
+space = "all"     # Show all spaces
+tab = "all"       # Show all tabs
 
+# Key bindings for normal mode
 [keys.normal]
-esc = ["collapse_selection", "keep_primary_selection"]
-C-r = ":config-reload"
-S-h = "goto_previous_buffer"
-S-l = "goto_next_buffer"
-A-w = "move_next_sub_word_start"
-A-b = "move_prev_sub_word_start"
-A-e = "move_next_sub_word_end"
-A-E = "move_prev_sub_word_end"
-X = "extend_line_above"
+esc = ["collapse_selection", "keep_primary_selection"]  # Clear selection on escape
+C-r = ":config-reload"          # Reload configuration
+S-h = "goto_previous_buffer"    # Previous buffer
+S-l = "goto_next_buffer"        # Next buffer
+A-w = "move_next_sub_word_start"    # Move to next sub-word
+A-b = "move_prev_sub_word_start"    # Move to previous sub-word
+A-e = "move_next_sub_word_end"      # Move to next sub-word end
+A-E = "move_prev_sub_word_end"      # Move to previous sub-word end
+X = "extend_line_above"         # Extend selection to line above
+# Tmux-style pane navigation
 C-h="jump_view_left"
 C-j="jump_view_down"
 C-k="jump_view_up"
 C-l="jump_view_right"
 
+# Key bindings for insert mode
 [keys.insert]
+# Tmux-style pane navigation (works in insert mode)
 C-h="jump_view_left"
 C-j="jump_view_down"
 C-k="jump_view_up"
 C-l="jump_view_right"
 
+# Key bindings for select mode
 [keys.select]
-A-w = "extend_next_sub_word_start"
-A-b = "extend_prev_sub_word_start"
-A-e = "extend_next_sub_word_end"
-A-E = "extend_prev_sub_word_end"
+A-w = "extend_next_sub_word_start"  # Extend to next sub-word
+A-b = "extend_prev_sub_word_start"  # Extend to previous sub-word
+A-e = "extend_next_sub_word_end"    # Extend to next sub-word end
+A-E = "extend_prev_sub_word_end"    # Extend to previous sub-word end
 
+# Space-prefixed commands (leader key bindings)
 [keys.normal."space"]
-x = ":buffer-close"
-e = [
+x = ":buffer-close"  # Close current buffer
+
+# File explorer integration with Yazi
+e = [  # Open file picker from current file's directory
     ":sh rm -f $TMPDIR/yazi-hx-path",
     ":insert-output yazi '%{buffer_name}' --chooser-file=$TMPDIR/yazi-hx-path",
-    ":insert-output echo \"x1b[?1049h\" > /dev/tty",
+    ":insert-output echo \\\"x1b[?1049h\\\" > /dev/tty",
     ":open %sh{cat $TMPDIR/yazi-hx-path}",
     ":redraw",
     ":set mouse false",
     ":set mouse true",
 ]
-E = [
+E = [  # Open file picker from workspace root
     ":sh rm -f $TMPDIR/yazi-hx-path",
     ":insert-output yazi '%{workspace_directory}' --chooser-file=$TMPDIR/yazi-hx-path",
-    ":insert-output echo \"x1b[?1049h\" > /dev/tty",
+    ":insert-output echo \\\"x1b[?1049h\\\" > /dev/tty",
     ":open %sh{cat $TMPDIR/yazi-hx-path}",
     ":redraw",
     ":set mouse false",
     ":set mouse true",
 ]
-l = [
+
+# Git integration
+l = [  # Open lazygit in workspace directory
     ":write-all",
     ":new",
     ":insert-output lazygit -p '%sh{workspace_directory}'",
@@ -102,4 +123,4 @@ l = [
     ":set mouse false",
     ":set mouse true",
 ]
-L = ":sh ~/.config/helix/get_git_permalink.sh %{buffer_name} %{cursor_line} | pbcopy"
+L = ":sh ~/.config/helix/get_git_permalink.sh %{buffer_name} %{cursor_line} | pbcopy"  # Copy GitHub permalink to clipboard
