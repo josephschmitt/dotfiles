@@ -1,7 +1,8 @@
 {
   "mcpServers": {
     "context7": {
-      "url": "https://mcp.context7.com/mcp",
+      "command": "bunx",
+      "args": ["-y", "@upstash/context7-mcp"],
       "autoApprove": true
     }
   }
