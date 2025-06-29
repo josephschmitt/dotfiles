@@ -1,16 +1,24 @@
 # Fish Shell Configuration
 # Personal configuration for Fish shell with development tools integration
 
-# XDG Base Directory Specification
+# Environment Variables (Fish-specific syntax)
 setenv XDG_CONFIG_HOME "$HOME/.config"
+setenv EDITOR nvim
+setenv OPENAI_API_KEY "op://Private/OPENAI_API_KEY/credential"
+
+# Zellij configuration
+setenv ZJ_ALWAYS_NAME true
+setenv ZJ_DEFAULT_LAYOUT ide
+setenv ZJ_LAYOUTS_DIR $HOME/development/zj/layouts
 
 # PATH Configuration
-# Set nix paths first to resolve before other paths (like homebrew)
+# Nix paths (set first to resolve before other paths like homebrew)
 set -gx PATH "$HOME/.nix-profile/bin" $PATH
 set -gx PATH /run/current-system/sw/bin $PATH
 set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 
-# Development tools
+# Package managers and development tools
+set -gx PATH /opt/homebrew/bin $PATH
 set -gx PATH "$HOME/.bun/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
 
@@ -18,8 +26,26 @@ set -gx PATH "$HOME/.cargo/bin" $PATH
 setenv VOLTA_HOME "$HOME/.volta"
 set -gx PATH "$VOLTA_HOME/bin" $PATH
 
-# Default editor
-setenv EDITOR nvim
+# Custom bin directories
+set -gx PATH "$HOME/bin" $PATH
+set -gx PATH "$HOME/go/bin" $PATH
+set -gx PATH "$HOME/.local/bin" $PATH
+set -gx PATH "$HOME/development/zide/bin" $PATH
+set -gx PATH "$HOME/development/zj/bin" $PATH
+
+# ASDF version manager
+if test -z $ASDF_DATA_DIR
+    set _asdf_shims "$HOME/.asdf/shims"
+else
+    set _asdf_shims "$ASDF_DATA_DIR/shims"
+end
+set -gx PATH $_asdf_shims $PATH
+
+# PNPM package manager
+set -gx PNPM_HOME /Users/josephschmitt/Library/pnpm
+if not string match -q -- $PNPM_HOME $PATH
+    set -gx PATH "$PNPM_HOME" $PATH
+end
 
 # Interactive shell configuration
 if status is-interactive
@@ -45,15 +71,10 @@ if status is-interactive
     setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
     setenv ZIDE_DEFAULT_LAYOUT compact_lazygit_focus
     setenv ZIDE_LAYOUT_DIR "$ZELLIJ_CONFIG_DIR/layouts/zide"
-
     setenv ZIDE_ALWAYS_NAME true
     setenv ZIDE_DEFAULT_LAYOUT default_lazygit
     setenv ZIDE_USE_YAZI_CONFIG false
     setenv ZIDE_USE_FOCUS_PLUGIN true
-
-    setenv ZJ_ALWAYS_NAME true
-    setenv ZJ_LAYOUTS_DIR $HOME/development/zj/layouts
-    setenv ZJ_DEFAULT_LAYOUT ide
 
     # Vi-mode configuration
     fish_vi_key_bindings
@@ -80,59 +101,37 @@ if status is-interactive
     end
 end
 
-# Additional PATH entries for custom tools
-set -gx PATH "$HOME/bin" $PATH
-set -gx PATH "$HOME/go/bin" $PATH
-set -gx PATH "$HOME/.local/bin" $PATH
-set -gx PATH "$HOME/development/zide/bin" $PATH
-set -gx PATH "$HOME/development/zj/bin" $PATH
-
-# Version manager configuration
-if test -z $ASDF_DATA_DIR
-    set _asdf_shims "$HOME/.asdf/shims"
-else
-    set _asdf_shims "$ASDF_DATA_DIR/shims"
-end
-
-# Useful aliases
-alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"  # Navigate to git root
-alias darwin_rebuild="sudo darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"  # Rebuild Nix Darwin
-alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"  # Update Nix Darwin flake
-alias nix_rebuild="nix profile upgrade --all"  # Upgrade all Nix packages
-alias nix_update="nix flake update --flake ~/dotfiles/.config/nix"  # Update Nix flake
-alias lg="lazygit"  # Quick access to lazygit
+# Fish-specific aliases and functions
+alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
+alias darwin_rebuild="sudo darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin"
+alias darwin_update="nix flake update --flake ~/dotfiles/.config/nix-darwin"
+alias nix_rebuild="nix profile upgrade --all"
+alias nix_update="nix flake update --flake ~/dotfiles/.config/nix"
+alias lg="lazygit"
+alias c="clear"
+alias vim="nvim"
 
 # Git-spice workflow aliases
-# Branch management
 alias gsb="gs branch"
 alias gsbc="gs branch checkout"
 alias gsbcr="gs branch create"
 alias gsbs="gs branch submit"
 alias gsbt="gs branch track"
-
-# Commit operations
 alias gsc="gs commit"
 alias gsca="gs commit amend"
 alias gscc="gs commit commit"
-
-# Log viewing
 alias gsl="gs log long -a"
 alias gsll="gs log long"
 alias gsls="gs log short"
-
-# Repository operations
 alias gsr="gs repo"
 alias gsrs="gs repo sync"
-
-# Stack management
 alias gss="gs stack"
 alias gssr="gs stack restack"
 alias gsss="gs stack submit"
 
-# Package manager: pnpm
-set -gx PNPM_HOME /Users/josephschmitt/Library/pnpm
-if not string match -q -- $PNPM_HOME $PATH
-    set -gx PATH "$PNPM_HOME" $PATH
+# Fish-specific functions
+function cdd
+    cd ~/development/$argv[1]
 end
 
 # Environment loading with replay (for sensitive configs)
