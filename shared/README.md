@@ -40,6 +40,8 @@ stow shared personal
 exec $SHELL
 ```
 
+**Note:** The shell configuration has been reorganized to follow Unix best practices. Your existing shell configs will be replaced with the new modular structure that eliminates duplication across Fish, Zsh, and Bash.
+
 #### Work Machine Setup
 ```bash
 # 1. Clone the repository
@@ -56,7 +58,9 @@ stow shared work
 exec $SHELL
 ```
 
-**Note:** Work setup requires access to the private `dotfiles-work-private` repository.
+**Notes:** 
+- Work setup requires access to the private `dotfiles-work-private` repository
+- The shell configuration has been reorganized to follow Unix best practices with shared modules
 
 ## Structure
 
@@ -91,6 +95,11 @@ Multi-shell setup following Unix best practices with shared configuration:
   - `functions.sh` - Shared shell functions
 - **No duplication** - Environment and aliases defined once, sourced everywhere
 - **Shell-specific optimizations** - Each shell can have unique features while sharing core config
+
+**Setup Details:**
+- Stow will symlink individual `.config` subdirectories (never the entire `.config` folder)
+- Shell profiles (`.zshrc`, `.bashrc`, etc.) will be symlinked to your home directory
+- The new `.profile` file provides centralized environment setup for all shells
 
 ### Editor Configuration
 - **Helix** (`.config/helix/`) - Modal text editor

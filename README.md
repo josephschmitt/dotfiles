@@ -1,8 +1,8 @@
-# Dotfiles
+# 🏠 Dotfiles
 
 Personal development environment configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-## Overview
+## 📋 Overview
 
 This repository contains my complete development environment setup, organized for easy deployment across personal and work machines while keeping sensitive work configurations private.
 
@@ -15,16 +15,16 @@ This repository contains my complete development environment setup, organized fo
 - **⌨️ Vi-mode everywhere** - Consistent navigation patterns
 - **🔍 Fuzzy finding** - FZF integration throughout the workflow
 
-## Quick Start
+## 🚀 Quick Start
 
-### Personal Machine
+### 🏠 Personal Machine
 ```bash
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 stow shared personal
 ```
 
-### Work Machine
+### 💼 Work Machine
 ```bash
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
@@ -32,31 +32,31 @@ git submodule update --init --recursive
 stow shared work
 ```
 
-## What's Included
+## 📦 What's Included
 
-### Core Tools
-- **Multi-Shell Setup**: Fish (primary), Zsh (secondary), Bash (fallback)
+### 🛠️ Core Tools
+- **🐚 Multi-Shell Setup**: Fish (primary), Zsh (secondary), Bash (fallback)
   - Shared configuration modules to eliminate duplication
   - POSIX-compliant environment setup across all shells
   - macOS Terminal.app compatibility with proper login shell handling
-- **Editor**: Helix with modal editing and custom keybindings
-- **Terminal**: Ghostty with optimized configuration
-- **Multiplexer**: tmux with plugin ecosystem
-- **Version Control**: Git with comprehensive aliases
+- **✏️ Editor**: Neovim (LazyVim) with Helix as secondary
+- **💻 Terminal**: Ghostty with optimized configuration
+- **🔀 Multiplexer**: tmux with plugin ecosystem
+- **🌳 Version Control**: Git with comprehensive aliases
 
-### Development Environment
-- **Languages**: Node.js, Rust, Python, Go configurations
-- **Package Managers**: pnpm, bun, cargo, asdf
-- **Build Tools**: Nix for reproducible environments
-- **CLI Tools**: FZF, EZA, Yazi, and more
+### 🔧 Development Environment
+- **🌐 Languages**: Node.js, Rust, Python, Go configurations
+- **📦 Package Managers**: pnpm, bun, cargo, asdf
+- **🏗️ Build Tools**: Nix for reproducible environments
+- **⚡ CLI Tools**: FZF, EZA, Yazi, and more
 
-### Productivity Features
-- **Git workflow optimization** with git-spice integration
-- **Fuzzy finding** for files, history, and processes
-- **Session management** with tmux persistence
-- **Custom keybindings** for efficient navigation
+### ⚡ Productivity Features
+- **🌶️ Git workflow optimization** with git-spice integration
+- **🔍 Fuzzy finding** for files, history, and processes
+- **💾 Session management** with tmux persistence
+- **⌨️ Custom keybindings** for efficient navigation
 
-## Repository Structure
+## 📁 Repository Structure
 
 ```
 dotfiles/
@@ -71,23 +71,23 @@ dotfiles/
     └── .compassrc   # Company-specific tools
 ```
 
-## Documentation
+## 📚 Documentation
 
 For complete setup instructions, troubleshooting, and maintenance information, see:
 - **[Setup Guide](shared/README.md)** - Detailed installation and configuration instructions
 
-## Core Philosophy
+## 🎯 Core Philosophy
 
 This dotfiles repository is built around several key principles that prioritize maintainability, Unix best practices, and real-world usability.
 
-### 1. Simplicity Over Complexity
+### 1. 🎯 Simplicity Over Complexity
 **"Files are files"** - No complex templating, generation, or build systems. What you see in the repository is exactly what gets deployed. This makes the configuration:
 - **Debuggable**: Easy to trace issues to specific files
 - **Portable**: Works anywhere without special tooling
 - **Understandable**: New contributors can immediately see what's happening
 - **Reliable**: No hidden dependencies or generation failures
 
-### 2. Unix Best Practices with Modern Realities
+### 2. 🐧 Unix Best Practices with Modern Realities
 The shell configuration follows traditional Unix conventions while acknowledging modern multi-shell workflows:
 
 **Traditional Unix Approach:**
@@ -106,21 +106,21 @@ The shell configuration follows traditional Unix conventions while acknowledging
 - **Flexibility**: Each shell can leverage its unique features
 - **Maintainability**: Changes propagate automatically
 
-### 3. Security Through Separation
+### 3. 🔒 Security Through Separation
 **Work/Personal Isolation:**
 - **Public sharing safe** - Personal configs can be shared openly
 - **Private submodule** - Work-specific configs stay in company-controlled repository
 - **Context switching** - Different git identities and tool configurations per environment
 - **Compliance friendly** - Meets corporate security requirements
 
-### 4. Practical Over Perfect
+### 4. 🛠️ Practical Over Perfect
 **Real-world considerations:**
 - **macOS Terminal.app quirks** - Handled explicitly rather than ignored
 - **Multiple package managers** - Support for the tools actually used (npm, pnpm, bun, cargo, etc.)
 - **Fallback compatibility** - Bash support for systems where Fish/Zsh aren't available
 - **Tool integration** - Configurations work together (tmux + vim navigation, fzf everywhere)
 
-### 5. Documentation as Code
+### 5. 📖 Documentation as Code
 **Self-documenting approach:**
 - **Clear file organization** - Purpose obvious from structure
 - **Comprehensive READMEs** - Both for humans and AI assistants
