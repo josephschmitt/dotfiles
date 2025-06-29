@@ -1,47 +1,68 @@
 # Dotfiles
 
-Personal configuration files for development environment.
+Personal configuration files for development environment using [GNU Stow](https://www.gnu.org/software/stow/) with work/personal separation.
 
-## Installation
-
-This repo uses [GNU Stow](https://www.gnu.org/software/stow/) for managing dotfiles.
+## Quick Start
 
 ### Prerequisites
 
-Install GNU Stow:
+**Required:**
+- [GNU Stow](https://www.gnu.org/software/stow/) for symlink management
+- Git with SSH keys configured for GitHub
+
+**Install Stow:**
 ```bash
 # macOS
 brew install stow
 
 # Ubuntu/Debian
 sudo apt install stow
+
+# Arch Linux
+sudo pacman -S stow
 ```
 
-### Setup
+### Installation
 
-Clone this repository:
+#### Personal Machine Setup
 ```bash
-$ git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
-$ cd ~/.dotfiles
-```
+# 1. Clone the repository
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
 
-#### Personal Machine
-```bash
+# 2. Update personal email in personal/.gitconfig
+# Edit personal/.gitconfig and replace "your-personal@email.com" with your actual email
+
+# 3. Apply configurations
 stow shared personal
+
+# 4. Restart your shell or source configs
+exec $SHELL
 ```
 
-#### Work Machine  
+#### Work Machine Setup
 ```bash
+# 1. Clone the repository
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# 2. Initialize work submodule (requires access to private work repo)
+git submodule update --init --recursive
+
+# 3. Apply configurations
 stow shared work
+
+# 4. Restart your shell or source configs
+exec $SHELL
 ```
 
-**Note:** Make sure to update the email in `personal/.gitconfig` before using.
+**Note:** Work setup requires access to the private `dotfiles-work-private` repository.
 
 ## Structure
 
 - `shared/` - Common configurations used on all machines
 - `personal/` - Personal-specific configs (personal email, etc.)
-- `work/` - Work-specific configs (work email, company tools, etc.)
+- `work/` - Work-specific configs (private submodule with work email, company tools, etc.)
 
 ## What's Included
 
@@ -83,3 +104,51 @@ stow shared work
 - **Fuzzy finding** integration (fzf) throughout the workflow
 - **Git workflow optimization** with custom aliases and git-spice
 - **Development environment** paths and tool configurations
+
+## Troubleshooting
+
+### Stow Conflicts
+If stow reports conflicts with existing files:
+```bash
+# Backup existing configs
+mkdir ~/dotfiles-backup
+mv ~/.gitconfig ~/dotfiles-backup/  # repeat for conflicting files
+
+# Then retry stow
+stow shared personal  # or work
+```
+
+### Missing Submodule (Work Setup)
+If work directory is empty:
+```bash
+git submodule update --init --recursive --force
+```
+
+### Permission Issues
+Ensure your SSH key has access to the repositories:
+```bash
+ssh -T git@github.com
+```
+
+## Updating
+
+### Pull Latest Changes
+```bash
+cd ~/.dotfiles
+git pull origin main
+
+# For work machines, also update submodule
+git submodule update --remote
+```
+
+### Adding New Configs
+1. Add files to appropriate directory (`shared/`, `personal/`, or `work/`)
+2. Re-run stow: `stow shared personal` (or `work`)
+
+## Uninstalling
+
+To remove all symlinks:
+```bash
+cd ~/.dotfiles
+stow -D shared personal  # or work
+```
