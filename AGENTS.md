@@ -1,0 +1,36 @@
+# Agent Guidelines for Dotfiles Repository
+
+## Repository Overview
+This is a personal dotfiles repository managed with GNU Stow. No build system - use `stow .` to install configs.
+
+## Key Commands
+- **Install**: `stow .` (from repo root)
+- **Shell**: Fish shell with custom prompt
+- **Editor**: Neovim (LazyVim) + Helix as secondary
+- **No tests/linting** - configuration files only
+
+## Code Style Guidelines
+
+### Shell Scripts
+- Use `#!/bin/sh` for POSIX compatibility
+- Set `set -x` for debugging when needed
+- Use `[[ ]]` for bash-specific tests
+- Variables in `${var}` format for clarity
+
+### Lua (Neovim configs)
+- 2-space indentation (per stylua.toml)
+- Column width: 120 characters  
+- Use `-- stylua: ignore` to skip formatting specific lines
+- Plugin configs return tables with dependency/opts structure
+- Comment disabled code with early returns: `if true then return {} end`
+
+### TOML/Config Files
+- 2-space indentation for nested structures
+- Use lowercase with hyphens for keys (`line-number`, `cursor-line`)
+- Keep related settings grouped together
+
+## File Organization
+- Neovim plugins: `.config/nvim/lua/plugins/`
+- Shell functions: `.config/fish/functions/`
+- Utilities: `bin/` directory
+- Theme files in respective app config dirs
