@@ -1,14 +1,47 @@
-# dotfiles
+# Dotfiles
 
-Personal dotfiles configuration managed by [`stow`](https://formulae.brew.sh/formula/stow).
+Personal configuration files for development environment.
 
 ## Installation
 
-```sh
-$ brew install stow
-$ git clone git@github.com:josephschmitt/dotfiles.git $HOME/dotfiles && cd $HOME/dotfiles
-$ stow .
+This repo uses [GNU Stow](https://www.gnu.org/software/stow/) for managing dotfiles.
+
+### Prerequisites
+
+Install GNU Stow:
+```bash
+# macOS
+brew install stow
+
+# Ubuntu/Debian
+sudo apt install stow
 ```
+
+### Setup
+
+Clone this repository:
+```bash
+$ git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+$ cd ~/.dotfiles
+```
+
+#### Personal Machine
+```bash
+stow shared personal
+```
+
+#### Work Machine  
+```bash
+stow shared work
+```
+
+**Note:** Make sure to update the email in `personal/.gitconfig` before using.
+
+## Structure
+
+- `shared/` - Common configurations used on all machines
+- `personal/` - Personal-specific configs (personal email, etc.)
+- `work/` - Work-specific configs (work email, company tools, etc.)
 
 ## What's Included
 
