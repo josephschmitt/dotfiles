@@ -6,7 +6,8 @@ This directory contains the MCP (Model Context Protocol) server configurations f
 
 ### Context7
 - **Purpose**: Up-to-date code documentation for LLMs
-- **Command**: `npx -y @upstash/context7-mcp`
+- **Type**: Remote MCP server
+- **URL**: `https://mcp.context7.com/mcp`
 - **Auto-approve**: Enabled for all Context7 tools
 
 ## Usage in Avante
@@ -18,14 +19,30 @@ After setup, you can:
 
 ## Adding More Servers
 
-Add new MCP servers to `servers.json` following this pattern:
+Add new MCP servers to `servers.json` following these patterns:
 
+### Local (stdio) Servers
 ```json
 {
   "mcpServers": {
-    "server-name": {
+    "local-server": {
       "command": "command-to-run",
       "args": ["arg1", "arg2"],
+      "autoApprove": true|false|["specific", "tools"]
+    }
+  }
+}
+```
+
+### Remote Servers
+```json
+{
+  "mcpServers": {
+    "remote-server": {
+      "url": "https://your-mcp-server.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${API_TOKEN}"
+      },
       "autoApprove": true|false|["specific", "tools"]
     }
   }
