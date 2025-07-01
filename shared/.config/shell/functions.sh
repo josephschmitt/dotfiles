@@ -5,12 +5,17 @@ cdd() {
   cd ~/development/"$1" || exit
 }
 
+# Find the given path in zoxide, or enter interactive mode
 zq() {
   zoxide query "$@" || zoxide query -i
 }
 
+# Convenience function to change directory and run twm
 twmp() {
-  pushd >/dev/null || exit
-  twm --project "$(zq "${@:-$(pwd)}")"
-  popd >/dev/null || exit
+  target_dir="$(zq "${@:-$(pwd)}")"
+  name="$(basename "$target_dir")"
+
+  pushd "$target_dir" >/dev/null || return
+  twm --path "$target_dir" --name "$name"
+  popd >/dev/null || return
 }

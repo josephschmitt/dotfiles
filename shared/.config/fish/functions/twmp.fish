@@ -1,9 +1,9 @@
+# Convenience function to change directory and run twm
 function twmp
-    pushd >/dev/null || exit
-    if test -z "$argv"
-        twm --path (zq "$PWD")
-    else
-        twm --path (zq "$argv")
-    end
-    popd >/dev/null || exit
+    set target_dir (zq (test -z "$argv"; and echo "$PWD"; or echo "$argv"))
+    set name (basename "$target_dir")
+
+    pushd "$target_dir" >/dev/null || return
+    twm --path "$target_dir" --name "$name"
+    popd >/dev/null || return
 end
