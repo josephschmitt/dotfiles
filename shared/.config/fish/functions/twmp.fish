@@ -4,6 +4,6 @@ function twmp
     set name (basename "$target_dir")
 
     pushd "$target_dir" >/dev/null || return
-    twm --path "$target_dir" --name "$name"
+    twm --path "$target_dir" --name "$name" --command nvim
     popd >/dev/null || return
 end
