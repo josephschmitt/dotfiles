@@ -17,3 +17,6 @@ fi
 
 # Bash-specific aliases
 alias ls='ls --color=auto'
+
+# TWM shell completions
+eval "$(twm --print-bash-completion)"

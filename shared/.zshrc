@@ -96,6 +96,8 @@ zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 # Zsh-specific aliases
 alias ls='ls --color'
 
-
 # Shell integrations
 eval "$(fzf --zsh)"
+
+# TWM shell completions
+eval "$(twm --print-zsh-completion)"

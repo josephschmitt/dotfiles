@@ -95,6 +95,9 @@ if status is-interactive
     set fish_cursor_external line
     set fish_cursor_visual block
 
+    # Completions for twm
+    twm --print-fish-completion | source
+
     # Smart directory jumping
     if type -q zoxide
         zoxide init fish | source
