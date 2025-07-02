@@ -14,6 +14,7 @@
     lima
     mosh
     shellcheck
+    yazi
 
     # Language Servers
     bash-language-server

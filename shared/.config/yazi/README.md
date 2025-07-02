@@ -2,6 +2,11 @@
 
 Modern terminal file manager configuration with Catppuccin theming and enhanced functionality.
 
+## Initial Setup
+```sh
+$ ya pkg install
+```
+
 ## Overview
 
 Yazi is a blazing fast terminal file manager written in Rust. This configuration provides:
