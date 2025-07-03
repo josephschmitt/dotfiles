@@ -4,7 +4,8 @@
     "context7": {
       "type": "local",
       "command": [
-        "bunx",
+        "pnpm",
+        "dlx",
         "@upstash/context7-mcp@latest"
       ],
       "enabled": true
@@ -12,7 +13,8 @@
     "circleci": {
       "type": "local",
       "command": [
-        "bunx",
+        "pnpm",
+        "dlx",
         "@circleci/mcp-server-circleci"
       ],
       "enabled": true,
@@ -20,8 +22,17 @@
       }
     },
     "github": {
-      "type": "remote",
-      "url": "https://api.githubcopilot.com/mcp/",
+      "type": "local",
+      "command": [
+        "pnpm",
+        "dlx",
+        "mcp-remote",
+        "https://api.githubcopilot.com/mcp/",
+        "--header",
+        "Authorization: Bearer ${AUTH_TOKEN}"
+      ],
+      "environment": {
+      },
       "enabled": true
     }
   }
