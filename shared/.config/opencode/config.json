@@ -3,7 +3,26 @@
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["bunx", "-y", "@upstash/context7-mcp"]
+      "command": [
+        "bunx",
+        "@upstash/context7-mcp@latest"
+      ],
+      "enabled": true
+    },
+    "circleci": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "@circleci/mcp-server-circleci"
+      ],
+      "enabled": true,
+      "environment": {
+      }
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": true
     }
   }
 }
