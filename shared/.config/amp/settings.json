@@ -1,0 +1,33 @@
+{
+  "amp.commands.allowlist": [
+    "pnpm"
+  ],
+  "amp.mcpServers": {
+    "atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
+    "context7": {
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "@upstash/context7-mcp@latest"
+      ],
+      "env": {
+        "HNVM_NODE": "22.16.0",
+        "HNVM_PNPM": "9.1.4"
+      }
+    },
+    "circleci": {
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "@circleci/mcp-server-circleci"
+      ],
+      "env": {
+        "HNVM_NODE": "22.16.0",
+        "HNVM_PNPM": "9.1.4"
+      }
+    }
+  }
+}
