@@ -27,9 +27,9 @@
         # mutableTaps = false;
       };
     };
-  in
-  {
-    darwinConfigurations = {
+
+    # Base configuration set
+    baseConfigs = {
       # Personal Mac mini server
       "mac-mini" = nix-darwin.lib.darwinSystem {
         modules = [
@@ -39,26 +39,44 @@
           nixHomebrewConfig
         ];
       };
-
-      # Compass M1 MacBook Pro
-      "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
-        modules = [
-          darwinConfig
-          (import ../../../work/.config/nix-darwin/machines/W2TD37NJKN.nix)
-          nix-homebrew.darwinModules.nix-homebrew
-          nixHomebrewConfig
-        ];
-      };
-
-      # Compass M4 MacBook Pro
-      "G5FXQQ0D00" = nix-darwin.lib.darwinSystem {
-        modules = [
-          darwinConfig
-          (import ../../../work/.config/nix-darwin/machines/G5FXQQ0D00.nix)
-          nix-homebrew.darwinModules.nix-homebrew
-          nixHomebrewConfig
-        ];
-      };
     };
+
+    # Helper function to conditionally import work machine configs
+    workMachineConfig = name: 
+      let
+        workConfigPath = ../../../work/.config/nix-darwin/machines + "/${name}.nix";
+      in
+        if builtins.pathExists workConfigPath
+        then import workConfigPath
+        else { }; # Empty config if work submodule not available
+
+    # Work configurations (only if work submodule exists)
+    workConfigs = 
+      if builtins.pathExists ../../../work/.config/nix-darwin/machines
+      then {
+        # Compass M1 MacBook Pro
+        "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
+          modules = [
+            darwinConfig
+            (workMachineConfig "W2TD37NJKN")
+            nix-homebrew.darwinModules.nix-homebrew
+            nixHomebrewConfig
+          ];
+        };
+
+        # Compass M4 MacBook Pro
+        "G5FXQQ0D00" = nix-darwin.lib.darwinSystem {
+          modules = [
+            darwinConfig
+            (workMachineConfig "G5FXQQ0D00")
+            nix-homebrew.darwinModules.nix-homebrew
+            nixHomebrewConfig
+          ];
+        };
+      }
+      else { };
+  in
+  {
+    darwinConfigurations = baseConfigs // workConfigs;
   };
 }
