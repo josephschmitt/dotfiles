@@ -2,6 +2,7 @@
   description = "A flake for my NixOS macOS configurations";
 
   inputs = {
+    self.submodules = true;
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
@@ -43,7 +44,7 @@
       "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
         modules = [
           darwinConfig
-          (import ./machines/W2TD37NJKN.nix)
+          (import ../../../work/.config/nix-darwin/machines/W2TD37NJKN.nix)
           nix-homebrew.darwinModules.nix-homebrew
           nixHomebrewConfig
         ];
@@ -53,7 +54,7 @@
       "G5FXQQ0D00" = nix-darwin.lib.darwinSystem {
         modules = [
           darwinConfig
-          (import ./machines/G5FXQQ0D00.nix)
+          (import ../../../work/.config/nix-darwin/machines/G5FXQQ0D00.nix)
           nix-homebrew.darwinModules.nix-homebrew
           nixHomebrewConfig
         ];
