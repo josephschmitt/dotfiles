@@ -5,3 +5,4 @@
 .config/fish/completions/kubectl.fish
 .config/helix/runtime
 .env
+.tmux

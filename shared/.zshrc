@@ -1,11 +1,21 @@
-if [ -f $HOME/.bashrc ]; then
-  source $HOME/.bashrc
+# Zsh interactive shell configuration
+# This file is sourced for interactive zsh sessions
+
+# Source shared aliases and functions
+if [ -f "$HOME/.config/shell/aliases.sh" ]; then
+  . "$HOME/.config/shell/aliases.sh"
 fi
 
+if [ -f "$HOME/.config/shell/functions.sh" ]; then
+  . "$HOME/.config/shell/functions.sh"
+fi
+
+# Oh-my-posh prompt (skip in Apple Terminal.app which has its own prompt)
 if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
   eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
+# Zoxide smart directory jumping
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
@@ -83,16 +93,11 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Use LS_COLORS for comp
 zstyle ':completion:*' menu no # Disable completion menu since we're using fzf
 zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 
-# Aliases
+# Zsh-specific aliases
 alias ls='ls --color'
-alias vim='nvim'
-alias c='clear'
-
-# Define the cdd function to change directories from ~/development
-cdd() {
-  cd ~/development/"$1"
-}
-
 
 # Shell integrations
 eval "$(fzf --zsh)"
+
+# TWM shell completions
+eval "$(twm --print-zsh-completion)"

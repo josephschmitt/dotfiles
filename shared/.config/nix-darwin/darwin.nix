@@ -18,6 +18,7 @@
     ripgrep
     stow
     tmux
+    twm
     volta
     zellij
     zoxide

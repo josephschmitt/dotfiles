@@ -40,6 +40,8 @@ stow shared personal
 exec $SHELL
 ```
 
+**Note:** The shell configuration has been reorganized to follow Unix best practices. Your existing shell configs will be replaced with the new modular structure that eliminates duplication across Fish, Zsh, and Bash.
+
 #### Work Machine Setup
 ```bash
 # 1. Clone the repository
@@ -56,7 +58,9 @@ stow shared work
 exec $SHELL
 ```
 
-**Note:** Work setup requires access to the private `dotfiles-work-private` repository.
+**Notes:** 
+- Work setup requires access to the private `dotfiles-work-private` repository
+- The shell configuration has been reorganized to follow Unix best practices with shared modules
 
 ## Structure
 
@@ -67,11 +71,35 @@ exec $SHELL
 ## What's Included
 
 ### Shell Configuration
-- **Fish Shell** (`.config/fish/`) - Modern shell with intelligent autocompletion
-  - Custom functions and aliases
-  - Git-spice integration
-  - Development environment setup
-  - Vi-mode keybindings
+Multi-shell setup following Unix best practices with shared configuration:
+
+- **Fish Shell** (`.config/fish/`) - Primary shell with modern features
+  - Self-contained configuration with Fish-specific syntax
+  - Vi-mode keybindings and custom functions
+  - Oh-my-posh prompt integration
+  
+- **Zsh** (`.zshrc`, `.zshenv`, `.zprofile`) - Alternative shell
+  - Zinit plugin manager with syntax highlighting and autocompletion
+  - Shared aliases and functions via POSIX-compliant modules
+  - macOS Terminal.app compatibility (login shell handling)
+  
+- **Bash** (`.bashrc`, `.bash_profile`) - Fallback shell
+  - POSIX-compliant configuration
+  - Shared environment and interactive setup
+
+**Shared Configuration Philosophy:**
+- **`.profile`** - Central environment setup (PATH, exports) for all POSIX shells
+- **`.config/shell/`** - Modular shared configuration:
+  - `exports.sh` - Environment variables
+  - `aliases.sh` - Common aliases (git-spice, development tools)
+  - `functions.sh` - Shared shell functions
+- **No duplication** - Environment and aliases defined once, sourced everywhere
+- **Shell-specific optimizations** - Each shell can have unique features while sharing core config
+
+**Setup Details:**
+- Stow will symlink individual `.config` subdirectories (never the entire `.config` folder)
+- Shell profiles (`.zshrc`, `.bashrc`, etc.) will be symlinked to your home directory
+- The new `.profile` file provides centralized environment setup for all shells
 
 ### Editor Configuration
 - **Helix** (`.config/helix/`) - Modal text editor
