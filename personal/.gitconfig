@@ -1,8 +1,8 @@
-# Git Configuration
+# Git Configuration - Personal
 # Personal Git settings with productivity-focused aliases
 
 [user]
-	email = joe@compass.com
+	email = your-personal@email.com  # Replace with your personal email
 	name = Joe Schmitt
 
 [alias]
@@ -36,6 +36,7 @@
 
   # Reset operations
   rs = "!f() { git reset ${@:-HEAD~1}; }; f"                          # Reset to previous commit
+
 # Git behavior configuration
 [branch]
   autosetuprebase = always    # Always rebase when pulling
@@ -87,10 +88,6 @@
 
 [init]
 	defaultBranch = main       # Use 'main' as default branch name
-
-# Security and workspace configuration
-[safe]
-	directory = /Users/josephschmitt/development/urbancompass  # Trusted directory
 
 # Git-spice configuration (stacked diffs workflow)
 [spice "branchCheckout"]

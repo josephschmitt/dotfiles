@@ -1,52 +1,80 @@
-# dotfiles
+# Dotfiles
 
-Personal dotfiles configuration managed by [`stow`](https://formulae.brew.sh/formula/stow).
+Personal development environment configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-## Installation
+## Overview
 
-```sh
-$ brew install stow
-$ git clone git@github.com:josephschmitt/dotfiles.git $HOME/dotfiles && cd $HOME/dotfiles
-$ stow .
+This repository contains my complete development environment setup, organized for easy deployment across personal and work machines while keeping sensitive work configurations private.
+
+## Features
+
+- **🔧 GNU Stow-based** - Simple symlink management, no complex templating
+- **🏠 Work/Personal separation** - Different configs for different contexts
+- **🔒 Private work configs** - Sensitive company data kept in private submodule
+- **🎨 Consistent theming** - Catppuccin theme across all tools
+- **⌨️ Vi-mode everywhere** - Consistent navigation patterns
+- **🔍 Fuzzy finding** - FZF integration throughout the workflow
+
+## Quick Start
+
+### Personal Machine
+```bash
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+stow shared personal
+```
+
+### Work Machine
+```bash
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+git submodule update --init --recursive
+stow shared work
 ```
 
 ## What's Included
 
-### Shell Configuration
-- **Fish Shell** (`.config/fish/`) - Modern shell with intelligent autocompletion
-  - Custom functions and aliases
-  - Git-spice integration
-  - Development environment setup
-  - Vi-mode keybindings
+### Core Tools
+- **Shell**: Fish with custom prompt and functions
+- **Editor**: Helix with modal editing and custom keybindings
+- **Terminal**: Ghostty with optimized configuration
+- **Multiplexer**: tmux with plugin ecosystem
+- **Version Control**: Git with comprehensive aliases
 
-### Editor Configuration
-- **Helix** (`.config/helix/`) - Modal text editor
-  - Catppuccin theme
-  - Custom keybindings for navigation
-  - Yazi file picker integration
-  - Git permalink generation
+### Development Environment
+- **Languages**: Node.js, Rust, Python, Go configurations
+- **Package Managers**: pnpm, bun, cargo, asdf
+- **Build Tools**: Nix for reproducible environments
+- **CLI Tools**: FZF, EZA, Yazi, and more
 
-### Terminal Multiplexer
-- **tmux** (`.config/tmux/`) - Terminal session management
-  - Catppuccin theme
-  - Plugin ecosystem (fzf, sessionx, floax)
-  - Vim-style navigation
-  - Session persistence
+### Productivity Features
+- **Git workflow optimization** with git-spice integration
+- **Fuzzy finding** for files, history, and processes
+- **Session management** with tmux persistence
+- **Custom keybindings** for efficient navigation
 
-### Development Tools
-- **Git** (`.gitconfig`) - Version control with custom aliases
-- **Ghostty** (`.config/ghostty/`) - Terminal emulator
-- **Warp** (`.warp/`) - Modern terminal with AI features
+## Repository Structure
 
-### Package Managers & Tools
-- **Nix** configuration for reproducible environments
-- **pnpm**, **bun**, **cargo** path configurations
-- **asdf** version manager setup
+```
+dotfiles/
+├── shared/          # Common configurations for all machines
+│   ├── .config/     # Application configurations
+│   ├── .zshrc       # Shell configurations
+│   └── README.md    # Detailed setup instructions
+├── personal/        # Personal-specific configurations
+│   └── .gitconfig   # Personal git settings
+└── work/           # Work-specific configurations (private submodule)
+    ├── .gitconfig   # Work git settings
+    └── .compassrc   # Company-specific tools
+```
 
-## Key Features
+## Documentation
 
-- **Consistent theming** across all tools (Catppuccin)
-- **Vi-mode everywhere** for consistent navigation
-- **Fuzzy finding** integration (fzf) throughout the workflow
-- **Git workflow optimization** with custom aliases and git-spice
-- **Development environment** paths and tool configurations
+For complete setup instructions, troubleshooting, and maintenance information, see:
+- **[Setup Guide](shared/README.md)** - Detailed installation and configuration instructions
+
+## Philosophy
+
+These dotfiles follow a "files are files" philosophy - no complex templating or generation. What you see is what you get, making them easy to understand, modify, and debug.
+
+The work/personal separation ensures you can safely share your configurations publicly while keeping sensitive company information secure in a private repository.
