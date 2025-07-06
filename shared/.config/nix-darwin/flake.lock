@@ -75,8 +75,21 @@
       "inputs": {
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "work": "work"
       }
+    },
+    "work": {
+      "flake": false,
+      "locked": {
+        "path": "../../../work",
+        "type": "path"
+      },
+      "original": {
+        "path": "../../../work",
+        "type": "path"
+      },
+      "parent": []
     }
   },
   "root": "root",

@@ -2,14 +2,17 @@
   description = "A flake for my NixOS macOS configurations";
 
   inputs = {
-    self.submodules = (builtins.getEnv "NIX_ENABLE_SUBMODULES") == "true";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    work = {
+      url = "path:../../../work";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, work, ... }:
   let
     darwinConfig = import ./darwin.nix;
     nixHomebrewConfig = {
@@ -43,16 +46,13 @@
 
     # Helper function to conditionally import work machine configs
     workMachineConfig = name: 
-      let
-        workConfigPath = ../../../work/.config/nix-darwin/machines + "/${name}.nix";
-      in
-        if builtins.pathExists workConfigPath
-        then import workConfigPath
-        else { }; # Empty config if work submodule not available
+      if (builtins.getEnv "NIX_ENABLE_SUBMODULES") == "true" && builtins.pathExists (work + "/.config/nix-darwin/machines/${name}.nix")
+      then import (work + "/.config/nix-darwin/machines/${name}.nix")
+      else { }; # Empty config if work submodule not enabled or file doesn't exist
 
-    # Work configurations (only if work submodule exists)
+    # Work configurations (only if submodules enabled and work configs exist)
     workConfigs = 
-      if builtins.pathExists ../../../work/.config/nix-darwin/machines
+      if (builtins.getEnv "NIX_ENABLE_SUBMODULES") == "true" && builtins.pathExists (work + "/.config/nix-darwin/machines")
       then {
         # Compass M1 MacBook Pro
         "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
