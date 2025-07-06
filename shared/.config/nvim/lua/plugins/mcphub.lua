@@ -1,6 +1,7 @@
 if vim.fn.executable("mcp-hub") == 1 then
   return {
     "ravitemer/mcphub.nvim",
+    enabled = false,
     event = "VeryLazy",
     opts = {
       -- Set to true to auto-approve all MCP tool calls without confirmation
@@ -19,4 +20,3 @@ if vim.fn.executable("mcp-hub") == 1 then
     },
   }
 end
-
