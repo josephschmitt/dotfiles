@@ -1,5 +1,6 @@
 search_paths:
   - "~/development"
+  - "~/dotfiles"
 exclude_path_components:
   - .git
   - .direnv
