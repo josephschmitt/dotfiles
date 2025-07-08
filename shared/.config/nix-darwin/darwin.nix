@@ -1,4 +1,4 @@
-{ pkgs, config, ... }: {
+{ pkgs, ... }: {
   nixpkgs.config.allowUnfree = true;
   system.primaryUser = "josephschmitt";
 
@@ -16,6 +16,7 @@
     neovim
     oh-my-posh
     ripgrep
+    sesh
     stow
     tmux
     twm
