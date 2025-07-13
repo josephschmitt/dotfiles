@@ -113,6 +113,7 @@ alias nix_update="nix flake update ~/dotfiles/shared/.config/nix && nix profile 
 alias lg="lazygit"
 alias c="clear"
 alias vim="nvim"
+alias claude="~/.claude/local/claude"
 
 # Git-spice workflow aliases
 alias gsb="gs branch"
