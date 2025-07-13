@@ -32,11 +32,11 @@ workspace_definitions:
 layouts:
   - name: nvim
     commands:
-      - tmux send-keys -t 0 'nvim' C-m
+      - tmux send-keys -t 1 'nvim' C-m
   - name: nvim-project
     inherits:
       - nvim
     commands:
       - tmux split-window -h
       - tmux resize-pane -x 80
-      - tmux select-pane -t 0
+      - tmux select-pane -t 1
