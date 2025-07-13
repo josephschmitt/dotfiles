@@ -76,7 +76,9 @@
       "type": "local",
       "command": ["pnpm", "dlx", "@circleci/mcp-server-circleci"],
       "enabled": true,
-      "environment": {}
+      "environment": {
+        "CIRCLECI_TOKEN": "{env:CIRCLECI_TOKEN}"
+      }
     }
   }
 }
