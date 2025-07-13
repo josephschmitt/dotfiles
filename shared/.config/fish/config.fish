@@ -139,8 +139,10 @@ end
 
 # Environment loading with replay (for sensitive configs)
 if type -q replay
-    # Load work-specific configuration
-    replay "source $HOME/.compassrc"
+    # Load work-specific configuration (if available)
+    if test -f "$HOME/.compassrc"
+        replay "source $HOME/.compassrc"
+    end
 
     # Load personal environment variables
     if test -f "$HOME/.env"
