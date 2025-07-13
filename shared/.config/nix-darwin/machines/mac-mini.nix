@@ -20,13 +20,6 @@
 
   system.defaults = {
     dock.tilesize = 64;
-
-    dock.persistent-apps = [
-      "/Applications/Safari.app"
-      "/Applications/ChatGPT.app"
-      "/Applications/Ghostty.app"
-      "/Applications/Visual Studio Code.app"
-    ];
   };
 
   # The platform the configuration will be used on.
