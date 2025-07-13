@@ -17,7 +17,7 @@ This directory contains lazygit configuration with support for multiple themes.
 
 ### Switching Themes
 
-**List available themes:**
+**Interactive theme selection (with gum):**
 ```bash
 ~/.config/lazygit/switch-theme.sh
 ```
@@ -26,6 +26,11 @@ This directory contains lazygit configuration with support for multiple themes.
 ```bash
 ~/.config/lazygit/switch-theme.sh tokyonight
 ~/.config/lazygit/switch-theme.sh catppuccin
+```
+
+**Install gum for better UX:**
+```bash
+brew install gum
 ```
 
 ### Adding New Themes
