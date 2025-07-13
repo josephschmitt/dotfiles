@@ -2,7 +2,7 @@
 # Personal Git settings with productivity-focused aliases
 
 [user]
-	email = your-personal@email.com  # Replace with your personal email
+	email = dev@joe.sh
 	name = Joe Schmitt
 
 [alias]
