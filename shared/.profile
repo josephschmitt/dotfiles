@@ -7,8 +7,8 @@ if [ -f "$HOME/.config/shell/exports.sh" ]; then
   . "$HOME/.config/shell/exports.sh"
 fi
 
-# Work-specific configuration (if on work machine)
-if [ -f "$HOME/.compassrc" ] && [ "$IS_COMPASS_MACHINE" ]; then
+# Work-specific configuration (if available)
+if [ -f "$HOME/.compassrc" ]; then
   . "$HOME/.compassrc"
 fi
 
