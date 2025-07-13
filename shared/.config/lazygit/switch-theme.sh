@@ -22,9 +22,6 @@ if [ ! -f "$THEME_CONFIG" ]; then
     exit 1
 fi
 
-# Backup current config
-cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
-
 # Copy theme config
 cp "$THEME_CONFIG" "$CONFIG_FILE"
 

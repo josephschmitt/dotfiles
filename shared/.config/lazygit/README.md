@@ -69,6 +69,6 @@ Then use: `lgtheme tokyonight` or `lgtheme catppuccin`
 
 - **`G`**: Open current repository in GitHub (works with both SSH and HTTPS remotes)
 
-## Backup
+## Version Control
 
-The theme switcher automatically creates a backup (`config.yml.bak`) before making changes.
+Since this is a git-managed dotfiles repository, all theme changes are tracked in version history - no backup files needed.
