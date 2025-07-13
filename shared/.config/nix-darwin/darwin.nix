@@ -12,6 +12,7 @@
     fish
     fzf
     gh
+    gum
     lazygit
     neovim
     oh-my-posh
