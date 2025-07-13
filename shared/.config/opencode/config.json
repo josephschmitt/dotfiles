@@ -69,37 +69,14 @@
   "mcp": {
     "context7": {
       "type": "local",
-      "command": [
-        "pnpm",
-        "dlx",
-        "@upstash/context7-mcp@latest"
-      ],
+      "command": ["pnpm", "dlx", "@upstash/context7-mcp@latest"],
       "enabled": true
     },
     "circleci": {
       "type": "local",
-      "command": [
-        "pnpm",
-        "dlx",
-        "@circleci/mcp-server-circleci"
-      ],
+      "command": ["pnpm", "dlx", "@circleci/mcp-server-circleci"],
       "enabled": true,
-      "environment": {
-      }
-    },
-    "github": {
-      "type": "local",
-      "command": [
-        "pnpm",
-        "dlx",
-        "mcp-remote",
-        "https://api.githubcopilot.com/mcp/",
-        "--header",
-        "Authorization: Bearer ${AUTH_TOKEN}"
-      ],
-      "environment": {
-      },
-      "enabled": true
+      "environment": {}
     }
   }
 }
