@@ -3,11 +3,9 @@
   system.primaryUser = "josephschmitt";
 
   environment.systemPackages = with pkgs; [
-    _1password-cli
     asdf-vm 
     atuin
-    claude-code
-    codex
+    bun
     fd
     fish
     fzf
@@ -21,7 +19,6 @@
     stow
     tmux
     twm
-    volta
     zellij
     zoxide
   ];
