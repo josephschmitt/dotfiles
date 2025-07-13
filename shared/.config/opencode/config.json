@@ -1,5 +1,71 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "mode": {
+    "pm": {
+      "prompt": "{file:./prompts/product-manager.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "todoread": true,
+        "todowrite": true,
+        "webfetch": true,
+        "edit": false,
+        "bash": false,
+        "patch": false
+      }
+    },
+    "architect": {
+      "prompt": "{file:./prompts/architect.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "todoread": true,
+        "todowrite": true,
+        "webfetch": true,
+        "edit": false,
+        "bash": false,
+        "patch": false
+      }
+    },
+    "implementer": {
+      "prompt": "{file:./prompts/implementer.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "patch": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "todoread": true,
+        "todowrite": true,
+        "webfetch": true
+      }
+    },
+    "solver": {
+      "prompt": "{file:./prompts/problem-solver.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true,
+        "patch": true,
+        "grep": true,
+        "glob": true,
+        "list": true,
+        "todoread": true,
+        "todowrite": true,
+        "webfetch": true
+      }
+    }
+  },
   "mcp": {
     "context7": {
       "type": "local",
