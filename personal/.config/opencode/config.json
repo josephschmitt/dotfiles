@@ -71,14 +71,6 @@
       "type": "local",
       "command": ["pnpm", "dlx", "@upstash/context7-mcp@latest"],
       "enabled": true
-    },
-    "circleci": {
-      "type": "local",
-      "command": ["pnpm", "dlx", "@circleci/mcp-server-circleci"],
-      "enabled": true,
-      "environment": {
-        "CIRCLECI_TOKEN": "{env:CIRCLECI_TOKEN}"
-      }
     }
   }
 }
