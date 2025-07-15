@@ -46,13 +46,13 @@
 
     # Helper function to conditionally import work machine configs
     workMachineConfig = name: 
-      if (builtins.getEnv "NIX_ENABLE_SUBMODULES") == "true" && builtins.pathExists (work + "/.config/nix-darwin/machines/${name}.nix")
+      if builtins.pathExists (work + "/.config/nix-darwin/machines/${name}.nix")
       then import (work + "/.config/nix-darwin/machines/${name}.nix")
-      else { }; # Empty config if work submodule not enabled or file doesn't exist
+      else { }; # Empty config if file doesn't exist
 
-    # Work configurations (only if submodules enabled and work configs exist)
+    # Work configurations (only if work configs exist)
     workConfigs = 
-      if (builtins.getEnv "NIX_ENABLE_SUBMODULES") == "true" && builtins.pathExists (work + "/.config/nix-darwin/machines")
+      if builtins.pathExists (work + "/.config/nix-darwin/machines")
       then {
         # Compass M1 MacBook Pro
         "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
