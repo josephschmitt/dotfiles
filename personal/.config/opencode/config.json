@@ -3,6 +3,7 @@
   "mode": {
     "pm": {
       "prompt": "{file:./prompts/product-manager.txt}",
+      "model": "openai/gpt-4.1",
       "tools": {
         "read": true,
         "write": true,
@@ -35,6 +36,7 @@
     },
     "implementer": {
       "prompt": "{file:./prompts/implementer.txt}",
+      "model": "anthropic/claude-sonnet-4-20250514",
       "tools": {
         "read": true,
         "write": true,
@@ -51,6 +53,7 @@
     },
     "solver": {
       "prompt": "{file:./prompts/problem-solver.txt}",
+      "model": "anthropic/claude-sonnet-4-20250514",
       "tools": {
         "read": true,
         "write": true,
