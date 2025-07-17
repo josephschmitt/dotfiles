@@ -37,3 +37,8 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 if [ -f "$HOME/.env" ]; then
   . "$HOME/.env"
 fi
+
+if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
+  export TERM=xterm-256color
+fi
+

@@ -150,3 +150,8 @@ if type -q replay
         replay "source $HOME/.env"
     end
 end
+
+# Ghostty workaround for terminal compatibility
+if "$TERM_PROGRAM" = ghostty
+    set -gx TERM xterm-256color
+end
