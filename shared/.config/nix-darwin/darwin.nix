@@ -29,6 +29,7 @@
     enable = true;
     brews = [
       "helix"
+      "morantron/tmux-fingers/tmux-fingers"
       "sst/tap/opencode"
     ];
     casks = [
