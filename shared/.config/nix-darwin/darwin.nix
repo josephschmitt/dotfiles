@@ -30,6 +30,7 @@
     brews = [
       "helix"
       "sst/tap/opencode"
+      "morantron/tmux-fingers/tmux-fingers"
     ];
     casks = [
       "1password"
