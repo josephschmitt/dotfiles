@@ -74,6 +74,11 @@
       "type": "local",
       "command": ["pnpm", "dlx", "@upstash/context7-mcp@latest"],
       "enabled": true
+    },
+    "gemini-cli": {
+      "type": "local",
+      "command": ["pnpm", "dlx", "gemini-mcp-tool"],
+      "enabled": true
     }
   }
 }
