@@ -1,7 +1,5 @@
-[[plugin.deps]]
-use = "josephschmitt/auto-layout"
-rev = "626a601"
-hash = "747a700c90fffc5b187a6094fd0661b0"
+[plugin]
+deps = []
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-mocha"
