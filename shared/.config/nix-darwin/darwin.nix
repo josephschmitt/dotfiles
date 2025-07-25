@@ -48,7 +48,10 @@
       "visual-studio-code"
       "vimr"
     ];
-    taps = ["sst/tap"];
+    taps = [
+      "sst/tap"
+      "morantron/tmux-fingers"
+    ];
 
     onActivation.autoUpdate = true;
     onActivation.upgrade = true;
