@@ -43,3 +43,4 @@ keybind = cmd+shift+w=close_tab
 keybind = cmd+shift+h=previous_tab
 keybind = cmd+shift+l=next_tab
 keybind = cmd+shift+w=close_tab
+keybind = shift+enter=text:\n
