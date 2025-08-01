@@ -36,7 +36,7 @@ keybind = ctrl+cmd+k=new_split:up
 keybind = ctrl+cmd+l=new_split:right
 
 # Misc. pane commands
-keybind = ctrl+alt+z=toggle_split_zoom
+keybind = cmd+alt+z=toggle_split_zoom
 keybind = cmd+shift+w=close_tab
 
 # Tab commands
