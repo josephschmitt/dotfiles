@@ -7,9 +7,6 @@ export XDG_CONFIG_HOME="$HOME/.config"
 # Default editor
 export EDITOR="nvim"
 
-# OpenAI API Key (using 1Password CLI)
-export OPENAI_API_KEY="op://Private/OPENAI_API_KEY/credential"
-
 # Zellij configuration
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="ide"
@@ -41,4 +38,3 @@ fi
 if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
   export TERM=xterm-256color
 fi
-
