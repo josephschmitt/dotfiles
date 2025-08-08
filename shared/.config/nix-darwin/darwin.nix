@@ -6,6 +6,7 @@
     asdf-vm 
     atuin
     bun
+    csvq
     fd
     fish
     fzf
