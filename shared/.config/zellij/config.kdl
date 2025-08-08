@@ -148,15 +148,15 @@ keybinds clear-defaults=true {
         bind "Ctrl d" { Detach; }
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
-        bind "Alt 1" { GoToTab 1; SwitchToMode "locked"; }
-        bind "Alt 2" { GoToTab 2; SwitchToMode "locked"; }
-        bind "Alt 3" { GoToTab 3; SwitchToMode "locked"; }
-        bind "Alt 4" { GoToTab 4; SwitchToMode "locked"; }
-        bind "Alt 5" { GoToTab 5; SwitchToMode "locked"; }
-        bind "Alt 6" { GoToTab 6; SwitchToMode "locked"; }
-        bind "Alt 7" { GoToTab 7; SwitchToMode "locked"; }
-        bind "Alt 8" { GoToTab 8; SwitchToMode "locked"; }
-        bind "Alt 9" { GoToTab 9; SwitchToMode "locked"; }
+        bind "Alt 1" { GoToTab 1; }
+        bind "Alt 2" { GoToTab 2; }
+        bind "Alt 3" { GoToTab 3; }
+        bind "Alt 4" { GoToTab 4; }
+        bind "Alt 5" { GoToTab 5; }
+        bind "Alt 6" { GoToTab 6; }
+        bind "Alt 7" { GoToTab 7; }
+        bind "Alt 8" { GoToTab 8; }
+        bind "Alt 9" { GoToTab 9; }
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
@@ -207,7 +207,7 @@ keybinds clear-defaults=true {
         bind "Alt l" { MoveFocusOrTab "right"; }
     }
     shared_except "locked" "scroll" "search" "tmux" {
-        bind "Ctrl b" { SwitchToMode "tmux"; }
+        bind "Ctrl g" { SwitchToMode "tmux"; }
     }
     shared_except "locked" "scroll" "search" {
         bind "Ctrl s" { SwitchToMode "scroll"; }
@@ -275,16 +275,45 @@ keybinds clear-defaults=true {
         bind "%" { NewPane "right"; SwitchToMode "normal"; }
         bind "," { SwitchToMode "renametab"; }
         bind "[" { SwitchToMode "scroll"; }
-        bind "Ctrl b" { Write 2; SwitchToMode "normal"; }
+        bind "Ctrl g" { Write 2; SwitchToMode "normal"; }
         bind "c" { NewTab; SwitchToMode "normal"; }
-        bind "h" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "l" { MoveFocus "right"; SwitchToMode "normal"; }
+        bind "h" { Resize "Increase left"; }
+        bind "j" { Resize "Increase down"; }
+        bind "k" { Resize "Increase up"; }
+        bind "l" { Resize "Increase right"; }
         bind "n" { GoToNextTab; SwitchToMode "normal"; }
-        bind "o" { FocusNextPane; }
+        bind "o" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "O" { NewPane "right"; Run "opencode" "."; SwitchToMode "normal"; }
         bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
         bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "G" {
+            NewPane "down"
+            ToggleFloatingPanes
+            Run "lazygit"
+            SwitchToMode "normal"
+        }
+        bind "Z" {
+            NewPane "down"
+            ToggleFloatingPanes  
+            Run "yazi"
+            SwitchToMode "normal"
+        }
+        // bind "H" { 
+        //     ChangeSwapLayout "main-horizontal"
+        //     SwitchToMode "normal"
+        // }
+        // bind "V" { 
+        //     ChangeSwapLayout "main-vertical"
+        //     SwitchToMode "normal"
+        // }
+        bind "|" { NewPane "right"; SwitchToMode "normal"; }
+        bind "-" { NewPane "down"; SwitchToMode "normal"; }
     }
 }
 
@@ -334,7 +363,7 @@ plugins {
         border_format   "#[fg=#6C7086]{char}"
         border_position "top"
 
-        // hide_frame_for_single_pane "true"
+        hide_frame_for_single_pane "true"
 
         mode_normal        "#[bg=#a6da95,fg=#181926,bold] NORMAL#[bg=#181926,fg=#a6da95]"
         mode_locked        "#[bg=#6e738d,fg=#181926,bold] LOCKED #[bg=#181926,fg=#6e738d]"
@@ -447,7 +476,7 @@ default_mode "normal"
 //   - true (default, enabled)
 //   - false
 // 
-pane_frames false
+// pane_frames false
  
 // When attaching to an existing session with other users,
 // should the session be mirrored (true)
