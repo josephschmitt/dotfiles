@@ -266,32 +266,68 @@ keybinds clear-defaults=true {
         bind "d" { Detach; }
     }
     tmux {
+        // Arrow keys and hjkl for moving focus (matching tmux default behavior)
         bind "left" { MoveFocus "left"; SwitchToMode "normal"; }
         bind "down" { MoveFocus "down"; SwitchToMode "normal"; }
         bind "up" { MoveFocus "up"; SwitchToMode "normal"; }
         bind "right" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "space" { NextSwapLayout; }
-        bind "\"" { NewPane "down"; SwitchToMode "normal"; }
-        bind "%" { NewPane "right"; SwitchToMode "normal"; }
-        bind "," { SwitchToMode "renametab"; }
-        bind "[" { SwitchToMode "scroll"; }
-        bind "Ctrl g" { Write 2; SwitchToMode "normal"; }
-        bind "c" { NewTab; SwitchToMode "normal"; }
+        
+        // hjkl for resizing panes (matching your tmux config)
         bind "h" { Resize "Increase left"; }
         bind "j" { Resize "Increase down"; }
         bind "k" { Resize "Increase up"; }
         bind "l" { Resize "Increase right"; }
-        bind "n" { GoToNextTab; SwitchToMode "normal"; }
-        bind "o" {
-            LaunchOrFocusPlugin "session-manager" {
-                floating true
-                move_to_focused_tab true
-            }
+        
+        // Layout management (your tmux config has H/V for layouts)
+        bind "space" { NextSwapLayout; SwitchToMode "normal"; }
+        bind "H" { 
+            ChangeSwapLayout "main-horizontal"
             SwitchToMode "normal"
         }
+        bind "V" { 
+            ChangeSwapLayout "main-vertical"
+            SwitchToMode "normal"
+        }
+        
+        // Pane splits (matching your tmux config)
+        bind "\\" { NewPane "down"; SwitchToMode "normal"; }    // Your tmux: \ splits vertically
+        bind "|" { NewPane "right"; SwitchToMode "normal"; }    // Your tmux: | splits horizontally
+        bind "-" { NewPane "down"; SwitchToMode "normal"; }     // Additional horizontal split
+        bind "\"" { NewPane "down"; SwitchToMode "normal"; }    // tmux default
+        bind "%" { NewPane "right"; SwitchToMode "normal"; }    // tmux default
+        
+        // Window/tab management (matching your tmux config)
+        bind "n" { NewTab; SwitchToMode "normal"; }             // Your tmux: n = new window
+        bind "c" { NewTab; SwitchToMode "normal"; }             // tmux default: c = new window
+        bind "L" { GoToNextTab; SwitchToMode "normal"; }        // Your tmux: L = next window
+        bind "P" { GoToPreviousTab; SwitchToMode "normal"; }    // Capital P for previous (since lowercase p is display-panes)
+        
+        // Pane selection by number (matching your tmux config)
+        bind "p" { FocusNextPane; SwitchToMode "normal"; }      // Your tmux: p = display-panes
+        bind "1" { FocusNextPane; SwitchToMode "normal"; }      // Approximate - zellij doesn't have direct pane numbers
+        bind "2" { FocusNextPane; SwitchToMode "normal"; }
+        bind "3" { FocusNextPane; SwitchToMode "normal"; }
+        bind "4" { FocusNextPane; SwitchToMode "normal"; }
+        bind "5" { FocusNextPane; SwitchToMode "normal"; }
+        bind "6" { FocusNextPane; SwitchToMode "normal"; }
+        bind "7" { FocusNextPane; SwitchToMode "normal"; }
+        bind "8" { FocusNextPane; SwitchToMode "normal"; }
+        bind "9" { FocusNextPane; SwitchToMode "normal"; }
+        
+        // Utility bindings (matching your tmux config)
+        bind ":" { WriteChars ":"; SwitchToMode "normal"; }     // Command prompt (limited in zellij)
+        bind "*" { ToggleActiveSyncTab; SwitchToMode "normal"; } // Sync panes equivalent
+        bind "x" { CloseFocus; SwitchToMode "normal"; }         // Kill pane
+        bind "X" { CloseTab; SwitchToMode "normal"; }           // Kill window/tab
+        bind "r" { SwitchToMode "renametab"; }                  // Rename window
+        bind "q" { Quit; }                                      // Kill session (close zellij)
+        bind "s" { SwitchToMode "session"; }                    // Session management
+        bind "R" { SwitchToMode "normal"; }                     // Reload (limited in zellij)
+        bind "K" { WriteChars "clear"; WriteChars "\n"; SwitchToMode "normal"; } // Clear screen
+        bind "v" { SwitchToMode "scroll"; }                     // Copy mode equivalent
+        
+        // Your custom bindings
         bind "O" { NewPane "right"; Run "opencode" "."; SwitchToMode "normal"; }
-        bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
-        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
         bind "G" {
             NewPane "down"
             ToggleFloatingPanes
@@ -304,16 +340,19 @@ keybinds clear-defaults=true {
             Run "yazi"
             SwitchToMode "normal"
         }
-        // bind "H" { 
-        //     ChangeSwapLayout "main-horizontal"
-        //     SwitchToMode "normal"
-        // }
-        // bind "V" { 
-        //     ChangeSwapLayout "main-vertical"
-        //     SwitchToMode "normal"
-        // }
-        bind "|" { NewPane "right"; SwitchToMode "normal"; }
-        bind "-" { NewPane "down"; SwitchToMode "normal"; }
+        bind "o" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        
+        // Core tmux bindings
+        bind "," { SwitchToMode "renametab"; }
+        bind "[" { SwitchToMode "scroll"; }
+        bind "Ctrl g" { Write 2; SwitchToMode "normal"; }       // Send literal Ctrl+g
+        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
     }
 }
 
