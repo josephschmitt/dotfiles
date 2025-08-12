@@ -9,8 +9,8 @@ alias vim="nvim"
 # Nix and Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
 alias darwin_update="nix flake update --flake ~/.config/nix-darwin"
-alias nix_rebuild="nix profile upgrade ~/dotfiles/shared/.config/nix"
-alias nix_update="nix flake update ~/dotfiles/shared/.config/nix && nix profile upgrade ~/dotfiles/shared/.config/nix"
+alias nix_rebuild="nix profile upgrade personal/.config/nix"
+alias nix_update="nix flake update --flake ~/dotfiles/personal/.config/nix && nix profile upgrade personal/.config/nix"
 alias claude="~/.claude/local/claude"
 
 # Git-spice workflow aliases

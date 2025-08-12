@@ -27,7 +27,10 @@
           neovim
           oh-my-posh
           ripgrep
+          sesh
           stow
+          tmux
+          twm
           volta
           zellij
           zoxide
