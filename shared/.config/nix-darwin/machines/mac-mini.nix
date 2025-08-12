@@ -1,4 +1,4 @@
-{ pkgs, config, ... }: {
+{ pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     git
     lf
@@ -12,6 +12,7 @@
     casks = [
       "backblaze"
       "jump-desktop-connect"
+      "lm-studio"
       "orbstack"
     ];
 

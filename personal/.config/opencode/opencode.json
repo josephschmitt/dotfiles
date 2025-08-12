@@ -69,6 +69,23 @@
       }
     }
   },
+  "provider": {
+    "lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio (local)",
+      "options": {
+        "baseURL": "https://lmstudio.internal.schmitt.town/v1"
+      },
+      "models": {
+        "openai/gpt-oss-20b": {
+          "name": "GPT-4 Turbo"
+        },
+        "qwen/qwen3-coder-30b": {
+          "name": "Qwen 3 Coder"
+        }
+      }
+    }
+  },
   "mcp": {
     "context7": {
       "type": "local",

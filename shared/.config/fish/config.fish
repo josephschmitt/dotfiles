@@ -155,3 +155,7 @@ end
 if test $TERM_PROGRAM = ghostty
     set -gx TERM xterm-256color
 end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /Users/josephschmitt/.lmstudio/bin
+# End of LM Studio CLI section

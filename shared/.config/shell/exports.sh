@@ -38,3 +38,7 @@ fi
 if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
   export TERM=xterm-256color
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/josephschmitt/.lmstudio/bin"
+# End of LM Studio CLI section
