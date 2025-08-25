@@ -1,36 +1,39 @@
 git:
   commit:
     autoWrapCommitMessage: false
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
 gui:
   theme:
     activeBorderColor:
-      - '#ff9e64'
+      - "#ff9e64"
       - bold
     inactiveBorderColor:
-      - '#27a1b9'
+      - "#27a1b9"
     searchingActiveBorderColor:
-      - '#ff9e64'
+      - "#ff9e64"
       - bold
     optionsTextColor:
-      - '#7aa2f7'
+      - "#7aa2f7"
     selectedLineBgColor:
-      - '#283457'
+      - "#283457"
     cherryPickedCommitFgColor:
-      - '#7aa2f7'
+      - "#7aa2f7"
     cherryPickedCommitBgColor:
-      - '#bb9af7'
+      - "#bb9af7"
     markedBaseCommitFgColor:
-      - '#7aa2f7'
+      - "#7aa2f7"
     markedBaseCommitBgColor:
-      - '#e0af68'
+      - "#e0af68"
     unstagedChangesColor:
-      - '#db4b4b'
+      - "#db4b4b"
     defaultFgColor:
-      - '#c0caf5'
+      - "#c0caf5"
   authorColors:
-    '*': '#b4befe'
+    "*": "#b4befe"
 customCommands:
-  - key: 'G'
-    context: 'global'
-    description: 'Open repository in GitHub'
+  - key: "G"
+    context: "global"
+    description: "Open repository in GitHub"
     command: 'git remote get-url origin | sed -E "s/git@github.com:(.*).git/https:\/\/github.com\/\1/" | xargs open'
