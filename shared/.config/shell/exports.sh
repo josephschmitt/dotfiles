@@ -7,6 +7,8 @@ export XDG_CONFIG_HOME="$HOME/.config"
 # Default editor
 export EDITOR="nvim"
 
+export BAT_THEME="tokyonight_night"
+
 # Zellij configuration
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="ide"

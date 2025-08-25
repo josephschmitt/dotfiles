@@ -4,7 +4,7 @@
 # Environment Variables (Fish-specific syntax)
 setenv XDG_CONFIG_HOME "$HOME/.config"
 setenv EDITOR nvim
-setenv OPENAI_API_KEY "op://Private/OPENAI_API_KEY/credential"
+setenv BAT_THEME tokyonight_night
 
 # Zellij configuration
 setenv ZJ_ALWAYS_NAME true
@@ -114,6 +114,7 @@ alias lg="lazygit"
 alias c="clear"
 alias vim="nvim"
 alias claude="~/.claude/local/claude"
+alias cat="bat"
 
 # Git-spice workflow aliases
 alias gsb="gs branch"

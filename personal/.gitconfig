@@ -43,9 +43,14 @@
 
 [core]
 	editor = $EDITOR            # Use system default editor
+  pager = delta
 
 [color]
   ui = auto                   # Enable colored output
+
+
+[interactive]
+    diffFilter = delta --color-only
 
 # Diff and merge tool configuration
 [diff]
@@ -61,6 +66,7 @@
   cmd = micro --diff $LOCAL $REMOTE
 
 [merge]
+  conflictStyle = zdiff3
   tool = vscode              # Use VS Code for merge conflicts
 
 [mergetool]
@@ -88,6 +94,13 @@
 
 [init]
 	defaultBranch = main       # Use 'main' as default branch name
+
+[delta]
+  navigate = true  # use n and N to move between diff sections
+  dark = true      # or light = true, or omit for auto-detection
+  line-numbers = true
+  side-by-side = true
+  syntax-theme = Dracula
 
 # Git-spice configuration (stacked diffs workflow)
 [spice "branchCheckout"]

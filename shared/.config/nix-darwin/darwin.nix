@@ -5,8 +5,10 @@
   environment.systemPackages = with pkgs; [
     asdf-vm 
     atuin
+    bat
     bun
     csvq
+    delta
     fd
     fish
     fzf

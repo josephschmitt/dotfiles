@@ -5,6 +5,7 @@ alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias lg="lazygit"
 alias c="clear"
 alias vim="nvim"
+alias cat="bat"
 
 # Nix and Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
