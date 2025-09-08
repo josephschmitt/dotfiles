@@ -6,6 +6,7 @@ alias lg="lazygit"
 alias c="clear"
 alias vim="nvim"
 alias cat="bat"
+alias tmx="tmux new-session -A -s \$(hostname); exit"
 
 # Nix and Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"

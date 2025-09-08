@@ -115,6 +115,7 @@ alias c="clear"
 alias vim="nvim"
 alias claude="~/.claude/local/claude"
 alias cat="bat"
+alias tmx="tmux new-session -A -s (hostname); exit"
 
 # Git-spice workflow aliases
 alias gsb="gs branch"
