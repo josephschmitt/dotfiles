@@ -7,6 +7,17 @@ return {
         explorer = {
           ignored = true,
           layout = { preset = "sidebar" },
+          auto_close = false,
+          include = { "node_modules" },
+          win = {
+            list = {
+              keys = {
+                ["S"] = "search_in_directory",
+                ["D"] = "diff",
+                ["<A-c>"] = "toggle_auto_close",
+              },
+            },
+          },
           actions = {
             toggle_preview = {
               action = function(picker)
@@ -93,17 +104,6 @@ return {
               end,
             },
           },
-          win = {
-            list = {
-              keys = {
-                ["S"] = "search_in_directory",
-                ["D"] = "diff",
-                ["<A-c>"] = "toggle_auto_close",
-              },
-            },
-          },
-          auto_close = false,
-          include = { "node_modules" },
         },
         files = {
           hidden = true,
@@ -112,7 +112,7 @@ return {
           win = {
             input = {
               keys = {
-                ["<Tab>"] = "select_and_next",
+                ["<Tab>"] = "select_and_next", -- Allow selecting files in git status window
               },
             },
           },
