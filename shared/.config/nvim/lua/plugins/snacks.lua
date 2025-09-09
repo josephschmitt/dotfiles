@@ -15,20 +15,11 @@ return {
                 ["S"] = "search_in_directory",
                 ["D"] = "diff",
                 ["<A-c>"] = "toggle_auto_close",
+                ["<C-l>"] = "explorer_focus",
               },
             },
           },
           actions = {
-            toggle_preview = {
-              action = function(picker)
-                local current = picker.layout.preview
-                if current then
-                  picker:set_layout({ preview = false })
-                else
-                  picker:set_layout("sidebar")
-                end
-              end,
-            },
             explorer_focus = {
               action = function(picker)
                 vim.cmd("cd " .. picker:dir())
