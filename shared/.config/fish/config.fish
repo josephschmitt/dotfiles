@@ -154,7 +154,7 @@ if type -q replay
 end
 
 # Ghostty workaround for terminal compatibility
-if test $TERM_PROGRAM = ghostty
+if test "$TERM_PROGRAM" = ghostty
     set -gx TERM xterm-256color
 end
 
