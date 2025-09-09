@@ -35,15 +35,21 @@ return {
       desc = "Add cursor for word/selection backwards",
       mode = { "n", "x" },
     },
-
-    -- Match new cursors within visual selections by regex.
     {
-      "<leader>mr",
+      "<S-Down>",
       function()
-        require("multicursor-nvim").matchCursors()
+        require("multicursor-nvim").lineSkipCursor(1)
       end,
-      desc = "Match new cursors in selection by regex",
-      mode = "x",
+      desc = "Add cursor for word/selection",
+      mode = { "n", "x" },
+    },
+    {
+      "<S-Up>",
+      function()
+        require("multicursor-nvim").lineSkipCursor(-1)
+      end,
+      desc = "Add cursor for word/selection backwards",
+      mode = { "n", "x" },
     },
 
     -- Add a cursor for all matches of cursor word/selection in the document.
@@ -74,6 +80,89 @@ return {
       end,
       desc = "Add cursors for match operator",
       mode = { "n", "x" },
+    },
+
+    -- Add a cursor to every search result in the buffer.
+    {
+      "<leader>mA",
+      function()
+        require("multicursor-nvim").searchAllAddCursors()
+      end,
+      desc = "Add cursors to every search result",
+      mode = { "n", "x" },
+    },
+
+    -- Add a cursor and jump to the next/previous search result.
+    {
+      "<leader>mn",
+      function()
+        require("multicursor-nvim").searchAddCursor(1)
+      end,
+      desc = "Add cursor and jump to next search result",
+      mode = "n",
+    },
+    {
+      "<leader>mN",
+      function()
+        require("multicursor-nvim").searchAddCursor(-1)
+      end,
+      desc = "Add cursor and jump to previous search result",
+      mode = "n",
+    },
+
+    -- Jump to the next/previous search result without adding a cursor.
+    {
+      "<leader>ms",
+      function()
+        require("multicursor-nvim").searchSkipCursor(1)
+      end,
+      desc = "Jump to next search result without adding cursor",
+      mode = "n",
+    },
+    {
+      "<leader>mS",
+      function()
+        require("multicursor-nvim").searchSkipCursor(-1)
+      end,
+      desc = "Jump to previous search result without adding cursor",
+      mode = "n",
+    },
+
+    -- Rotate the text contained in each visual selection between cursors.
+    {
+      "<leader>mt",
+      function()
+        require("multicursor-nvim").transposeCursors(1)
+      end,
+      desc = "Rotate text between cursors forward",
+      mode = "x",
+    },
+    {
+      "<leader>mT",
+      function()
+        require("multicursor-nvim").transposeCursors(-1)
+      end,
+      desc = "Rotate text between cursors backward",
+      mode = "x",
+    },
+
+    -- Append/insert for each line of visual selections.
+    -- Similar to block selection insertion.
+    {
+      "I",
+      function()
+        require("multicursor-nvim").insertVisual()
+      end,
+      desc = "Insert at beginning of visual selections",
+      mode = "x",
+    },
+    {
+      "A",
+      function()
+        require("multicursor-nvim").appendVisual()
+      end,
+      desc = "Append at end of visual selections",
+      mode = "x",
     },
   },
   config = function()
