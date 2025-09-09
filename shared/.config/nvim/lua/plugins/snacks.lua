@@ -13,7 +13,7 @@ return {
             list = {
               keys = {
                 ["S"] = "search_in_directory",
-                ["D"] = "diff",
+                ["D"] = "diff_files",
                 ["<A-c>"] = "toggle_auto_close",
                 ["<C-l>"] = "explorer_focus",
               },
@@ -60,7 +60,7 @@ return {
                 })
               end,
             },
-            diff = {
+            diff_files = {
               action = function(picker)
                 picker:close()
                 local sel = picker:selected()
