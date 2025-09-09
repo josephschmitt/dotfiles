@@ -23,44 +23,6 @@ return {
                 vim.cmd("cd " .. picker:dir())
               end,
             },
-            copy_file_path = {
-              action = function(_, item)
-                if not item then
-                  return
-                end
-
-                local vals = {
-                  ["BASENAME"] = vim.fn.fnamemodify(item.file, ":t:r"),
-                  ["EXTENSION"] = vim.fn.fnamemodify(item.file, ":t:e"),
-                  ["FILENAME"] = vim.fn.fnamemodify(item.file, ":t"),
-                  ["PATH"] = item.file,
-                  ["PATH (CWD)"] = vim.fn.fnamemodify(item.file, ":."),
-                  ["PATH (HOME)"] = vim.fn.fnamemodify(item.file, ":~"),
-                  ["URI"] = vim.uri_from_fname(item.file),
-                }
-
-                local options = vim.tbl_filter(function(val)
-                  return vals[val] ~= ""
-                end, vim.tbl_keys(vals))
-                if vim.tbl_isempty(options) then
-                  vim.notify("No values to copy", vim.log.levels.WARN)
-                  return
-                end
-                table.sort(options)
-                vim.ui.select(options, {
-                  prompt = "Choose to copy to clipboard:",
-                  format_item = function(list_item)
-                    return ("%s: %s"):format(list_item, vals[list_item])
-                  end,
-                }, function(choice)
-                  local result = vals[choice]
-                  if result then
-                    vim.fn.setreg("+", result)
-                    Snacks.notify.info("Yanked `" .. result .. "`")
-                  end
-                end)
-              end,
-            },
             search_in_directory = {
               action = function(_, item)
                 if not item then
@@ -111,36 +73,36 @@ return {
                 Snacks.notify.info("Select two entries for the diff")
               end,
             },
+            toggle_auto_close = {
+              desc = "toggle_auto_close",
+              action = function()
+                local current = Snacks.config.picker.sources.explorer.auto_close
+                Snacks.config.picker.sources.explorer.auto_close = not current
+
+                -- Refresh the view by closing and reopening the explorer
+                vim.cmd("lua Snacks.picker.explorer()")
+                vim.cmd("lua Snacks.picker.explorer()")
+
+                local message = "Explorer auto_close: "
+                  .. (Snacks.config.picker.sources.explorer.auto_close and "Enabled" or "Disabled")
+                if vim.notify then
+                  vim.notify(message, vim.log.levels.INFO, { title = "Snacks Explorer" })
+                else
+                  vim.api.nvim_echo({ { message, "None" } }, false, {})
+                end
+              end,
+            },
           },
           win = {
             list = {
               keys = {
-                ["y"] = "copy_file_path",
                 ["S"] = "search_in_directory",
                 ["D"] = "diff",
-                ["<A-c>"] = {
-                  desc = "toggle_auto_close",
-                  function()
-                    local current = Snacks.config.picker.sources.explorer.auto_close
-                    Snacks.config.picker.sources.explorer.auto_close = not current
-
-                    -- Refresh the view by closing and reopening the explorer
-                    vim.cmd("lua Snacks.picker.explorer()")
-                    vim.cmd("lua Snacks.picker.explorer()")
-
-                    local message = "Explorer auto_close: "
-                      .. (Snacks.config.picker.sources.explorer.auto_close and "Enabled" or "Disabled")
-                    if vim.notify then
-                      vim.notify(message, vim.log.levels.INFO, { title = "Snacks Explorer" })
-                    else
-                      vim.api.nvim_echo({ { message, "None" } }, false, {})
-                    end
-                  end,
-                },
+                ["<A-c>"] = "toggle_auto_close",
               },
             },
           },
-          auto_close = true,
+          auto_close = false,
           include = { "node_modules" },
         },
         files = {
