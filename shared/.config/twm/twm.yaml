@@ -38,5 +38,7 @@ layouts:
       - nvim
     commands:
       - tmux split-window -h
+      - tmux split-window -v
       - tmux resize-pane -x 100
+      - tmux resize-pane -y 20
       - tmux select-pane -t 1
