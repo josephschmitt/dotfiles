@@ -2,7 +2,7 @@
 
 # Navigation and utilities
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
-alias lg="lazygit"
+alias lg="TMPDIR=\$HOME/.local/tmp lazygit"
 alias c="clear"
 alias vim="nvim"
 alias cat="bat"
