@@ -161,3 +161,10 @@ end
 # Added by LM Studio CLI (lms)
 set -gx PATH $PATH /Users/josephschmitt/.lmstudio/bin
 # End of LM Studio CLI section
+
+# Auto-load additional configuration modules
+for config_file in ~/.config/fish/config.*.fish
+    if test -f $config_file
+        source $config_file
+    end
+end
