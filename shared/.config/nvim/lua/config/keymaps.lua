@@ -46,7 +46,7 @@ map({ "n" }, "<A-o>", "<C-w>o", { desc = "Close other window" })
 map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch window" })
 
 -- Helix-like line selection and delete
-map({ "n" }, "<C-a>", "ggVG", { desc = "Select all" })
+map({ "n" }, "gV", "ggVG", { desc = "Select all" })
 map({ "v" }, "<S-v>", "j", { desc = "Select down" })
 
 -- map({ "n" }, "x", "V", { desc = "Select line" })
