@@ -16,7 +16,7 @@
       "description": "Spec-driven development expert that guides users through the complete SDD workflow, orchestrating PM, Architect, Planner, Implementer, and Solver subagents",
       "mode": "primary",
       "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agent/sdd.md}",
+      "prompt": "{file:./agents/sdd.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -35,7 +35,7 @@
     "PM": {
       "description": "Gathers requirements and creates product requirements documents (PRDs) focused on functional rather than technical needs",
       "mode": "subagent",
-      "prompt": "{file:./agent/product-manager.md}",
+      "prompt": "{file:./agents/product-manager.md}",
       "model": "openai/gpt-5",
       "tools": {
         "read": true,
@@ -55,7 +55,7 @@
       "description": "Designs technical implementation of features based on product requirements documents",
       "mode": "subagent",
       "model": "google/gemini-2.5-pro",
-      "prompt": "{file:./agent/architect.md}",
+      "prompt": "{file:./agents/architect.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -74,7 +74,7 @@
       "description": "Converts technical specifications from the Architect into detailed implementation plans for the Implementer",
       "mode": "subagent",
       "model": "google/gemini-2.5-pro",
-      "prompt": "{file:./agent/planner.md}",
+      "prompt": "{file:./agents/planner.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -92,7 +92,7 @@
     "Implementer": {
       "description": "Carries out technical implementation based on architect's specifications and designs",
       "mode": "subagent",
-      "prompt": "{file:./agent/implementer.md}",
+      "prompt": "{file:./agents/implementer.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -111,7 +111,7 @@
       "description": "Investigates issues and finds creative solutions when things don't work as expected",
       "mode": "subagent",
       "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agent/problem-solver.md}",
+      "prompt": "{file:./agents/problem-solver.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -130,7 +130,7 @@
       "description": "Expert code researcher that analyzes codebases, understands system architecture, and produces detailed reports on technical decisions, historical knowledge, and design patterns",
       "mode": "subagent",
       "model": "google/gemini-2.5-pro",
-      "prompt": "{file:./agent/code-researcher.md}",
+      "prompt": "{file:./agents/code-researcher.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -149,7 +149,7 @@
       "description": "Expert in writing comprehensive unit tests with high coverage, mocking, and testing best practices",
       "mode": "subagent",
       "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agent/unit-tester.md}",
+      "prompt": "{file:./agents/unit-tester.md}",
       "tools": {
         "read": true,
         "write": true,
@@ -168,7 +168,7 @@
       "description": "Provides thorough, constructive code reviews focusing on security, performance, maintainability, and best practices",
       "mode": "subagent",
       "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agent/code-reviewer.md}",
+      "prompt": "{file:./agents/code-reviewer.md}",
       "tools": {
         "read": true,
         "write": false,
