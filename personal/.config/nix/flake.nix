@@ -14,6 +14,7 @@
       default = pkgs.buildEnv {
         name = "server-env";
         paths = with pkgs; [
+          delta
           docker
           fd
           fish
@@ -26,6 +27,7 @@
           mosh
           neovim
           oh-my-posh
+          opencode
           ripgrep
           sesh
           stow
