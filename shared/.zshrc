@@ -10,6 +10,9 @@ if [ -f "$HOME/.config/shell/functions.sh" ]; then
   . "$HOME/.config/shell/functions.sh"
 fi
 
+# Auto-start tmux if available
+auto_start_tmux
+
 # Oh-my-posh prompt (skip in Apple Terminal.app which has its own prompt)
 if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
   eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"

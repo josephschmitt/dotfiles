@@ -47,6 +47,11 @@ if not string match -q -- $PNPM_HOME $PATH
     set -gx PATH "$PNPM_HOME" $PATH
 end
 
+# Auto-start tmux if available
+if status is-interactive
+    auto_start_tmux
+end
+
 # Interactive shell configuration
 if status is-interactive
     # Prompt configuration

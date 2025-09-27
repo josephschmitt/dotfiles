@@ -19,3 +19,18 @@ twmp() {
   twm --path "$target_dir" --name "$name" --command nvim
   popd >/dev/null || return
 }
+
+# Auto-start tmux if available and not already inside tmux
+auto_start_tmux() {
+  # Check if tmux is available and we're not already in tmux or SSH
+  if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
+    # Check if there's an existing tmux session
+    if tmux has-session 2>/dev/null; then
+      # Attach to existing session
+      exec tmux attach-session
+    else
+      # Create new session with hostname as name
+      exec tmux new-session -s "$(hostname)"
+    fi
+  fi
+}
