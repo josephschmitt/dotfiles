@@ -8,6 +8,13 @@ alias vim="nvim"
 alias cat="bat"
 alias tmx="tmux new-session -A -s \$(hostname); exit"
 
+# Eza (modern ls replacement) aliases
+alias ls="eza"
+alias ll="eza -l"
+alias la="eza -la"
+alias lt="eza --tree"
+alias tree="eza --tree"
+
 # Nix and Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
 alias darwin_update="nix flake update --flake ~/.config/nix-darwin"

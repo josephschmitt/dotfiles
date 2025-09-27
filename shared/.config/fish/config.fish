@@ -5,6 +5,8 @@
 setenv XDG_CONFIG_HOME "$HOME/.config"
 setenv EDITOR nvim
 setenv BAT_THEME tokyonight_night
+setenv EZA_ICONS_AUTO always
+setenv EZA_CONFIG_DIR "$XDG_CONFIG_HOME/eza"
 
 # Zellij configuration
 setenv ZJ_ALWAYS_NAME true
@@ -121,6 +123,13 @@ alias vim="nvim"
 alias claude="~/.claude/local/claude"
 alias cat="bat"
 alias tmx="tmux new-session -A -s (hostname); exit"
+
+# Eza (modern ls replacement) aliases
+alias ls="eza"
+alias ll="eza -l"
+alias la="eza -la"
+alias lt="eza --tree"
+alias tree="eza --tree"
 
 # Git-spice workflow aliases
 alias gsb="gs branch"

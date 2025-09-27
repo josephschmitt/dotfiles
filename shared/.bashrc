@@ -18,8 +18,5 @@ if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
-# Bash-specific aliases
-alias ls='ls --color=auto'
-
 # TWM shell completions
 eval "$(twm --print-bash-completion)"

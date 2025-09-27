@@ -8,6 +8,7 @@
     bat
     bun
     csvq
+    eza
     delta
     fd
     fish

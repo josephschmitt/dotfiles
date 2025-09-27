@@ -96,8 +96,8 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Use LS_COLORS for comp
 zstyle ':completion:*' menu no # Disable completion menu since we're using fzf
 zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 
-# Zsh-specific aliases
-alias ls='ls --color'
+# Zsh-specific aliases  
+# ls alias is now provided by shared aliases (eza)
 
 # Shell integrations
 eval "$(fzf --zsh)"

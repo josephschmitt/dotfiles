@@ -9,6 +9,10 @@ export EDITOR="nvim"
 
 export BAT_THEME="tokyonight_night"
 
+# Eza configuration
+export EZA_ICONS_AUTO="always"
+export EZA_CONFIG_DIR="$XDG_CONFIG_HOME/eza"
+
 # Zellij configuration
 export ZJ_ALWAYS_NAME="true"
 export ZJ_DEFAULT_LAYOUT="ide"
