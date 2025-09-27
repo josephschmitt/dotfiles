@@ -1,14 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "keybinds": {
-    "session_child_cycle": "ctrl+]",
-    "session_child_cycle_reverse": "ctrl+["
-  },
   "permission": {
     "bash": {
       "aws": "deny",
       "git commit": "ask",
-      "git push": "ask"
+      "git push": "ask",
+      "git clone": "deny"
     }
   },
   "agent": {
