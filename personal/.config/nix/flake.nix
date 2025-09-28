@@ -16,6 +16,7 @@
         paths = with pkgs; [
           delta
           docker
+          eza
           fd
           fish
           fzf
