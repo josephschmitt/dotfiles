@@ -46,6 +46,15 @@ auto_start_tmux() {
 tmx() {
   local dir="${1:-$(pwd)}"
   cd "$dir" || return 1
-  tmux new-session -A -s "$(basename "$dir")"
-  exit
+  local session_name="$(basename "$dir")"
+  
+  if [ -n "$TMUX" ]; then
+    # Already in tmux, switch to session instead of nesting
+    tmux new-session -A -d -s "$session_name"
+    tmux switch-client -t "$session_name"
+  else
+    # Not in tmux, start new session normally
+    tmux new-session -A -s "$session_name"
+    exit
+  fi
 }
