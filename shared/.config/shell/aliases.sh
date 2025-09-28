@@ -6,7 +6,7 @@ alias lg="TMPDIR=\$HOME/.local/tmp lazygit"
 alias c="clear"
 alias vim="nvim"
 alias cat="bat"
-alias tmx="tmux new-session -A -s \$(hostname); exit"
+
 
 # Eza (modern ls replacement) aliases
 alias ls="eza"

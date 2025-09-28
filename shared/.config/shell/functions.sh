@@ -41,3 +41,11 @@ auto_start_tmux() {
     fi
   fi
 }
+
+# Launch tmux session with directory argument support
+tmx() {
+  local dir="${1:-$(pwd)}"
+  cd "$dir" || return 1
+  tmux new-session -A -s "$(basename "$dir")"
+  exit
+}

@@ -122,7 +122,6 @@ alias c="clear"
 alias vim="nvim"
 alias claude="~/.claude/local/claude"
 alias cat="bat"
-alias tmx="tmux new-session -A -s (hostname); exit"
 
 # Eza (modern ls replacement) aliases
 alias ls="eza"
