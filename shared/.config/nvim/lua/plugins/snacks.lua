@@ -7,7 +7,7 @@ return {
         explorer = {
           ignored = true,
           layout = { preset = "sidebar" },
-          auto_close = false,
+          auto_close = true,
           include = { "node_modules" },
           win = {
             list = {
