@@ -120,7 +120,6 @@ alias nix_update="nix flake update --flake ~/dotfiles/personal/.config/nix && ni
 alias lg="env TMPDIR=/tmp lazygit"
 alias c="clear"
 alias vim="nvim"
-alias claude="~/.claude/local/claude"
 alias cat="bat"
 
 # Eza (modern ls replacement) aliases
