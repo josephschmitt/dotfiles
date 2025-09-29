@@ -10,6 +10,7 @@ font-thicken = true
 quick-terminal-animation-duration = 0.15
 quick-terminal-position = right
 quick-terminal-screen = macos-menu-bar
+quick-terminal-size = 500px,100%
 shell-integration = fish
 theme = Catppuccin Mocha
 working-directory = $HOME/development
