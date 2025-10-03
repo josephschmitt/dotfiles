@@ -3,18 +3,38 @@
     {
       "actions" : [
         {
-          "key" : "c",
+          "key" : "a",
           "type" : "application",
-          "value" : "/Applications/ChatGPT.app"
+          "value" : "/Applications/Arc.app"
+        },
+        {
+          "key" : "e",
+          "type" : "application",
+          "value" : "/Applications/Spark.app"
+        },
+        {
+          "key" : "f",
+          "type" : "application",
+          "value" : "/Applications/Fantastical.app"
         },
         {
           "key" : "g",
           "type" : "application",
-          "value" : "/Users/josephschmitt/Applications/Brave Browser Apps.localized/Google Gemini.app"
+          "value" : "/Applications/Ghostty.app"
+        },
+        {
+          "key" : "r",
+          "type" : "application",
+          "value" : "/Applications/Reeder.app"
+        },
+        {
+          "key" : "s",
+          "type" : "application",
+          "value" : "/Applications/Slack.app"
         }
       ],
       "key" : "a",
-      "label" : "AI",
+      "label" : "Apps",
       "type" : "group"
     },
     {
@@ -42,23 +62,6 @@
       ],
       "key" : "b",
       "label" : "Browsers",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
-          "key" : "m",
-          "type" : "application",
-          "value" : "/System/Applications/Messages.app"
-        },
-        {
-          "key" : "s",
-          "type" : "application",
-          "value" : "/Applications/Slack.app"
-        }
-      ],
-      "key" : "c",
-      "label" : "Chat",
       "type" : "group"
     },
     {
@@ -110,6 +113,36 @@
       ],
       "key" : "f",
       "label" : "Finder",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "u",
+          "label" : "urbancompass",
+          "type" : "url",
+          "value" : "https://github.com/UrbanCompass/urbancompass"
+        },
+        {
+          "key" : "f",
+          "label" : "uc-frontend",
+          "type" : "url",
+          "value" : "https://github.com/UrbanCompass/uc-frontend"
+        },
+        {
+          "key" : "n",
+          "label" : "uc-node-services",
+          "type" : "url",
+          "value" : "https://github.com/UrbanCompass/uc-node-services"
+        },
+        {
+          "key" : "c",
+          "label" : "cli",
+          "type" : "url",
+          "value" : "https://github.com/UrbanCompass/cli"
+        }
+      ],
+      "key" : "g",
       "type" : "group"
     },
     {
