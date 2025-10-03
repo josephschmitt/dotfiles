@@ -40,6 +40,7 @@
       "1password"
       "adobe-creative-cloud"
       "arc"
+      "bbedit"
       "chatgpt"
       "claude"
       "ghostty"
