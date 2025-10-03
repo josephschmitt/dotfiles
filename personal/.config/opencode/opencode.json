@@ -8,6 +8,13 @@
       "git clone": "deny"
     }
   },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    }
+  },
   "agent": {
     "Spec-ify": {
       "description": "Spec-driven development expert that guides users through the complete SDD workflow, orchestrating PM, Architect, Planner, Implementer, and Solver subagents",
