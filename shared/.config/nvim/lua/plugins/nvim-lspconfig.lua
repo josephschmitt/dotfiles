@@ -1,7 +1,6 @@
 return {
   "neovim/nvim-lspconfig",
   opts = {
-    -- Using tiny-inline-diagnostics
     diagnostics = {
       virtual_text = false,
       virtual_lines = false,
@@ -9,7 +8,7 @@ return {
     servers = { eslint = {} },
     setup = {
       eslint = function()
-        require("lazyvim.util").lsp.on_attach(function(client)
+        LazyVim.lsp.on_attach(function(client)
           if client.name == "eslint" then
             client.server_capabilities.documentFormattingProvider = true
           elseif client.name == "tsserver" then
