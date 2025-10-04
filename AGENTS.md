@@ -49,6 +49,24 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 - Interactive features → appropriate shell's rc file
 - Never duplicate configuration between shells
 
+#### Multi-Shell Support Requirements:
+**CRITICAL**: When making changes to shell environment configuration, you MUST ensure changes work across ALL supported shells:
+
+**Currently Supported Shells:**
+- Bash (fallback)
+- Zsh (secondary)
+- Fish (primary)
+
+**Future Shells Under Consideration:**
+- Nushell (may be added later)
+
+**Required Actions:**
+1. **POSIX shells (Bash/Zsh)**: Add to shared modules (`.config/shell/*.sh`)
+2. **Fish**: Add equivalent configuration to `.config/fish/config.fish` or appropriate Fish-specific files
+3. **Test across shells**: Verify changes work in Bash, Zsh, AND Fish before considering complete
+4. **Future-proof**: Use approaches that can extend to Nushell if/when added
+5. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
+
 ### Shell Scripts
 - Use `#!/bin/sh` for POSIX compatibility
 - Set `set -x` for debugging when needed
@@ -74,6 +92,37 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 - Shell profiles: Root level (`.profile`, `.zshrc`, `.bashrc`, etc.)
 - Utilities: `bin/` directory
 - Theme files in respective app config dirs
+- OpenCode agents: `.config/opencode/agents/` (NOT `agent/` - see below)
+
+### CRITICAL: OpenCode Agents Directory Naming
+**ALWAYS use `agents/` (plural), NEVER `agent/` (singular)** for the OpenCode agents directory.
+
+**Why:**
+- OpenCode auto-detects `agent/` directories for custom instructions
+- GitHub Copilot also auto-detects `.github/copilot/agent/` directories
+- Using `.config/opencode/agent/` causes conflicts between OpenCode and Copilot
+- The `agents/` (plural) naming avoids this clash while maintaining clarity
+
+**Correct structure:**
+```
+.config/opencode/
+├── agents/          # ✅ Custom agent definitions
+│   ├── architect.md
+│   ├── implementer.md
+│   └── ...
+└── opencode.json    # References ./agents/ path
+```
+
+**Configuration in opencode.json:**
+```json
+{
+  "agent": {
+    "Agent Name": {
+      "prompt": "{file:./agents/filename.md}"
+    }
+  }
+}
+```
 
 ### CRITICAL: .config Directory Handling
 **NEVER symlink the entire `.config` directory!** Some subdirectories contain local-only data that should not be version controlled or shared across machines.
