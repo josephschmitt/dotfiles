@@ -183,6 +183,12 @@
       "type" : "group"
     },
     {
+      "key" : "o",
+      "label" : "Sesh",
+      "type" : "url",
+      "value" : "raycast://extensions/joshmedeski/sesh/cmd-connect"
+    },
+    {
       "actions" : [
         {
           "key" : "n",
