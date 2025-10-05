@@ -3,7 +3,7 @@
   system.primaryUser = "josephschmitt";
 
   environment.systemPackages = with pkgs; [
-    asdf-vm 
+    asdf-vm
     atuin
     bat
     bun
@@ -18,6 +18,7 @@
     lazygit
     neovim
     nixpkgs-fmt
+    nushell
     oh-my-posh
     ripgrep
     sesh
@@ -28,7 +29,7 @@
     zoxide
   ];
 
-  environment.shells = [pkgs.fish];
+  environment.shells = [ pkgs.fish ];
 
   homebrew = {
     enable = true;
