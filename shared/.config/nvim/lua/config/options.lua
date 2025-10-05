@@ -6,6 +6,11 @@
 vim.env.HNVM_NODE = "22.14.0"
 vim.env.HVNM_QUIET = true
 
+-- LazyVim root dir detection
+-- Options: "lsp", "cwd", or patterns like ".git", "package.json", etc.
+-- Default is: { "lsp", { ".git", "lua" }, "cwd" }
+vim.g.root_spec = { { ".git", "package.json" }, "cwd" }
+
 vim.opt.guicursor = {
   "n-v-c:block", -- Normal, visual, and command mode: block cursor
   "v:hor10", -- Override visual mode: horizontal line (underscore)
