@@ -17,6 +17,7 @@
     gum
     lazygit
     neovim
+    nixpkgs-fmt
     oh-my-posh
     ripgrep
     sesh

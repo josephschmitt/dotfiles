@@ -27,6 +27,7 @@
           lazygit
           mosh
           neovim
+          nixpkgs-fmt
           oh-my-posh
           opencode
           ripgrep
