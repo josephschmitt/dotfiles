@@ -183,10 +183,22 @@
       "type" : "group"
     },
     {
-      "key" : "o",
-      "label" : "Sesh",
-      "type" : "url",
-      "value" : "raycast://extensions/joshmedeski/sesh/cmd-connect"
+      "actions" : [
+        {
+          "key" : "g",
+          "type" : "url",
+          "value" : "raycast://extensions/josephschmitt/gif-search/search"
+        },
+        {
+          "key" : "o",
+          "label" : "Sesh",
+          "type" : "url",
+          "value" : "raycast://extensions/joshmedeski/sesh/cmd-connect"
+        }
+      ],
+      "key" : "r",
+      "label" : "Raycast",
+      "type" : "group"
     },
     {
       "actions" : [
