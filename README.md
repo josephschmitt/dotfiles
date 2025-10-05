@@ -38,6 +38,16 @@ mkdir -p ~/.config
 stow shared work
 ```
 
+#### Removing Work Submodule
+
+When you're done working with the work submodule and want to remove it from your machine:
+
+```bash
+git submodule deinit -f work
+```
+
+This clears the `work/` directory and unregisters the submodule without affecting the main repository.
+
 ## 📦 What's Included
 
 ### 🛠️ Core Tools
