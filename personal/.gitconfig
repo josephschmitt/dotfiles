@@ -85,12 +85,12 @@
   syntax-theme = "Dracula"
 
   # Base backgrounds
-  plus-style       = "syntax #1c2733"
-  minus-style      = "syntax #3b1e25"
+  plus-style = "syntax #2a3e52"
+  minus-style = "syntax #3b1e25"
 
   # Intraline
-  plus-emph-style  = "auto #264b5e bold"
-  minus-emph-style = "auto #7a3345"
+  plus-emph-style  = "auto #2c5a66 bold"
+  minus-emph-style = "auto #94394c bold"
 
   # Line numbers
   line-numbers-plus-style  = "#4a949b"
