@@ -48,32 +48,11 @@
 [color]
   ui = auto                   # Enable colored output
 
-
 [interactive]
-    diffFilter = delta --color-only
-
-# Diff and merge tool configuration
-[diff]
-  tool = micro               # Use micro as default diff tool
-
-[difftool "default-difftool"]
-  cmd = micro --diff $LOCAL $REMOTE
-
-[difftool "vscode"]
-  cmd = "code-insiders --wait --diff  "
-
-[difftool "micro"]
-  cmd = micro --diff $LOCAL $REMOTE
+  diffFilter = delta --color-only
 
 [merge]
-  conflictStyle = zdiff3
-  tool = vscode              # Use VS Code for merge conflicts
-
-[mergetool]
-  keepBackup = true          # Keep backup files during merge
-
-[mergetool "vscode"]
-  cmd = "code-insiders --wait "
+  conflictStyle = zdiff3      # Show common ancestor in merge conflicts
 
 # Git LFS (Large File Storage) configuration
 [filter "lfs"]
@@ -96,11 +75,33 @@
 	defaultBranch = main       # Use 'main' as default branch name
 
 [delta]
-  navigate = true  # use n and N to move between diff sections
-  dark = true      # or light = true, or omit for auto-detection
+  navigate = true
   line-numbers = true
-  side-by-side = true
-  syntax-theme = Dracula
+  side-by-side = false
+  dark = true
+  features = tokyonight
+
+[delta "tokyonight"]
+  syntax-theme = "Dracula"
+
+  # Base backgrounds
+  plus-style       = "syntax #1c2733"
+  minus-style      = "syntax #3b1e25"
+
+  # Intraline
+  plus-emph-style  = "auto #264b5e bold"
+  minus-emph-style = "auto #7a3345"
+
+  # Line numbers
+  line-numbers-plus-style  = "#4a949b"
+  line-numbers-minus-style = "#914c54"
+  line-numbers-zero-style  = "#2b3347"
+
+  # Headers
+  file-style                   = "bold #a9b1d6"
+  hunk-header-style            = "bold syntax #1a2332"
+  hunk-header-decoration-style = "box #3b4261"
+  zero-style                   = "syntax"
 
 # Git-spice configuration (stacked diffs workflow)
 [spice "branchCheckout"]
