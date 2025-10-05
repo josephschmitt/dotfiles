@@ -45,6 +45,12 @@ map({ "n" }, "<A-q>", "<C-w>q", { desc = "Close window" })
 map({ "n" }, "<A-o>", "<C-w>o", { desc = "Close other window" })
 map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch window" })
 
+-- Tmux navigation with Alt+hjkl
+map({ "n", "v", "o" }, "<M-h>", "<cmd>TmuxNavigateLeft<cr>", { silent = true })
+map({ "n", "v", "o" }, "<M-j>", "<cmd>TmuxNavigateDown<cr>", { silent = true })
+map({ "n", "v", "o" }, "<M-k>", "<cmd>TmuxNavigateUp<cr>", { silent = true })
+map({ "n", "v", "o" }, "<M-l>", "<cmd>TmuxNavigateRight<cr>", { silent = true })
+
 -- Helix-like line selection and delete
 map({ "n" }, "gV", "ggVG", { desc = "Select all" })
 map({ "v" }, "<S-v>", "j", { desc = "Select down" })
