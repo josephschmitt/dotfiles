@@ -6,8 +6,10 @@ source ~/.config/fish/aliases.fish
 
 # Interactive shell configuration
 if status is-interactive
-    # Auto-start tmux if available
-    auto_start_tmux
+    # Auto-start tmux if available (skip for IDE/editor integrated terminals)
+    if not set -q VSCODE_INJECTION; and not set -q INSIDE_EMACS
+        auto_start_tmux
+    end
 
     # Prompt configuration
     if type -q oh-my-posh
@@ -21,10 +23,6 @@ if status is-interactive
     if type -q basher
         . (basher init - fish | psub)
     end
-
-    # Fuzzy finder setup
-    fzf --fish | source
-    setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude={.git,OrbStack}"
 
     # Vi-mode configuration
     fish_vi_key_bindings
@@ -44,14 +42,6 @@ if status is-interactive
     set fish_cursor_replace underscore
     set fish_cursor_external line
     set fish_cursor_visual block
-
-    # Completions for twm
-    twm --print-fish-completion | source
-
-    # Smart directory jumping
-    if type -q zoxide
-        zoxide init fish | source
-    end
 end
 
 # Fish-specific functions
