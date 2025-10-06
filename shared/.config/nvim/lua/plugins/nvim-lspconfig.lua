@@ -7,15 +7,6 @@ return {
     },
     servers = {
       eslint = {},
-      nil_ls = {
-        settings = {
-          ["nil"] = {
-            formatting = {
-              command = { "nixpkgs-fmt" },
-            },
-          },
-        },
-      },
     },
     setup = {
       eslint = function()

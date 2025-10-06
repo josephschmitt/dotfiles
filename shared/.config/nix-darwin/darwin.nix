@@ -17,6 +17,7 @@
     gum
     lazygit
     neovim
+    nil
     nixpkgs-fmt
     nushell
     oh-my-posh
