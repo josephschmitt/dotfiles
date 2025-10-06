@@ -19,23 +19,10 @@ if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
 fi
 
 # Zoxide smart directory jumping
-zoxide() {
-  unfunction zoxide z zi 2>/dev/null
-  eval "$(command zoxide init zsh)"
-  command zoxide "$@"
-}
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
 
-z() {
-  unfunction zoxide z zi 2>/dev/null
-  eval "$(command zoxide init zsh)"
-  z "$@"
-}
-
-zi() {
-  unfunction zoxide z zi 2>/dev/null
-  eval "$(command zoxide init zsh)"
-  zi "$@"
-}
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 

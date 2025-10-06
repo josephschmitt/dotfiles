@@ -18,6 +18,11 @@ if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
+# Zoxide smart directory jumping
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init bash)"
+fi
+
 # TWM shell completions (lazy-loaded)
 twm() {
   unset -f twm

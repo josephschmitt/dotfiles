@@ -24,6 +24,11 @@ if status is-interactive
         . (basher init - fish | psub)
     end
 
+    # Zoxide (smart directory jumper)
+    if type -q zoxide
+        zoxide init fish | source
+    end
+
     # Vi-mode configuration
     fish_vi_key_bindings
 
