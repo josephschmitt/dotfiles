@@ -2,7 +2,7 @@
 
 # Navigation and utilities
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
-alias lg="TMPDIR=\$HOME/.local/tmp lazygit"
+alias lg="env TMPDIR=/tmp lazygit"
 alias c="clear"
 alias vim="nvim"
 alias cat="bat"
@@ -16,7 +16,7 @@ alias tree="eza --tree"
 
 # Nix and Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
-alias darwin_update="nix flake update --flake ~/.config/nix-darwin"
+alias darwin_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
 alias nix_rebuild="nix profile upgrade personal/.config/nix"
 alias nix_update="nix flake update --flake ~/dotfiles/personal/.config/nix && nix profile upgrade personal/.config/nix"
 
