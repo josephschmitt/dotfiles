@@ -19,8 +19,7 @@ This configuration manages macOS systems declaratively using Nix, providing:
 ├── darwin.nix         # Shared system configuration
 ├── machines/           # Machine-specific configurations
 │   ├── mac-mini.nix    # Personal Mac mini server
-│   ├── W2TD37NJKN.nix  # Compass M1 MacBook Pro
-│   └── G5FXQQ0D00.nix  # Compass M4 MacBook Pro
+│   └── [work machines] # Work MacBook Pro configurations
 ├── flake.lock          # Dependency lockfile
 └── README.md           # This file
 ```
@@ -33,7 +32,7 @@ This configuration manages macOS systems declaratively using Nix, providing:
 - **Services**: Docker Compose daemon for home services
 - **Dock**: Minimal setup with essential apps
 
-### Work MacBooks (`W2TD37NJKN`, `G5FXQQ0D00`)
+### Work MacBooks
 - **Purpose**: Professional development workstations
 - **Focus**: Development tools and productivity applications
 - **Configuration**: Optimized for software engineering workflows
