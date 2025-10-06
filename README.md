@@ -2,6 +2,10 @@
 
 Personal development environment configuration files managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
+![Terminal Setup](https://joe.sh/content/16-terminal-tools/terminal2.jpeg)
+
+> **Read the blog post**: [The Tools That Make My Terminal Work](https://joe.sh/terminal-tools) — A deep dive into how these configurations come together into a cohesive workflow.
+
 ## 📋 Overview
 
 This repository contains my complete development environment setup, organized for easy deployment across personal and work machines while keeping sensitive work configurations private.
