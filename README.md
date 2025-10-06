@@ -11,7 +11,7 @@ This repository contains my complete development environment setup, organized fo
 - **🔧 GNU Stow-based** - Simple symlink management, no complex templating
 - **🏠 Work/Personal separation** - Different configs for different contexts
 - **🔒 Private work configs** - Sensitive company data kept in private submodule
-- **🎨 Consistent theming** - Catppuccin theme across all tools
+- **🎨 Consistent theming** - Tokyo Night and Catppuccin themes across tools
 - **⌨️ Vi-mode everywhere** - Consistent navigation patterns
 - **🔍 Fuzzy finding** - FZF integration throughout the workflow
 
@@ -60,7 +60,7 @@ This clears the `work/` directory and unregisters the submodule without affectin
   - macOS Terminal.app compatibility with proper login shell handling
 - **✏️ Editor**: Neovim (LazyVim) with Helix as secondary
 - **💻 Terminal**: Ghostty with optimized configuration
-- **🔀 Multiplexer**: tmux with plugin ecosystem
+- **🔀 Multiplexer**: tmux with plugin ecosystem, Zellij as alternative
 - **🌳 Version Control**: Git with comprehensive aliases
 
 ### 🔧 Development Environment
@@ -68,14 +68,15 @@ This clears the `work/` directory and unregisters the submodule without affectin
 - **🌐 Languages**: Node.js, Rust, Python, Go configurations
 - **📦 Package Managers**: pnpm, bun, cargo, asdf
 - **🏗️ Build Tools**: Nix for reproducible environments
-- **⚡ CLI Tools**: FZF, EZA, Yazi, and more
+- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, and more
 
 ### ⚡ Productivity Features
 
-- **🌶️ Git workflow optimization** with git-spice integration
+- **🌶️ Git workflow optimization** with git-spice and lazygit
 - **🔍 Fuzzy finding** for files, history, and processes
-- **💾 Session management** with tmux persistence
+- **💾 Session management** with sesh and tmux persistence
 - **⌨️ Custom keybindings** for efficient navigation
+- **🤖 AI assistance** with OpenCode integration
 
 ## 📁 Repository Structure
 

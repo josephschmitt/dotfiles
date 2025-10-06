@@ -149,9 +149,29 @@ stow --target=~/.config shared/.config  # DON'T DO THIS
 **CRITICAL**: When making consequential changes to configurations, always update relevant documentation:
 
 ### Root README (`/README.md`)
-- Update if adding/removing major tools or changing repository structure
-- Keep feature list current with actual configurations
-- Update quick start instructions if setup process changes
+**When to Update:**
+- Adding/removing major tools or changing repository structure
+- Adding/removing entire tool categories (terminal emulators, multiplexers, etc.)
+- Changing theming systems (e.g., switching from Catppuccin to Tokyo Night)
+- Modifying the quick start installation process
+- Adding/removing shell support
+
+**What to Verify After Changes:**
+After making any significant configuration changes, verify the README sections remain accurate:
+
+1. **Features section (lines 9-16)**: Ensure themes and core features match reality
+2. **Core Tools section (lines 55-64)**: Verify shells, editors, terminals, and multiplexers are correctly listed
+3. **Development Environment section (lines 66-71)**: Check languages and build tools are current
+4. **Productivity Features section (lines 73-78)**: Confirm git workflow tools and features are accurate
+5. **Repository Structure section (lines 80-93)**: Update if directory structure changes
+
+**Examples of Changes Requiring README Updates:**
+- ✅ Adding Zellij → Update "Multiplexer" in Core Tools section
+- ✅ Switching from Catppuccin to Tokyo Night → Update Features section
+- ✅ Adding Nushell support → Update "Multi-Shell Setup" in Core Tools
+- ✅ Adding Wezterm config → Update "Terminal" in Core Tools (if it becomes primary/secondary)
+- ❌ Tweaking individual plugin settings → No README update needed
+- ❌ Adding a Fish function → No README update needed
 
 ### Setup Guide (`/shared/README.md`)
 - Update "What's Included" section when adding/removing tools
@@ -164,13 +184,14 @@ stow --target=~/.config shared/.config  # DON'T DO THIS
 - Ensure project-specific documentation reflects current configurations
 - Update setup instructions for individual tools if changed
 
-### When to Update Documentation
-- Adding or removing major tools/configurations
-- Changing installation or setup procedures
-- Modifying directory structure
-- Adding new troubleshooting scenarios
-- Updating tool versions with breaking changes
-- Changing theming or major customizations
+### Documentation Update Process
+When making significant changes:
+1. **Make the configuration changes** first
+2. **Test the changes** to ensure they work
+3. **Review README.md** for accuracy - check all sections mentioned above
+4. **Update AGENTS.md** if the change affects agent guidelines (new tools, workflow changes)
+5. **Update shared/README.md** if setup/installation is affected
+6. **Create a single commit** that includes both the config changes and documentation updates
 
 ### Documentation Standards
 - Keep instructions clear and step-by-step
