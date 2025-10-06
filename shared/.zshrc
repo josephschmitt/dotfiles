@@ -19,9 +19,23 @@ if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
 fi
 
 # Zoxide smart directory jumping
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-fi
+zoxide() {
+  unfunction zoxide z zi 2>/dev/null
+  eval "$(command zoxide init zsh)"
+  command zoxide "$@"
+}
+
+z() {
+  unfunction zoxide z zi 2>/dev/null
+  eval "$(command zoxide init zsh)"
+  z "$@"
+}
+
+zi() {
+  unfunction zoxide z zi 2>/dev/null
+  eval "$(command zoxide init zsh)"
+  zi "$@"
+}
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
@@ -54,21 +68,32 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Add in zsh plugins
+# Add in zsh plugins (with turbo-mode for faster startup)
+zinit ice wait lucid
 zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
+zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
+zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
+zinit light zsh-users/zsh-completions
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
 
 # Add in snippets
+zinit ice wait lucid
 zinit snippet OMZP::sudo
+zinit ice wait lucid
 zinit snippet OMZP::aws
+zinit ice wait lucid
 zinit snippet OMZP::command-not-found
 
-# Load completions
-autoload -Uz compinit && compinit
+# Load completions with daily caching
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
 # Replay all cached completions
 zinit cdreplay -q
@@ -99,8 +124,16 @@ zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 # Zsh-specific aliases  
 # ls alias is now provided by shared aliases (eza)
 
-# Shell integrations
-eval "$(fzf --zsh)"
+# Shell integrations (lazy-loaded)
+fzf() {
+  unfunction fzf
+  eval "$(command fzf --zsh)"
+  command fzf "$@"
+}
 
-# TWM shell completions
-eval "$(twm --print-zsh-completion)"
+# TWM shell completions (lazy-loaded)
+twm() {
+  unfunction twm
+  eval "$(command twm --print-zsh-completion)"
+  command twm "$@"
+}

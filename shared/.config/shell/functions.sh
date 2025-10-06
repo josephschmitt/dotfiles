@@ -22,6 +22,11 @@ twmp() {
 
 # Auto-start tmux if available and not already inside tmux
 auto_start_tmux() {
+  # Skip in IDE/editor integrated terminals
+  if [ -n "$VSCODE_INJECTION" ] || [ -n "$INSIDE_EMACS" ]; then
+    return
+  fi
+  
   # Check if tmux is available and we're not already in tmux or SSH
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
     # Check if there's an existing tmux session

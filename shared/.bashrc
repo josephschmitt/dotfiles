@@ -18,5 +18,9 @@ if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
-# TWM shell completions
-eval "$(twm --print-bash-completion)"
+# TWM shell completions (lazy-loaded)
+twm() {
+  unset -f twm
+  eval "$(command twm --print-bash-completion)"
+  command twm "$@"
+}
