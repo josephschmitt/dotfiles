@@ -30,13 +30,16 @@ sudo pacman -S stow
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
-# 2. Update personal email in personal/.gitconfig
+# 2. Create directories that need to exist before stowing
+mkdir -p ~/.config/tmux
+
+# 3. Update personal email in personal/.gitconfig
 # Edit personal/.gitconfig and replace "your-personal@email.com" with your actual email
 
-# 3. Apply configurations
+# 4. Apply configurations
 stow shared personal
 
-# 4. Restart your shell or source configs
+# 5. Restart your shell or source configs
 exec $SHELL
 ```
 
@@ -51,10 +54,13 @@ cd ~/.dotfiles
 # 2. Initialize work submodule (requires access to private work repo)
 git submodule update --init --recursive
 
-# 3. Apply configurations
+# 3. Create directories that need to exist before stowing
+mkdir -p ~/.config/tmux
+
+# 4. Apply configurations
 stow shared work
 
-# 4. Restart your shell or source configs
+# 5. Restart your shell or source configs
 exec $SHELL
 ```
 
@@ -101,6 +107,15 @@ Multi-shell setup following Unix best practices with shared configuration:
 - Shell profiles (`.zshrc`, `.bashrc`, etc.) will be symlinked to your home directory
 - The new `.profile` file provides centralized environment setup for all shells
 
+**How Stow Handles Directories:**
+Stow's symlinking behavior depends on whether directories exist at the target location:
+- **Directory doesn't exist**: Stow creates a symlink to the entire directory
+- **Directory exists**: Stow "unfolds" it and creates symlinks for individual files/subdirectories
+
+This is why we create `~/.config/tmux` before running stow. The `-p` flag creates both parent and child directories:
+- `~/.config` (parent) - Forces Stow to symlink individual app configs (`.config/fish/`, `.config/tmux/`, etc.) rather than the entire `.config` directory, preserving other applications' local-only configurations
+- `~/.config/tmux` (child) - Ensures Stow symlinks individual tmux config files (like `tmux.conf`) instead of the entire directory, allowing TPM (Tmux Plugin Manager) to create and manage the `plugins/` subdirectory properly
+
 ### Editor Configuration
 - **Helix** (`.config/helix/`) - Modal text editor
   - Catppuccin theme
@@ -110,10 +125,11 @@ Multi-shell setup following Unix best practices with shared configuration:
 
 ### Terminal Multiplexer
 - **tmux** (`.config/tmux/`) - Terminal session management
-  - Catppuccin theme
+  - Catppuccin theme with custom fork
   - Plugin ecosystem (fzf, sessionx, floax)
   - Vim-style navigation
   - Session persistence
+  - **Note:** `~/.config/tmux` must exist before stowing to prevent symlinking the `plugins/` directory (see [tmux README](.config/tmux/README.md))
 
 ### Development Tools
 - **Git** (`.gitconfig`) - Version control with custom aliases

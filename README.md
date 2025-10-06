@@ -22,8 +22,9 @@ This repository contains my complete development environment setup, organized fo
 ```bash
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-# Make sure we don't symlink the entire .config directory
-mkdir -p ~/.config
+# Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
+# (Stow symlinks entire directories unless they already exist at the target)
+mkdir -p ~/.config/tmux
 stow shared personal
 ```
 
@@ -33,8 +34,9 @@ stow shared personal
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 git submodule update --init --recursive
-# Make sure we don't symlink the entire .config directory
-mkdir -p ~/.config
+# Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
+# (Stow symlinks entire directories unless they already exist at the target)
+mkdir -p ~/.config/tmux
 stow shared work
 ```
 
