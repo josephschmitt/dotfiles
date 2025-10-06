@@ -10,6 +10,20 @@ if [ -f "$HOME/.config/shell/functions.sh" ]; then
   . "$HOME/.config/shell/functions.sh"
 fi
 
+# Auto-source profile-specific aliases (aliases.*.sh)
+for config_file in "$HOME/.config/shell/aliases."*.sh; do
+  if [ -f "$config_file" ]; then
+    . "$config_file"
+  fi
+done
+
+# Auto-source profile-specific functions (functions.*.sh)
+for config_file in "$HOME/.config/shell/functions."*.sh; do
+  if [ -f "$config_file" ]; then
+    . "$config_file"
+  fi
+done
+
 # Auto-start tmux if available
 auto_start_tmux
 
