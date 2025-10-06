@@ -2,14 +2,20 @@
   "$schema": "https://opencode.ai/config.json",
   "keybinds": {
     "messages_first": "<leader>g",
-    "messages_last": "<leader>G"
+    "messages_last": "<leader>G",
+    "session_child_cycle": "ctrl+]",
+    "session_child_cycle_reverse": "ctrl+["
   },
   "permission": {
     "bash": {
       "aws": "deny",
       "git commit": "ask",
       "git push": "ask",
-      "git clone": "deny"
+      "git clone": "ask",
+      "mkdir": "ask",
+      "mv": "ask",
+      "rm": "ask",
+      "*": "allow"
     }
   },
   "mcp": {
