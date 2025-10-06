@@ -3,12 +3,17 @@ show_git_branch() {
   local icon="$(get_tmux_option "@catppuccin_git_branch_icon" "")"
   local color="$(get_tmux_option "@catppuccin_git_branch_color" "$thm_yellow")"
 
-  # Use double quotes so your linter stops yelling; tmux will evaluate #{...} at draw time.
-  # symbolic-ref returns branch for normal cases; fallback to short SHA when detached.
-  local text="#(git -C \"#{pane_current_path}\" symbolic-ref --short -q HEAD 2>/dev/null \
-    || git -C \"#{pane_current_path}\" rev-parse --short HEAD 2>/dev/null)"
+  # Build the module format first so we can embed it in the conditional
+  local module_template
+  module_template="$(build_status_module "$index" "$icon" "$color" "BRANCH_PLACEHOLDER")"
 
+  # Use double quotes so your linter stops yelling; tmux will evaluate #{...} at draw time.
+  # Only show module if inside a git repo.
+  # symbolic-ref returns branch for normal cases; fallback to short SHA when detached.
   local module
-  module="$(build_status_module "$index" "$icon" "$color" "$text")"
-  printf '%s' "$module"
+  module="#(branch=\$(git -C \"#{pane_current_path}\" symbolic-ref --short -q HEAD 2>/dev/null \
+    || git -C \"#{pane_current_path}\" rev-parse --short HEAD 2>/dev/null); \
+    if [ -n \"\$branch\" ]; then echo '${module_template}' | sed \"s/BRANCH_PLACEHOLDER/\$branch/\"; fi)"
+
+  echo "$module"
 }
