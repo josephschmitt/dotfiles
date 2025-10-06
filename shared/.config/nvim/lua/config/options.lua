@@ -7,14 +7,47 @@ vim.env.HNVM_NODE = "22.14.0"
 vim.env.HVNM_QUIET = true
 
 -- LazyVim root dir detection
--- Options: "lsp", "cwd", or patterns like ".git", "package.json", etc.
--- Default is: { "lsp", { ".git", "lua" }, "cwd" }
 vim.g.root_spec = { { ".git", "package.json" }, "cwd" }
 
+-- Cursor shapes for different modes
 vim.opt.guicursor = {
-  "n-v-c:block", -- Normal, visual, and command mode: block cursor
-  "v:hor10", -- Override visual mode: horizontal line (underscore)
-  "i-ci:ver25", -- Insert and command-insert: vertical bar
-  "r-cr:hor20", -- Replace and command-replace: horizontal bar
-  "o:hor50", -- Operator-pending: thick horizontal
+  "n-v-c:block",
+  "v:hor10",
+  "i-ci:ver25",
+  "r-cr:hor20",
+  "o:hor50",
 }
+
+-- Split border characters
+vim.opt.fillchars:append({ vert = "│", horiz = "─", horizup = "┴", horizdown = "┬" })
+
+-- Make split borders visible with bright blue color
+local function set_winseparator_hl()
+  vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#7aa2f7", bg = "NONE", bold = true })
+end
+
+-- Apply after colorscheme changes
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = set_winseparator_hl,
+})
+
+-- Apply after LazyVim loads (with delay to override theme defaults)
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    vim.defer_fn(set_winseparator_hl, 100)
+  end,
+})
+
+-- Show filename in winbar only when multiple splits exist
+vim.api.nvim_create_autocmd("WinEnter", {
+  callback = function()
+    local wins = vim.api.nvim_tabpage_list_wins(0)
+    local normal_wins = vim.tbl_filter(function(win)
+      local buf = vim.api.nvim_win_get_buf(win)
+      local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+      return buftype == ""
+    end, wins)
+
+    vim.wo.winbar = #normal_wins > 1 and "%f %m" or ""
+  end,
+})
