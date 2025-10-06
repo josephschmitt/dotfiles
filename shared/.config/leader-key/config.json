@@ -140,6 +140,12 @@
           "label" : "cli",
           "type" : "url",
           "value" : "https://github.com/UrbanCompass/cli"
+        },
+        {
+          "key" : "U",
+          "label" : "UC Org Settings",
+          "type" : "url",
+          "value" : "https://github.com/organizations/UrbanCompass/settings/profile"
         }
       ],
       "key" : "g",
