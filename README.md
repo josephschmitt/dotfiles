@@ -13,6 +13,7 @@ This repository contains my complete development environment setup, organized fo
 ## Features
 
 - **🔧 GNU Stow-based** - Simple symlink management, no complex templating
+- **❄️ Nix-darwin managed** - Declarative macOS system configuration with reproducible environments
 - **🏠 Work/Personal separation** - Different configs for different contexts
 - **🔒 Private work configs** - Sensitive company data kept in private submodule
 - **🎨 Consistent theming** - Tokyo Night and Catppuccin themes across tools
@@ -21,11 +22,28 @@ This repository contains my complete development environment setup, organized fo
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+1. **Install Nix with flakes support:**
+```bash
+sh <(curl -L https://nixos.org/nix/install)
+```
+
+2. **Install nix-darwin** (see [nix-darwin README](shared/.config/nix-darwin/README.md) for details):
+```bash
+sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/shared/.config/nix-darwin
+```
+
 ### 🏠 Personal Machine
 
 ```bash
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
+
+# Apply nix-darwin configuration (installs packages, sets system preferences)
+darwin_rebuild
+
+# Install user-level configuration files
 # Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
 # (Stow symlinks entire directories unless they already exist at the target)
 mkdir -p ~/.config/tmux
@@ -38,6 +56,12 @@ stow shared personal
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 git submodule update --init --recursive
+
+# Apply nix-darwin configuration (installs packages, sets system preferences)
+# The darwin_rebuild wrapper automatically detects work machines and uses work configurations
+darwin_rebuild
+
+# Install user-level configuration files
 # Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
 # (Stow symlinks entire directories unless they already exist at the target)
 mkdir -p ~/.config/tmux
@@ -69,10 +93,11 @@ This clears the `work/` directory and unregisters the submodule without affectin
 
 ### 🔧 Development Environment
 
+- **❄️ System Management**: [nix-darwin](https://github.com/LnL7/nix-darwin) for declarative macOS configuration
+- **📦 Package Management**: Nix packages + Homebrew integration
 - **🌐 Languages**: Node.js, Rust, Python, Go configurations
-- **📦 Package Managers**: pnpm, bun, cargo, asdf
-- **🏗️ Build Tools**: Nix for reproducible environments
-- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, and more
+- **🔨 Package Managers**: pnpm, bun, cargo, asdf, volta
+- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, and more
 
 ### ⚡ Productivity Features
 
@@ -88,11 +113,20 @@ This clears the `work/` directory and unregisters the submodule without affectin
 dotfiles/
 ├── shared/          # Common configurations for all machines
 │   ├── .config/     # Application configurations
+│   │   ├── nix-darwin/    # Declarative macOS system configuration
+│   │   ├── fish/          # Fish shell configuration
+│   │   ├── nvim/          # Neovim configuration (LazyVim)
+│   │   ├── tmux/          # Tmux multiplexer
+│   │   ├── ghostty/       # Ghostty terminal emulator
+│   │   └── ...            # Other tool configurations
+│   ├── bin/         # Utility scripts (darwin-rebuild-wrapper, etc.)
 │   ├── .zshrc       # Shell configurations
 │   └── README.md    # Detailed setup instructions
 ├── personal/        # Personal-specific configurations
+│   ├── .config/nix-darwin/machines/mac-mini.nix  # Personal machine
 │   └── .gitconfig   # Personal git settings
 └── work/           # Work-specific configurations (private submodule)
+    ├── .config/nix-darwin/machines/   # Work machine configurations
     ├── .gitconfig   # Work git settings
     └── .compassrc   # Company-specific tools
 ```
@@ -102,6 +136,51 @@ dotfiles/
 For complete setup instructions, troubleshooting, and maintenance information, see:
 
 - **[Setup Guide](shared/README.md)** - Detailed installation and configuration instructions
+- **[Nix-darwin Configuration](shared/.config/nix-darwin/README.md)** - System-level package and settings management
+
+## ❄️ Nix-darwin: System-Level Configuration Management
+
+A major component of this setup is **[nix-darwin](https://github.com/LnL7/nix-darwin)**, which provides declarative macOS system configuration. This means your entire system setup—packages, applications, system preferences, and more—is defined as code.
+
+### Why nix-darwin?
+
+**Reproducibility**: Define your entire system configuration once, apply it consistently across multiple machines. No more manually clicking through System Preferences or running installation scripts.
+
+**Rollbacks**: Every system change creates a new "generation." If something breaks, roll back to a previous working state instantly.
+
+**Machine-specific configurations**: Share common settings across all machines while maintaining machine-specific customizations (home server vs. work laptop).
+
+### What It Manages
+
+- **System packages**: CLI tools, development utilities (installed via Nix)
+- **GUI applications**: Apps like Ghostty, VS Code, Arc browser (via Homebrew integration)
+- **System preferences**: Dock position, Finder settings, keyboard behavior, etc.
+- **Services**: Background daemons (e.g., Docker Compose on home server)
+- **Fonts**: Nerd Fonts for terminal compatibility
+
+### Quick Usage
+
+```bash
+# Apply system configuration changes
+darwin_rebuild
+
+# Update package versions
+darwin_update
+
+# Both: update packages then rebuild
+darwin_update && darwin_rebuild
+```
+
+The `darwin_rebuild` alias intelligently detects whether you're on a personal or work machine and applies the appropriate configuration automatically.
+
+### Integration with Dotfiles
+
+- **Nix-darwin handles**: System-wide packages, GUI apps, macOS preferences
+- **Stow handles**: User-level configuration files (shell configs, editor settings, etc.)
+
+This separation means nix-darwin manages *what's installed and how the system behaves*, while your dotfiles manage *how those tools are configured*.
+
+For detailed nix-darwin setup, machine configurations, and troubleshooting, see the **[Nix-darwin README](shared/.config/nix-darwin/README.md)**.
 
 ## 🎯 Core Philosophy
 

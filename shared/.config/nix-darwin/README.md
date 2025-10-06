@@ -76,31 +76,70 @@ This configuration manages macOS systems declaratively using Nix, providing:
 ## Installation
 
 ### Initial Setup
-1. Install Nix with flakes support:
+
+1. **Install Nix with flakes support:**
 ```bash
 sh <(curl -L https://nixos.org/nix/install)
 ```
 
-2. Install nix-darwin:
+2. **Install nix-darwin:**
 ```bash
-sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/.config/nix-darwin
+sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/shared/.config/nix-darwin
 ```
 
-3. Apply configuration:
+3. **Apply configuration using the convenience alias:**
 ```bash
-darwin-rebuild switch --flake ~/.config/nix-darwin
+darwin_rebuild
+```
+
+Or manually:
+```bash
+darwin-rebuild switch --flake ~/dotfiles/shared/.config/nix-darwin
 ```
 
 ### Daily Usage
-Apply configuration changes:
+
+#### Convenience Commands
+
+This configuration includes shell aliases for easier management:
+
 ```bash
-darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin
+# Apply configuration changes
+darwin_rebuild
+
+# Update flake dependencies
+darwin_update
+
+# Update and rebuild in one command
+darwin_update && darwin_rebuild
 ```
 
-Update dependencies:
+#### What the Wrapper Does
+
+The `darwin_rebuild` alias uses a smart wrapper script (`darwin-rebuild-wrapper.sh`) that:
+
+1. **Detects your machine** by hostname
+2. **Determines if you're on a work or personal machine**
+3. **Checks for work submodule availability** (for work machines)
+4. **Applies the correct flake configuration automatically**:
+   - Work machines: Uses impure evaluation with submodules
+   - Personal machines: Uses pure evaluation
+
+This means you never have to remember the complex `darwin-rebuild` command syntax or worry about which configuration to use.
+
+#### Manual Commands
+
+If you prefer to run commands manually or need more control:
+
 ```bash
-nix flake update
-darwin-rebuild switch --flake ~/dotfiles/.config/nix-darwin
+# Personal machines
+darwin-rebuild switch --flake ~/dotfiles/shared/.config/nix-darwin
+
+# Work machines (requires work submodule)
+darwin-rebuild switch --impure --flake "git+file://$HOME/dotfiles?dir=shared/.config/nix-darwin&submodules=1#$(hostname -s)"
+
+# Update flake dependencies
+nix flake update --flake ~/dotfiles/shared/.config/nix-darwin
 ```
 
 ## Machine-Specific Configuration
