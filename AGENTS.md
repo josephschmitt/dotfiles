@@ -63,9 +63,10 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 **Required Actions:**
 1. **POSIX shells (Bash/Zsh)**: Add to shared modules (`.config/shell/*.sh`)
 2. **Fish**: Add equivalent configuration to `.config/fish/config.fish` or appropriate Fish-specific files
-3. **Test across shells**: Verify changes work in Bash, Zsh, AND Fish before considering complete
-4. **Future-proof**: Use approaches that can extend to Nushell if/when added
-5. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
+3. **ALWAYS port across shells**: When adding ANY feature, function, alias, or export to one shell, you MUST add the equivalent to ALL other supported shells (Bash/Zsh/Fish). Do not consider a task complete until implemented in all shells.
+4. **Test across shells**: Verify changes work in Bash, Zsh, AND Fish before considering complete
+5. **Future-proof**: Use approaches that can extend to Nushell if/when added
+6. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
 
 ### Shell Scripts
 - Use `#!/bin/sh` for POSIX compatibility
