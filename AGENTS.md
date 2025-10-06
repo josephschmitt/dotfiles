@@ -179,19 +179,60 @@ After making any significant configuration changes, verify the README sections r
 - Update installation steps if prerequisites change
 - Keep tool descriptions accurate with actual configurations
 
-### Nested Project READMEs
-- Update any README files in subdirectories (e.g., `.config/*/README.md`)
-- Ensure project-specific documentation reflects current configurations
-- Update setup instructions for individual tools if changed
+### Tool-Specific READMEs (`.config/*/README.md`)
+**CRITICAL**: When modifying any tool's configuration files, you MUST update its corresponding README to reflect the changes.
+
+**Tools with README files:**
+- `.config/fish/README.md` - Fish shell configuration
+- `.config/ghostty/README.md` - Ghostty terminal emulator
+- `.config/helix/README.md` - Helix editor
+- `.config/eza/README.md` - Eza (ls replacement)
+- `.config/leader-key/README.md` - Leader-key launcher
+- `.config/oh-my-posh/README.md` - Oh-my-posh prompt
+- `.config/sesh/README.md` - Sesh session manager
+- `.config/twm/README.md` - TWM workspace manager
+- `.config/zed/README.md` - Zed editor
+- `.config/lazygit/README.md` - Lazygit git UI
+- `.config/tmux/README.md` - Tmux multiplexer
+- `.config/yazi/README.md` - Yazi file manager
+- `.config/nvim/README.md` - Neovim editor (if exists)
+- `.config/zellij/README.md` - Zellij multiplexer (if exists)
+
+**When to Update Tool READMEs:**
+- ✅ Adding/removing keybindings → Update "Keybindings" or "Key Bindings" section
+- ✅ Changing configuration options → Update "Configuration" section with new values
+- ✅ Adding/removing features → Update "Features" section
+- ✅ Modifying integrations with other tools → Update "Integration" or "Related Tools" section
+- ✅ Changing themes or appearance → Update "Theme" or "Appearance" section
+- ✅ Adding new plugins or extensions → Update relevant sections
+- ❌ Minor comment changes → No README update needed
+- ❌ Whitespace/formatting only → No README update needed
+
+**Update Process:**
+1. Make the configuration change in the tool's config file(s)
+2. Test the change to ensure it works as expected
+3. Open the tool's README file (`.config/{tool}/README.md`)
+4. Update the relevant section(s) to reflect the change
+5. Ensure examples, keybindings, and descriptions are accurate
+6. Commit both the config change and README update together
+
+**Documentation Standards for Tool READMEs:**
+- Keep keybinding tables or lists up to date
+- Include examples for complex configurations
+- Explain the "why" behind non-obvious settings
+- Cross-reference related tools and integration points
+- Use consistent formatting across all tool READMEs
+- **Link to project homepage** - First line should be "Configuration for [Tool Name](https://project-url) - description"
 
 ### Documentation Update Process
 When making significant changes:
 1. **Make the configuration changes** first
 2. **Test the changes** to ensure they work
-3. **Review README.md** for accuracy - check all sections mentioned above
-4. **Update AGENTS.md** if the change affects agent guidelines (new tools, workflow changes)
-5. **Update shared/README.md** if setup/installation is affected
-6. **Create a single commit** that includes both the config changes and documentation updates
+3. **Update tool-specific README** - Update `.config/{tool}/README.md` for the tool being modified
+4. **Review README.md** for accuracy - check all sections mentioned above (if it's a major change)
+5. **Update AGENTS.md** if the change affects agent guidelines (new tools, workflow changes)
+6. **Update shared/README.md** if setup/installation is affected
+7. **Create a single commit** that includes config changes + all documentation updates
 
 ### Documentation Standards
 - Keep instructions clear and step-by-step
