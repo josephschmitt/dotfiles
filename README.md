@@ -61,7 +61,7 @@ This clears the `work/` directory and unregisters the submodule without affectin
 - **🐚 Multi-Shell Setup**: Fish (primary), Zsh (secondary), Bash (fallback)
   - Shared configuration modules to eliminate duplication
   - POSIX-compliant environment setup across all shells
-  - macOS Terminal.app compatibility with proper login shell handling
+  - macOS login shell compatibility
 - **✏️ Editor**: Neovim (LazyVim) with Helix as secondary
 - **💻 Terminal**: Ghostty with optimized configuration
 - **🔀 Multiplexer**: tmux with plugin ecosystem, Zellij as alternative
@@ -129,7 +129,7 @@ The shell configuration follows traditional Unix conventions while acknowledging
 **Modern Adaptations:**
 
 - **Shared modules** (`.config/shell/`) - Eliminate duplication across shells
-- **macOS compatibility** - Handle Terminal.app's login shell quirks
+- **macOS compatibility** - Proper login shell handling
 - **Multi-shell support** - Fish, Zsh, and Bash coexist harmoniously
 
 **Why This Matters:**
@@ -152,7 +152,7 @@ The shell configuration follows traditional Unix conventions while acknowledging
 
 **Real-world considerations:**
 
-- **macOS Terminal.app quirks** - Handled explicitly rather than ignored
+- **macOS compatibility** - Handle platform-specific shell behavior
 - **Multiple package managers** - Support for the tools actually used (npm, pnpm, bun, cargo, etc.)
 - **Fallback compatibility** - Bash support for systems where Fish/Zsh aren't available
 - **Tool integration** - Configurations work together (tmux + vim navigation, fzf everywhere)
