@@ -1,7 +1,7 @@
 return {
   "yetone/avante.nvim",
   event = "VeryLazy",
-  enabled = false,
+  enabled = true,
   version = false, -- Never set this value to "*"! Never!
   opts = {
     provider = "copilot",
