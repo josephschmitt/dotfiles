@@ -51,8 +51,7 @@ vim.api.nvim_create_autocmd("WinEnter", {
     local wins = vim.api.nvim_tabpage_list_wins(0)
     local normal_wins = vim.tbl_filter(function(win)
       local buf = vim.api.nvim_win_get_buf(win)
-      local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
-      return buftype == ""
+      return vim.bo[buf].buftype == ""
     end, wins)
 
     vim.wo.winbar = #normal_wins > 1 and "%f %m" or ""
