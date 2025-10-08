@@ -48,10 +48,17 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
 -- Show filename in winbar only when multiple splits exist
 vim.api.nvim_create_autocmd("WinEnter", {
   callback = function()
+    -- Skip floating windows (used by pickers, notifications, etc.)
+    if vim.api.nvim_win_get_config(0).relative ~= "" then
+      return
+    end
+
     local wins = vim.api.nvim_tabpage_list_wins(0)
     local normal_wins = vim.tbl_filter(function(win)
       local buf = vim.api.nvim_win_get_buf(win)
-      return vim.bo[buf].buftype == ""
+      local is_normal_buf = vim.bo[buf].buftype == ""
+      local is_normal_win = vim.api.nvim_win_get_config(win).relative == ""
+      return is_normal_buf and is_normal_win
     end, wins)
 
     vim.wo.winbar = #normal_wins > 1 and "%f %m" or ""
