@@ -97,6 +97,11 @@ return {
         },
         files = {
           hidden = true,
+          formatters = {
+            file = {
+              filename_first = true,
+            },
+          },
         },
         git_status = {
           win = {
@@ -121,7 +126,14 @@ return {
     {
       "<leader><space>",
       function()
-        require("snacks").picker.files({ follow = true })
+        require("snacks").picker.smart({
+          follow = true,
+          formatters = {
+            file = {
+              filename_first = true,
+            },
+          },
+        })
       end,
       desc = "Smart Find Files",
     },
