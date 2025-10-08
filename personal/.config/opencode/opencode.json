@@ -3,8 +3,8 @@
   "keybinds": {
     "messages_first": "<leader>g",
     "messages_last": "<leader>G",
-    "session_child_cycle": "ctrl+]",
-    "session_child_cycle_reverse": "ctrl+["
+    "session_child_cycle": "<leader>]",
+    "session_child_cycle_reverse": "<leader>["
   },
   "permission": {
     "bash": {
