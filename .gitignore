@@ -3,6 +3,7 @@
 .circleci/telemetry.yml
 .config/fish/completions/docker.fish
 .config/fish/completions/kubectl.fish
+**/fish/fish_variables
 .config/helix/runtime
 .env
 .tmux
