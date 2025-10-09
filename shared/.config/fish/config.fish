@@ -54,12 +54,9 @@ function cdd
     cd ~/development/$argv[1]
 end
 
-# Environment loading with replay (for sensitive configs)
-if type -q replay
-    # Load personal environment variables
-    if test -f "$HOME/.env"
-        replay "source $HOME/.env"
-    end
+# Load personal environment variables from .env
+if test -f "$HOME/.env"
+    load_env "$HOME/.env"
 end
 
 # Ghostty workaround for terminal compatibility
