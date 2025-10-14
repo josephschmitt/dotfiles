@@ -29,20 +29,22 @@ auto_start_tmux() {
   
   # Check if tmux is available and we're not already in tmux or SSH
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
-    # Check if there's an existing tmux session
-    if tmux has-session 2>/dev/null; then
+    session_name="$(hostname -s)"
+    
+    # Check if the hostname session exists
+    if tmux has-session -t "$session_name" 2>/dev/null; then
       # Check if the session has any attached clients
-      attached_clients=$(tmux list-clients 2>/dev/null | wc -l)
+      attached_clients=$(tmux list-clients -t "$session_name" 2>/dev/null | wc -l)
       if [ "$attached_clients" -eq 0 ]; then
         # No clients attached, safe to attach
-        exec tmux attach-session
+        exec tmux attach-session -t "$session_name"
       else
-        # Session has attached clients, create new session
+        # Session has attached clients, create new session with auto name
         exec tmux new-session
       fi
     else
       # Create new session with hostname as name
-      exec tmux new-session -s "$(hostname -s)"
+      exec tmux new-session -s "$session_name"
     fi
   fi
 }
