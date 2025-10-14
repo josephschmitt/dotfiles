@@ -26,6 +26,7 @@ map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
 
 -- Window commands
 map({ "n", "v" }, "gw", "<C-w>", { desc = "Window mode" })
+map({ "n" }, "<A-w>", "<C-w>w", { desc = "Switch window" })
 
 -- Helix-like line selection and delete
 map({ "v" }, "<S-v>", "j", { desc = "Select down" })
