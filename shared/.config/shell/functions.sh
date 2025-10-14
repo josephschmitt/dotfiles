@@ -39,8 +39,12 @@ auto_start_tmux() {
         # No clients attached, safe to attach
         exec tmux attach-session -t "$session_name"
       else
-        # Session has attached clients, create new session with auto name
-        exec tmux new-session
+        # Session has attached clients, create new session with random name
+        adjectives="curious jumping happy clever brave swift quiet bright calm eager"
+        animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
+        adj=$(echo "$adjectives" | tr ' ' '\n' | shuf -n 1)
+        animal=$(echo "$animals" | tr ' ' '\n' | shuf -n 1)
+        exec tmux new-session -s "$adj-$animal"
       fi
     else
       # Create new session with hostname as name

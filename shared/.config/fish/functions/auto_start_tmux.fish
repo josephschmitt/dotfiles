@@ -11,8 +11,12 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
                 # No clients attached, safe to attach
                 exec tmux attach-session -t $session_name
             else
-                # Session has attached clients, create new session with auto name
-                exec tmux new-session
+                # Session has attached clients, create new session with random name
+                set adjectives "curious" "jumping" "happy" "clever" "brave" "swift" "quiet" "bright" "calm" "eager"
+                set animals "lemur" "lizard" "panda" "tiger" "eagle" "dolphin" "falcon" "rabbit" "otter" "ferret"
+                set adj (random choice $adjectives)
+                set animal (random choice $animals)
+                exec tmux new-session -s "$adj-$animal"
             end
         else
             # Create new session with hostname as name
