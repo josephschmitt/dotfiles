@@ -22,7 +22,7 @@ return {
   init = function()
     ---@type opencode.Opts
     vim.g.opencode_opts = {
-      -- Your configuration, if any — see lua/opencode/config.lua
+      default_target = "tmux",
     }
   end,
   keys = {
