@@ -31,25 +31,23 @@ auto_start_tmux() {
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
     session_name="$(hostname -s)"
     
-    # Check if the hostname session exists
+    # If hostname session exists and has no attached clients, just attach
     if tmux has-session -t "$session_name" 2>/dev/null; then
-      # Check if the session has any attached clients
       attached_clients=$(tmux list-clients -t "$session_name" 2>/dev/null | wc -l)
       if [ "$attached_clients" -eq 0 ]; then
-        # No clients attached, safe to attach
         exec tmux attach-session -t "$session_name"
-      else
-        # Session has attached clients, create new session with random name
-        adjectives="curious jumping happy clever brave swift quiet bright calm eager"
-        animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
-        adj=$(echo "$adjectives" | tr ' ' '\n' | shuf -n 1)
-        animal=$(echo "$animals" | tr ' ' '\n' | shuf -n 1)
-        exec tmux new-session -s "$adj-$animal" \; run-shell "~/.config/tmux/sesh-or-stay.sh '$adj-$animal'"
       fi
-    else
-      # Create new session with hostname as name
-      exec tmux new-session -s "$session_name"
+      
+      # Session already attached, generate random name for new session
+      adjectives="curious jumping happy clever brave swift quiet bright calm eager"
+      animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
+      adj=$(echo "$adjectives" | tr ' ' '\n' | shuf -n 1)
+      animal=$(echo "$animals" | tr ' ' '\n' | shuf -n 1)
+      session_name="$adj-$animal"
     fi
+    
+    # Create new session and launch sesh popup
+    exec tmux new-session -s "$session_name" \; run-shell "~/.config/tmux/sesh-or-stay.sh '$session_name'"
   fi
 }
 
