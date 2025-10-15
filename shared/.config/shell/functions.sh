@@ -44,7 +44,7 @@ auto_start_tmux() {
         animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
         adj=$(echo "$adjectives" | tr ' ' '\n' | shuf -n 1)
         animal=$(echo "$animals" | tr ' ' '\n' | shuf -n 1)
-        exec tmux new-session -s "$adj-$animal"
+        exec tmux new-session -s "$adj-$animal" \; run-shell "~/.config/tmux/sesh-or-stay.sh '$adj-$animal'"
       fi
     else
       # Create new session with hostname as name

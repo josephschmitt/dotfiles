@@ -16,7 +16,7 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
                 set animals "lemur" "lizard" "panda" "tiger" "eagle" "dolphin" "falcon" "rabbit" "otter" "ferret"
                 set adj (random choice $adjectives)
                 set animal (random choice $animals)
-                exec tmux new-session -s "$adj-$animal"
+                exec tmux new-session -s "$adj-$animal" \; run-shell "~/.config/tmux/sesh-or-stay.sh '$adj-$animal'"
             end
         else
             # Create new session with hostname as name
