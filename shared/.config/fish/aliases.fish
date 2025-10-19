@@ -1,8 +1,8 @@
 # Fish Shell Aliases
 
 alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
-alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
-alias darwin_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
+alias nix_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
+alias nix_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
 alias lg="env TMPDIR=/tmp lazygit"
 alias c="clear"
 alias vim="nvim"
