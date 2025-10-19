@@ -15,6 +15,7 @@
         default = pkgs.buildEnv {
           name = "server-env";
           paths = with pkgs; [
+            bat
             delta
             docker
             eza
@@ -25,9 +26,12 @@
             gh
             ghostty
             git
+            gum
             lazygit
             mosh
             neovim
+            nil
+            nixpkgs-fmt
             nixpkgs-fmt
             oh-my-posh
             opencode
@@ -36,6 +40,7 @@
             stow
             tmux
             twm
+            uv
             volta
             zellij
             zoxide

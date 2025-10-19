@@ -78,6 +78,18 @@ git submodule deinit -f work
 
 This clears the `work/` directory and unregisters the submodule without affecting the main repository.
 
+### 🐧 Ubuntu Server
+
+```bash
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# Install user-level configuration files
+stow shared ubuntu-server
+```
+
+See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix configuration and system services included.
+
 ## 📦 What's Included
 
 ### 🛠️ Core Tools
@@ -125,6 +137,8 @@ dotfiles/
 ├── personal/        # Personal-specific configurations
 │   ├── .config/nix-darwin/machines/mac-mini.nix  # Personal machine
 │   └── .gitconfig   # Personal git settings
+├── ubuntu-server/   # Ubuntu server-specific configurations
+│   └── .config/nix/ # Nix configuration for Ubuntu servers
 └── work/           # Work-specific configurations (private submodule)
     ├── .config/nix-darwin/machines/   # Work machine configurations
     ├── .gitconfig   # Work git settings

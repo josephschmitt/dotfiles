@@ -4,16 +4,18 @@
 This is a personal dotfiles repository managed with GNU Stow. No build system - use `stow .` to install configs.
 
 ## Environment Context
-- Platform: macOS
+- Platform: macOS (primary), Ubuntu Server (secondary)
 - Shells: Fish (primary), Zsh (secondary), Bash (fallback)
 - Editor: Neovim (LazyVim) + Helix as secondary
 - Package Manager: GNU Stow
+- Profiles: shared (all machines), personal (macOS personal), work (macOS work), ubuntu-server (Ubuntu servers)
 - No tests/linting - configuration files only
 
 ## Key Commands
-- **Install**: `stow .` (from repo root)
-- **Uninstall**: `stow -D .`
-- **Restow**: `stow -R .`
+- **Install all**: `stow .` (from repo root)
+- **Install profiles**: `stow shared personal` (macOS), `stow shared ubuntu-server` (Ubuntu)
+- **Uninstall**: `stow -D .` or `stow -D shared personal`
+- **Restow**: `stow -R .` or `stow -R shared personal`
 
 ## Code Style Guidelines
 
@@ -49,6 +51,25 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 - Interactive features → appropriate shell's rc file
 - Never duplicate configuration between shells
 
+#### Profile-Specific Configuration:
+**CRITICAL**: Some configurations are specific to certain machine types or environments and should NOT be in shared configs.
+
+**Profile-Specific Patterns:**
+- **POSIX shells**: Use `aliases.{profile}.sh` and `functions.{profile}.sh` in `.config/shell/`
+- **Fish shell**: Use `config.{profile}.fish` and `aliases.{profile}.fish` in `.config/fish/`
+- **Auto-loading**: Shared configs automatically source profile-specific files using glob patterns
+
+**Examples:**
+- `ubuntu-server/.config/shell/aliases.ubuntu-server.sh` - Ubuntu server-specific aliases (nix_rebuild, nix_update)
+- `ubuntu-server/.config/fish/config.ubuntu-server.fish` - Fish config for Ubuntu servers
+- These are auto-sourced by shared shell configs when the profile is installed
+
+**When to use profile-specific configs:**
+- ✅ Platform-specific commands (nix on Ubuntu, darwin-rebuild on macOS)
+- ✅ Environment-specific aliases (server management, work tools)
+- ✅ Machine-specific paths or settings
+- ❌ Universal tools that work the same everywhere
+
 #### Multi-Shell Support Requirements:
 **CRITICAL**: When making changes to shell environment configuration, you MUST ensure changes work across ALL supported shells:
 
@@ -61,12 +82,13 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 - Nushell (may be added later)
 
 **Required Actions:**
-1. **POSIX shells (Bash/Zsh)**: Add to shared modules (`.config/shell/*.sh`)
+1. **POSIX shells (Bash/Zsh)**: Add to shared modules (`.config/shell/*.sh`) or profile-specific files
 2. **Fish**: Add equivalent configuration to `.config/fish/config.fish` or appropriate Fish-specific files
 3. **ALWAYS port across shells**: When adding ANY feature, function, alias, or export to one shell, you MUST add the equivalent to ALL other supported shells (Bash/Zsh/Fish). Do not consider a task complete until implemented in all shells.
 4. **Test across shells**: Verify changes work in Bash, Zsh, AND Fish before considering complete
-5. **Future-proof**: Use approaches that can extend to Nushell if/when added
-6. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
+5. **Profile-specific considerations**: If adding to a profile (like ubuntu-server), ensure it works across all shells within that profile
+6. **Future-proof**: Use approaches that can extend to Nushell if/when added
+7. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
 
 ### Shell Scripts
 - Use `#!/bin/sh` for POSIX compatibility
@@ -90,9 +112,11 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 - Neovim plugins: `.config/nvim/lua/plugins/`
 - Fish functions: `.config/fish/functions/`
 - Shared shell config: `.config/shell/` (exports.sh, aliases.sh, functions.sh)
+- Profile-specific shell config: `{profile}/.config/shell/aliases.{profile}.sh`, `{profile}/.config/fish/config.{profile}.fish`
 - Shell profiles: Root level (`.profile`, `.zshrc`, `.bashrc`, etc.)
 - Utilities: `bin/` directory
 - Theme files in respective app config dirs
+- Ubuntu server configs: `ubuntu-server/.config/nix/` (Nix configuration and system services)
 - OpenCode agents: `.config/opencode/agents/` (NOT `agent/` - see below)
 
 ### CRITICAL: OpenCode Agents Directory Naming

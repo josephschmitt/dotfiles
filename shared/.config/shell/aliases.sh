@@ -14,11 +14,9 @@ alias la="eza -la"
 alias lt="eza --tree"
 alias tree="eza --tree"
 
-# Nix and Darwin rebuild shortcuts
+# Darwin rebuild shortcuts
 alias darwin_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
 alias darwin_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
-alias nix_rebuild="nix profile upgrade personal/.config/nix"
-alias nix_update="nix flake update --flake ~/dotfiles/personal/.config/nix && nix profile upgrade personal/.config/nix"
 
 # Git-spice workflow aliases
 # Branch management

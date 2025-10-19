@@ -4,10 +4,10 @@
 
 ```sh
 # First time:
-$ nix profile install ~/dotfiles/.config/nix#default
+$ nix profile install ~/dotfiles/ubuntu-server/.config/nix#default
 
 # On later updates:
-$ cd ~/dotfiles/.config/nix
+$ cd ~/dotfiles/ubuntu-server/.config/nix
 $ nix flake update           # refresh nixpkgs revision in flake.lock
 $ nix profile upgrade --all  # rebuild your profile to the new lock file
 ```
@@ -43,8 +43,8 @@ If Docker daemon crashes with segfaults (SIGSEGV), containers won't auto-restart
 **Setup:**
 ```sh
 # Copy service files to system directories
-sudo cp ~/dotfiles/.config/nix/docker-compose-restart.service /etc/systemd/system/
-sudo cp ~/dotfiles/.config/nix/restart-docker-compose.sh /usr/local/bin/
+sudo cp ~/dotfiles/ubuntu-server/.config/nix/docker-compose-restart.service /etc/systemd/system/
+sudo cp ~/dotfiles/ubuntu-server/.config/nix/restart-docker-compose.sh /usr/local/bin/
 sudo chmod +x /usr/local/bin/restart-docker-compose.sh
 sudo systemctl enable docker-compose-restart.service
 ```
