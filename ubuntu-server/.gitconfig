@@ -1,0 +1,11 @@
+# Git Configuration - Ubuntu Server
+# Server Git settings that extend shared base configuration
+
+# Include shared base configuration
+[include]
+	path = ./.gitconfig-base
+
+# Server user settings (overrides base)
+[user]
+	email = josephschmitt@users.noreply.github.com
+	name = josephschmitt
