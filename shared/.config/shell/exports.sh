@@ -57,16 +57,17 @@ export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 
 # PNPM package manager
 export PNPM_HOME="$HOME/Library/pnpm"
-if [[ ":$PATH:" != *":$PNPM_HOME:"* ]]; then
-  export PATH="$PNPM_HOME:$PATH"
-fi
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 
 # Source personal environment file if it exists
 if [ -f "$HOME/.env" ]; then
   . "$HOME/.env"
 fi
 
-if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
+if [ "$TERM_PROGRAM" = "ghostty" ]; then
   export TERM=xterm-256color
 fi
 

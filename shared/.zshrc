@@ -1,6 +1,9 @@
 # Zsh interactive shell configuration
 # This file is sourced for interactive zsh sessions
 
+# Enable nullglob for profile-specific file loading
+setopt nullglob
+
 # Source shared aliases and functions
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   . "$HOME/.config/shell/aliases.sh"
