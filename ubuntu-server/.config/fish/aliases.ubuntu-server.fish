@@ -3,3 +3,6 @@
 # Nix rebuild shortcuts for Ubuntu servers
 alias nix_rebuild="nix profile upgrade ubuntu-server/.config/nix"
 alias nix_update="nix flake update --flake ~/dotfiles/ubuntu-server/.config/nix && nix profile upgrade ubuntu-server/.config/nix"
+
+# Claude Code CLI
+alias claude="/home/josephschmitt/.config/claude/local/claude"
