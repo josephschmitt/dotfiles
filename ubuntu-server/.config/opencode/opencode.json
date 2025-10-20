@@ -1,0 +1,30 @@
+
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "tokyonight",
+  "keybinds": {
+    "messages_first": "<leader>g",
+    "messages_last": "<leader>G",
+    "session_child_cycle": "<leader>]",
+    "session_child_cycle_reverse": "<leader>["
+  },
+  "permission": {
+    "bash": {
+      "aws": "deny",
+      "git commit": "ask",
+      "git push": "ask",
+      "git clone": "ask",
+      "mkdir": "ask",
+      "mv": "ask",
+      "rm": "ask",
+      "*": "allow"
+    }
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    }
+  }
+}
