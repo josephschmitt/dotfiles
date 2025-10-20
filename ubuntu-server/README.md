@@ -14,7 +14,7 @@ git clone git@github.com:josephschmitt/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
 # Run bootstrap script (requires sudo)
-sudo ubuntu-server/bin/bootstrap.sh
+sudo bootstrap
 ```
 
 The bootstrap script automates:
@@ -37,7 +37,7 @@ stow shared ubuntu-server
 ## What's Included
 
 - **Bootstrap Script** - Automated server setup for Docker and dependencies
-  - `bin/bootstrap.sh` - One-command server configuration
+  - `bin/bootstrap` - One-command server configuration
   - `bin/bootstrap.md` - Detailed setup guide and manual steps
 - **Nix Configuration** - Flake-based package management and system configuration
   - `flake.nix` - Package definitions and system configuration

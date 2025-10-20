@@ -15,7 +15,8 @@ This document describes how to recreate this Docker server from scratch.
 # 1. Clone this repo and run bootstrap script
 git clone git@github.com:josephschmitt/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-sudo ubuntu-server/bin/bootstrap.sh
+stow shared ubuntu-server
+sudo bootstrap
 
 # 2. Restore other project directories
 # - Clone/restore ~/projects/schmitt.town
