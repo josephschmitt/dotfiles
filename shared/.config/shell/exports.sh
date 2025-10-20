@@ -36,6 +36,9 @@ export PATH="$HOME/.nix-profile/bin:$PATH"
 export PATH="/run/current-system/sw/bin:$PATH"
 export PATH="/nix/var/nix/profiles/default/bin:$PATH"
 
+# Homebrew configuration
+export HOMEBREW_NO_ENV_HINTS=1
+
 # Package managers and version managers
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
@@ -58,8 +61,8 @@ export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 # PNPM package manager
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+*":$PNPM_HOME:"*) ;;
+*) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
 # Source personal environment file if it exists

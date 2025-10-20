@@ -15,6 +15,9 @@ set -gx PATH "$HOME/.nix-profile/bin" $PATH
 set -gx PATH /run/current-system/sw/bin $PATH
 set -gx PATH /nix/var/nix/profiles/default/bin $PATH
 
+# Homebrew configuration
+set -gx HOMEBREW_NO_ENV_HINTS 1
+
 set -gx PATH /opt/homebrew/bin $PATH
 set -gx PATH "$HOME/.bun/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
