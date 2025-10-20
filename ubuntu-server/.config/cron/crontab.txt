@@ -22,4 +22,4 @@
 # 
 # m h  dom mon dow   command
 
-rsync -avz --delete --exclude '*/.mono/keypairs/**' --exclude '*/radarr/Backups/manual/**' ./ joe@synology:/volume1/NetBackup/buntubox >> /home/josephschmitt/rsync-backup.log
+0 2 * * * /home/josephschmitt/bin/run-backup /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox

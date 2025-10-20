@@ -1,0 +1,61 @@
+#!/bin/sh
+
+set -e
+
+usage() {
+  echo "Usage: $0 [--no-log] SOURCE DESTINATION"
+  echo ""
+  echo "Backup files using rsync with predefined exclusions"
+  echo ""
+  echo "Options:"
+  echo "  --no-log    Don't log output to rsync-backup.log"
+  echo ""
+  echo "Arguments:"
+  echo "  SOURCE      Directory to back up (required)"
+  echo "  DESTINATION Backup destination (required)"
+  exit 1
+}
+
+NO_LOG=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --no-log)
+      NO_LOG=1
+      shift
+      ;;
+    --help|-h)
+      usage
+      ;;
+    *)
+      if [ -z "$SOURCE" ]; then
+        SOURCE="$1"
+      elif [ -z "$DESTINATION" ]; then
+        DESTINATION="$1"
+      else
+        echo "Error: Too many arguments"
+        usage
+      fi
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$SOURCE" ] || [ -z "$DESTINATION" ]; then
+  echo "Error: SOURCE and DESTINATION are required"
+  usage
+fi
+
+run_rsync() {
+  rsync -avz --delete \
+    --exclude '*/.mono/keypairs/**' \
+    --exclude '*/radarr/Backups/manual/**' \
+    --exclude 'downloads/' \
+    "$SOURCE" "$DESTINATION"
+}
+
+if [ $NO_LOG -eq 1 ]; then
+  run_rsync
+else
+  run_rsync >> /home/josephschmitt/rsync-backup.log 2>&1
+fi

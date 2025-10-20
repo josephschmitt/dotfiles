@@ -42,11 +42,13 @@ stow shared ubuntu-server
 - **Docker Compose Service Manager** - Set up systemd services for Docker Compose projects
   - `bin/bootstrap-compose-service` - Register Docker Compose project as systemd service
   - `bin/docker-compose@.service` - Systemd template for Docker Compose projects
+- **Backup Script** - Automated rsync backups with exclusions
+  - `bin/run-backup` - Configurable backup script using rsync
+  - `.config/cron/crontab.txt` - Scheduled backup configuration
 - **Nix Configuration** - Flake-based package management and system configuration
   - `flake.nix` - Package definitions and system configuration
   - `nix.conf` - Nix daemon configuration
   - System service files for Docker Compose management
-  - Crontab configuration
 - **Shell Aliases** - Ubuntu server-specific command aliases
   - `nix_rebuild` - Rebuild nix profile from current configuration
   - `nix_update` - Update flake lockfile and rebuild profile
@@ -110,3 +112,53 @@ sudo systemctl reload docker-compose@<project-name>.service
 - Network-aware (waits for network connectivity)
 - Restart on failure with rate limiting (20 attempts in 30 seconds)
 - Supports `reload` for pulling updates and restarting containers
+
+### Setting Up Automated Backups
+
+The `run-backup` script provides automated rsync backups with predefined exclusions for common directories that don't need backing up.
+
+**Setup:**
+
+1. Install the crontab configuration:
+   ```bash
+   crontab ubuntu-server/.config/cron/crontab.txt
+   ```
+
+2. Verify the cron job is installed:
+   ```bash
+   crontab -l
+   ```
+
+**Manual Usage:**
+
+```bash
+# Run backup with logging (logs to ~/rsync-backup.log)
+run-backup /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+
+# Run backup without logging (outputs to stdout)
+run-backup --no-log /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+
+# View help
+run-backup --help
+```
+
+**Automated Schedule:**
+
+The default crontab runs daily at 2:00 AM:
+```
+0 2 * * * /home/josephschmitt/bin/run-backup /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+```
+
+**What Gets Excluded:**
+
+The backup script automatically excludes:
+- `*/.mono/keypairs/**` - Mono framework keys
+- `*/radarr/Backups/manual/**` - Radarr manual backups
+- `downloads/` - Download directories
+
+**Monitoring:**
+
+Check backup logs:
+```bash
+tail -f ~/rsync-backup.log
+```
