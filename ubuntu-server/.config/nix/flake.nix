@@ -26,6 +26,7 @@
             gh
             ghostty
             git
+            gnumake
             gum
             lazygit
             mosh
