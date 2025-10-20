@@ -51,11 +51,19 @@ if [ -z "$SOURCE" ] || [ -z "$DESTINATION" ]; then
 fi
 
 run_rsync() {
-  rsync -avz --delete \
-    --exclude '*/.mono/keypairs/**' \
-    --exclude '*/radarr/Backups/manual/**' \
-    --exclude 'downloads/' \
-    "$SOURCE" "$DESTINATION"
+  if [ -n "$LOG_FILE" ]; then
+    rsync -avz --delete \
+      --exclude '*/.mono/keypairs/**' \
+      --exclude '*/radarr/Backups/manual/**' \
+      --exclude 'downloads/' \
+      "$SOURCE" "$DESTINATION"
+  else
+    rsync -az --delete --info=progress2 \
+      --exclude '*/.mono/keypairs/**' \
+      --exclude '*/radarr/Backups/manual/**' \
+      --exclude 'downloads/' \
+      "$SOURCE" "$DESTINATION"
+  fi
 }
 
 if [ -n "$LOG_FILE" ]; then
