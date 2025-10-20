@@ -37,7 +37,7 @@ return {
     {
       "<leader>oa",
       function()
-        require("opencode").ask("@cursor: ")
+        require("opencode").ask("@cursor ", {})
       end,
       desc = "Ask opencode about this",
       mode = "n",
@@ -45,7 +45,7 @@ return {
     {
       "<leader>oa",
       function()
-        require("opencode").ask("@selection: ")
+        require("opencode").ask("@selection ", {})
       end,
       desc = "Ask opencode about selection",
       mode = "v",
