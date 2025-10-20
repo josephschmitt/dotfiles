@@ -3,25 +3,29 @@
 set -e
 
 usage() {
-  echo "Usage: $0 [--no-log] SOURCE DESTINATION"
+  echo "Usage: $0 [--log[=PATH]] SOURCE DESTINATION"
   echo ""
   echo "Backup files using rsync with predefined exclusions"
   echo ""
   echo "Options:"
-  echo "  --no-log    Don't log output to rsync-backup.log"
+  echo "  --log[=PATH]  Log output to file (default: ~/rsync-backup.log)"
   echo ""
   echo "Arguments:"
-  echo "  SOURCE      Directory to back up (required)"
-  echo "  DESTINATION Backup destination (required)"
+  echo "  SOURCE        Directory to back up (required)"
+  echo "  DESTINATION   Backup destination (required)"
   exit 1
 }
 
-NO_LOG=0
+LOG_FILE=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --no-log)
-      NO_LOG=1
+    --log)
+      LOG_FILE="/home/josephschmitt/rsync-backup.log"
+      shift
+      ;;
+    --log=*)
+      LOG_FILE="${1#*=}"
       shift
       ;;
     --help|-h)
@@ -54,8 +58,8 @@ run_rsync() {
     "$SOURCE" "$DESTINATION"
 }
 
-if [ $NO_LOG -eq 1 ]; then
-  run_rsync
+if [ -n "$LOG_FILE" ]; then
+  run_rsync 2>&1 | tee -a "$LOG_FILE"
 else
-  run_rsync >> /home/josephschmitt/rsync-backup.log 2>&1
+  run_rsync
 fi

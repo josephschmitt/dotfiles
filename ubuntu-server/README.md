@@ -132,11 +132,14 @@ The `run-backup` script provides automated rsync backups with predefined exclusi
 **Manual Usage:**
 
 ```bash
-# Run backup with logging (logs to ~/rsync-backup.log)
+# Run backup (shows output)
 run-backup /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
 
-# Run backup without logging (outputs to stdout)
-run-backup --no-log /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+# Run backup with logging to default file (also shows output)
+run-backup --log /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+
+# Run backup with custom log file
+run-backup --log=/path/to/custom.log /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
 
 # View help
 run-backup --help
@@ -144,9 +147,9 @@ run-backup --help
 
 **Automated Schedule:**
 
-The default crontab runs daily at 2:00 AM:
+The default crontab runs daily at 2:00 AM with logging enabled:
 ```
-0 2 * * * /home/josephschmitt/bin/run-backup /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
+0 2 * * * /home/josephschmitt/bin/run-backup --log /home/josephschmitt joe@synology:/volume1/NetBackup/buntubox
 ```
 
 **What Gets Excluded:**
