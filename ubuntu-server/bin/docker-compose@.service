@@ -1,0 +1,24 @@
+[Unit]
+Description=Docker Compose stack %i
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+PartOf=docker.service
+BindsTo=docker.service
+StartLimitIntervalSec=30
+StartLimitBurst=20
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/josephschmitt/%i
+User=josephschmitt
+Environment="PATH=/home/josephschmitt/.nix-profile/bin:/usr/local/bin:/usr/bin"
+ExecStart=/usr/bin/env docker compose up -d
+ExecStop=/usr/bin/env docker compose down
+ExecReload=/usr/bin/env sh -c 'docker compose pull --quiet && docker compose up -d'
+TimeoutStartSec=0
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

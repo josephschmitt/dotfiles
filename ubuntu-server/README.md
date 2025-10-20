@@ -39,6 +39,9 @@ stow shared ubuntu-server
 - **Bootstrap Script** - Automated server setup for Docker and dependencies
   - `bin/bootstrap` - One-command server configuration
   - `bin/bootstrap.md` - Detailed setup guide and manual steps
+- **Docker Compose Service Manager** - Set up systemd services for Docker Compose projects
+  - `bin/bootstrap-compose-service` - Register Docker Compose project as systemd service
+  - `bin/docker-compose@.service` - Systemd template for Docker Compose projects
 - **Nix Configuration** - Flake-based package management and system configuration
   - `flake.nix` - Package definitions and system configuration
   - `nix.conf` - Nix daemon configuration
@@ -61,3 +64,49 @@ Use alongside the `shared` profile for a complete server environment:
 ```bash
 stow shared ubuntu-server
 ```
+
+### Setting Up Docker Compose Services
+
+To register a Docker Compose project as a systemd service that starts automatically on boot:
+
+```bash
+# Set up systemd service for a project
+sudo bootstrap-compose-service <project-name>
+
+# Example: Set up service for ~/hbojoe project
+sudo bootstrap-compose-service hbojoe
+```
+
+This will:
+1. Copy the systemd service template to `/etc/systemd/system/`
+2. Enable the service to start on boot
+3. Start the service immediately
+4. Show the service status
+
+The service expects your Docker Compose project to be at `~/projects/<project-name>/docker-compose.yaml`.
+
+**Service Management:**
+
+```bash
+# Check service status
+sudo systemctl status docker-compose@<project-name>.service
+
+# Restart service
+sudo systemctl restart docker-compose@<project-name>.service
+
+# Stop service
+sudo systemctl stop docker-compose@<project-name>.service
+
+# Disable auto-start on boot
+sudo systemctl disable docker-compose@<project-name>.service
+
+# Pull latest images and restart (updates)
+sudo systemctl reload docker-compose@<project-name>.service
+```
+
+**Features:**
+- Automatic start on boot
+- Depends on Docker service (won't start if Docker isn't running)
+- Network-aware (waits for network connectivity)
+- Restart on failure with rate limiting (20 attempts in 30 seconds)
+- Supports `reload` for pulling updates and restarting containers
