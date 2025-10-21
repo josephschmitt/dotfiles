@@ -11,8 +11,11 @@ if status is-interactive
         auto_start_tmux
     end
 
-    # Prompt configuration - lazy-loaded for faster startup
+    # Prompt configuration - lazy-loaded with cached init for faster startup
     if type -q oh-my-posh
+        set -l omp_config ~/.config/oh-my-posh/themes/custom.omp.yaml
+        set -l omp_cache ~/.cache/oh-my-posh-init.fish
+
         # Set a simple temporary prompt for instant shell readiness
         function fish_prompt
             echo -n (set_color cyan)(prompt_pwd)(set_color normal)' > '
@@ -23,8 +26,14 @@ if status is-interactive
             # Only run once
             functions -e _load_oh_my_posh
 
-            # Initialize oh-my-posh in background
-            oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
+            # Regenerate cache if missing or config is newer than cache
+            if not test -f $omp_cache; or test $omp_config -nt $omp_cache
+                mkdir -p (dirname $omp_cache)
+                oh-my-posh init fish --config $omp_config > $omp_cache
+            end
+
+            # Source the cached initialization (much faster than generating)
+            source $omp_cache
         end
     end
 
