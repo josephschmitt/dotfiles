@@ -14,6 +14,13 @@ if status is-interactive
     # Prompt configuration - Starship (fast enough to init directly)
     if type -q starship
         starship init fish | source
+
+        # Enable transient prompt (matches oh-my-posh behavior)
+        # After command execution, previous prompts simplify to just the arrow
+        function starship_transient_prompt_func
+            starship module character
+        end
+        enable_transience
     end
 
     # Suppress the default fish greeting
