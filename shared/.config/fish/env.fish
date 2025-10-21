@@ -1,6 +1,9 @@
 # Fish Shell Environment Configuration
 # Environment variables and PATH setup
 
+# Use starship for the custom prompt instead of OMP
+setenv USE_STARSHIP true
+
 setenv XDG_CONFIG_HOME "$HOME/.config"
 setenv EDITOR nvim
 setenv BAT_THEME tokyonight_night
