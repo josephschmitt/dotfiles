@@ -35,9 +35,9 @@ done
 # Auto-start tmux if available
 auto_start_tmux
 
-# Oh-my-posh prompt for bash
-if command -v oh-my-posh >/dev/null 2>&1; then
-  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
+# Starship prompt for bash
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init bash)"
 fi
 
 # Zoxide smart directory jumping
