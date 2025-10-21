@@ -1,4 +1,9 @@
 function auto_start_tmux -d "Auto-start tmux if available and not already inside tmux"
+    # Skip in IDE/editor integrated terminals
+    if set -q VSCODE_INJECTION; or set -q INSIDE_EMACS; or set -q VSCODE_PID; or test "$TERM_PROGRAM" = "vscode"
+        return
+    end
+    
     # Check if tmux is available and we're not already in tmux or SSH
     if command -q tmux; and not set -q TMUX; and not set -q SSH_CONNECTION
         set session_name (hostname -s)

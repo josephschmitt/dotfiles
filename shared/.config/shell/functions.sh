@@ -23,7 +23,7 @@ twmp() {
 # Auto-start tmux if available and not already inside tmux
 auto_start_tmux() {
   # Skip in IDE/editor integrated terminals
-  if [ -n "$VSCODE_INJECTION" ] || [ -n "$INSIDE_EMACS" ]; then
+  if [ -n "$VSCODE_INJECTION" ] || [ -n "$INSIDE_EMACS" ] || [ -n "$VSCODE_PID" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
     return
   fi
   
