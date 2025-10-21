@@ -25,28 +25,7 @@ if status is-interactive
         enable_transience
     else if type -q oh-my-posh
         # oh-my-posh prompt (default)
-        set -l omp_config ~/.config/oh-my-posh/themes/custom.omp.yaml
-        set -l omp_cache ~/.cache/oh-my-posh-init.fish
-
-        # Set a simple temporary prompt for instant shell readiness
-        function fish_prompt
-            echo -n (set_color cyan)(prompt_pwd)(set_color normal)' > '
-        end
-
-        # Load oh-my-posh asynchronously after the first prompt is displayed
-        function _load_oh_my_posh --on-event fish_prompt
-            # Only run once
-            functions -e _load_oh_my_posh
-
-            # Regenerate cache if missing or config is newer than cache
-            if not test -f $omp_cache; or test $omp_config -nt $omp_cache
-                mkdir -p (dirname $omp_cache)
-                oh-my-posh init fish --config $omp_config > $omp_cache
-            end
-
-            # Source the cached initialization (much faster than generating)
-            source $omp_cache
-        end
+        oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
     end
 
     # Suppress the default fish greeting
