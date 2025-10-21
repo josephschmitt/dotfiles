@@ -30,21 +30,28 @@ done
 # Auto-start tmux if available
 auto_start_tmux
 
-# Starship prompt (skip in Apple Terminal.app which has its own prompt)
+# Prompt configuration (skip in Apple Terminal.app which has its own prompt)
+# Use Starship if USE_STARSHIP env var is set, otherwise use oh-my-posh (default)
 if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
-  eval "$(starship init zsh)"
+  if [ -n "$USE_STARSHIP" ] && command -v starship >/dev/null 2>&1; then
+    # Starship prompt
+    eval "$(starship init zsh)"
 
-  # Enable transient prompt (matches oh-my-posh behavior)
-  # After command execution, previous prompts simplify to just the arrow
-  autoload -Uz add-zle-hook-widget
+    # Enable transient prompt (matches oh-my-posh behavior)
+    # After command execution, previous prompts simplify to just the arrow
+    autoload -Uz add-zle-hook-widget
 
-  function _starship_transient_prompt() {
-    PROMPT="$(starship prompt --profile transient)"
-    RPROMPT=""
-    zle reset-prompt
-  }
+    function _starship_transient_prompt() {
+      PROMPT="$(starship prompt --profile transient)"
+      RPROMPT=""
+      zle reset-prompt
+    }
 
-  add-zle-hook-widget zle-line-finish _starship_transient_prompt
+    add-zle-hook-widget zle-line-finish _starship_transient_prompt
+  elif command -v oh-my-posh >/dev/null 2>&1; then
+    # oh-my-posh prompt (default)
+    eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
+  fi
 fi
 
 # Zoxide smart directory jumping

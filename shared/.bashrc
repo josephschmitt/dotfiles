@@ -35,9 +35,14 @@ done
 # Auto-start tmux if available
 auto_start_tmux
 
-# Starship prompt for bash
-if command -v starship >/dev/null 2>&1; then
+# Prompt configuration
+# Use Starship if USE_STARSHIP env var is set, otherwise use oh-my-posh (default)
+if [ -n "$USE_STARSHIP" ] && command -v starship >/dev/null 2>&1; then
+  # Starship prompt for bash
   eval "$(starship init bash)"
+elif command -v oh-my-posh >/dev/null 2>&1; then
+  # oh-my-posh prompt for bash (default)
+  eval "$(oh-my-posh init bash --config ~/.config/oh-my-posh/themes/custom.omp.yaml)"
 fi
 
 # Zoxide smart directory jumping
