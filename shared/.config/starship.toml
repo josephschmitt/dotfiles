@@ -1,0 +1,154 @@
+# Starship configuration matching oh-my-posh custom theme
+# Based on Catppuccin color palette
+
+# Define custom palette (matching oh-my-posh)
+palette = "catppuccin_custom"
+
+[palettes.catppuccin_custom]
+blue = "#8CAAEE"
+lavender = "#BABBF1"
+gray = "#ACB0BE"
+pink = "#F4B8E4"
+red = "#E78284"
+
+# Format: Two-line prompt matching oh-my-posh layout
+# Line 1: OS + Shell + SSH + Path + Git + Status
+# Line 2: Prompt character
+format = """
+[](gray)\
+$os\
+$shell\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$status\
+$line_break\
+$character\
+"""
+
+# Add space at the end of prompt
+add_newline = true
+
+# OS icon (matching oh-my-posh os module)
+[os]
+disabled = false
+style = "gray"
+format = "[$symbol ]($style)"
+
+[os.symbols]
+Macos = ""
+Linux = ""
+Windows = ""
+Unknown = ""
+
+# Shell indicator (matching oh-my-posh shell module)
+[shell]
+disabled = false
+style = "gray"
+format = "[$indicator ]($style)"
+fish_indicator = "fish"
+bash_indicator = "bash"
+zsh_indicator = "zsh"
+
+# SSH session detection (only show when SSH, matching oh-my-posh)
+[username]
+disabled = false
+show_always = false
+style_user = "blue"
+style_root = "red"
+format = "[$user]($style)"
+
+[hostname]
+disabled = false
+ssh_only = true
+style = "blue"
+format = "[@$hostname ]($style)"
+
+# Directory/Path (matching oh-my-posh path module with custom icons)
+[directory]
+disabled = false
+style = "pink"
+format = "[$path ]($style)"
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+home_symbol = ""
+
+[directory.substitutions]
+"~/development" = "  "
+
+# Git branch (matching oh-my-posh git branch)
+[git_branch]
+disabled = false
+style = "lavender"
+format = "[$symbol$branch ]($style)"
+symbol = " "
+
+# Git status (matching oh-my-posh git status display)
+[git_status]
+disabled = false
+style = "lavender"
+format = "([${all_status}${ahead_behind} ]($style))"
+conflicted = ""
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+up_to_date = ""
+untracked = "?${count}"
+stashed = "$${count}"
+modified = "~${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+
+# Status/Exit code (matching oh-my-posh status module)
+[status]
+disabled = false
+style = "gray"
+format = "[$symbol $status ]($style)"
+symbol = "󰈆"
+success_symbol = "[󰈆 0](gray)"
+not_executable_symbol = "[󰈆](red)"
+not_found_symbol = "[󰈆](red)"
+sigint_symbol = "[󰈆](red)"
+signal_symbol = "[󰈆](red)"
+
+[status.pipestatus_format]
+disabled = false
+
+# Prompt character (matching oh-my-posh prompt arrow)
+[character]
+disabled = false
+success_symbol = "[](gray)"
+error_symbol = "[](red)"
+vimcmd_symbol = "[](green)"
+
+# Disable modules not in oh-my-posh theme
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[package]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[kubernetes]
+disabled = true
