@@ -33,6 +33,18 @@ auto_start_tmux
 # Starship prompt (skip in Apple Terminal.app which has its own prompt)
 if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
   eval "$(starship init zsh)"
+
+  # Enable transient prompt (matches oh-my-posh behavior)
+  # After command execution, previous prompts simplify to just the arrow
+  autoload -Uz add-zle-hook-widget
+
+  function _starship_transient_prompt() {
+    PROMPT="$(starship prompt --profile transient)"
+    RPROMPT=""
+    zle reset-prompt
+  }
+
+  add-zle-hook-widget zle-line-finish _starship_transient_prompt
 fi
 
 # Zoxide smart directory jumping
