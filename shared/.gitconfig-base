@@ -67,6 +67,10 @@
 [rebase]
   autoStash = true           # Automatically stash changes during rebase
 
+[rerere]
+  enabled = true             # Enable reuse recorded resolution for merge conflicts
+  autoUpdate = true          # Automatically stage files after rerere resolves them
+
 [init]
 	defaultBranch = main       # Use 'main' as default branch name
 
