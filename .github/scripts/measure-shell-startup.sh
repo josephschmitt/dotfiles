@@ -55,17 +55,17 @@ command -v fish >/dev/null 2>&1 || { echo "fish not found" >&2; exit 1; }
 echo "Starting shell performance measurements..." >&2
 echo "" >&2
 
-bash_result=$(measure_shell "bash" "bash -l")
+bash_result=$(measure_shell "bash" "bash -i -l")
 bash_avg=$(echo $bash_result | cut -d'|' -f1)
 bash_min=$(echo $bash_result | cut -d'|' -f2)
 bash_max=$(echo $bash_result | cut -d'|' -f3)
 
-zsh_result=$(measure_shell "zsh" "zsh -l")
+zsh_result=$(measure_shell "zsh" "zsh -i -l")
 zsh_avg=$(echo $zsh_result | cut -d'|' -f1)
 zsh_min=$(echo $zsh_result | cut -d'|' -f2)
 zsh_max=$(echo $zsh_result | cut -d'|' -f3)
 
-fish_result=$(measure_shell "fish" "fish -l")
+fish_result=$(measure_shell "fish" "fish -i -l")
 fish_avg=$(echo $fish_result | cut -d'|' -f1)
 fish_min=$(echo $fish_result | cut -d'|' -f2)
 fish_max=$(echo $fish_result | cut -d'|' -f3)
