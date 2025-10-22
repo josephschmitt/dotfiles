@@ -118,10 +118,10 @@
     {
       "actions" : [
         {
-          "key" : "u",
-          "label" : "urbancompass",
+          "key" : "c",
+          "label" : "cli",
           "type" : "url",
-          "value" : "https://github.com/UrbanCompass/urbancompass"
+          "value" : "https://github.com/UrbanCompass/cli"
         },
         {
           "key" : "f",
@@ -136,10 +136,16 @@
           "value" : "https://github.com/UrbanCompass/uc-node-services"
         },
         {
-          "key" : "c",
-          "label" : "cli",
+          "key" : "u",
+          "label" : "urbancompass",
           "type" : "url",
-          "value" : "https://github.com/UrbanCompass/cli"
+          "value" : "https://github.com/UrbanCompass/urbancompass"
+        },
+        {
+          "key" : "C",
+          "label" : "@CopilotUsers",
+          "type" : "url",
+          "value" : "https://github.com/orgs/UrbanCompass/teams/copilot-users"
         },
         {
           "key" : "U",
