@@ -1,0 +1,186 @@
+name: Shell Startup Performance
+
+on:
+  pull_request:
+    paths:
+      - 'shared/.config/shell/**'
+      - 'shared/.config/fish/**'
+      - 'shared/.profile'
+      - 'shared/.zshrc'
+      - 'shared/.zshenv'
+      - 'shared/.zprofile'
+      - 'shared/.bashrc'
+      - 'shared/.bash_profile'
+      - 'personal/.config/shell/**'
+      - 'personal/.config/fish/**'
+      - 'work/.config/shell/**'
+      - 'work/.config/fish/**'
+      - 'ubuntu-server/.config/shell/**'
+      - 'ubuntu-server/.config/fish/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  measure-performance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bash zsh fish stow bc time
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Install PR dotfiles
+        run: |
+          # Install shared and ubuntu-server profiles
+          stow -v --target="$HOME" shared
+          stow -v --target="$HOME" ubuntu-server
+
+      - name: Measure PR startup times
+        run: |
+          chmod +x .github/scripts/measure-shell-startup.sh
+          .github/scripts/measure-shell-startup.sh 10 pr-times.json
+          cat pr-times.json
+
+      - name: Save PR results
+        run: |
+          cp pr-times.json /tmp/pr-times.json
+
+      - name: Uninstall PR dotfiles
+        run: |
+          stow -v --target="$HOME" -D shared
+          stow -v --target="$HOME" -D ubuntu-server
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Install base dotfiles
+        run: |
+          stow -v --target="$HOME" shared
+          stow -v --target="$HOME" ubuntu-server
+
+      - name: Measure base startup times
+        run: |
+          chmod +x .github/scripts/measure-shell-startup.sh
+          .github/scripts/measure-shell-startup.sh 10 base-times.json
+          cat base-times.json
+
+      - name: Compare and generate report
+        id: compare
+        run: |
+          # Read the JSON files
+          PR_BASH=$(jq -r '.bash.avg' /tmp/pr-times.json)
+          PR_ZSH=$(jq -r '.zsh.avg' /tmp/pr-times.json)
+          PR_FISH=$(jq -r '.fish.avg' /tmp/pr-times.json)
+
+          BASE_BASH=$(jq -r '.bash.avg' base-times.json)
+          BASE_ZSH=$(jq -r '.zsh.avg' base-times.json)
+          BASE_FISH=$(jq -r '.fish.avg' base-times.json)
+
+          # Calculate differences and percentages
+          BASH_DIFF=$(echo "$PR_BASH - $BASE_BASH" | bc)
+          BASH_PCT=$(echo "scale=1; ($BASH_DIFF / $BASE_BASH) * 100" | bc)
+
+          ZSH_DIFF=$(echo "$PR_ZSH - $BASE_ZSH" | bc)
+          ZSH_PCT=$(echo "scale=1; ($ZSH_DIFF / $BASE_ZSH) * 100" | bc)
+
+          FISH_DIFF=$(echo "$PR_FISH - $BASE_FISH" | bc)
+          FISH_PCT=$(echo "scale=1; ($FISH_DIFF / $BASE_FISH) * 100" | bc)
+
+          # Determine emoji based on performance change
+          get_emoji() {
+            local diff=$1
+            if (( $(echo "$diff < 0" | bc -l) )); then
+              echo "🚀" # Faster
+            elif (( $(echo "$diff > 5" | bc -l) )); then
+              echo "⚠️" # Slower by more than 5ms
+            else
+              echo "✅" # Roughly the same
+            fi
+          }
+
+          BASH_EMOJI=$(get_emoji "$BASH_DIFF")
+          ZSH_EMOJI=$(get_emoji "$ZSH_DIFF")
+          FISH_EMOJI=$(get_emoji "$FISH_DIFF")
+
+          # Format the comment
+          cat > comment.md <<EOF
+          ## Shell Startup Performance Report
+
+          | Shell | Base (ms) | PR (ms) | Diff (ms) | % Change | Status |
+          |-------|-----------|---------|-----------|----------|--------|
+          | Bash  | ${BASE_BASH} | ${PR_BASH} | ${BASH_DIFF} | ${BASH_PCT}% | ${BASH_EMOJI} |
+          | Zsh   | ${BASE_ZSH} | ${PR_ZSH} | ${ZSH_DIFF} | ${ZSH_PCT}% | ${ZSH_EMOJI} |
+          | Fish  | ${BASE_FISH} | ${PR_FISH} | ${FISH_DIFF} | ${FISH_PCT}% | ${FISH_EMOJI} |
+
+          ### Legend
+          - 🚀 Faster than base
+          - ✅ Similar performance (within 5ms)
+          - ⚠️ Slower by more than 5ms
+
+          <details>
+          <summary>Detailed Results</summary>
+
+          **Base Branch:**
+          \`\`\`json
+          $(cat base-times.json)
+          \`\`\`
+
+          **PR Branch:**
+          \`\`\`json
+          $(cat /tmp/pr-times.json)
+          \`\`\`
+
+          </details>
+
+          ---
+          *Measurements based on 10 iterations. Lower is better.*
+          EOF
+
+          # Save comment for next step
+          cat comment.md
+          echo "COMMENT_FILE=comment.md" >> $GITHUB_OUTPUT
+
+      - name: Post comment to PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('comment.md', 'utf8');
+
+            // Check if we already commented
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Shell Startup Performance Report')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
