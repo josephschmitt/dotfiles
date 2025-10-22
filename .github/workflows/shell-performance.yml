@@ -85,15 +85,26 @@ jobs:
           BASE_ZSH=$(jq -r '.zsh.avg' base-times.json)
           BASE_FISH=$(jq -r '.fish.avg' base-times.json)
 
+          # Helper function to calculate percentage, handling divide by zero
+          calc_percent() {
+            local diff=$1
+            local base=$2
+            if (( $(echo "$base == 0" | bc -l) )); then
+              echo "N/A"
+            else
+              echo "scale=1; ($diff / $base) * 100" | bc
+            fi
+          }
+
           # Calculate differences and percentages
           BASH_DIFF=$(echo "$PR_BASH - $BASE_BASH" | bc)
-          BASH_PCT=$(echo "scale=1; ($BASH_DIFF / $BASE_BASH) * 100" | bc)
+          BASH_PCT=$(calc_percent "$BASH_DIFF" "$BASE_BASH")
 
           ZSH_DIFF=$(echo "$PR_ZSH - $BASE_ZSH" | bc)
-          ZSH_PCT=$(echo "scale=1; ($ZSH_DIFF / $BASE_ZSH) * 100" | bc)
+          ZSH_PCT=$(calc_percent "$ZSH_DIFF" "$BASE_ZSH")
 
           FISH_DIFF=$(echo "$PR_FISH - $BASE_FISH" | bc)
-          FISH_PCT=$(echo "scale=1; ($FISH_DIFF / $BASE_FISH) * 100" | bc)
+          FISH_PCT=$(calc_percent "$FISH_DIFF" "$BASE_FISH")
 
           # Determine emoji based on performance change
           get_emoji() {
