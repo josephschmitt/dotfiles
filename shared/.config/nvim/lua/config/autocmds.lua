@@ -27,3 +27,18 @@ vim.api.nvim_create_autocmd("BufEnter", {
     vim.opt.conceallevel = 0
   end,
 })
+
+-- Show dashboard when all buffers are deleted
+vim.api.nvim_create_autocmd("BufDelete", {
+  callback = function()
+    vim.schedule(function()
+      local bufs = vim.fn.getbufinfo({ buflisted = 1 })
+      local real_bufs = vim.tbl_filter(function(buf)
+        return buf.name ~= ""
+      end, bufs)
+      if #real_bufs == 0 then
+        require("snacks").dashboard()
+      end
+    end)
+  end,
+})
