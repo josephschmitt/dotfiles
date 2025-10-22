@@ -44,7 +44,7 @@ jobs:
       - name: Measure PR startup times
         run: |
           chmod +x .github/scripts/measure-shell-startup.sh
-          .github/scripts/measure-shell-startup.sh 10 pr-times.json
+          .github/scripts/measure-shell-startup.sh 20 pr-times.json
           cat pr-times.json
 
       - name: Save PR results
@@ -70,20 +70,20 @@ jobs:
       - name: Measure base startup times
         run: |
           chmod +x .github/scripts/measure-shell-startup.sh
-          .github/scripts/measure-shell-startup.sh 10 base-times.json
+          .github/scripts/measure-shell-startup.sh 20 base-times.json
           cat base-times.json
 
       - name: Compare and generate report
         id: compare
         run: |
           # Read the JSON files
-          PR_BASH=$(jq -r '.bash.avg' /tmp/pr-times.json)
-          PR_ZSH=$(jq -r '.zsh.avg' /tmp/pr-times.json)
-          PR_FISH=$(jq -r '.fish.avg' /tmp/pr-times.json)
+          PR_BASH=$(jq -r '.bash.median' /tmp/pr-times.json)
+          PR_ZSH=$(jq -r '.zsh.median' /tmp/pr-times.json)
+          PR_FISH=$(jq -r '.fish.median' /tmp/pr-times.json)
 
-          BASE_BASH=$(jq -r '.bash.avg' base-times.json)
-          BASE_ZSH=$(jq -r '.zsh.avg' base-times.json)
-          BASE_FISH=$(jq -r '.fish.avg' base-times.json)
+          BASE_BASH=$(jq -r '.bash.median' base-times.json)
+          BASE_ZSH=$(jq -r '.zsh.median' base-times.json)
+          BASE_FISH=$(jq -r '.fish.median' base-times.json)
 
           # Helper function to calculate percentage, handling divide by zero
           calc_percent() {
@@ -153,7 +153,7 @@ jobs:
           </details>
 
           ---
-          *Measurements based on 10 iterations. Lower is better.*
+          *Median of 20 iterations after 3 warmup runs. Lower is better.*
           EOF
 
           # Save comment for next step

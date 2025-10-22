@@ -4,19 +4,24 @@
 
 set -e
 
-# Number of iterations for averaging
-ITERATIONS=${1:-10}
+# Number of iterations for median calculation
+ITERATIONS=${1:-20}
 OUTPUT_FILE=${2:-startup-times.json}
 
 # Function to measure shell startup time
 measure_shell() {
     local shell=$1
     local shell_cmd=$2
-    local total=0
     local times=()
 
-    echo "Measuring $shell startup time ($ITERATIONS iterations)..." >&2
+    echo "Measuring $shell startup time ($ITERATIONS iterations + 3 warmup)..." >&2
 
+    # Warmup runs to stabilize caches and avoid cold-start penalties
+    for i in $(seq 1 3); do
+        $shell_cmd -c "exit" >/dev/null 2>&1
+    done
+
+    # Actual measurements
     for i in $(seq 1 $ITERATIONS); do
         # Use GNU time format to get real time in milliseconds
         # The command just starts the shell and immediately exits
@@ -25,25 +30,28 @@ measure_shell() {
         # Convert to milliseconds (multiply by 1000)
         time_ms=$(echo "$result * 1000" | bc)
         times+=($time_ms)
-        total=$(echo "$total + $time_ms" | bc)
     done
 
-    # Calculate average
-    avg=$(echo "scale=2; $total / $ITERATIONS" | bc)
+    # Sort times for median calculation
+    IFS=$'\n' sorted_times=($(sort -n <<<"${times[*]}"))
+    unset IFS
+
+    # Calculate median (more robust against outliers than mean)
+    local count=${#sorted_times[@]}
+    if (( count % 2 == 0 )); then
+        local mid1=$(( count / 2 - 1 ))
+        local mid2=$(( count / 2 ))
+        median=$(echo "scale=2; (${sorted_times[$mid1]} + ${sorted_times[$mid2]}) / 2" | bc)
+    else
+        local mid=$(( count / 2 ))
+        median=${sorted_times[$mid]}
+    fi
 
     # Calculate min and max
-    min=${times[0]}
-    max=${times[0]}
-    for time in "${times[@]}"; do
-        if (( $(echo "$time < $min" | bc -l) )); then
-            min=$time
-        fi
-        if (( $(echo "$time > $max" | bc -l) )); then
-            max=$time
-        fi
-    done
+    min=${sorted_times[0]}
+    max=${sorted_times[$((count - 1))]}
 
-    echo "$avg|$min|$max"
+    echo "$median|$min|$max"
 }
 
 # Check if shells are available
@@ -56,17 +64,17 @@ echo "Starting shell performance measurements..." >&2
 echo "" >&2
 
 bash_result=$(measure_shell "bash" "bash -i -l")
-bash_avg=$(echo $bash_result | cut -d'|' -f1)
+bash_median=$(echo $bash_result | cut -d'|' -f1)
 bash_min=$(echo $bash_result | cut -d'|' -f2)
 bash_max=$(echo $bash_result | cut -d'|' -f3)
 
 zsh_result=$(measure_shell "zsh" "zsh -i -l")
-zsh_avg=$(echo $zsh_result | cut -d'|' -f1)
+zsh_median=$(echo $zsh_result | cut -d'|' -f1)
 zsh_min=$(echo $zsh_result | cut -d'|' -f2)
 zsh_max=$(echo $zsh_result | cut -d'|' -f3)
 
 fish_result=$(measure_shell "fish" "fish -i -l")
-fish_avg=$(echo $fish_result | cut -d'|' -f1)
+fish_median=$(echo $fish_result | cut -d'|' -f1)
 fish_min=$(echo $fish_result | cut -d'|' -f2)
 fish_max=$(echo $fish_result | cut -d'|' -f3)
 
@@ -74,17 +82,17 @@ fish_max=$(echo $fish_result | cut -d'|' -f3)
 cat > "$OUTPUT_FILE" <<EOF
 {
   "bash": {
-    "avg": $bash_avg,
+    "median": $bash_median,
     "min": $bash_min,
     "max": $bash_max
   },
   "zsh": {
-    "avg": $zsh_avg,
+    "median": $zsh_median,
     "min": $zsh_min,
     "max": $zsh_max
   },
   "fish": {
-    "avg": $fish_avg,
+    "median": $fish_median,
     "min": $fish_min,
     "max": $fish_max
   }
