@@ -29,7 +29,36 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y bash zsh fish stow bc time
+          sudo apt-get install -y bash zsh fish stow bc time curl unzip
+
+      - name: Install shell startup tools
+        run: |
+          # Install oh-my-posh (default prompt)
+          curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
+          
+          # Install starship (optional prompt)
+          curl -sS https://starship.rs/install.sh | sh -s -- -y
+          
+          # Install zoxide (smart directory jumping)
+          curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
+          sudo mv ~/.local/bin/zoxide /usr/local/bin/
+          
+          # Install fzf (fuzzy finder)
+          git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+          ~/.fzf/install --bin
+          sudo mv ~/.fzf/bin/fzf /usr/local/bin/
+          
+          # Install basher (bash package manager)
+          git clone --depth=1 https://github.com/basherpm/basher.git ~/.basher
+          echo 'export PATH="$HOME/.basher/bin:$PATH"' >> ~/.bashrc
+          export PATH="$HOME/.basher/bin:$PATH"
+          
+          # Verify installations
+          oh-my-posh version
+          starship --version
+          zoxide --version
+          fzf --version
+          basher version
 
       - name: Checkout PR branch
         uses: actions/checkout@v4
