@@ -58,7 +58,7 @@ jobs:
           starship --version
           zoxide --version
           fzf --version
-          basher version
+          basher help
 
       - name: Checkout PR branch
         uses: actions/checkout@v4
