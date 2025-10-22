@@ -11,10 +11,10 @@
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
     if vim.fn.argc() == 1 then
-      local arg0 = vim.fn.argv(0)
+      local arg0 = vim.fn.argv(0) --[[@as string]]
       if vim.fn.isdirectory(arg0) == 1 then
-        vim.cmd("cd " .. arg0)
-        vim.cmd("silent! 0") -- avoid trying to open the dir as a file
+        vim.cmd.cd(arg0)
+        vim.cmd("silent! 0")
       end
     end
   end,
