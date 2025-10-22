@@ -36,9 +36,8 @@ jobs:
 
       - name: Install PR dotfiles
         run: |
-          # Install shared and ubuntu-server profiles
-          stow -v --target="$HOME" shared
-          stow -v --target="$HOME" ubuntu-server
+          # Install shared and ubuntu-server profiles together to allow directory folding
+          stow -v --target="$HOME" shared ubuntu-server
 
       - name: Measure PR startup times
         run: |
@@ -52,8 +51,7 @@ jobs:
 
       - name: Uninstall PR dotfiles
         run: |
-          stow -v --target="$HOME" -D shared
-          stow -v --target="$HOME" -D ubuntu-server
+          stow -v --target="$HOME" -D shared ubuntu-server
 
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -62,8 +60,7 @@ jobs:
 
       - name: Install base dotfiles
         run: |
-          stow -v --target="$HOME" shared
-          stow -v --target="$HOME" ubuntu-server
+          stow -v --target="$HOME" shared ubuntu-server
 
       - name: Measure base startup times
         run: |
