@@ -48,6 +48,17 @@ fi
 # Zoxide smart directory jumping
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init bash)"
+  
+  # Override z with our custom version that triggers interactive on ambiguous queries
+  z() {
+    result_count=$(zoxide query --list -- "$@" 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$result_count" -gt 1 ]; then
+      result=$(zoxide query --interactive -- "$@")
+      [ -n "$result" ] && cd "$result"
+    else
+      __zoxide_z "$@"
+    fi
+  }
 fi
 
 # TWM shell completions (lazy-loaded)
