@@ -90,6 +90,39 @@ This is a personal dotfiles repository managed with GNU Stow. No build system - 
 6. **Future-proof**: Use approaches that can extend to Nushell if/when added
 7. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
 
+#### Shell Performance CI Workflow:
+**CRITICAL**: Keep the CI workflow (`.github/workflows/shell-performance.yml`) in sync with shell configurations.
+
+**When to Update the CI Workflow:**
+1. **Adding a new shell** → Add measurements for the new shell in the workflow and measurement script
+2. **Adding startup dependencies** → Install the tool in the "Install shell startup tools" step
+3. **Removing startup dependencies** → Remove from CI installation step
+4. **Changing shell initialization** → Verify CI flags match how shells are invoked (currently `-i -l`)
+
+**Startup Dependencies to Track:**
+These tools run on every shell startup and must be installed in CI for realistic measurements:
+- **oh-my-posh** - Default prompt (runs `oh-my-posh init` on startup)
+- **starship** - Optional prompt (runs `starship init` on startup if `USE_STARSHIP` is set)
+- **zoxide** - Smart directory jumping (runs `zoxide init` on startup)
+- **fzf** - Fuzzy finder (lazy-loaded but affects startup time)
+- **basher** - Bash package manager (lazy-loaded, but needs to be available)
+- **zinit** (zsh only) - Plugin manager (auto-installs on first run)
+
+**Adding a New Startup Dependency:**
+1. Add the tool to shell configs (`.bashrc`, `.zshrc`, `config.fish`)
+2. Update `.github/workflows/shell-performance.yml` "Install shell startup tools" step:
+   ```yaml
+   # Install new-tool (description of what it does)
+   curl -sS https://install-url.sh | bash
+   sudo mv ~/.local/bin/new-tool /usr/local/bin/
+   new-tool --version  # Verify installation
+   ```
+3. Test that CI can install and use the tool
+4. Document in this section of AGENTS.md
+
+**Why This Matters:**
+The CI measures shell startup performance to catch regressions. If a tool runs on startup but isn't installed in CI, the measurements will be unrealistic and optimizations (like lazy-loading) won't be properly validated.
+
 ### Shell Scripts
 - Use `#!/bin/sh` for POSIX compatibility
 - Set `set -x` for debugging when needed
