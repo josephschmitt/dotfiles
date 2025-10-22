@@ -31,11 +31,6 @@ if status is-interactive
     # Suppress the default fish greeting
     set fish_greeting
 
-    # Package managers
-    if type -q basher
-        . (basher init - fish | psub)
-    end
-
     # Vi-mode configuration
     fish_vi_key_bindings
 
