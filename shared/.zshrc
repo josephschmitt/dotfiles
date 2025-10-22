@@ -50,9 +50,11 @@ if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
   
   # Override z with our custom version that triggers interactive on ambiguous queries
+  # Set ZOXIDE_INTERACTIVE_THRESHOLD to control minimum matches needed (default: 2)
   z() {
+    threshold="${ZOXIDE_INTERACTIVE_THRESHOLD:-2}"
     result_count=$(zoxide query --list -- "$@" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$result_count" -gt 1 ]; then
+    if [ "$result_count" -ge "$threshold" ]; then
       result=$(zoxide query --interactive -- "$@")
       [ -n "$result" ] && cd "$result"
     else
