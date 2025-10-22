@@ -21,20 +21,24 @@ vim.opt.guicursor = {
 -- Split border characters
 vim.opt.fillchars:append({ vert = "│", horiz = "─", horizup = "┴", horizdown = "┬" })
 
--- Make split borders visible with bright blue color
-local function set_winseparator_hl()
+-- Show vertical line at 100 characters
+vim.opt.colorcolumn = "100"
+
+-- Make split borders and colorcolumn visible with theme colors
+local function set_custom_highlights()
   vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#7aa2f7", bg = "NONE", bold = true })
+  vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#292e42" })
 end
 
 -- Apply after colorscheme changes
 vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = set_winseparator_hl,
+  callback = set_custom_highlights,
 })
 
 -- Apply after LazyVim loads (with delay to override theme defaults)
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
-    vim.defer_fn(set_winseparator_hl, 100)
+    vim.defer_fn(set_custom_highlights, 100)
   end,
 })
 
