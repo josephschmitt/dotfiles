@@ -36,6 +36,8 @@ jobs:
 
       - name: Install PR dotfiles
         run: |
+          # Remove default shell configs to avoid conflicts with stow
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
           # Install shared and ubuntu-server profiles together to allow directory folding
           stow -v --target="$HOME" shared ubuntu-server
 
@@ -60,6 +62,9 @@ jobs:
 
       - name: Install base dotfiles
         run: |
+          # Remove default shell configs to avoid conflicts with stow
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          # Install shared and ubuntu-server profiles together to allow directory folding
           stow -v --target="$HOME" shared ubuntu-server
 
       - name: Measure base startup times
