@@ -17,6 +17,25 @@ on:
       - 'work/.config/fish/**'
       - 'ubuntu-server/.config/shell/**'
       - 'ubuntu-server/.config/fish/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'shared/.config/shell/**'
+      - 'shared/.config/fish/**'
+      - 'shared/.profile'
+      - 'shared/.zshrc'
+      - 'shared/.zshenv'
+      - 'shared/.zprofile'
+      - 'shared/.bashrc'
+      - 'shared/.bash_profile'
+      - 'personal/.config/shell/**'
+      - 'personal/.config/fish/**'
+      - 'work/.config/shell/**'
+      - 'work/.config/fish/**'
+      - 'ubuntu-server/.config/shell/**'
+      - 'ubuntu-server/.config/fish/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -29,7 +48,7 @@ jobs:
       OS_NAME: Ubuntu
       PROFILES: shared ubuntu-server
     steps:
-      - name: Checkout PR branch
+      - name: Checkout current branch
         uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -40,7 +59,7 @@ jobs:
       - name: Install shell startup tools
         run: .github/scripts/install-startup-tools.sh
 
-      - name: Install PR dotfiles
+      - name: Install current dotfiles
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
           stow -v --target="$HOME" ${{ env.PROFILES }}
@@ -48,49 +67,72 @@ jobs:
       - name: Create test .env file
         run: .github/scripts/create-test-env.sh
 
-      - name: Measure PR startup times
+      - name: Measure current startup times
         run: |
-          .github/scripts/measure-shell-startup.sh 20 pr-times.json
-          cat pr-times.json
+          .github/scripts/measure-shell-startup.sh 20 current-times.json
+          cat current-times.json
 
-      - name: Save PR results
-        run: cp pr-times.json /tmp/pr-times.json
+      - name: Save current results
+        run: cp current-times.json /tmp/current-times.json
 
-      - name: Uninstall PR dotfiles
+      - name: Uninstall current dotfiles
         run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
 
       - name: Checkout base branch
+        if: github.event_name == 'pull_request'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
 
+      - name: Checkout previous commit
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.before }}
+
       - name: Install base dotfiles
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: .github/scripts/create-test-env.sh
 
       - name: Measure base startup times
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           .github/scripts/measure-shell-startup.sh 20 base-times.json
           cat base-times.json
 
       - name: Generate performance report
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           .github/scripts/generate-performance-report.sh \
             "${{ env.OS_NAME }}" \
             "${{ env.PROFILES }}" \
-            /tmp/pr-times.json \
+            /tmp/current-times.json \
             base-times.json \
             comment.md
           cat comment.md
 
       - name: Post comment to PR
+        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: .github/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
+
+      - name: Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-performance-results
+          path: |
+            current-times.json
+            base-times.json
+            comment.md
+          retention-days: 30
 
   macos-performance:
     runs-on: macos-14
@@ -98,7 +140,7 @@ jobs:
       OS_NAME: macOS
       PROFILES: shared personal
     steps:
-      - name: Checkout PR branch
+      - name: Checkout current branch
         uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -107,7 +149,7 @@ jobs:
       - name: Install shell startup tools
         run: .github/scripts/install-startup-tools.sh
 
-      - name: Install PR dotfiles
+      - name: Install current dotfiles
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
           stow -v --target="$HOME" ${{ env.PROFILES }}
@@ -115,46 +157,69 @@ jobs:
       - name: Create test .env file
         run: .github/scripts/create-test-env.sh
 
-      - name: Measure PR startup times
+      - name: Measure current startup times
         run: |
-          .github/scripts/measure-shell-startup.sh 20 pr-times.json
-          cat pr-times.json
+          .github/scripts/measure-shell-startup.sh 20 current-times.json
+          cat current-times.json
 
-      - name: Save PR results
-        run: cp pr-times.json /tmp/pr-times.json
+      - name: Save current results
+        run: cp current-times.json /tmp/current-times.json
 
-      - name: Uninstall PR dotfiles
+      - name: Uninstall current dotfiles
         run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
 
       - name: Checkout base branch
+        if: github.event_name == 'pull_request'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
 
+      - name: Checkout previous commit
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.before }}
+
       - name: Install base dotfiles
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: .github/scripts/create-test-env.sh
 
       - name: Measure base startup times
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           .github/scripts/measure-shell-startup.sh 20 base-times.json
           cat base-times.json
 
       - name: Generate performance report
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
           .github/scripts/generate-performance-report.sh \
             "${{ env.OS_NAME }}" \
             "${{ env.PROFILES }}" \
-            /tmp/pr-times.json \
+            /tmp/current-times.json \
             base-times.json \
             comment.md
           cat comment.md
 
       - name: Post comment to PR
+        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: .github/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
+
+      - name: Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-performance-results
+          path: |
+            current-times.json
+            base-times.json
+            comment.md
+          retention-days: 30
