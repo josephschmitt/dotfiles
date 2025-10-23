@@ -2,7 +2,6 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 local map = vim.keymap.set
-local utils = require("config.utils")
 
 -- Undo/redo
 map({ "n", "v" }, "U", "<C-r>", { desc = "Redo" })
@@ -51,6 +50,3 @@ map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
 
 -- Buffers
 map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
-
--- Convert shell syntax
-map({ "v", "V" }, "<leader>cs", utils.convert_shell_syntax, { desc = "Convert shell syntax (POSIX ↔ Fish)" })
