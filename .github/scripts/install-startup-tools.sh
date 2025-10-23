@@ -9,6 +9,16 @@ export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
 
 echo "Installing shell startup tools..."
 
+# Install fish shell (primary shell being tested)
+echo "Installing fish..."
+if [ "$RUNNER_OS" = "macOS" ]; then
+  brew install fish
+else
+  sudo apt-add-repository ppa:fish-shell/release-3
+  sudo apt update
+  sudo apt install -y fish
+fi
+
 # Install oh-my-posh (default prompt)
 echo "Installing oh-my-posh..."
 curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
@@ -55,6 +65,7 @@ mkdir -p "$HOME/bin"
 # Verify installations
 echo ""
 echo "Verifying installations..."
+fish --version
 oh-my-posh version
 starship --version
 zoxide --version
