@@ -41,7 +41,7 @@ else
 end
 set -gx PATH $_asdf_shims $PATH
 
-set -gx PNPM_HOME /Users/josephschmitt/Library/pnpm
+set -gx PNPM_HOME $HOME/Library/pnpm
 if not string match -q -- $PNPM_HOME $PATH
     set -gx PATH "$PNPM_HOME" $PATH
 end
@@ -53,4 +53,4 @@ setenv ZIDE_ALWAYS_NAME true
 setenv ZIDE_USE_YAZI_CONFIG false
 setenv ZIDE_USE_FOCUS_PLUGIN true
 
-set -gx PATH $PATH /Users/josephschmitt/.lmstudio/bin
+set -gx PATH $PATH $HOME/.lmstudio/bin
