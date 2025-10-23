@@ -78,5 +78,5 @@ if [ "$TERM_PROGRAM" = "ghostty" ]; then
 fi
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/josephschmitt/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
