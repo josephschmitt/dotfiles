@@ -23,92 +23,41 @@ permissions:
   pull-requests: write
 
 jobs:
-  measure-performance:
+  ubuntu-performance:
     runs-on: ubuntu-latest
+    env:
+      OS_NAME: Ubuntu
+      PROFILES: shared ubuntu-server
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bash zsh fish stow bc time curl unzip
-
-      - name: Install shell startup tools
-        run: |
-          # Install oh-my-posh (default prompt)
-          curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
-          
-          # Install starship (optional prompt)
-          curl -sS https://starship.rs/install.sh | sh -s -- -y
-          
-          # Install zoxide (smart directory jumping)
-          curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-          sudo mv ~/.local/bin/zoxide /usr/local/bin/
-          
-          # Install fzf (fuzzy finder)
-          git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-          ~/.fzf/install --bin
-          sudo mv ~/.fzf/bin/fzf /usr/local/bin/
-          
-          # Install basher (bash package manager)
-          git clone --depth=1 https://github.com/basherpm/basher.git ~/.basher
-          echo 'export PATH="$HOME/.basher/bin:$PATH"' >> ~/.bashrc
-          export PATH="$HOME/.basher/bin:$PATH"
-          
-          # Verify installations
-          oh-my-posh version
-          starship --version
-          zoxide --version
-          fzf --version
-          basher help
-
       - name: Checkout PR branch
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bash zsh fish stow bc time curl unzip jq
+
+      - name: Install shell startup tools
+        run: .github/scripts/install-startup-tools.sh
+
       - name: Install PR dotfiles
         run: |
-          # Remove default shell configs to avoid conflicts with stow
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
-          # Install shared and ubuntu-server profiles together to allow directory folding
-          stow -v --target="$HOME" shared ubuntu-server
+          stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
-        run: |
-          # Create fake .env for performance testing of .env parsing
-          cat > "$HOME/.env" <<'EOF'
-          # Fake environment variables for CI performance testing
-          # This file is used to test .env parsing performance in shell startup
-
-          # Development environment
-          NODE_ENV=development
-          DEBUG=true
-          LOG_LEVEL=info
-
-          # API keys (fake values for testing)
-          GITHUB_TOKEN=ghp_1234567890abcdefghijklmnopqrstuvwxyz
-          OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890
-          ANTHROPIC_API_KEY=sk-ant-api03-1234567890abcdefghijklmnopqrstuvwxyz
-
-          # Editor and tool configuration
-          EDITOR=nvim
-          VISUAL=nvim
-          PAGER=less
-
-          # Shell configuration
-          SHELL_PERFORMANCE_TEST=enabled
-          EOF
+        run: .github/scripts/create-test-env.sh
 
       - name: Measure PR startup times
         run: |
-          chmod +x .github/scripts/measure-shell-startup.sh
           .github/scripts/measure-shell-startup.sh 20 pr-times.json
           cat pr-times.json
 
       - name: Save PR results
-        run: |
-          cp pr-times.json /tmp/pr-times.json
+        run: cp pr-times.json /tmp/pr-times.json
 
       - name: Uninstall PR dotfiles
-        run: |
-          stow -v --target="$HOME" -D shared ubuntu-server
+        run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
 
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -117,164 +66,95 @@ jobs:
 
       - name: Install base dotfiles
         run: |
-          # Remove default shell configs to avoid conflicts with stow
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
-          # Install shared and ubuntu-server profiles together to allow directory folding
-          stow -v --target="$HOME" shared ubuntu-server
+          stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
-        run: |
-          # Create fake .env for performance testing of .env parsing
-          cat > "$HOME/.env" <<'EOF'
-          # Fake environment variables for CI performance testing
-          # This file is used to test .env parsing performance in shell startup
-
-          # Development environment
-          NODE_ENV=development
-          DEBUG=true
-          LOG_LEVEL=info
-
-          # API keys (fake values for testing)
-          GITHUB_TOKEN=ghp_1234567890abcdefghijklmnopqrstuvwxyz
-          OPENAI_API_KEY=sk-proj-abcdefghijklmnopqrstuvwxyz1234567890
-          ANTHROPIC_API_KEY=sk-ant-api03-1234567890abcdefghijklmnopqrstuvwxyz
-
-          # Editor and tool configuration
-          EDITOR=nvim
-          VISUAL=nvim
-          PAGER=less
-
-          # Shell configuration
-          SHELL_PERFORMANCE_TEST=enabled
-          EOF
+        run: .github/scripts/create-test-env.sh
 
       - name: Measure base startup times
         run: |
-          chmod +x .github/scripts/measure-shell-startup.sh
           .github/scripts/measure-shell-startup.sh 20 base-times.json
           cat base-times.json
 
-      - name: Compare and generate report
-        id: compare
+      - name: Generate performance report
         run: |
-          # Read the JSON files
-          PR_BASH=$(jq -r '.bash.median' /tmp/pr-times.json)
-          PR_ZSH=$(jq -r '.zsh.median' /tmp/pr-times.json)
-          PR_FISH=$(jq -r '.fish.median' /tmp/pr-times.json)
-
-          BASE_BASH=$(jq -r '.bash.median' base-times.json)
-          BASE_ZSH=$(jq -r '.zsh.median' base-times.json)
-          BASE_FISH=$(jq -r '.fish.median' base-times.json)
-
-          # Helper function to calculate percentage, handling divide by zero
-          calc_percent() {
-            local diff=$1
-            local base=$2
-            if (( $(echo "$base == 0" | bc -l) )); then
-              echo "N/A"
-            else
-              echo "scale=1; ($diff / $base) * 100" | bc
-            fi
-          }
-
-          # Calculate differences and percentages
-          BASH_DIFF=$(echo "$PR_BASH - $BASE_BASH" | bc)
-          BASH_PCT=$(calc_percent "$BASH_DIFF" "$BASE_BASH")
-
-          ZSH_DIFF=$(echo "$PR_ZSH - $BASE_ZSH" | bc)
-          ZSH_PCT=$(calc_percent "$ZSH_DIFF" "$BASE_ZSH")
-
-          FISH_DIFF=$(echo "$PR_FISH - $BASE_FISH" | bc)
-          FISH_PCT=$(calc_percent "$FISH_DIFF" "$BASE_FISH")
-
-          # Determine emoji based on performance change
-          get_emoji() {
-            local diff=$1
-            if (( $(echo "$diff < 0" | bc -l) )); then
-              echo "🚀" # Faster
-            elif (( $(echo "$diff > 5" | bc -l) )); then
-              echo "⚠️" # Slower by more than 5ms
-            else
-              echo "✅" # Roughly the same
-            fi
-          }
-
-          BASH_EMOJI=$(get_emoji "$BASH_DIFF")
-          ZSH_EMOJI=$(get_emoji "$ZSH_DIFF")
-          FISH_EMOJI=$(get_emoji "$FISH_DIFF")
-
-          # Format the comment
-          cat > comment.md <<EOF
-          ## Shell Startup Performance Report
-
-          | Shell | Base (ms) | PR (ms) | Diff (ms) | % Change | Status |
-          |-------|-----------|---------|-----------|----------|--------|
-          | Bash  | ${BASE_BASH} | ${PR_BASH} | ${BASH_DIFF} | ${BASH_PCT}% | ${BASH_EMOJI} |
-          | Zsh   | ${BASE_ZSH} | ${PR_ZSH} | ${ZSH_DIFF} | ${ZSH_PCT}% | ${ZSH_EMOJI} |
-          | Fish  | ${BASE_FISH} | ${PR_FISH} | ${FISH_DIFF} | ${FISH_PCT}% | ${FISH_EMOJI} |
-
-          ### Legend
-          - 🚀 Faster than base
-          - ✅ Similar performance (within 5ms)
-          - ⚠️ Slower by more than 5ms
-
-          <details>
-          <summary>Detailed Results</summary>
-
-          **Base Branch:**
-          \`\`\`json
-          $(cat base-times.json)
-          \`\`\`
-
-          **PR Branch:**
-          \`\`\`json
-          $(cat /tmp/pr-times.json)
-          \`\`\`
-
-          </details>
-
-          ---
-          *Median of 20 iterations after 3 warmup runs. Lower is better.*
-          EOF
-
-          # Save comment for next step
+          .github/scripts/generate-performance-report.sh \
+            "${{ env.OS_NAME }}" \
+            "${{ env.PROFILES }}" \
+            /tmp/pr-times.json \
+            base-times.json \
+            comment.md
           cat comment.md
-          echo "COMMENT_FILE=comment.md" >> $GITHUB_OUTPUT
 
       - name: Post comment to PR
-        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
+
+  macos-performance:
+    runs-on: macos-14
+    env:
+      OS_NAME: macOS
+      PROFILES: shared personal
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install stow bc jq
+
+      - name: Install shell startup tools
+        run: .github/scripts/install-startup-tools.sh
+
+      - name: Install PR dotfiles
+        run: |
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          stow -v --target="$HOME" ${{ env.PROFILES }}
+
+      - name: Create test .env file
+        run: .github/scripts/create-test-env.sh
+
+      - name: Measure PR startup times
+        run: |
+          .github/scripts/measure-shell-startup.sh 20 pr-times.json
+          cat pr-times.json
+
+      - name: Save PR results
+        run: cp pr-times.json /tmp/pr-times.json
+
+      - name: Uninstall PR dotfiles
+        run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const comment = fs.readFileSync('comment.md', 'utf8');
+          ref: ${{ github.base_ref }}
 
-            // Check if we already commented
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
+      - name: Install base dotfiles
+        run: |
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          stow -v --target="$HOME" ${{ env.PROFILES }}
 
-            const botComment = comments.find(comment =>
-              comment.user.type === 'Bot' &&
-              comment.body.includes('Shell Startup Performance Report')
-            );
+      - name: Create test .env file
+        run: .github/scripts/create-test-env.sh
 
-            if (botComment) {
-              // Update existing comment
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: comment
-              });
-            } else {
-              // Create new comment
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: comment
-              });
-            }
+      - name: Measure base startup times
+        run: |
+          .github/scripts/measure-shell-startup.sh 20 base-times.json
+          cat base-times.json
+
+      - name: Generate performance report
+        run: |
+          .github/scripts/generate-performance-report.sh \
+            "${{ env.OS_NAME }}" \
+            "${{ env.PROFILES }}" \
+            /tmp/pr-times.json \
+            base-times.json \
+            comment.md
+          cat comment.md
+
+      - name: Post comment to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
