@@ -2,7 +2,7 @@
 # This file should contain only environment variable exports
 
 # Use starship for the custom prompt instead of OMP
-export USE_STARSHIP="true"
+# export USE_STARSHIP="true"
 
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="$HOME/.config"
