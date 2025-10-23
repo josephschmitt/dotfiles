@@ -1,15 +1,8 @@
 # Starship configuration matching oh-my-posh custom theme
 # Based on Catppuccin color palette
 
-# Define custom palette (matching oh-my-posh)
-palette = "catppuccin_custom"
-
-[palettes.catppuccin_custom]
-blue = "#8CAAEE"
-lavender = "#BABBF1"
-gray = "#ACB0BE"
-pink = "#F4B8E4"
-red = "#E78284"
+# Add space at the end of prompt
+add_newline = true
 
 # Format: Two-line prompt matching oh-my-posh layout
 # Line 1: OS + Shell + SSH + Path + Git + Status
@@ -28,8 +21,15 @@ $line_break\
 $character\
 """
 
-# Add space at the end of prompt
-add_newline = true
+# Define custom palette (matching oh-my-posh)
+palette = "catppuccin_custom"
+
+[palettes.catppuccin_custom]
+blue = "#8CAAEE"
+lavender = "#BABBF1"
+gray = "#ACB0BE"
+pink = "#F4B8E4"
+red = "#E78284"
 
 # OS icon (matching oh-my-posh os module)
 [os]
@@ -115,8 +115,7 @@ not_found_symbol = "[󰈆](red)"
 sigint_symbol = "[󰈆](red)"
 signal_symbol = "[󰈆](red)"
 
-[status.pipestatus_format]
-disabled = false
+pipestatus_format = "$pipestatus"
 
 # Prompt character (matching oh-my-posh prompt arrow)
 [character]
@@ -153,12 +152,4 @@ disabled = true
 [kubernetes]
 disabled = true
 
-# Transient prompt profile (for zsh/PowerShell/other shells)
-# Simplifies previous prompts to just the character after command execution
-[profiles.transient]
-format = "$character"
-add_newline = false
 
-[profiles.transient.character]
-success_symbol = "[](gray)"
-error_symbol = "[](red)"
