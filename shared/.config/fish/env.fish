@@ -32,27 +32,26 @@ end
 
 # PATH configuration - prepend directories in reverse priority order
 # (later entries take precedence)
-set -l path_prepends \
-    "$HOME/.nix-profile/bin" \
-    /run/current-system/sw/bin \
-    /nix/var/nix/profiles/default/bin \
-    /opt/homebrew/bin \
-    "$HOME/.bun/bin" \
-    "$HOME/.cargo/bin" \
-    "$VOLTA_HOME/bin" \
-    "$HOME/bin" \
-    "$HOME/go/bin" \
-    "$HOME/.local/bin" \
-    "$HOME/development/zide/bin" \
-    "$HOME/development/zj/bin" \
-    $_asdf_shims \
+set -l path_prepends (
+    "$HOME/.nix-profile/bin"
+    /run/current-system/sw/bin
+    /nix/var/nix/profiles/default/bin
+    /opt/homebrew/bin
+    "$HOME/.bun/bin"
+    "$HOME/.cargo/bin"
+    "$VOLTA_HOME/bin"
+    "$HOME/bin"
+    "$HOME/go/bin"
+    "$HOME/.local/bin"
+    "$HOME/development/zide/bin"
+    "$HOME/development/zj/bin"
+    $_asdf_shims
     $PNPM_HOME
+    $HOME/.lmstudio/bin
+)
 
 # Apply all path additions in one operation
 set -gx PATH $path_prepends $PATH
-
-# Append LM Studio to the end of PATH
-set -gx PATH $PATH $HOME/.lmstudio/bin
 
 setenv ZELLIJ_CONFIG_DIR "$HOME/.config/zellij"
 setenv ZIDE_DEFAULT_LAYOUT compact_lazygit_focus
