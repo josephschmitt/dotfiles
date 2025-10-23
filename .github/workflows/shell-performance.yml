@@ -72,6 +72,20 @@ jobs:
           .github/scripts/measure-shell-startup.sh 20 current-times.json
           cat current-times.json
 
+      - name: Add current times to workflow summary
+        run: |
+          echo "## Shell Startup Performance (${{ env.OS_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bash  | $(jq -r '.bash.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Zsh   | $(jq -r '.zsh.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fish  | $(jq -r '.fish.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Profiles tested:** \`${{ env.PROFILES }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Median of 20 iterations after 3 warmup runs. Lower is better.*" >> $GITHUB_STEP_SUMMARY
+
       - name: Save current results
         run: cp current-times.json /tmp/current-times.json
 
@@ -116,6 +130,10 @@ jobs:
             base-times.json \
             comment.md
           cat comment.md
+
+      - name: Add performance report to workflow summary
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        run: cat comment.md >> $GITHUB_STEP_SUMMARY
 
       - name: Post comment to PR
         if: github.event_name == 'pull_request'
@@ -162,6 +180,20 @@ jobs:
           .github/scripts/measure-shell-startup.sh 20 current-times.json
           cat current-times.json
 
+      - name: Add current times to workflow summary
+        run: |
+          echo "## Shell Startup Performance (${{ env.OS_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bash  | $(jq -r '.bash.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Zsh   | $(jq -r '.zsh.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fish  | $(jq -r '.fish.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Profiles tested:** \`${{ env.PROFILES }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Median of 20 iterations after 3 warmup runs. Lower is better.*" >> $GITHUB_STEP_SUMMARY
+
       - name: Save current results
         run: cp current-times.json /tmp/current-times.json
 
@@ -206,6 +238,10 @@ jobs:
             base-times.json \
             comment.md
           cat comment.md
+
+      - name: Add performance report to workflow summary
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        run: cat comment.md >> $GITHUB_STEP_SUMMARY
 
       - name: Post comment to PR
         if: github.event_name == 'pull_request'
