@@ -61,7 +61,7 @@ jobs:
 
       - name: Install current dotfiles
         run: |
-          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
@@ -107,7 +107,7 @@ jobs:
       - name: Install base dotfiles
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
-          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
@@ -169,7 +169,7 @@ jobs:
 
       - name: Install current dotfiles
         run: |
-          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
@@ -215,7 +215,7 @@ jobs:
       - name: Install base dotfiles
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
-          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile"
+          rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
