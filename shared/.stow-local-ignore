@@ -21,5 +21,6 @@ _darcs
 ^/README.*
 ^/LICENSE.*
 ^/COPYING
+^/AGENTS\.md
 
 node_modules
