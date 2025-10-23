@@ -42,6 +42,16 @@ git clone --depth=1 https://github.com/basherpm/basher.git ~/.basher
 echo 'export PATH="$HOME/.basher/bin:$PATH"' >> ~/.bashrc
 export PATH="$HOME/.basher/bin:$PATH"
 
+# Pre-create directories that need to be merged across stow packages
+# This forces stow to symlink individual files/subdirs instead of the entire directory
+echo ""
+echo "Pre-creating directories for stow package merging..."
+mkdir -p "$HOME/.config/fish"
+mkdir -p "$HOME/.config/shell"
+mkdir -p "$HOME/.config/nix"
+mkdir -p "$HOME/.config/nix-darwin"
+mkdir -p "$HOME/bin"
+
 # Verify installations
 echo ""
 echo "Verifying installations..."
