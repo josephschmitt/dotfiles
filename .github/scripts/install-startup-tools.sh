@@ -4,6 +4,9 @@
 
 set -e
 
+# Add user local bin directories to PATH for tool installations
+export PATH="$HOME/.local/bin:$HOME/.fzf/bin:$PATH"
+
 echo "Installing shell startup tools..."
 
 # Install oh-my-posh (default prompt)
