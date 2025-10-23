@@ -106,6 +106,7 @@ zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
 zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
+zinit ice wait lucid
 zinit light zsh-users/zsh-completions
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
@@ -120,10 +121,11 @@ zinit snippet OMZP::command-not-found
 
 # Load completions with daily caching
 autoload -Uz compinit
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-  compinit
+typeset -g ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -n $ZCOMPDUMP(#qN.mh+24) ]]; then
+  compinit -d "$ZCOMPDUMP"
 else
-  compinit -C
+  compinit -C -d "$ZCOMPDUMP"
 fi
 
 # Replay all cached completions
