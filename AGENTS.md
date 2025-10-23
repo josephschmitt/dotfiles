@@ -1,341 +1,154 @@
 # Agent Guidelines for Dotfiles Repository
 
-## Repository Overview
-This is a personal dotfiles repository managed with GNU Stow. No build system - use `stow .` to install configs.
+## Critical Context
+- **Repository Type**: Personal dotfiles managed with GNU Stow
+- **No Build System**: Configuration files only, no tests/linting
+- **Platforms**: macOS (primary), Ubuntu Server (secondary)
+- **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
+- **Editors**: Neovim (LazyVim primary) + Helix (secondary)
+- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `ubuntu-server/` (Ubuntu)
 
-## Environment Context
-- Platform: macOS (primary), Ubuntu Server (secondary)
-- Shells: Fish (primary), Zsh (secondary), Bash (fallback)
-- Editor: Neovim (LazyVim) + Helix as secondary
-- Package Manager: GNU Stow
-- Profiles: shared (all machines), personal (macOS personal), work (macOS work), ubuntu-server (Ubuntu servers)
-- No tests/linting - configuration files only
+### Stow Commands
+```bash
+stow .                        # Install all
+stow shared personal          # Install specific profiles (macOS)
+stow shared ubuntu-server     # Install specific profiles (Ubuntu)
+stow -R .                     # Restow (re-link)
+stow -D .                     # Uninstall
+```
 
-## Key Commands
-- **Install all**: `stow .` (from repo root)
-- **Install profiles**: `stow shared personal` (macOS), `stow shared ubuntu-server` (Ubuntu)
-- **Uninstall**: `stow -D .` or `stow -D shared personal`
-- **Restow**: `stow -R .` or `stow -R shared personal`
+## Shell Configuration Architecture
 
-## Code Style Guidelines
+### CRITICAL RULE: Zero Duplication
+**Define once, source everywhere.** Changes must work across ALL shells: Bash, Zsh, Fish.
 
-### Shell Configuration Philosophy
+### Shell Configuration Map
+| File | Purpose | Sources |
+|------|---------|---------|
+| `.profile` | POSIX environment (PATH, exports) | - |
+| `.config/shell/exports.sh` | Shared environment variables | - |
+| `.config/shell/aliases.sh` | Shared aliases (POSIX) | - |
+| `.config/shell/functions.sh` | Shared functions (POSIX) | - |
+| `.bash_profile` | Bash login shell | `.profile`, `.bashrc` |
+| `.bashrc` | Bash interactive | `shell/{exports,aliases,functions}.sh` |
+| `.zshenv` | Zsh environment | `.profile` |
+| `.zshrc` | Zsh interactive | `shell/{exports,aliases,functions}.sh` |
+| `fish/config.fish` | Fish (self-contained) | Fish-specific equivalents |
 
-**CRITICAL**: This repository follows a strict shell configuration organization. Always maintain this structure:
+### Decision Tree for Configuration Changes
+```
+New configuration needed?
+├─ Environment variable → `.config/shell/exports.sh` + Fish equivalent
+├─ Alias/Function → Is it profile-specific?
+│  ├─ YES → `{profile}/.config/shell/aliases.{profile}.sh` + Fish equivalent
+│  └─ NO → `.config/shell/aliases.sh` + Fish equivalent
+└─ Interactive feature → Shell-specific rc file only
+```
 
-#### File Purposes (DO NOT DEVIATE):
-- **`.profile`** - POSIX environment setup (PATH, exports) for all shells
-- **`.zshenv`** - Sources `.profile`, minimal Zsh environment
-- **`.zshrc`** - Zsh interactive configuration (plugins, completions, prompt)
-- **`.zprofile`** - Minimal macOS Terminal.app compatibility only
-- **`.bash_profile`** - Sources `.profile` + `.bashrc` for Bash login shells
-- **`.bashrc`** - Bash interactive configuration
-- **`fish/config.fish`** - Self-contained Fish configuration (Fish doesn't follow POSIX)
+### Multi-Shell Requirements (NON-NEGOTIABLE)
+**Task incomplete until implemented in ALL shells: Bash, Zsh, Fish**
 
-#### Shared Configuration Modules:
-- **`.config/shell/exports.sh`** - Environment variables for POSIX shells
-- **`.config/shell/aliases.sh`** - Shared aliases (bash/zsh compatible)
-- **`.config/shell/functions.sh`** - Shared functions (bash/zsh compatible)
+1. Add to POSIX shells: `.config/shell/*.sh`
+2. Add Fish equivalent: `.config/fish/config.fish` or `functions/*.fish`
+3. Test in all three shells
+4. Document shell-specific workarounds if needed
 
-#### Rules:
-1. **NO DUPLICATION**: Environment variables, aliases, and functions should be defined once in shared modules
-2. **PROPER SOURCING**: Each shell file should only source appropriate shared modules
-3. **Shell-specific only**: Only put shell-specific features in shell-specific files
-4. **macOS compatibility**: Handle Terminal.app's login shell behavior correctly
-5. **POSIX compliance**: Shared modules must work across bash/zsh
+### CI Performance Tracking
+**When modifying shell startup:** Update `.github/workflows/shell-performance.yml`
 
-#### When modifying shell configs:
-- Environment variables → `.config/shell/exports.sh`
-- Aliases → `.config/shell/aliases.sh` (or shell-specific if needed)
-- Functions → `.config/shell/functions.sh` (or shell-specific if needed)
-- Interactive features → appropriate shell's rc file
-- Never duplicate configuration between shells
+**Startup dependencies** (auto-run on shell init): oh-my-posh, starship, zoxide, fzf, basher, zinit
+- Add new tools to CI "Install shell startup tools" step
+- Remove from CI when lazy-loading or removing tools
 
-#### Profile-Specific Configuration:
-**CRITICAL**: Some configurations are specific to certain machine types or environments and should NOT be in shared configs.
-
-**Profile-Specific Patterns:**
-- **POSIX shells**: Use `aliases.{profile}.sh` and `functions.{profile}.sh` in `.config/shell/`
-- **Fish shell**: Use `config.{profile}.fish` and `aliases.{profile}.fish` in `.config/fish/`
-- **Auto-loading**: Shared configs automatically source profile-specific files using glob patterns
-
-**Examples:**
-- `ubuntu-server/.config/shell/aliases.ubuntu-server.sh` - Ubuntu server-specific aliases (nix_rebuild, nix_update)
-- `ubuntu-server/.config/fish/config.ubuntu-server.fish` - Fish config for Ubuntu servers
-- These are auto-sourced by shared shell configs when the profile is installed
-
-**When to use profile-specific configs:**
-- ✅ Platform-specific commands (nix on Ubuntu, darwin-rebuild on macOS)
-- ✅ Environment-specific aliases (server management, work tools)
-- ✅ Machine-specific paths or settings
-- ❌ Universal tools that work the same everywhere
-
-#### Multi-Shell Support Requirements:
-**CRITICAL**: When making changes to shell environment configuration, you MUST ensure changes work across ALL supported shells:
-
-**Currently Supported Shells:**
-- Bash (fallback)
-- Zsh (secondary)
-- Fish (primary)
-
-**Future Shells Under Consideration:**
-- Nushell (may be added later)
-
-**Required Actions:**
-1. **POSIX shells (Bash/Zsh)**: Add to shared modules (`.config/shell/*.sh`) or profile-specific files
-2. **Fish**: Add equivalent configuration to `.config/fish/config.fish` or appropriate Fish-specific files
-3. **ALWAYS port across shells**: When adding ANY feature, function, alias, or export to one shell, you MUST add the equivalent to ALL other supported shells (Bash/Zsh/Fish). Do not consider a task complete until implemented in all shells.
-4. **Test across shells**: Verify changes work in Bash, Zsh, AND Fish before considering complete
-5. **Profile-specific considerations**: If adding to a profile (like ubuntu-server), ensure it works across all shells within that profile
-6. **Future-proof**: Use approaches that can extend to Nushell if/when added
-7. **Document shell-specific workarounds**: If a feature requires different implementations per shell, document why in comments
-
-#### Shell Performance CI Workflow:
-**CRITICAL**: Keep the CI workflow (`.github/workflows/shell-performance.yml`) in sync with shell configurations.
-
-**When to Update the CI Workflow:**
-1. **Adding a new shell** → Add measurements for the new shell in the workflow and measurement script
-2. **Adding startup dependencies** → Install the tool in the "Install shell startup tools" step
-3. **Removing startup dependencies** → Remove from CI installation step
-4. **Changing shell initialization** → Verify CI flags match how shells are invoked (currently `-i -l`)
-
-**Startup Dependencies to Track:**
-These tools run on every shell startup and must be installed in CI for realistic measurements:
-- **oh-my-posh** - Default prompt (runs `oh-my-posh init` on startup)
-- **starship** - Optional prompt (runs `starship init` on startup if `USE_STARSHIP` is set)
-- **zoxide** - Smart directory jumping (runs `zoxide init` on startup)
-- **fzf** - Fuzzy finder (lazy-loaded but affects startup time)
-- **basher** - Bash package manager (lazy-loaded, but needs to be available)
-- **zinit** (zsh only) - Plugin manager (auto-installs on first run)
-
-**Adding a New Startup Dependency:**
-1. Add the tool to shell configs (`.bashrc`, `.zshrc`, `config.fish`)
-2. Update `.github/workflows/shell-performance.yml` "Install shell startup tools" step:
-   ```yaml
-   # Install new-tool (description of what it does)
-   curl -sS https://install-url.sh | bash
-   sudo mv ~/.local/bin/new-tool /usr/local/bin/
-   new-tool --version  # Verify installation
-   ```
-3. Test that CI can install and use the tool
-4. Document in this section of AGENTS.md
-
-**Why This Matters:**
-The CI measures shell startup performance to catch regressions. If a tool runs on startup but isn't installed in CI, the measurements will be unrealistic and optimizations (like lazy-loading) won't be properly validated.
-
-### Shell Scripts
-- Use `#!/bin/sh` for POSIX compatibility
-- Set `set -x` for debugging when needed
-- Use `[[ ]]` for bash-specific tests
-- Variables in `${var}` format for clarity
-
-### Lua (Neovim configs)
-- 2-space indentation (per stylua.toml)
-- Column width: 120 characters  
-- Use `-- stylua: ignore` to skip formatting specific lines
-- Plugin configs return tables with dependency/opts structure
-- Comment disabled code with early returns: `if true then return {} end`
-
-### TOML/Config Files
-- 2-space indentation for nested structures
-- Use lowercase with hyphens for keys (`line-number`, `cursor-line`)
-- Keep related settings grouped together
+## Code Style (Quick Reference)
+| Language | Style |
+|----------|-------|
+| **Shell** | `#!/bin/sh`, `${var}` format, `[[ ]]` for bash tests |
+| **Lua** | 2-space indent, 120 char width, return tables, `-- stylua: ignore` to skip format |
+| **TOML** | 2-space indent, lowercase-with-hyphens keys |
 
 ## File Organization
-- Neovim plugins: `.config/nvim/lua/plugins/`
-- Fish functions: `.config/fish/functions/`
-- Shared shell config: `.config/shell/` (exports.sh, aliases.sh, functions.sh)
-- Profile-specific shell config: `{profile}/.config/shell/aliases.{profile}.sh`, `{profile}/.config/fish/config.{profile}.fish`
-- Shell profiles: Root level (`.profile`, `.zshrc`, `.bashrc`, etc.)
-- Utilities: `bin/` directory
-- Theme files in respective app config dirs
-- Ubuntu server configs: `ubuntu-server/.config/nix/` (Nix configuration and system services)
-- OpenCode agents: `.config/opencode/agents/` (NOT `agent/` - see below)
-
-### CRITICAL: OpenCode Agents Directory Naming
-**ALWAYS use `agents/` (plural), NEVER `agent/` (singular)** for the OpenCode agents directory.
-
-**Why:**
-- OpenCode auto-detects `agent/` directories for custom instructions
-- GitHub Copilot also auto-detects `.github/copilot/agent/` directories
-- Using `.config/opencode/agent/` causes conflicts between OpenCode and Copilot
-- The `agents/` (plural) naming avoids this clash while maintaining clarity
-
-**Correct structure:**
 ```
-.config/opencode/
-├── agents/          # ✅ Custom agent definitions
-│   ├── architect.md
-│   ├── implementer.md
-│   └── ...
-└── opencode.json    # References ./agents/ path
+.config/
+├── nvim/lua/plugins/          # Neovim plugins
+├── fish/functions/            # Fish functions
+├── shell/                     # Shared POSIX configs (exports, aliases, functions)
+└── opencode/agents/           # ⚠️ MUST be 'agents/' plural (not 'agent/' - conflicts with Copilot)
+
+{profile}/.config/
+├── shell/aliases.{profile}.sh # Profile-specific POSIX configs
+└── fish/config.{profile}.fish # Profile-specific Fish configs
+
+Root:
+├── .profile, .zshrc, .bashrc  # Shell init files
+└── bin/                       # Utilities
+
+ubuntu-server/.config/nix/     # Nix configs and services
 ```
 
-**Configuration in opencode.json:**
-```json
-{
-  "agent": {
-    "Agent Name": {
-      "prompt": "{file:./agents/filename.md}"
-    }
-  }
-}
-```
+### CRITICAL: .config Symlinking Rules
+**NEVER `stow` entire `.config/` directory** - symlink individual app configs only
 
-### CRITICAL: .config Directory Handling
-**NEVER symlink the entire `.config` directory!** Some subdirectories contain local-only data that should not be version controlled or shared across machines.
-
-**Rules:**
-- **Individual app configs only**: Symlink specific subdirectories like `.config/nvim/`, `.config/fish/`, `.config/tmux/`
-- **Never `.config` root**: The `.config` directory itself must remain local to preserve machine-specific configurations
-- **Local-only examples**: `.config/gh/`, `.config/1Password/`, `.config/BetterDisplay/`, etc.
-- **When adding new configs**: Always add the specific subdirectory, never the parent `.config`
-
-**Correct approach:**
 ```bash
-# Good - specific app configs
+# ✅ CORRECT
 stow --target=~/.config/nvim shared/.config/nvim
-stow --target=~/.config/fish shared/.config/fish
 
-# Bad - entire .config directory
-stow --target=~/.config shared/.config  # DON'T DO THIS
+# ❌ WRONG - includes local-only configs (.config/gh/, .config/1Password/, etc.)
+stow --target=~/.config shared/.config
 ```
 
-## Documentation Maintenance
+## Documentation Updates (Required for Config Changes)
 
-**CRITICAL**: When making consequential changes to configurations, always update relevant documentation:
+### Update Triggers (Config Change → Documentation Update)
+| Change Type | Update These Files |
+|-------------|-------------------|
+| Config file modified | `.config/{tool}/README.md` (mandatory) |
+| Major tool added/removed | `/README.md` + `/shared/README.md` |
+| Keybinding changed | `.config/{tool}/README.md` keybindings section |
+| Theme/appearance changed | `/README.md` features + tool README |
+| Shell support added | `/README.md` + `AGENTS.md` |
 
-### Root README (`/README.md`)
-**When to Update:**
-- Adding/removing major tools or changing repository structure
-- Adding/removing entire tool categories (terminal emulators, multiplexers, etc.)
-- Changing theming systems (e.g., switching from Catppuccin to Tokyo Night)
-- Modifying the quick start installation process
-- Adding/removing shell support
-
-**What to Verify After Changes:**
-After making any significant configuration changes, verify the README sections remain accurate:
-
-1. **Features section (lines 9-16)**: Ensure themes and core features match reality
-2. **Core Tools section (lines 55-64)**: Verify shells, editors, terminals, and multiplexers are correctly listed
-3. **Development Environment section (lines 66-71)**: Check languages and build tools are current
-4. **Productivity Features section (lines 73-78)**: Confirm git workflow tools and features are accurate
-5. **Repository Structure section (lines 80-93)**: Update if directory structure changes
-
-**Examples of Changes Requiring README Updates:**
-- ✅ Adding Zellij → Update "Multiplexer" in Core Tools section
-- ✅ Switching from Catppuccin to Tokyo Night → Update Features section
-- ✅ Adding Nushell support → Update "Multi-Shell Setup" in Core Tools
-- ✅ Adding Wezterm config → Update "Terminal" in Core Tools (if it becomes primary/secondary)
-- ❌ Tweaking individual plugin settings → No README update needed
-- ❌ Adding a Fish function → No README update needed
-
-### Setup Guide (`/shared/README.md`)
-- Update "What's Included" section when adding/removing tools
-- Add troubleshooting entries for new common issues
-- Update installation steps if prerequisites change
-- Keep tool descriptions accurate with actual configurations
-
-### Tool-Specific READMEs (`.config/*/README.md`)
-**CRITICAL**: When modifying any tool's configuration files, you MUST update its corresponding README to reflect the changes.
-
-**Tools with README files:**
-- `.config/fish/README.md` - Fish shell configuration
-- `.config/ghostty/README.md` - Ghostty terminal emulator
-- `.config/helix/README.md` - Helix editor
-- `.config/eza/README.md` - Eza (ls replacement)
-- `.config/leader-key/README.md` - Leader-key launcher
-- `.config/oh-my-posh/README.md` - Oh-my-posh prompt
-- `.config/sesh/README.md` - Sesh session manager
-- `.config/twm/README.md` - TWM workspace manager
-- `.config/zed/README.md` - Zed editor
-- `.config/lazygit/README.md` - Lazygit git UI
-- `.config/tmux/README.md` - Tmux multiplexer
-- `.config/yazi/README.md` - Yazi file manager
-- `.config/nvim/README.md` - Neovim editor (if exists)
-- `.config/zellij/README.md` - Zellij multiplexer (if exists)
-
-**When to Update Tool READMEs:**
-- ✅ Adding/removing keybindings → Update "Keybindings" or "Key Bindings" section
-- ✅ Changing configuration options → Update "Configuration" section with new values
-- ✅ Adding/removing features → Update "Features" section
-- ✅ Modifying integrations with other tools → Update "Integration" or "Related Tools" section
-- ✅ Changing themes or appearance → Update "Theme" or "Appearance" section
-- ✅ Adding new plugins or extensions → Update relevant sections
-- ❌ Minor comment changes → No README update needed
-- ❌ Whitespace/formatting only → No README update needed
-
-**Update Process:**
-1. Make the configuration change in the tool's config file(s)
-2. Test the change to ensure it works as expected
-3. Open the tool's README file (`.config/{tool}/README.md`)
-4. Update the relevant section(s) to reflect the change
-5. Ensure examples, keybindings, and descriptions are accurate
-6. Commit both the config change and README update together
-
-**Documentation Standards for Tool READMEs:**
-- Keep keybinding tables or lists up to date
-- Include examples for complex configurations
-- Explain the "why" behind non-obvious settings
-- Cross-reference related tools and integration points
-- Use consistent formatting across all tool READMEs
-- **Link to project homepage** - First line should be "Configuration for [Tool Name](https://project-url) - description"
-
-### Documentation Update Process
-When making significant changes:
-1. **Make the configuration changes** first
-2. **Test the changes** to ensure they work
-3. **Update tool-specific README** - Update `.config/{tool}/README.md` for the tool being modified
-4. **Review README.md** for accuracy - check all sections mentioned above (if it's a major change)
-5. **Update AGENTS.md** if the change affects agent guidelines (new tools, workflow changes)
-6. **Update shared/README.md** if setup/installation is affected
-7. **Create a single commit** that includes config changes + all documentation updates
+### Update Workflow (Atomic Commits)
+1. Make config changes → Test changes
+2. Update `.config/{tool}/README.md` (if applicable)
+3. Update `/README.md` (if major change affects Features/Core Tools/Repository Structure sections)
+4. Update `/shared/README.md` (if affects installation/troubleshooting)
+5. Update `AGENTS.md` (if changes agent workflow)
+6. **Commit all together** (config + documentation in single commit)
 
 ### Documentation Standards
-- Keep instructions clear and step-by-step
-- Include troubleshooting for common issues
-- Maintain consistent formatting and style
-- Test instructions on fresh installations when possible
-- Link between related documentation sections
+- **Tool READMEs**: Link to project homepage in first line: `Configuration for [Tool Name](url) - description`
+- **Keybindings**: Keep tables/lists current
+- **Examples**: Include "why" behind non-obvious settings
+- **Cross-reference**: Link related tools and integrations
 
-## Git Workflow
+## Git Workflow (MANDATORY APPROVAL REQUIRED)
 
-**CRITICAL**: NEVER commit without explicit user approval. Always follow this process:
+### Pre-Commit Checklist (Complete Before Requesting Approval)
+1. Stage files: `git add <files>`
+2. Show changes: `git status` + `git diff --staged`
+3. Draft commit message in code block
+4. List all files being committed
+5. **STOP → WAIT FOR APPROVAL** (do not run `git commit` without explicit "yes"/"approve")
+6. After approval → commit
+7. Push only when explicitly requested
 
-### Before ANY Commit:
-1. **Stage changes**: Use `git add` to stage the intended files
-2. **Show what will be committed**: 
-   - Run `git status` to show staged files
-   - Run `git diff --staged` to show the actual changes
-3. **Present commit message**: Draft the complete commit message
-4. **List all files being committed**: Clearly show which files are included
-5. **WAIT FOR EXPLICIT APPROVAL**: Do not run `git commit` until user says "yes" or "approve"
-6. **Only then commit**: After approval, run the commit command
-7. **Push only when requested**: Don't push to remote unless specifically asked
-
-### Commit Message Format:
-Present the commit message in a code block so the user can review it exactly as it will appear.
-
-### Example Workflow:
+### Approval Request Format
 ```
 Files to be committed:
-- .claude.md (modified)
-- README.md (modified)
+- .config/fish/config.fish (modified)
+- .config/fish/README.md (modified)
 
 Proposed commit message:
 ```
-Update agent instructions to require commit approval
+Add zoxide integration to Fish shell
 
-- Add mandatory review process before any commits
-- Require explicit user approval for all git operations
-- Ensure user maintains full control over git history
+- Configure zoxide for smart directory jumping
+- Update Fish README with new keybindings
 
 🤖 Generated with [opencode](https://opencode.ai)
-
 Co-Authored-By: opencode <noreply@opencode.ai>
 ```
 
-Do you approve this commit? (yes/no)
+Approve? (yes/no)
 ```
-
-**NEVER** run `git commit` without this approval process. This ensures the user maintains complete control over their git history and commit messages.
