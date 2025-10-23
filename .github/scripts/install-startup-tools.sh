@@ -19,16 +19,20 @@ curl -sS https://starship.rs/install.sh | sh -s -- -y
 
 # Install zoxide (smart directory jumping)
 echo "Installing zoxide..."
-curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-if [ "$RUNNER_OS" = "Linux" ]; then
+if [ "$RUNNER_OS" = "macOS" ]; then
+  brew install zoxide
+else
+  curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
   sudo mv ~/.local/bin/zoxide /usr/local/bin/
 fi
 
 # Install fzf (fuzzy finder)
 echo "Installing fzf..."
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install --bin
-if [ "$RUNNER_OS" = "Linux" ]; then
+if [ "$RUNNER_OS" = "macOS" ]; then
+  brew install fzf
+else
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  ~/.fzf/install --bin
   sudo mv ~/.fzf/bin/fzf /usr/local/bin/
 fi
 
