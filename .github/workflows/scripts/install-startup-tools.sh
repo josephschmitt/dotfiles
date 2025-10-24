@@ -19,6 +19,14 @@ else
   sudo apt install -y fish
 fi
 
+# Install tmux (for tmux auto-start testing)
+echo "Installing tmux..."
+if [ "$RUNNER_OS" = "macOS" ]; then
+  brew install tmux
+else
+  sudo apt install -y tmux
+fi
+
 # Install oh-my-posh (default prompt)
 echo "Installing oh-my-posh..."
 curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
@@ -66,6 +74,7 @@ mkdir -p "$HOME/bin"
 echo ""
 echo "Verifying installations..."
 fish --version
+tmux -V
 oh-my-posh version
 starship --version
 zoxide --version
