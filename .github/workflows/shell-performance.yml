@@ -115,36 +115,30 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
 
-      - name: Checkout previous commit
-        if: github.event_name == 'push'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.before }}
-
       - name: Install base dotfiles
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: .github/workflows/scripts/create-test-env.sh
 
       - name: Measure base startup times (no tmux)
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json false
           cat base-times.json
 
       - name: Measure base startup times (with tmux)
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/measure-shell-startup.sh 20 base-tmux-times.json true
           cat base-tmux-times.json
 
       - name: Generate performance report
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/generate-performance-report.sh \
             "${{ env.OS_NAME }}" \
@@ -157,7 +151,7 @@ jobs:
           cat comment.md
 
       - name: Add performance report to workflow summary
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: cat comment.md >> $GITHUB_STEP_SUMMARY
 
       - name: Post comment to PR
@@ -250,36 +244,30 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
 
-      - name: Checkout previous commit
-        if: github.event_name == 'push'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.before }}
-
       - name: Install base dotfiles
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           rm -f "$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/.profile" "$HOME/.gitconfig"
           stow -v --target="$HOME" ${{ env.PROFILES }}
 
       - name: Create test .env file
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: .github/workflows/scripts/create-test-env.sh
 
       - name: Measure base startup times (no tmux)
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json false
           cat base-times.json
 
       - name: Measure base startup times (with tmux)
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/measure-shell-startup.sh 20 base-tmux-times.json true
           cat base-tmux-times.json
 
       - name: Generate performance report
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           .github/workflows/scripts/generate-performance-report.sh \
             "${{ env.OS_NAME }}" \
@@ -292,7 +280,7 @@ jobs:
           cat comment.md
 
       - name: Add performance report to workflow summary
-        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: cat comment.md >> $GITHUB_STEP_SUMMARY
 
       - name: Post comment to PR
