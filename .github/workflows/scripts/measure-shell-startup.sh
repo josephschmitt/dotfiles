@@ -16,7 +16,7 @@ measure_shell() {
     local times=()
 
     if [ "$WITH_TMUX" = "true" ]; then
-        echo "Measuring $shell startup time in tmux ($ITERATIONS iterations + 3 warmup)..." >&2
+        echo "Measuring $shell startup + tmux session creation ($ITERATIONS iterations + 3 warmup)..." >&2
     else
         echo "Measuring $shell startup time ($ITERATIONS iterations + 3 warmup)..." >&2
     fi
@@ -24,7 +24,8 @@ measure_shell() {
     # Warmup runs to stabilize caches and avoid cold-start penalties
     for i in $(seq 1 3); do
         if [ "$WITH_TMUX" = "true" ]; then
-            tmux new-session "$shell_cmd -c 'exit'" >/dev/null 2>&1 || true
+            $shell_cmd -c "tmux new-session -d -s warmup-$$-$i true" >/dev/null 2>&1
+            tmux kill-session -t "warmup-$$-$i" 2>/dev/null || true
         else
             $shell_cmd -c "exit" >/dev/null 2>&1
         fi
@@ -33,9 +34,10 @@ measure_shell() {
     # Actual measurements
     for i in $(seq 1 $ITERATIONS); do
         if [ "$WITH_TMUX" = "true" ]; then
-            # Measure tmux session creation + shell startup + exit
-            # We create a non-detached session that will exit immediately, simulating real auto-start behavior
-            result=$( (time -p tmux new-session "$shell_cmd -c 'exit'" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
+            # Measure shell startup + tmux session creation
+            # This simulates the cost of auto-start (shell init + creating tmux session)
+            result=$( (time -p $shell_cmd -c "tmux new-session -d -s test-$$-$i true" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
+            tmux kill-session -t "test-$$-$i" 2>/dev/null || true
         else
             # Measure just shell startup
             result=$( (time -p $shell_cmd -c "exit" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
@@ -80,13 +82,13 @@ fi
 
 # Measure each shell
 if [ "$WITH_TMUX" = "true" ]; then
-    echo "Starting shell performance measurements (with tmux)..." >&2
+    echo "Starting shell performance measurements (with tmux session creation)..." >&2
 else
-    echo "Starting shell performance measurements..." >&2
+    echo "Starting shell performance measurements (without tmux)..." >&2
 fi
 echo "" >&2
 
-# Disable auto_start_tmux for Fish when testing
+# Always disable auto_start_tmux for Fish to avoid interference
 export SKIP_AUTO_TMUX=1
 
 bash_result=$(measure_shell "bash" "bash -i -l")
