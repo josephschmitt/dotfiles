@@ -67,14 +67,21 @@ jobs:
       - name: Create test .env file
         run: .github/workflows/scripts/create-test-env.sh
 
-      - name: Measure current startup times
+      - name: Measure current startup times (no tmux)
         run: |
-          .github/workflows/scripts/measure-shell-startup.sh 20 current-times.json
+          .github/workflows/scripts/measure-shell-startup.sh 20 current-times.json false
           cat current-times.json
+
+      - name: Measure current startup times (with tmux)
+        run: |
+          .github/workflows/scripts/measure-shell-startup.sh 20 current-tmux-times.json true
+          cat current-tmux-times.json
 
       - name: Add current times to workflow summary
         run: |
           echo "## Shell Startup Performance (${{ env.OS_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Without tmux" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
@@ -82,12 +89,22 @@ jobs:
           echo "| Zsh   | $(jq -r '.zsh.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
           echo "| Fish  | $(jq -r '.fish.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### With tmux auto-start" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bash  | $(jq -r '.bash.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Zsh   | $(jq -r '.zsh.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fish  | $(jq -r '.fish.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Profiles tested:** \`${{ env.PROFILES }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "*Median of 20 iterations after 3 warmup runs. Lower is better.*" >> $GITHUB_STEP_SUMMARY
 
       - name: Save current results
-        run: cp current-times.json /tmp/current-times.json
+        run: |
+          cp current-times.json /tmp/current-times.json
+          cp current-tmux-times.json /tmp/current-tmux-times.json
 
       - name: Uninstall current dotfiles
         run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
@@ -114,11 +131,17 @@ jobs:
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: .github/workflows/scripts/create-test-env.sh
 
-      - name: Measure base startup times
+      - name: Measure base startup times (no tmux)
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
-          .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json
+          .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json false
           cat base-times.json
+
+      - name: Measure base startup times (with tmux)
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        run: |
+          .github/workflows/scripts/measure-shell-startup.sh 20 base-tmux-times.json true
+          cat base-tmux-times.json
 
       - name: Generate performance report
         if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -128,6 +151,8 @@ jobs:
             "${{ env.PROFILES }}" \
             /tmp/current-times.json \
             base-times.json \
+            /tmp/current-tmux-times.json \
+            base-tmux-times.json \
             comment.md
           cat comment.md
 
@@ -148,7 +173,9 @@ jobs:
           name: ubuntu-performance-results
           path: |
             current-times.json
+            current-tmux-times.json
             base-times.json
+            base-tmux-times.json
             comment.md
           retention-days: 30
 
@@ -175,14 +202,21 @@ jobs:
       - name: Create test .env file
         run: .github/workflows/scripts/create-test-env.sh
 
-      - name: Measure current startup times
+      - name: Measure current startup times (no tmux)
         run: |
-          .github/workflows/scripts/measure-shell-startup.sh 20 current-times.json
+          .github/workflows/scripts/measure-shell-startup.sh 20 current-times.json false
           cat current-times.json
+
+      - name: Measure current startup times (with tmux)
+        run: |
+          .github/workflows/scripts/measure-shell-startup.sh 20 current-tmux-times.json true
+          cat current-tmux-times.json
 
       - name: Add current times to workflow summary
         run: |
           echo "## Shell Startup Performance (${{ env.OS_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Without tmux" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
@@ -190,12 +224,22 @@ jobs:
           echo "| Zsh   | $(jq -r '.zsh.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
           echo "| Fish  | $(jq -r '.fish.median' current-times.json) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### With tmux auto-start" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Shell | Median (ms) |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Bash  | $(jq -r '.bash.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Zsh   | $(jq -r '.zsh.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Fish  | $(jq -r '.fish.median' current-tmux-times.json) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Profiles tested:** \`${{ env.PROFILES }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "*Median of 20 iterations after 3 warmup runs. Lower is better.*" >> $GITHUB_STEP_SUMMARY
 
       - name: Save current results
-        run: cp current-times.json /tmp/current-times.json
+        run: |
+          cp current-times.json /tmp/current-times.json
+          cp current-tmux-times.json /tmp/current-tmux-times.json
 
       - name: Uninstall current dotfiles
         run: stow -v --target="$HOME" -D ${{ env.PROFILES }}
@@ -222,11 +266,17 @@ jobs:
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: .github/workflows/scripts/create-test-env.sh
 
-      - name: Measure base startup times
+      - name: Measure base startup times (no tmux)
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         run: |
-          .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json
+          .github/workflows/scripts/measure-shell-startup.sh 20 base-times.json false
           cat base-times.json
+
+      - name: Measure base startup times (with tmux)
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        run: |
+          .github/workflows/scripts/measure-shell-startup.sh 20 base-tmux-times.json true
+          cat base-tmux-times.json
 
       - name: Generate performance report
         if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -236,6 +286,8 @@ jobs:
             "${{ env.PROFILES }}" \
             /tmp/current-times.json \
             base-times.json \
+            /tmp/current-tmux-times.json \
+            base-tmux-times.json \
             comment.md
           cat comment.md
 
@@ -256,6 +308,8 @@ jobs:
           name: macos-performance-results
           path: |
             current-times.json
+            current-tmux-times.json
             base-times.json
+            base-tmux-times.json
             comment.md
           retention-days: 30

@@ -1,4 +1,9 @@
 function auto_start_tmux -d "Auto-start tmux if available and not already inside tmux"
+    # Skip if SKIP_AUTO_TMUX is set (for performance testing)
+    if set -q SKIP_AUTO_TMUX
+        return
+    end
+    
     # Skip in IDE/editor integrated terminals
     if set -q VSCODE_INJECTION; or set -q INSIDE_EMACS; or set -q VSCODE_PID; or test "$TERM_PROGRAM" = "vscode"
         return

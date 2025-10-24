@@ -7,6 +7,7 @@ set -e
 # Number of iterations for median calculation
 ITERATIONS=${1:-20}
 OUTPUT_FILE=${2:-startup-times.json}
+WITH_TMUX=${3:-false}
 
 # Function to measure shell startup time
 measure_shell() {
@@ -14,18 +15,32 @@ measure_shell() {
     local shell_cmd=$2
     local times=()
 
-    echo "Measuring $shell startup time ($ITERATIONS iterations + 3 warmup)..." >&2
+    if [ "$WITH_TMUX" = "true" ]; then
+        echo "Measuring $shell startup time in tmux ($ITERATIONS iterations + 3 warmup)..." >&2
+    else
+        echo "Measuring $shell startup time ($ITERATIONS iterations + 3 warmup)..." >&2
+    fi
 
     # Warmup runs to stabilize caches and avoid cold-start penalties
     for i in $(seq 1 3); do
-        $shell_cmd -c "exit" >/dev/null 2>&1
+        if [ "$WITH_TMUX" = "true" ]; then
+            tmux new-session -d -s "warmup-$shell-$i" "$shell_cmd -c 'exit'" 2>/dev/null || true
+            tmux kill-session -t "warmup-$shell-$i" 2>/dev/null || true
+        else
+            $shell_cmd -c "exit" >/dev/null 2>&1
+        fi
     done
 
     # Actual measurements
     for i in $(seq 1 $ITERATIONS); do
-        # Use GNU time format to get real time in milliseconds
-        # The command just starts the shell and immediately exits
-        result=$( (time -p $shell_cmd -c "exit" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
+        if [ "$WITH_TMUX" = "true" ]; then
+            # Measure tmux session creation + shell startup
+            result=$( (time -p tmux new-session -d -s "test-$shell-$i" "$shell_cmd -c 'exit'" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
+            tmux kill-session -t "test-$shell-$i" 2>/dev/null || true
+        else
+            # Measure just shell startup
+            result=$( (time -p $shell_cmd -c "exit" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
+        fi
 
         # Convert to milliseconds (multiply by 1000)
         time_ms=$(echo "$result * 1000" | bc)
@@ -59,9 +74,21 @@ command -v bash >/dev/null 2>&1 || { echo "bash not found" >&2; exit 1; }
 command -v zsh >/dev/null 2>&1 || { echo "zsh not found" >&2; exit 1; }
 command -v fish >/dev/null 2>&1 || { echo "fish not found" >&2; exit 1; }
 
+# Check if tmux is available when WITH_TMUX is true
+if [ "$WITH_TMUX" = "true" ]; then
+    command -v tmux >/dev/null 2>&1 || { echo "tmux not found but WITH_TMUX=true" >&2; exit 1; }
+fi
+
 # Measure each shell
-echo "Starting shell performance measurements..." >&2
+if [ "$WITH_TMUX" = "true" ]; then
+    echo "Starting shell performance measurements (with tmux)..." >&2
+else
+    echo "Starting shell performance measurements..." >&2
+fi
 echo "" >&2
+
+# Disable auto_start_tmux for Fish when testing
+export SKIP_AUTO_TMUX=1
 
 bash_result=$(measure_shell "bash" "bash -i -l")
 bash_median=$(echo $bash_result | cut -d'|' -f1)
