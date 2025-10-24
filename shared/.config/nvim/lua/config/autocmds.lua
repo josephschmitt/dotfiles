@@ -48,7 +48,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "sh", "bash", "zsh", "fish" },
   callback = function()
     local utils = require("config.utils")
-    vim.keymap.set({ "v", "V" }, "<leader>cs", utils.convert_shell_syntax, {
+    vim.keymap.set("x", "<leader>cs", utils.convert_shell_syntax, {
       desc = "Convert shell syntax (POSIX ↔ Fish)",
       buffer = true
     })
