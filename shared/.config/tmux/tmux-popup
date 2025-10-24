@@ -1,0 +1,177 @@
+#!/bin/sh
+# Standardized tmux popup script with size presets
+# Usage: tmux-popup [-s SIZE] [-t TITLE] [-d DIR] [-w WIDTH] [-h HEIGHT] [-x XPOS] [-y YPOS] [-E] COMMAND [ARGS...]
+
+set -e
+
+# Default values
+SIZE="medium"
+TITLE=""
+DIR="#{pane_current_path}"
+CUSTOM_WIDTH=""
+CUSTOM_HEIGHT=""
+XPOS=""
+YPOS=""
+EXIT_ON_CLOSE=""
+
+# Parse arguments
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -s|--size)
+            SIZE="$2"
+            shift 2
+            ;;
+        -t|--title)
+            TITLE="$2"
+            shift 2
+            ;;
+        -d|--dir)
+            DIR="$2"
+            shift 2
+            ;;
+        -w|--width)
+            CUSTOM_WIDTH="$2"
+            shift 2
+            ;;
+        -h|--height)
+            CUSTOM_HEIGHT="$2"
+            shift 2
+            ;;
+        -x|--xpos)
+            XPOS="$2"
+            shift 2
+            ;;
+        -y|--ypos)
+            YPOS="$2"
+            shift 2
+            ;;
+        -E|--exit-on-close)
+            EXIT_ON_CLOSE="-E"
+            shift
+            ;;
+        -H|--help)
+            cat << EOF
+Usage: tmux-popup [OPTIONS] COMMAND [ARGS...]
+
+Standardized tmux popup launcher with size presets.
+
+OPTIONS:
+    -s, --size SIZE           Preset size: small, medium, large, full (default: medium)
+    -t, --title TITLE        Popup title/border label
+    -d, --dir DIR            Working directory (default: current pane path)
+    -w, --width WIDTH        Custom width (overrides size preset)
+    -h, --height HEIGHT      Custom height (overrides size preset)
+    -x, --xpos POS           Horizontal position (C for center)
+    -y, --ypos POS           Vertical position (C for center)
+    -E, --exit-on-close      Exit popup when command exits
+    -H, --help               Show this help message
+
+SIZE PRESETS:
+    small   - 80% width, 70% height (good for fzf/selection menus)
+    medium  - 90% width (max 250 cols), 90% height (max 100 lines)
+    large   - 90% width, 90% height (good for lazygit, editors)
+    full    - 100% width, 100% height
+
+EXAMPLES:
+    tmux-popup -s small -t "Files" fzf
+    tmux-popup -s large -t "Lazygit" -E lazygit
+    tmux-popup -w 120 -h 40 -t "Custom" nvim
+    tmux-popup -s medium -t "Editor" -E nvim file.txt
+EOF
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            echo "Use -H or --help for usage information" >&2
+            exit 1
+            ;;
+        *)
+            # Rest of arguments are the command
+            break
+            ;;
+    esac
+done
+
+# Command is required
+if [ $# -eq 0 ]; then
+    echo "Error: No command specified" >&2
+    echo "Use -H or --help for usage information" >&2
+    exit 1
+fi
+
+# Set dimensions based on size preset (custom dimensions override individual values)
+case "$SIZE" in
+    small)
+        PRESET_WIDTH="80%"
+        PRESET_HEIGHT="70%"
+        ;;
+    medium)
+        # Get terminal dimensions for max calculation
+        TERM_WIDTH=$(tmux display -p '#{window_width}')
+        TERM_HEIGHT=$(tmux display -p '#{window_height}')
+        
+        # Calculate 90% of terminal size
+        WIDTH_90=$((TERM_WIDTH * 90 / 100))
+        HEIGHT_90=$((TERM_HEIGHT * 90 / 100))
+        
+        # Apply maximum limits (250 cols, 100 lines)
+        if [ "$WIDTH_90" -gt 250 ]; then
+            PRESET_WIDTH="250"
+        else
+            PRESET_WIDTH="90%"
+        fi
+        
+        if [ "$HEIGHT_90" -gt 100 ]; then
+            PRESET_HEIGHT="100"
+        else
+            PRESET_HEIGHT="90%"
+        fi
+        ;;
+    large)
+        PRESET_WIDTH="90%"
+        PRESET_HEIGHT="90%"
+        ;;
+    full)
+        PRESET_WIDTH="100%"
+        PRESET_HEIGHT="100%"
+        ;;
+    *)
+        echo "Error: Invalid size preset: $SIZE" >&2
+        echo "Valid sizes: small, medium, large, full" >&2
+        exit 1
+        ;;
+esac
+
+# Apply custom dimensions or fall back to preset
+WIDTH="${CUSTOM_WIDTH:-$PRESET_WIDTH}"
+HEIGHT="${CUSTOM_HEIGHT:-$PRESET_HEIGHT}"
+
+# Build tmux display-popup command
+TMUX_ARGS=""
+
+# Add exit-on-close flag if specified
+if [ -n "$EXIT_ON_CLOSE" ]; then
+    TMUX_ARGS="$TMUX_ARGS -E"
+fi
+
+# Add dimensions
+TMUX_ARGS="$TMUX_ARGS -w $WIDTH -h $HEIGHT"
+
+# Add position if specified
+if [ -n "$XPOS" ]; then
+    TMUX_ARGS="$TMUX_ARGS -x $XPOS"
+fi
+if [ -n "$YPOS" ]; then
+    TMUX_ARGS="$TMUX_ARGS -y $YPOS"
+fi
+
+# Add directory
+TMUX_ARGS="$TMUX_ARGS -d $DIR"
+
+# Add title if specified
+if [ -n "$TITLE" ]; then
+    TMUX_ARGS="$TMUX_ARGS -T $TITLE"
+fi
+
+# Execute the popup - pass all remaining args as the command
+exec tmux display-popup $TMUX_ARGS "$@"

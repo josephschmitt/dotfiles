@@ -103,16 +103,41 @@ Main-horizontal layout with fixed 20-row bottom panes:
 - `Ctrl-s /` - Open Scooter in 100-column right split
 
 ### Application Popups
-- `Ctrl-s G` - Open Lazygit in popup (90% width/height)
-- `Ctrl-s N` - Open Neovim scratch buffer in popup (120 columns wide)
-- `Ctrl-s C` - Open Scooter in popup (90% width/height)
-- `Ctrl-s Z` - Open Yazi in popup (90% width/height)
+- `Ctrl-s G` - Open Lazygit in popup (large: 90% width/height)
+- `Ctrl-s N` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
+- `Ctrl-s C` - Open Scooter in popup (large: 90% width/height)
+- `Ctrl-s Z` - Open Yazi in popup (large: 90% width/height)
 - `Ctrl-s P` - Open floating scratch terminal (Fish shell)
 
 ### Session Management
-- `Ctrl-s o` - Open Sesh session switcher
-- `Ctrl-s t` - Open TWM workspace manager
-- `Ctrl-s T` - Open TWM workspace manager (existing sessions only)
+- `Ctrl-s o` - Open Sesh session switcher (small: 80% width, 70% height)
+- `Ctrl-s t` - Open TWM workspace manager (small: 80% width, 70% height)
+- `Ctrl-s T` - Open TWM workspace manager for existing sessions (small: 80% width, 70% height)
+
+## Popup Management
+
+### Standardized Popup Script
+All tmux popups use the `tmux-popup` script for consistent behavior and sizing. The script provides standardized size presets:
+
+| Preset | Dimensions | Use Case |
+|--------|------------|----------|
+| **small** | 80% width, 70% height | FZF menus, session switchers |
+| **medium** | 90% width (max 250 cols), 90% height (max 100 lines) | General purpose editing |
+| **large** | 90% width, 90% height | Full applications like Lazygit, Yazi |
+| **full** | 100% width, 100% height | Maximum space utilization |
+
+The medium preset intelligently limits to 250 columns and 100 lines maximum to prevent overly large popups on ultrawide monitors.
+
+### Custom Popup Usage
+You can create custom popup keybindings using the `~/.config/tmux/tmux-popup` script:
+
+```tmux
+# Example: Add a popup for htop
+bind-key H run-shell "~/.config/tmux/tmux-popup -s medium -t 'System Monitor' -E htop"
+
+# Example: Add a popup with custom dimensions
+bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'fd . | fzf'"
+```
 
 ## Plugins
 
