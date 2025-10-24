@@ -27,41 +27,59 @@ for config_file in "$HOME/.config/shell/functions."*.sh; do
   fi
 done
 
+# Zsh-specific version of start_interactive
+start_interactive() {
+  # Prompt configuration (skip in Apple Terminal.app which has its own prompt)
+  # Use Starship if USE_STARSHIP env var is set, otherwise use oh-my-posh (default)
+  if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+    if [ -n "$USE_STARSHIP" ] && command -v starship >/dev/null 2>&1; then
+      # Starship prompt
+      eval "$(starship init zsh)"
+
+      # Enable transient prompt (built-in zsh option)
+      setopt transient_prompt
+    elif command -v oh-my-posh >/dev/null 2>&1; then
+      # oh-my-posh prompt (default)
+      eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
+    fi
+  fi
+
+  # Zoxide smart directory jumping
+  if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+    
+    # Override z with our custom version that triggers interactive on ambiguous queries
+    # Set ZOXIDE_INTERACTIVE_THRESHOLD to control minimum matches needed (default: 2)
+    z() {
+      threshold="${ZOXIDE_INTERACTIVE_THRESHOLD:-2}"
+      result_count=$(zoxide query --list -- "$@" 2>/dev/null | wc -l | tr -d ' ')
+      if [ "$result_count" -ge "$threshold" ]; then
+        result=$(zoxide query --interactive -- "$@")
+        [ -n "$result" ] && cd "$result"
+      else
+        __zoxide_z "$@"
+      fi
+    }
+  fi
+
+  # Remove zinit's zi alias to avoid conflict with zoxide's zi
+  unalias zi 2>/dev/null || true
+  alias zi=__zoxide_zi
+
+  # Mark as loaded (only when inside tmux to skip in future tmux panes)
+  if [ -n "$TMUX" ]; then
+    export TMUX_INTERACTIVE_LOADED=1
+  fi
+}
+
+# Load interactive customizations first (before tmux auto-start)
+# Only skip if we're inside tmux AND already loaded
+if [ -z "$TMUX" ] || [ -z "$TMUX_INTERACTIVE_LOADED" ]; then
+  start_interactive
+fi
+
 # Auto-start tmux if available
 auto_start_tmux
-
-# Prompt configuration (skip in Apple Terminal.app which has its own prompt)
-# Use Starship if USE_STARSHIP env var is set, otherwise use oh-my-posh (default)
-if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
-  if [ -n "$USE_STARSHIP" ] && command -v starship >/dev/null 2>&1; then
-    # Starship prompt
-    eval "$(starship init zsh)"
-
-    # Enable transient prompt (built-in zsh option)
-    setopt transient_prompt
-  elif command -v oh-my-posh >/dev/null 2>&1; then
-    # oh-my-posh prompt (default)
-    eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
-  fi
-fi
-
-# Zoxide smart directory jumping
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-  
-  # Override z with our custom version that triggers interactive on ambiguous queries
-  # Set ZOXIDE_INTERACTIVE_THRESHOLD to control minimum matches needed (default: 2)
-  z() {
-    threshold="${ZOXIDE_INTERACTIVE_THRESHOLD:-2}"
-    result_count=$(zoxide query --list -- "$@" 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$result_count" -ge "$threshold" ]; then
-      result=$(zoxide query --interactive -- "$@")
-      [ -n "$result" ] && cd "$result"
-    else
-      __zoxide_z "$@"
-    fi
-  }
-fi
 
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -94,10 +112,6 @@ fi
 
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
-
-# Remove zinit's zi alias to avoid conflict with zoxide's zi
-unalias zi 2>/dev/null || true
-alias zi=__zoxide_zi
 
 # Add in zsh plugins (with turbo-mode for faster startup)
 zinit ice wait lucid
