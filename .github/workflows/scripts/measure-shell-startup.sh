@@ -24,8 +24,7 @@ measure_shell() {
     # Warmup runs to stabilize caches and avoid cold-start penalties
     for i in $(seq 1 3); do
         if [ "$WITH_TMUX" = "true" ]; then
-            tmux new-session -d -s "warmup-$shell-$i" "$shell_cmd -c 'exit'" 2>/dev/null || true
-            tmux kill-session -t "warmup-$shell-$i" 2>/dev/null || true
+            tmux new-session "$shell_cmd -c 'exit'" >/dev/null 2>&1 || true
         else
             $shell_cmd -c "exit" >/dev/null 2>&1
         fi
@@ -34,9 +33,9 @@ measure_shell() {
     # Actual measurements
     for i in $(seq 1 $ITERATIONS); do
         if [ "$WITH_TMUX" = "true" ]; then
-            # Measure tmux session creation + shell startup
-            result=$( (time -p tmux new-session -d -s "test-$shell-$i" "$shell_cmd -c 'exit'" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
-            tmux kill-session -t "test-$shell-$i" 2>/dev/null || true
+            # Measure tmux session creation + shell startup + exit
+            # We create a non-detached session that will exit immediately, simulating real auto-start behavior
+            result=$( (time -p tmux new-session "$shell_cmd -c 'exit'" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
         else
             # Measure just shell startup
             result=$( (time -p $shell_cmd -c "exit" 2>&1 >/dev/null) 2>&1 | grep real | awk '{print $2}')
