@@ -55,10 +55,21 @@ twmp() {
   popd >/dev/null || return
 }
 
+# Check if running in an IDE/editor integrated terminal
+is_integrated_terminal() {
+  [ -n "$VSCODE_INJECTION" ] || \
+  [ -n "$VSCODE_PID" ] || \
+  [ "$TERM_PROGRAM" = "vscode" ] || \
+  [ -n "$INSIDE_EMACS" ] || \
+  [ -n "$ZED_TERM" ] || \
+  [ -n "$NVIM" ] || \
+  [ -n "$NVIM_LISTEN_ADDRESS" ]
+}
+
 # Auto-start tmux if available and not already inside tmux
 auto_start_tmux() {
   # Skip in IDE/editor integrated terminals
-  if [ -n "$VSCODE_INJECTION" ] || [ -n "$INSIDE_EMACS" ] || [ -n "$VSCODE_PID" ] || [ "$TERM_PROGRAM" = "vscode" ]; then
+  if is_integrated_terminal; then
     return
   fi
   
