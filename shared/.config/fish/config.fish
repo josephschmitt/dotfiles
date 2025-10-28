@@ -4,6 +4,9 @@
 source ~/.config/fish/env.fish
 source ~/.config/fish/aliases.fish
 
+# Suppress the default fish greeting
+set fish_greeting
+
 # Interactive shell configuration
 if status is-interactive
     # Load interactive customizations first (before tmux auto-start)

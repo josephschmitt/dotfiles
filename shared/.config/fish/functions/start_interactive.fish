@@ -16,9 +16,6 @@ function start_interactive -d "Load interactive shell customizations (prompt, ke
         oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
     end
 
-    # Suppress the default fish greeting
-    set fish_greeting
-
     # Vi-mode configuration
     fish_vi_key_bindings
 
