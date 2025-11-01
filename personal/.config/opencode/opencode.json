@@ -27,106 +27,11 @@
     }
   },
   "agent": {
-    "Spec-ify": {
-      "description": "Spec-driven development expert that guides users through the complete SDD workflow, orchestrating PM, Architect, Planner, Implementer, and Solver subagents",
-      "mode": "primary",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agents/sdd.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true,
-        "patch": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true,
-        "task": true
-      }
-    },
-    "PM": {
-      "description": "Gathers requirements and creates product requirements documents (PRDs) focused on functional rather than technical needs",
-      "mode": "subagent",
-      "prompt": "{file:./agents/product-manager.md}",
-      "model": "openai/gpt-5",
-      "tools": {
-        "read": true,
-        "write": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true,
-        "edit": false,
-        "bash": false,
-        "patch": false
-      }
-    },
-    "Architect": {
-      "description": "Designs technical implementation of features based on product requirements documents",
-      "mode": "subagent",
-      "model": "google/gemini-2.5-pro",
-      "prompt": "{file:./agents/architect.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true,
-        "edit": false,
-        "bash": false,
-        "patch": false
-      }
-    },
-    "Planner": {
-      "description": "Converts technical specifications from the Architect into detailed implementation plans for the Implementer",
-      "mode": "subagent",
-      "model": "google/gemini-2.5-pro",
-      "prompt": "{file:./agents/planner.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true,
-        "edit": false,
-        "bash": false,
-        "patch": false
-      }
-    },
     "Implementer": {
       "description": "Carries out technical implementation based on architect's specifications and designs",
       "mode": "subagent",
       "prompt": "{file:./agents/implementer.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true,
-        "patch": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true
-      }
-    },
-    "Solver": {
-      "description": "Investigates issues and finds creative solutions when things don't work as expected",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agents/problem-solver.md}",
+      "model": "anthropic/claude-haiku-4-5-20251001",
       "tools": {
         "read": true,
         "write": true,
@@ -163,7 +68,7 @@
     "Unit Tester": {
       "description": "Expert in writing comprehensive unit tests with high coverage, mocking, and testing best practices",
       "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
+      "model": "anthropic/claude-haiku-4-5-20251001",
       "prompt": "{file:./agents/unit-tester.md}",
       "tools": {
         "read": true,
@@ -171,25 +76,6 @@
         "edit": true,
         "bash": true,
         "patch": true,
-        "grep": true,
-        "glob": true,
-        "list": true,
-        "todoread": true,
-        "todowrite": true,
-        "webfetch": true
-      }
-    },
-    "Code Reviewer": {
-      "description": "Provides thorough, constructive code reviews focusing on security, performance, maintainability, and best practices",
-      "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "prompt": "{file:./agents/code-reviewer.md}",
-      "tools": {
-        "read": true,
-        "write": false,
-        "edit": false,
-        "bash": true,
-        "patch": false,
         "grep": true,
         "glob": true,
         "list": true,
