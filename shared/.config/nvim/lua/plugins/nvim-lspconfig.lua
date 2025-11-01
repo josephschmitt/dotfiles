@@ -10,7 +10,7 @@ return {
     },
     setup = {
       eslint = function()
-        LazyVim.lsp.on_attach(function(client)
+        Snacks.util.lsp.on_attach(function(client)
           if client.name == "eslint" then
             client.server_capabilities.documentFormattingProvider = true
           elseif client.name == "tsserver" then
