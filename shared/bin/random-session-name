@@ -1,0 +1,10 @@
+#!/bin/sh
+# Generate random session name with adjective-animal format
+
+adjectives="curious jumping happy clever brave swift quiet bright calm eager"
+animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
+
+adj=$(printf "%s\n" $adjectives | awk 'BEGIN{srand()} {print rand(), $0}' | sort -n | cut -d' ' -f2 | head -n1)
+animal=$(printf "%s\n" $animals | awk 'BEGIN{srand()} {print rand(), $0}' | sort -n | cut -d' ' -f2 | head -n1)
+
+echo "$adj-$animal"

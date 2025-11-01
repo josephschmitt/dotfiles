@@ -86,11 +86,7 @@ auto_start_tmux() {
       fi
 
       # Session already attached, generate random name for new session
-      adjectives="curious jumping happy clever brave swift quiet bright calm eager"
-      animals="lemur lizard panda tiger eagle dolphin falcon rabbit otter ferret"
-      adj=$(echo "$adjectives" | tr ' ' '\n' | shuf -n 1)
-      animal=$(echo "$animals" | tr ' ' '\n' | shuf -n 1)
-      session_name="$adj-$animal"
+      session_name="$(random-session-name)"
     fi
 
     # Create new session and launch sesh popup
@@ -118,8 +114,11 @@ tmx() {
   
   if [ -n "$TMUX" ]; then
     # Already in tmux, switch to session instead of nesting
-    tmux new-session -A -d -s "$session_name"
-    tmux switch-client -t "$session_name"
+    if tmux has-session -t "$session_name" 2>/dev/null; then
+      tmux switch-client -t "$session_name"
+    else
+      tmux-new-session "$session_name"
+    fi
   else
     # Not in tmux, start new session normally
     tmux new-session -A -s "$session_name"

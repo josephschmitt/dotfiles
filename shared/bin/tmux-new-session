@@ -1,0 +1,9 @@
+#!/bin/sh
+# Create new tmux session and switch to it
+# Usage: tmux-new-session [session-name]
+# If no name provided, generates random adjective-animal name
+
+session_name="${1:-$(random-session-name)}"
+
+tmux new-session -d -s "$session_name"
+tmux switch-client -t "$session_name"

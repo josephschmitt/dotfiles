@@ -22,11 +22,7 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
             end
 
             # Session already attached, generate random name for new session
-            set adjectives "curious" "jumping" "happy" "clever" "brave" "swift" "quiet" "bright" "calm" "eager"
-            set animals "lemur" "lizard" "panda" "tiger" "eagle" "dolphin" "falcon" "rabbit" "otter" "ferret"
-            set adj (random choice $adjectives)
-            set animal (random choice $animals)
-            set session_name "$adj-$animal"
+            set session_name (random-session-name)
         end
 
         # Create new session and launch sesh popup
