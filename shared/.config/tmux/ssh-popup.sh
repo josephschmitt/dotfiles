@@ -8,31 +8,31 @@ mkdir -p "$(dirname "$RECENT_HOSTS")"
 
 # Function to get icon based on hostname patterns
 get_host_icon() {
-    host="$1"
-    case "$host" in
-        *prod*|*production*) echo "🔒" ;;
-        *stage*|*staging*)   echo "🚧" ;;
-        *dev*|*develop*)     echo "🔧" ;;
-        *test*)              echo "🧪" ;;
-        *docker*|*container*) echo "🐳" ;;
-        *aws*|*ec2*|*cloud*) echo "☁️" ;;
-        *ubuntu*|*buntu*|*debian*|*linux*) echo "🐧" ;;
-        *mac*|*darwin*)      echo "🍎" ;;
-        *web*|*www*)         echo "🌐" ;;
-        *db*|*database*)     echo "💾" ;;
-        *git*)               echo "" ;;
-        localhost|127.*)     echo "🏠" ;;
-        *)                   echo "🖥️" ;;
-    esac
+  host="$1"
+  case "$host" in
+  *prod* | *production*) echo "" ;;                   # nf-fa-lock
+  *stage* | *staging*) echo "" ;;                     # nf-fa-flask
+  *dev* | *develop*) echo "󰵮" ;;                       # nf-dev-code
+  *test*) echo "󰙨" ;;                                  # nf-md-test_tube
+  *docker* | *container*) echo "" ;;                  # nf-linux-docker
+  *aws* | *ec2* | *cloud*) echo "󰅟" ;;                 # nf-md-cloud
+  *ubuntu* | *buntu* | *debian* | *linux*) echo "" ;; # nf-linux-ubuntu
+  *mac* | *darwin*) echo "" ;;                        # nf-dev-apple
+  *web* | *www*) echo "󰖟" ;;                           # nf-md-web
+  *db* | *database*) echo "" ;;                       # nf-dev-database
+  *git*) echo "" ;;                                   # nf-dev-git
+  localhost | 127.*) echo "" ;;                       # nf-fa-home
+  *) echo "󰒋" ;;                                       # nf-md-server
+  esac
 }
 
 # Function to list known hosts from SSH history
 list_known_hosts() {
-    # Parse known_hosts file for hostnames
-    # Handle both hashed and plain format
-    {
-        # Plain format hostnames (not hashed)
-        awk '
+  # Parse known_hosts file for hostnames
+  # Handle both hashed and plain format
+  {
+    # Plain format hostnames (not hashed)
+    awk '
             /^[^#|]/ {
                 # Split on comma and space to handle multiple formats
                 split($1, hosts, ",")
@@ -56,9 +56,9 @@ list_known_hosts() {
                 }
             }
         ' ~/.ssh/known_hosts ~/.ssh/known_hosts.old 2>/dev/null
-        
-        # Also include SSH config hosts as they're likely to be used
-        awk '
+
+    # Also include SSH config hosts as they're likely to be used
+    awk '
             /^Host / {
                 for (i=2; i<=NF; i++) {
                     host = $i
@@ -72,39 +72,39 @@ list_known_hosts() {
                 }
             }
         ' ~/.ssh/config ~/.ssh/config.d/* 2>/dev/null
-    } | sort -u
+  } | sort -u
 }
 
 # Function to list recent hosts
 list_recent_hosts() {
-    if [ -f "$RECENT_HOSTS" ]; then
-        # Show last 10 unique recent hosts
-        tac "$RECENT_HOSTS" 2>/dev/null | awk '!seen[$0]++' | head -10
-    fi
+  if [ -f "$RECENT_HOSTS" ]; then
+    # Show last 10 unique recent hosts
+    tac "$RECENT_HOSTS" 2>/dev/null | awk '!seen[$0]++' | head -10
+  fi
 }
 
 # Function to format hosts with icons and labels
 format_hosts() {
-    label="$1"
-    while read -r host; do
-        [ -z "$host" ] && continue
-        icon=$(get_host_icon "$host")
-        printf "%s  %-30s  %s\n" "$icon" "$host" "$label"
-    done
+  label="$1"
+  while read -r host; do
+    [ -z "$host" ] && continue
+    icon=$(get_host_icon "$host")
+    printf "%s  %-30s  %s\n" "$icon" "$host" "$label"
+  done
 }
 
 # Build host list with recent hosts at top
 {
-    list_recent_hosts | format_hosts "⭐ recent"
-    echo "---"
-    list_known_hosts | format_hosts ""
+  list_recent_hosts | format_hosts " recent"
+  echo "---"
+  list_known_hosts | format_hosts ""
 } | fzf-tmux -p 80%,70% \
-    --ansi \
-    --border-label ' SSH Connect ' \
-    --prompt '🖥️  ' \
-    --header '  Select host to connect • ^r reload • ESC cancel' \
-    --bind 'tab:down,btab:up' \
-    --bind 'ctrl-r:reload({
+  --ansi \
+  --border-label ' SSH Connect ' \
+  --prompt '  ' \
+  --header '  Select host to connect • ^r reload • ESC cancel' \
+  --bind 'tab:down,btab:up' \
+  --bind 'ctrl-r:reload({
         list_recent_hosts() {
             if [ -f "'"$RECENT_HOSTS"'" ]; then
                 tac "'"$RECENT_HOSTS"'" 2>/dev/null | awk "!seen[\$0]++" | head -10
@@ -148,30 +148,30 @@ format_hosts() {
             while read -r host; do
                 [ -z "$host" ] && continue
                 case "$host" in
-                    *prod*|*production*) icon="🔒" ;;
-                    *stage*|*staging*)   icon="🚧" ;;
-                    *dev*|*develop*)     icon="🔧" ;;
-                    *test*)              icon="🧪" ;;
-                    *docker*|*container*) icon="🐳" ;;
-                    *aws*|*ec2*|*cloud*) icon="☁️" ;;
-                    *ubuntu*|*buntu*|*debian*|*linux*) icon="🐧" ;;
-                    *mac*|*darwin*)      icon="🍎" ;;
-                    *web*|*www*)         icon="🌐" ;;
-                    *db*|*database*)     icon="💾" ;;
+                    *prod*|*production*) icon="" ;;
+                    *stage*|*staging*)   icon="" ;;
+                    *dev*|*develop*)     icon="" ;;
+                    *test*)              icon="" ;;
+                    *docker*|*container*) icon="" ;;
+                    *aws*|*ec2*|*cloud*) icon="󰅟" ;;
+                    *ubuntu*|*buntu*|*debian*|*linux*) icon="" ;;
+                    *mac*|*darwin*)      icon="" ;;
+                    *web*|*www*)         icon="󰖟" ;;
+                    *db*|*database*)     icon="" ;;
                     *git*)               icon="" ;;
-                    localhost|127.*)     icon="🏠" ;;
-                    *)                   icon="🖥️" ;;
+                    localhost|127.*)     icon="" ;;
+                    *)                   icon="" ;;
                 esac
                 printf "%s  %-30s  %s\n" "$icon" "$host" "$label"
             done
         }
         {
-            list_recent_hosts | format_hosts "⭐ recent"
+            list_recent_hosts | format_hosts " recent"
             echo "---"
             list_known_hosts | format_hosts ""
         }
     })' \
-    --preview 'bash -c '\''
+  --preview 'bash -c '\''
         host={2}
         echo "=== SSH Configuration ==="
         ssh -G "$host" 2>/dev/null | grep -E "^(hostname|user|port|identityfile)" | \
@@ -191,6 +191,6 @@ format_hosts() {
             echo "Previously connected"
         fi
     '\''' \
-    --preview-window 'right:50%' \
-    --delimiter ' ' \
-    --with-nth 1,2,3 | awk '{print $2}'
+  --preview-window 'right:50%' \
+  --delimiter ' ' \
+  --with-nth 1,2,3 | awk '{print $2}'
