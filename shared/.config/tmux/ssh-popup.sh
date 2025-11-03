@@ -10,9 +10,9 @@ mkdir -p "$(dirname "$RECENT_HOSTS")"
 get_host_icon() {
   host="$1"
   case "$host" in
-  *prod* | *production*) echo "" ;;                   # nf-fa-lock
+  *prod*) echo "" ;;                                  # nf-fa-lock
   *stage* | *staging*) echo "" ;;                     # nf-fa-flask
-  *dev* | *develop*) echo "󰵮" ;;                       # nf-dev-code
+  *dev*) echo "󰵮" ;;                                   # nf-dev-code
   *test*) echo "󰙨" ;;                                  # nf-md-test_tube
   *docker* | *container*) echo "" ;;                  # nf-linux-docker
   *aws* | *ec2* | *cloud*) echo "󰅟" ;;                 # nf-md-cloud
@@ -95,8 +95,8 @@ format_hosts() {
 
 # Build host list with recent hosts at top
 {
-    list_recent_hosts | format_hosts " recent"
-    list_known_hosts | format_hosts ""
+  list_recent_hosts | format_hosts " recent"
+  list_known_hosts | format_hosts ""
 } | fzf-tmux -p 80%,70% \
   --ansi \
   --border-label ' SSH Connect ' \
