@@ -111,6 +111,7 @@ Main-horizontal layout with fixed 20-row bottom panes:
 
 ### Session Management
 - `Ctrl-s o` - Open Sesh session switcher (small: 80% width, 70% height)
+- `Ctrl-s @` - Open SSH host selector with smart tmux handling (small: 80% width, 70% height)
 - `Ctrl-s t` - Open TWM workspace manager (small: 80% width, 70% height)
 - `Ctrl-s T` - Open TWM workspace manager for existing sessions (small: 80% width, 70% height)
 
@@ -149,3 +150,41 @@ bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 
 - [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) - Seamless vim/tmux navigation
 - [tmux-tilish](https://github.com/jabirali/tmux-tilish) - i3-like window management
 - [tmux-floating-terminal](https://github.com/lloydbond/tmux-floating-terminal) - Floating terminal windows
+
+## SSH Session Manager
+
+The SSH popup (`Ctrl-s @`) provides an enhanced SSH connection experience with:
+
+### Features
+- **Smart host detection** - Parses `~/.ssh/known_hosts` for SSH connection history, plus `~/.ssh/config` for configured hosts
+- **Nerd font icons** - Visual host categorization:
+  - 🔒 Production servers (`*prod*`, `*production*`)
+  - 🚧 Staging servers (`*stage*`, `*staging*`)
+  - 🔧 Development servers (`*dev*`, `*develop*`)
+  - 🧪 Test servers (`*test*`)
+  - 🐳 Docker/Container hosts (`*docker*`, `*container*`)
+  - ☁️  Cloud instances (`*aws*`, `*ec2*`, `*cloud*`)
+  - 🐧 Linux servers (`*ubuntu*`, `*debian*`, `*linux*`)
+  - 🍎 macOS servers (`*mac*`, `*darwin*`)
+  - 🌐 Web servers (`*web*`, `*www*`)
+  - 💾 Database servers (`*db*`, `*database*`)
+  -  Git servers (`*git*`)
+  - 🏠 Localhost (`localhost`, `127.*`)
+  - 🖥️  Default server icon
+- **Recent hosts tracking** - Shows ⭐ recent connections at the top
+- **Connection status preview** - Tests if hosts are reachable (1-second timeout)
+- **SSH config preview** - Shows hostname, user, port, and identity file
+- **Smart tmux handling** - Avoids tmux-in-tmux nesting:
+  - Connects in new tmux window (not nested session)
+  - Attempts to attach to existing remote tmux session
+  - Falls back to creating new remote tmux session
+  - Falls back to shell if tmux unavailable on remote
+
+### Keybindings (within SSH popup)
+- `↑/↓` or `Tab/Shift-Tab` - Navigate hosts
+- `Ctrl-r` - Reload host list
+- `Enter` - Connect to selected host
+- `Esc` - Cancel
+
+### Recent Hosts
+Recent SSH connections are tracked in `~/.cache/tmux-ssh-recent` and displayed with a ⭐ indicator at the top of the list for quick access to frequently used hosts.
