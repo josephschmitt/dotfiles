@@ -95,9 +95,26 @@ format_hosts() {
 
 # Build host list with recent hosts at top
 {
-  list_recent_hosts | format_hosts " recent"
-  echo "---"
-  list_known_hosts | format_hosts ""
+    recent=$(list_recent_hosts)
+    all=$(list_known_hosts)
+    
+    # Show recent hosts
+    if [ -n "$recent" ]; then
+        echo "$recent" | format_hosts " recent"
+    fi
+    
+    # Only show separator and other hosts if there are non-recent hosts
+    if [ -n "$recent" ] && [ -n "$all" ]; then
+        # Filter out recent hosts from all hosts
+        other=$(echo "$all" | grep -vxF "$recent")
+        if [ -n "$other" ]; then
+            echo "---"
+            echo "$other" | format_hosts ""
+        fi
+    elif [ -z "$recent" ] && [ -n "$all" ]; then
+        # No recent hosts, just show all
+        echo "$all" | format_hosts ""
+    fi
 } | fzf-tmux -p 80%,70% \
   --ansi \
   --border-label ' SSH Connect ' \
@@ -166,9 +183,22 @@ format_hosts() {
             done
         }
         {
-            list_recent_hosts | format_hosts " recent"
-            echo "---"
-            list_known_hosts | format_hosts ""
+            recent=$(list_recent_hosts)
+            all=$(list_known_hosts)
+            
+            if [ -n "$recent" ]; then
+                echo "$recent" | format_hosts " recent"
+            fi
+            
+            if [ -n "$recent" ] && [ -n "$all" ]; then
+                other=$(echo "$all" | grep -vxF "$recent")
+                if [ -n "$other" ]; then
+                    echo "---"
+                    echo "$other" | format_hosts ""
+                fi
+            elif [ -z "$recent" ] && [ -n "$all" ]; then
+                echo "$all" | format_hosts ""
+            fi
         }
     })' \
   --preview 'bash -c '\''
