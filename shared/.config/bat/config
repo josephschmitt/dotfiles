@@ -1,0 +1,17 @@
+# Bat configuration
+# Syntax highlighting for file previews
+
+# Theme (set via BAT_THEME environment variable in shell exports)
+# --theme="tokyonight_night"
+
+# Show line numbers and git modifications
+--style="numbers,changes"
+
+# Wrap text instead of truncating
+--wrap="auto"
+
+# Use italic text (requires terminal support)
+--italic-text="always"
+
+# Paging behavior
+--paging="auto"
