@@ -116,6 +116,7 @@ Main-horizontal layout with fixed 20-row bottom panes:
 
 ### Application Popups
 
+- `Ctrl-s g` - Open Ripgrep search in popup (large: 90% width/height)
 - `Ctrl-s G` - Open Lazygit in popup (large: 90% width/height)
 - `Ctrl-s N` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
 - `Ctrl-s C` - Open Scooter in popup (large: 90% width/height)
@@ -166,6 +167,40 @@ bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 
 - [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) - Seamless vim/tmux navigation
 - [tmux-tilish](https://github.com/jabirali/tmux-tilish) - i3-like window management
 - [tmux-floating-terminal](https://github.com/lloydbond/tmux-floating-terminal) - Floating terminal windows
+
+## Ripgrep Search
+
+The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search across your current directory. Based on [junegunn's ripgrep integration guide](https://junegunn.github.io/fzf/tips/ripgrep-integration/).
+
+### Features
+
+- **Fast search** - Uses [ripgrep](https://github.com/BurntSushi/ripgrep) for blazing-fast code search with live reload
+- **Interactive preview** - Syntax-highlighted preview with [bat](https://github.com/sharkdp/bat), automatically centered on matched line
+- **Multi-select** - Select multiple matches with `Tab/Shift-Tab` to open in quickfix list
+- **Smart case** - Case-insensitive by default, case-sensitive when query contains uppercase
+- **Respects .gitignore** - Automatically excludes files listed in `.gitignore`
+- **Adaptive layout** - Preview window moves above search on narrow terminals (< 80 cols)
+
+### Usage
+
+1. Press `Ctrl-s g` to open the search popup
+2. Type your search query - results update live as you type
+3. Navigate with arrow keys
+4. **Single file**: Press `Enter` to open file at line number and exit, or `Ctrl-o` to open and return to search
+5. **Multiple files**: Use `Tab/Shift-Tab` to select multiple matches, then `Enter` to open all in quickfix list
+6. Press `Esc` to cancel
+
+### Keybindings (within search popup)
+
+- `Enter` - Open file at matched line and exit
+- `Ctrl-o` - Open file and return to search
+- `Tab/Shift-Tab` - Select/deselect multiple matches
+- `Alt-a` - Select all matches
+- `Alt-d` - Deselect all matches  
+- `Ctrl-/` - Toggle preview window
+- `Esc` - Cancel and close popup
+
+The preview window shows the file header (name/size) with syntax highlighting and centers on the matched line for context.
 
 ## SSH Session Manager
 
