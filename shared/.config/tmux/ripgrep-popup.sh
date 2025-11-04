@@ -5,7 +5,8 @@
 # Start with empty list, only show results when user types
 # --no-ignore-vcs: ignore .gitignore but respect .ignore files
 # --hidden: search hidden files/directories (like .config)
-RG_PREFIX="rg --column --color=always --smart-case --no-ignore-vcs --hidden"
+# --glob '!.git': exclude .git directories
+RG_PREFIX="rg --column --color=always --smart-case --no-ignore-vcs --hidden --glob '!.git'"
 INITIAL_QUERY="${*:-}"
 
 : | fzf --disabled --ansi --multi \
