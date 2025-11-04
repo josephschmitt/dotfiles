@@ -2,6 +2,11 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+-- Enable RPC server for remote file opening from popups
+-- This creates a socket file that other processes can use to send commands  
+local socket_file = vim.fn.stdpath("run") .. "/nvim." .. vim.fn.getpid() .. ".sock"
+vim.fn.serverstart(socket_file)
+
 -- Force a specific node version for global hnvm
 vim.env.HNVM_NODE = "22.14.0"
 vim.env.HVNM_QUIET = true

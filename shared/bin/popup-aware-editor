@@ -1,0 +1,104 @@
+#!/bin/sh
+# Popup-aware editor wrapper
+# Opens files in an existing Neovim pane when called from a tmux popup
+# Falls back to opening in popup if no Neovim pane found
+#
+# How it works:
+# 1. Detects if running in a tmux popup (via TMUX_IN_POPUP env var)
+# 2. Searches for Neovim instances with RPC sockets in current tmux window
+# 3. Uses nvim --remote-send to open files via RPC
+# 4. Focuses the Neovim pane and closes the popup
+
+# Detect the actual editor to use
+ACTUAL_EDITOR="${VISUAL:-${EDITOR:-nvim}}"
+
+# If we're in a tmux popup, try to find a Neovim pane with RPC
+if [ -n "$TMUX_IN_POPUP" ] && [ -n "$TMUX" ]; then
+    # Search for nvim panes with RPC sockets in current window
+    NVIM_PANE=$(tmux list-panes -F '#{pane_id} #{pane_pid}' | while read pane_id pane_pid; do
+        # Function to recursively find nvim processes and their sockets
+        find_nvim_with_socket() {
+            local pid="$1"
+            local depth="${2:-0}"
+            
+            # Limit recursion depth to avoid infinite loops
+            if [ "$depth" -gt 3 ]; then
+                return
+            fi
+            
+            # Check if this PID is nvim
+            if ps -p "$pid" -o comm= 2>/dev/null | grep -q nvim; then
+                # Look for socket files with this PID
+                local sock=$(find /var/folders -name "nvim.$pid.sock" -o -name "nvim.$pid.0" 2>/dev/null | head -1)
+                if [ -z "$sock" ]; then
+                    sock=$(find /tmp -name "nvim.$pid.sock" -o -name "nvim.$pid.0" 2>/dev/null | head -1)
+                fi
+                
+                # If we found a socket, return it immediately
+                if [ -n "$sock" ]; then
+                    echo "$pid $sock"
+                    return
+                fi
+            fi
+            
+            # Recursively check children
+            pgrep -P "$pid" 2>/dev/null | while read child_pid; do
+                result=$(find_nvim_with_socket "$child_pid" $((depth + 1)))
+                if [ -n "$result" ]; then
+                    echo "$result"
+                    return
+                fi
+            done
+        }
+        
+        # Start searching from the pane's PID
+        nvim_result=$(find_nvim_with_socket "$pane_pid")
+        
+        if [ -n "$nvim_result" ]; then
+            nvim_pid=$(echo "$nvim_result" | awk '{print $1}')
+            socket=$(echo "$nvim_result" | awk '{print $2}')
+            echo "$pane_id $socket"
+            break
+        fi
+    done)
+    
+    if [ -n "$NVIM_PANE" ]; then
+        # Found an nvim pane with RPC socket
+        PANE_ID=$(echo "$NVIM_PANE" | awk '{print $1}')
+        SOCKET=$(echo "$NVIM_PANE" | awk '{print $2}')
+        
+        # Parse arguments: separate file paths from line numbers
+        FILE_PATH=""
+        LINE_NUM=""
+        for arg in "$@"; do
+            if echo "$arg" | grep -q '^+[0-9]'; then
+                LINE_NUM=$(echo "$arg" | sed 's/^+//')
+            else
+                FILE_PATH="$arg"
+            fi
+        done
+        
+        if [ -n "$FILE_PATH" ]; then
+            # Escape the file path for vim command
+            escaped_path=$(printf '%s' "$FILE_PATH" | sed "s/'/''/g")
+            
+            # Send commands to open file and jump to line
+            if [ -n "$LINE_NUM" ]; then
+                nvim --server "$SOCKET" --remote-send "<Esc>:e $escaped_path<CR>:$LINE_NUM<CR>zz" 2>/dev/null
+            else
+                nvim --server "$SOCKET" --remote-send "<Esc>:e $escaped_path<CR>" 2>/dev/null
+            fi
+            
+            # Focus the editor pane
+            tmux select-pane -t "$PANE_ID"
+            
+            exit 0
+        fi
+    fi
+    
+    # No nvim with RPC found - open in popup itself
+    exec "$ACTUAL_EDITOR" "$@"
+else
+    # Not in a popup, just open normally
+    exec "$ACTUAL_EDITOR" "$@"
+fi

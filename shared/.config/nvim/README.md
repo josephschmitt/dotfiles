@@ -42,6 +42,7 @@ This configuration extends LazyVim with custom plugins and settings focused on:
 ### Terminal Integration
 - **tmux-navigator** - Seamless navigation between vim and tmux panes
 - **zellij-nav** - Navigation support for zellij terminal multiplexer
+- **RPC server** - Enabled by default for remote file opening from tmux popups
 
 ### File Management
 - **yazi** - Modern file manager integration

@@ -12,8 +12,8 @@ INITIAL_QUERY="${*:-}"
 : | fzf --disabled --ansi --multi \
     --bind "start:reload:$RG_PREFIX {q} || :" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || :" \
-    --bind "enter:become(${EDITOR:-nvim} {1} +{2})" \
-    --bind "ctrl-o:execute(${EDITOR:-nvim} {1} +{2})" \
+    --bind "enter:execute(popup-aware-editor {1} +{2})+abort" \
+    --bind "ctrl-o:execute(popup-aware-editor {1} +{2})" \
     --bind 'alt-a:select-all,alt-d:deselect-all,ctrl-/:toggle-preview' \
     --delimiter : \
     --preview 'bat --style=full --color=always --highlight-line {2} {1}' \

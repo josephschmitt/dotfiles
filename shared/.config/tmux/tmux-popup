@@ -174,4 +174,7 @@ if [ -n "$TITLE" ]; then
 fi
 
 # Execute the popup - pass all remaining args as the command
-exec tmux display-popup $TMUX_ARGS "$@"
+# Set TMUX_IN_POPUP to indicate we're running in a popup context
+exec tmux display-popup $TMUX_ARGS \
+    -e "TMUX_IN_POPUP=1" \
+    "$@"

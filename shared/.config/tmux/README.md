@@ -145,6 +145,36 @@ All tmux popups use the `tmux-popup` script for consistent behavior and sizing. 
 
 The medium preset intelligently limits to 250 columns and 100 lines maximum to prevent overly large popups on ultrawide monitors.
 
+### Popup-Aware Editor
+
+When opening files from within a popup (e.g., selecting a file in Ripgrep or Yazi), the editor automatically opens in an **existing Neovim pane** rather than inside the popup. This provides a seamless IDE-like workflow where:
+
+1. Open a popup (Ripgrep, Yazi, etc.) with a tmux keybinding
+2. Browse/search for files in the popup
+3. Select a file to edit
+4. The file opens in your Neovim pane using RPC
+5. The popup automatically closes
+
+This is achieved through:
+- The `popup-aware-editor` wrapper script in `~/bin/`
+- Neovim RPC server enabled via `serverstart()` in your config
+- Detecting running Neovim instances with listen sockets
+- Using `nvim --remote` to open files via RPC
+
+**Behavior:**
+- If a Neovim instance with RPC is found in the current window: opens the file there
+- If no Neovim instance found: opens the editor in the popup itself
+
+**Supported in:**
+- Ripgrep search popup (`Ctrl-s g`)
+- Yazi file manager popup (`Ctrl-s Z`)
+- Lazygit popup (`Ctrl-s G`) - when pressing `e` to edit files
+- Any custom popup that calls `popup-aware-editor`
+
+**Requirements:**
+- Neovim must be running with RPC enabled (automatically configured in `lua/config/options.lua`)
+- `lsof` command must be available (for detecting Neovim sockets)
+
 ### Custom Popup Usage
 
 You can create custom popup keybindings using the `~/.config/tmux/tmux-popup` script:
