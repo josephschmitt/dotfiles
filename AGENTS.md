@@ -56,7 +56,7 @@ New configuration needed?
 ### CI Performance Tracking
 **When modifying shell startup:** Update `.github/workflows/shell-performance.yml`
 
-**Startup dependencies** (auto-run on shell init): oh-my-posh, starship, zoxide, fzf, basher, zinit
+**Startup dependencies** (auto-run on shell init): oh-my-posh, zoxide, fzf, basher, zinit
 - Add new tools to CI "Install shell startup tools" step
 - Remove from CI when lazy-loading or removing tools
 

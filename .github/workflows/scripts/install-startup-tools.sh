@@ -31,10 +31,6 @@ fi
 echo "Installing oh-my-posh..."
 curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
 
-# Install starship (optional prompt)
-echo "Installing starship..."
-curl -sS https://starship.rs/install.sh | sh -s -- -y
-
 # Install zoxide (smart directory jumping)
 echo "Installing zoxide..."
 if [ "$RUNNER_OS" = "macOS" ]; then
@@ -76,7 +72,6 @@ echo "Verifying installations..."
 fish --version
 tmux -V
 oh-my-posh version
-starship --version
 zoxide --version
 fzf --version
 basher help

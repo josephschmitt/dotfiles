@@ -1,18 +1,7 @@
 function start_interactive -d "Load interactive shell customizations (prompt, keybindings, etc.)"
     # Prompt configuration
-    # Use Starship if USE_STARSHIP env var is set, otherwise use oh-my-posh (default)
-    if set -q USE_STARSHIP; and type -q starship
-        # Starship prompt (fast enough to init directly)
-        starship init fish | source
-
-        # Enable transient prompt (matches oh-my-posh behavior)
-        # After command execution, previous prompts simplify to just the arrow
-        function starship_transient_prompt_func
-            starship module character
-        end
-        enable_transience
-    else if type -q oh-my-posh
-        # oh-my-posh prompt (default)
+    if type -q oh-my-posh
+        # oh-my-posh prompt
         oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
     end
 
