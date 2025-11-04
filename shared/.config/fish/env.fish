@@ -54,4 +54,8 @@ setenv ZIDE_ALWAYS_NAME true
 setenv ZIDE_USE_YAZI_CONFIG false
 setenv ZIDE_USE_FOCUS_PLUGIN true
 
+# FZF configuration
+# fd respects .ignore files automatically, just exclude .git
+setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude=.git"
+
 set -gx PATH $PATH $HOME/.lmstudio/bin

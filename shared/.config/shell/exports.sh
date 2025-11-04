@@ -29,7 +29,8 @@ export ZIDE_USE_YAZI_CONFIG="false"
 export ZIDE_USE_FOCUS_PLUGIN="true"
 
 # Fuzzy finder configuration
-export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude={.git,OrbStack}"
+# fd respects .ignore files automatically, just exclude .git
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude=.git"
 
 # PATH Configuration
 # Nix paths (set first to resolve before other paths like homebrew)

@@ -1,0 +1,50 @@
+# Ignore patterns for fd, ripgrep, and other tools
+# Used by:
+# - fd (FZF_DEFAULT_COMMAND for fzf file search)
+# - ripgrep (code search, including tmux ripgrep popup)
+# - other tools that respect .ignore files
+#
+# This is the single source of truth for ignore patterns.
+# Both .gitignore and .ignore are respected, but .ignore takes precedence.
+
+# Dependencies
+node_modules/
+.pnpm-store/
+.npm/
+.cargo/
+.bun/
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+out/
+target/
+
+# Cache directories
+.cache/
+.turbo/
+.parcel-cache/
+
+# IDE
+.vscode/extensions/
+.vscode-server/
+.config/raycast/extensions/
+
+# System
+.DS_Store
+.Trash/
+.bash_history
+.zsh_sessions/
+
+# Docker/Containers
+.docker/
+.orbstack/
+OrbStack/
+.bzvol/
+
+# Other
+.adobe/
+.local/
+.vscode/cli/servers/
