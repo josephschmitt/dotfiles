@@ -8,12 +8,22 @@
 # 2. Searches for Neovim instances with RPC sockets in current tmux window
 # 3. Uses nvim --remote-send to open files via RPC
 # 4. Focuses the Neovim pane and closes the popup
+#
+# Options:
+# --no-rpc: Skip RPC and always open in the current context
 
 # Detect the actual editor to use
 ACTUAL_EDITOR="${VISUAL:-${EDITOR:-nvim}}"
 
-# If we're in a tmux popup, try to find a Neovim pane with RPC
-if [ -n "$TMUX_IN_POPUP" ] && [ -n "$TMUX" ]; then
+# Check for --no-rpc flag
+SKIP_RPC=0
+if [ "$1" = "--no-rpc" ]; then
+    SKIP_RPC=1
+    shift
+fi
+
+# If we're in a tmux popup, try to find a Neovim pane with RPC (unless --no-rpc specified)
+if [ "$SKIP_RPC" -eq 0 ] && [ -n "$TMUX_IN_POPUP" ] && [ -n "$TMUX" ]; then
     # Search for nvim panes with RPC sockets in current window
     NVIM_PANE=$(tmux list-panes -F '#{pane_id} #{pane_pid}' | while read pane_id pane_pid; do
         # Function to recursively find nvim processes and their sockets
