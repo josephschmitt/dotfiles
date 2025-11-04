@@ -10,6 +10,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 # Default editor
 export EDITOR="nvim"
 
+export COLORTERM="truecolor"
 export BAT_THEME="tokyonight_night"
 
 # Eza configuration

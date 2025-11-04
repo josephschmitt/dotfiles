@@ -6,6 +6,7 @@
 
 setenv XDG_CONFIG_HOME "$HOME/.config"
 setenv EDITOR nvim
+setenv COLORTERM truecolor
 setenv BAT_THEME tokyonight_night
 setenv EZA_ICONS_AUTO always
 setenv EZA_CONFIG_DIR "$XDG_CONFIG_HOME/eza"
