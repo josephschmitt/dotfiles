@@ -7,6 +7,6 @@ dark = "catppuccin-mocha"
 
 [opener]
 edit = [
-  { run = '$EDITOR "$@"', block = false, for = "unix" },
+  { run = 'popup-aware-editor "$@"', block = false, for = "unix" },
   { run = "%EDITOR% %*",  block = false, for = "windows" },
 ]

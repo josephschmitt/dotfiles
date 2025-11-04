@@ -92,13 +92,37 @@ if [ -n "$TMUX_IN_POPUP" ] && [ -n "$TMUX" ]; then
             # Focus the editor pane
             tmux select-pane -t "$PANE_ID"
             
+            # Kill the parent process to close the popup immediately
+            # This works for lazygit, yazi, or any other interactive tool
+            # Get the process tree: shell -> tool (lazygit/yazi/etc) -> our script
+            PARENT_PID=$PPID
+            if [ -n "$PARENT_PID" ] && [ "$PARENT_PID" != "1" ]; then
+                PARENT_CMD=$(ps -p "$PARENT_PID" -o comm= 2>/dev/null)
+                # Only kill if it's not a shell (we want to kill the tool, not the shell)
+                case "$PARENT_CMD" in
+                    *sh|bash|zsh|fish) 
+                        # Parent is a shell, so the tool is probably the grandparent
+                        GRANDPARENT_PID=$(ps -p "$PARENT_PID" -o ppid= 2>/dev/null | tr -d ' ')
+                        if [ -n "$GRANDPARENT_PID" ] && [ "$GRANDPARENT_PID" != "1" ]; then
+                            (kill "$GRANDPARENT_PID" 2>/dev/null) &
+                        fi
+                        ;;
+                    *)
+                        # Parent is the tool itself
+                        (kill "$PARENT_PID" 2>/dev/null) &
+                        ;;
+                esac
+            fi
+            
             exit 0
         fi
     fi
     
     # No nvim with RPC found - open in popup itself
+    # Note: We're still in popup context here, so normal editor behavior applies
     exec "$ACTUAL_EDITOR" "$@"
 else
     # Not in a popup, just open normally
+    # This is for running lazygit outside a popup, or any other normal usage
     exec "$ACTUAL_EDITOR" "$@"
 fi
