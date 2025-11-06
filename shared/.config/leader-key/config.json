@@ -118,6 +118,12 @@
     {
       "actions" : [
         {
+          "key" : "A",
+          "label" : "UC Apps",
+          "type" : "url",
+          "value" : "https://github.com/organizations/UrbanCompass/settings/installations"
+        },
+        {
           "key" : "c",
           "label" : "cli",
           "type" : "url",
