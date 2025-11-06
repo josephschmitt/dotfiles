@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Helper script for ripgrep-popup.sh to parse --include/--exclude flags
+
+query="$*"
+globs=""
+
+# Extract --include patterns
+while [[ "$query" =~ --include[[:space:]]+([^[:space:]]+) ]]; do
+  pattern="${BASH_REMATCH[1]}"
+  globs="$globs --glob $pattern"
+  query="${query/--include $pattern/}"
+done
+
+# Extract --exclude patterns  
+while [[ "$query" =~ --exclude[[:space:]]+([^[:space:]]+) ]]; do
+  pattern="${BASH_REMATCH[1]}"
+  globs="$globs --glob !$pattern"
+  query="${query/--exclude $pattern/}"
+done
+
+# Clean up extra whitespace from query
+query=$(echo "$query" | xargs)
+
+# Run ripgrep with base options + custom globs + search term
+if [[ -n "$query" ]]; then
+  rg --column --color=always --smart-case --no-ignore-vcs --hidden --glob '!.git' $globs -- "$query"
+fi
