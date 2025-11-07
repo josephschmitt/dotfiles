@@ -206,6 +206,7 @@ The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search acr
 
 - **Fast search** - Uses [ripgrep](https://github.com/BurntSushi/ripgrep) for blazing-fast code search with live reload
 - **Interactive preview** - Syntax-highlighted preview with [bat](https://github.com/sharkdp/bat), automatically centered on matched line
+- **Interactive filtering** - Filter by file type or path on-the-fly with `--include`/`--exclude` flags
 - **Multi-select** - Select multiple matches with `Tab/Shift-Tab` to open in quickfix list
 - **Smart case** - Case-insensitive by default, case-sensitive when query contains uppercase
 - **Respects .gitignore** - Automatically excludes files listed in `.gitignore`
@@ -215,10 +216,39 @@ The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search acr
 
 1. Press `Ctrl-s g` to open the search popup
 2. Type your search query - results update live as you type
-3. Navigate with arrow keys
-4. **Single file**: Press `Enter` to open file at line number and exit, or `Ctrl-o` to open and return to search
-5. **Multiple files**: Use `Tab/Shift-Tab` to select multiple matches, then `Enter` to open all in quickfix list
-6. Press `Esc` to cancel
+3. Optionally use `--include` or `--exclude` to filter files (see examples below)
+4. Navigate with arrow keys
+5. **Single file**: Press `Enter` to open file at line number and exit, or `Ctrl-o` to open and return to search
+6. **Multiple files**: Use `Tab/Shift-Tab` to select multiple matches, then `Enter` to open all in quickfix list
+7. Press `Esc` to cancel
+
+#### Filtering Examples
+
+You can dynamically filter which files to search using `--include` and `--exclude` flags:
+
+```
+# Search only in YAML files
+--include=*.yaml config
+
+# Search only in YAML and YML files (comma-separated)
+--include=*.yaml,*.yml authentication
+
+# Search in shell scripts
+--include=*.fish,*.sh,*.bash export
+
+# Exclude test files
+--exclude=*.test.js,*.spec.js function
+
+# Exclude directories
+--exclude=node_modules TODO
+
+# Combine filters
+--include=*.rs --exclude=*.test.rs struct
+
+# Both space and equals syntax work
+--include *.toml lazy
+--include=*.toml lazy
+```
 
 ### Keybindings (within search popup)
 

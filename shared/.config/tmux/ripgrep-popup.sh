@@ -3,11 +3,14 @@
 # Based on https://junegunn.github.io/fzf/tips/ripgrep-integration/
 #
 # Interactive file filtering:
-#   --include *.yaml search term       → search only *.yaml files
-#   --include *.{rs,toml} term         → search only *.rs and *.toml files
-#   --exclude node_modules term        → exclude node_modules directory
-#   --include src/** --exclude *.test.js term → combine filters
-#   search term                        → search all files (default)
+#   --include *.yaml search term           → search only *.yaml files
+#   --include=*.yaml search term           → same as above (= syntax supported)
+#   --include=*.yaml,*.yml term            → comma-separated patterns
+#   --include *.{rs,toml} term             → search only *.rs and *.toml files
+#   --exclude node_modules term            → exclude node_modules directory
+#   --exclude=*.test.js,*.spec.js term     → exclude multiple patterns
+#   --include src/** --exclude *.min.js    → combine filters
+#   search term                            → search all files (default)
 
 INITIAL_QUERY="${*:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

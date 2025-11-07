@@ -4,17 +4,43 @@
 query="$*"
 globs=""
 
-# Extract --include patterns
+# Helper function to expand comma-separated patterns into multiple --glob flags
+expand_patterns() {
+  local patterns="$1"
+  local prefix="$2"  # either "" for include or "!" for exclude
+  
+  # Split on commas and create a --glob flag for each pattern
+  IFS=',' read -ra PATTERNS <<< "$patterns"
+  for pattern in "${PATTERNS[@]}"; do
+    globs="$globs --glob ${prefix}${pattern}"
+  done
+}
+
+# Extract --include patterns (supports both --include=*.yaml and --include *.yaml)
+# Also supports comma-separated: --include=*.yaml,*.yml
+while [[ "$query" =~ --include=([^[:space:]]+) ]]; do
+  pattern="${BASH_REMATCH[1]}"
+  expand_patterns "$pattern" ""
+  query="${query/--include=$pattern/}"
+done
+
 while [[ "$query" =~ --include[[:space:]]+([^[:space:]]+) ]]; do
   pattern="${BASH_REMATCH[1]}"
-  globs="$globs --glob $pattern"
+  expand_patterns "$pattern" ""
   query="${query/--include $pattern/}"
 done
 
-# Extract --exclude patterns  
+# Extract --exclude patterns (supports both --exclude=*.yaml and --exclude *.yaml)
+# Also supports comma-separated: --exclude=*.yaml,*.yml
+while [[ "$query" =~ --exclude=([^[:space:]]+) ]]; do
+  pattern="${BASH_REMATCH[1]}"
+  expand_patterns "$pattern" "!"
+  query="${query/--exclude=$pattern/}"
+done
+
 while [[ "$query" =~ --exclude[[:space:]]+([^[:space:]]+) ]]; do
   pattern="${BASH_REMATCH[1]}"
-  globs="$globs --glob !$pattern"
+  expand_patterns "$pattern" "!"
   query="${query/--exclude $pattern/}"
 done
 
