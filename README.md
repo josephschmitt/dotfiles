@@ -41,7 +41,7 @@ git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
 # Apply nix-darwin configuration (installs packages, sets system preferences)
-darwin_rebuild
+nix_rebuild
 
 # Install user-level configuration files
 # Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
@@ -58,8 +58,8 @@ cd ~/.dotfiles
 git submodule update --init --recursive
 
 # Apply nix-darwin configuration (installs packages, sets system preferences)
-# The darwin_rebuild wrapper automatically detects work machines and uses work configurations
-darwin_rebuild
+# The nix_rebuild wrapper automatically detects work machines and uses work configurations
+nix_rebuild
 
 # Install user-level configuration files
 # Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
@@ -176,16 +176,16 @@ A major component of this setup is **[nix-darwin](https://github.com/LnL7/nix-da
 
 ```bash
 # Apply system configuration changes
-darwin_rebuild
+nix_rebuild
 
 # Update package versions
-darwin_update
+nix_update
 
 # Both: update packages then rebuild
-darwin_update && darwin_rebuild
+nix_update && nix_rebuild
 ```
 
-The `darwin_rebuild` alias intelligently detects whether you're on a personal or work machine and applies the appropriate configuration automatically.
+The `nix_rebuild` alias intelligently detects whether you're on a personal or work machine and applies the appropriate configuration automatically.
 
 ### Integration with Dotfiles
 
