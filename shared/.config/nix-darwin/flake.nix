@@ -6,13 +6,9 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    work = {
-      url = "path:../../../work";
-      flake = false;
-    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, work, ... }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, ... }:
     let
       darwinConfig = import ./darwin.nix;
       nixHomebrewConfig = {
@@ -44,15 +40,21 @@
         };
       };
 
+      # Path to work directory (relative to this flake)
+      workPath = ../../../work;
+      
       # Helper function to conditionally import work machine configs
       workMachineConfig = name:
-        if builtins.pathExists (work + "/.config/nix-darwin/machines/${name}.nix")
-        then import (work + "/.config/nix-darwin/machines/${name}.nix")
+        let
+          configPath = workPath + "/.config/nix-darwin/machines/${name}.nix";
+        in
+        if builtins.pathExists configPath
+        then import configPath
         else { }; # Empty config if file doesn't exist
 
       # Work configurations (only if work configs exist)
       workConfigs =
-        if builtins.pathExists (work + "/.config/nix-darwin/machines")
+        if builtins.pathExists (workPath + "/.config/nix-darwin/machines")
         then {
           # Compass M1 MacBook Pro
           "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
