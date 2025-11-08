@@ -3,9 +3,9 @@ promptToReturnFromSubprocess: false
 git:
   commit:
     autoWrapCommitMessage: false
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 os:
   edit: 'popup-aware-editor {{filename}}'
   editAtLine: 'popup-aware-editor {{filename}} +{{line}}'
