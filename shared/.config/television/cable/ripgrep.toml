@@ -1,0 +1,26 @@
+# Interactive ripgrep search channel
+# Note: This channel requires a search query as input since television
+# doesn't support fzf's reload-on-change pattern. Use the wrapper script.
+
+[metadata]
+name = "ripgrep"
+description = "Search code with ripgrep - requires search query"
+requirements = ["rg", "bat"]
+
+[source]
+# This will be overridden by the wrapper script with actual search term
+command = "fd -t f ."
+
+# Display full line
+display = "{}"
+
+# Output the file path
+output = "{}"
+
+[preview]
+# Show file contents with bat
+command = "bat --style=full --color=always {}"
+
+[ui]
+layout = "landscape"
+preview_size = 55
