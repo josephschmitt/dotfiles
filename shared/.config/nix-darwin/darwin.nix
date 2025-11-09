@@ -12,7 +12,6 @@
     delta
     fd
     fish
-    fzf
     gh
     gum
     lazygit
@@ -25,6 +24,7 @@
     sesh
     starship
     stow
+    television
     tmux
     twm
     uv
