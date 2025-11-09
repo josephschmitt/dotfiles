@@ -18,15 +18,13 @@ fi
 # Escape single quotes in query for shell command
 ESCAPED_QUERY="${INITIAL_QUERY//\'/\'\\\'\'}"
 
-# Use television with inline ripgrep source command
-tv \
+# Use television ripgrep channel with dynamic search query
+# The channel provides preview, layout, and output configuration
+# We only override the source command to inject the search term
+tv ripgrep \
   --source-command "rg --column --line-number --no-heading --color=always --smart-case --hidden --glob '!.git' '${ESCAPED_QUERY}' 2>/dev/null || true" \
   --ansi \
-  --preview-command 'bat --style=full --color=always --highlight-line $(echo {} | cut -d: -f2) $(echo {} | cut -d: -f1) 2>/dev/null' \
-  --preview-size 55 \
   --input-header "Ripgrep: ${INITIAL_QUERY}" \
   --input-prompt "🔍 " \
-  --layout landscape \
   --no-remote \
-  --hide-help-panel \
-  --source-output '{split::0}:{split::1}' || true
+  --hide-help-panel || true

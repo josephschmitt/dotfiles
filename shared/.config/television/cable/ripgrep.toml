@@ -1,25 +1,24 @@
 # Interactive ripgrep search channel
-# Note: This channel requires a search query as input since television
-# doesn't support fzf's reload-on-change pattern. Use the wrapper script.
+# Use wrapper script to inject search query via --source-command override
 
 [metadata]
 name = "ripgrep"
-description = "Search code with ripgrep - requires search query"
+description = "Search code with ripgrep and fuzzy filter results"
 requirements = ["rg", "bat"]
 
 [source]
-# This will be overridden by the wrapper script with actual search term
-command = "fd -t f ."
+# Default command (overridden by wrapper with actual search query)
+command = "echo 'Use ripgrep-popup-tv.sh wrapper to search'"
 
-# Display full line
+# Display full line with ANSI colors preserved
 display = "{}"
 
-# Output the file path
-output = "{}"
+# Output format: file:line
+output = "{split::0}:{split::1}"
 
 [preview]
-# Show file contents with bat
-command = "bat --style=full --color=always {}"
+# Extract file path and line number, highlight the matched line
+command = "bat --style=full --color=always --highlight-line $(echo {} | cut -d: -f2) $(echo {} | cut -d: -f1) 2>/dev/null"
 
 [ui]
 layout = "landscape"
