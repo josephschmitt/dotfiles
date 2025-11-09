@@ -18,7 +18,8 @@ display = "{}"
 output = "{split: :1..}"
 
 [preview]
-command = "sesh preview '{}'"
+# Extract session name (everything after first field/icon) and preview it
+command = "sesh preview $(echo '{}' | cut -d' ' -f2-)"
 
 [ui]
 # Use portrait layout for better preview visibility
