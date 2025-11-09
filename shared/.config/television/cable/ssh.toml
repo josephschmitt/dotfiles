@@ -1,0 +1,39 @@
+# SSH host selector channel
+# Smart SSH host detection with icons and connection info
+
+[metadata]
+name = "ssh"
+description = "SSH host selector with smart detection and previews"
+requirements = ["ssh", "nc"]
+
+[source]
+# Use helper script that aggregates hosts from known_hosts, ssh config, and recent connections
+command = "ssh-tv-list-hosts"
+
+# Display the full formatted line with icon
+display = "{}"
+
+# Output only the hostname (field 2, space-delimited)
+output = "{split: :1}"
+
+[preview]
+# Show SSH config and connection status
+command = '''
+host=$(echo '{}' | awk '{print $2}')
+echo "=== SSH Configuration ==="
+ssh -G "$host" 2>/dev/null | grep -E "^(hostname|user|port|identityfile)" | \
+    awk "{printf \"%-15s: %s\\n\", toupper(substr(\$1,1,1)) substr(\$1,2), substr(\$0, index(\$0,\$2))}"
+echo ""
+echo "=== Connection Status ==="
+actual_host=$(ssh -G "$host" 2>/dev/null | awk "/^hostname / {print \$2}")
+test -z "$actual_host" && actual_host="$host"
+if timeout 1 nc -z "$actual_host" 22 2>/dev/null; then
+    echo "✓ Reachable"
+else
+    echo "✗ Unreachable"
+fi
+'''
+
+[ui]
+layout = "landscape"
+preview_size = 50

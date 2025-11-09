@@ -183,15 +183,83 @@ You can create custom popup keybindings using the `~/.config/tmux/tmux-popup` sc
 # Example: Add a popup for htop
 bind-key H run-shell "~/.config/tmux/tmux-popup -s medium -t 'System Monitor' -E htop"
 
-# Example: Add a popup with custom dimensions
-bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'fd . | fzf'"
+# Example: Add a popup with television for file finding
+bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'tv files'"
 ```
+
+## Television Integration
+
+All fuzzy-finding popups use [television](https://github.com/alexpasmantier/television), a modern, cross-platform fuzzy finder with excellent performance and a clean UI.
+
+### Custom Channels
+
+Television channels are defined in `~/.config/television/cable/` as TOML files. This configuration includes three custom channels:
+
+**sesh.toml** - Session management
+```toml
+[source]
+command = "sesh list --icons"
+
+[preview]
+command = "sesh preview {}"
+```
+
+**ripgrep.toml** - Code search (see detailed section above)
+
+**ssh.toml** - SSH host selection
+```toml
+[source]
+command = "ssh-tv-list-hosts"
+
+[preview]
+# Shows SSH config and connection status
+```
+
+### Creating Custom Channels
+
+You can create your own television channels for any list-based workflow:
+
+```bash
+# 1. Create a channel file
+nvim ~/.config/television/cable/mychannel.toml
+
+# 2. Define the channel
+[metadata]
+name = "mychannel"
+description = "Description of your channel"
+
+[source]
+command = "command-that-generates-list"
+
+[preview]
+command = "command-to-preview {}"
+
+# 3. Use it from tmux
+bind-key X run-shell "tmux-popup -s medium -t 'My Channel' -E 'tv mychannel'"
+```
+
+See the [television documentation](https://github.com/alexpasmantier/television) for more advanced channel features like custom output templates, UI layouts, and keybindings.
+
+## Dependencies
+
+### Required Tools
+
+- [television](https://github.com/alexpasmantier/television) - Modern fuzzy finder powering all popup selectors
+- [bat](https://github.com/sharkdp/bat) - Syntax-highlighted file previews
+- [ripgrep](https://github.com/BurntSushi/ripgrep) - Fast code search
+- [sesh](https://github.com/joshmedeski/sesh) - Session manager
+
+### Optional Tools
+
+- [fd](https://github.com/sharkdp/fd) - Fast file finder
+- [lazygit](https://github.com/jesseduffield/lazygit) - Terminal git UI
+- [yazi](https://github.com/sxyazi/yazi) - Terminal file manager
 
 ## Plugins
 
 - [tpm](https://github.com/tmux-plugins/tpm) - Tmux Plugin Manager
 - [tmux-sensible](https://github.com/tmux-plugins/tmux-sensible) - Sensible default settings
-- [tmux-fzf](https://github.com/sainnhe/tmux-fzf) - Fuzzy finder integration
+- [tmux-fzf](https://github.com/sainnhe/tmux-fzf) - Fuzzy finder integration (legacy)
 - [tmux-fzf-url](https://github.com/wfxr/tmux-fzf-url) - URL extraction and opening
 - [catppuccin-tmux](https://github.com/catppuccin/tmux) - Catppuccin Mocha theme
 - [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) - Seamless vim/tmux navigation
@@ -200,67 +268,49 @@ bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 
 
 ## Ripgrep Search
 
-The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search across your current directory. Based on [junegunn's ripgrep integration guide](https://junegunn.github.io/fzf/tips/ripgrep-integration/).
+The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search across your current directory using [television](https://github.com/alexpasmantier/television).
 
 ### Features
 
-- **Fast search** - Uses [ripgrep](https://github.com/BurntSushi/ripgrep) for blazing-fast code search with live reload
+- **Fast search** - Uses [ripgrep](https://github.com/BurntSushi/ripgrep) for blazing-fast code search
 - **Interactive preview** - Syntax-highlighted preview with [bat](https://github.com/sharkdp/bat), automatically centered on matched line
-- **Interactive filtering** - Filter by file type or path on-the-fly with `--include`/`--exclude` flags
-- **Multi-select** - Select multiple matches with `Tab/Shift-Tab` to open in quickfix list
+- **Fuzzy filtering** - Filter search results with fuzzy matching via television
 - **Smart case** - Case-insensitive by default, case-sensitive when query contains uppercase
-- **Respects .gitignore** - Automatically excludes files listed in `.gitignore`
-- **Adaptive layout** - Preview window moves above search on narrow terminals (< 80 cols)
+- **Hidden files** - Searches hidden files (respects `.git` exclusion)
+- **Modern UI** - Clean, responsive interface powered by television
 
 ### Usage
 
 1. Press `Ctrl-s g` to open the search popup
-2. Type your search query - results update live as you type
-3. Optionally use `--include` or `--exclude` to filter files (see examples below)
-4. Navigate with arrow keys
-5. **Single file**: Press `Enter` to open file at line number and exit, or `Ctrl-o` to open and return to search
-6. **Multiple files**: Use `Tab/Shift-Tab` to select multiple matches, then `Enter` to open all in quickfix list
-7. Press `Esc` to cancel
+2. Enter your search query at the prompt
+3. Results appear instantly - use television's fuzzy search to filter them further
+4. Navigate with arrow keys or `j/k`
+5. Press `Enter` to select and output the file:line location
+6. Press `Esc` or `q` to cancel
 
-#### Filtering Examples
+### Example Workflow
 
-You can dynamically filter which files to search using `--include` and `--exclude` flags:
+```bash
+# Press Ctrl-s g
+🔍 Search query: TODO
 
-```
-# Search only in YAML files
---include=*.yaml config
-
-# Search only in YAML and YML files (comma-separated)
---include=*.yaml,*.yml authentication
-
-# Search in shell scripts
---include=*.fish,*.sh,*.bash export
-
-# Exclude test files
---exclude=*.test.js,*.spec.js function
-
-# Exclude directories
---exclude=node_modules TODO
-
-# Combine filters
---include=*.rs --exclude=*.test.rs struct
-
-# Both space and equals syntax work
---include *.toml lazy
---include=*.toml lazy
+# Television shows all lines containing "TODO"
+# Type additional characters to fuzzy filter results
+# Preview pane shows the matched line with context
+# Press Enter to select
 ```
 
-### Keybindings (within search popup)
+### Television Channels
 
-- `Enter` - Open file at matched line and exit
-- `Ctrl-o` - Open file and return to search
-- `Tab/Shift-Tab` - Select/deselect multiple matches
-- `Alt-a` - Select all matches
-- `Alt-d` - Deselect all matches  
-- `Ctrl-/` - Toggle preview window
-- `Esc` - Cancel and close popup
+The ripgrep functionality is powered by a custom television channel defined in `~/.config/television/cable/ripgrep.toml`. You can also invoke it directly:
 
-The preview window shows the file header (name/size) with syntax highlighting and centers on the matched line for context.
+```bash
+# Search from command line
+tv ripgrep --input "search term"
+
+# Or use the wrapper script
+~/.config/tmux/ripgrep-popup-tv.sh "search term"
+```
 
 ## SSH Session Manager
 

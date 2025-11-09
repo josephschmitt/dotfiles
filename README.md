@@ -18,7 +18,7 @@ This repository contains my complete development environment setup, organized fo
 - **🔒 Private work configs** - Sensitive company data kept in private submodule
 - **🎨 Consistent theming** - Tokyo Night and Catppuccin themes across tools
 - **⌨️ Vi-mode everywhere** - Consistent navigation patterns
-- **🔍 Fuzzy finding** - FZF integration throughout the workflow
+- **🔍 Fuzzy finding** - Television integration throughout the workflow
 
 ## 🚀 Quick Start
 
@@ -109,7 +109,7 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
 - **📦 Package Management**: Nix packages + Homebrew integration
 - **🌐 Languages**: Node.js, Rust, Python, Go configurations
 - **🔨 Package Managers**: pnpm, bun, cargo, asdf, volta
-- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, and more
+- **⚡ CLI Tools**: Television, EZA, Yazi, sesh, leader-key, ripgrep, fd, and more
 
 ### ⚡ Productivity Features
 

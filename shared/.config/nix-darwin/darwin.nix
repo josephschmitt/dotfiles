@@ -25,6 +25,7 @@
     sesh
     starship
     stow
+    television
     tmux
     twm
     uv
