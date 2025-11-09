@@ -18,7 +18,7 @@ output = "{split::0}:{split::1}"
 
 [preview]
 # Extract file path and line number, highlight the matched line
-command = "bat --style=full --color=always --highlight-line $(echo {} | cut -d: -f2) $(echo {} | cut -d: -f1) 2>/dev/null"
+command = "bat --style=full --color=always --highlight-line $(echo '{}' | cut -d: -f2) $(echo '{}' | cut -d: -f1) 2>/dev/null"
 
 [ui]
 layout = "landscape"

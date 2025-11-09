@@ -19,7 +19,7 @@ output = "{split: :1}"
 [preview]
 # Show SSH config and connection status
 command = '''
-host=$(echo {} | awk '{print $2}')
+host=$(echo '{}' | awk '{print $2}')
 echo "=== SSH Configuration ==="
 ssh -G "$host" 2>/dev/null | grep -E "^(hostname|user|port|identityfile)" | \
     awk "{printf \"%-15s: %s\\n\", toupper(substr(\$1,1,1)) substr(\$1,2), substr(\$0, index(\$0,\$2))}"

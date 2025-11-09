@@ -18,7 +18,7 @@ display = "{}"
 output = "{split: :1..}"
 
 [preview]
-command = "sesh preview {}"
+command = "sesh preview '{}'"
 
 [ui]
 # Use portrait layout for better preview visibility
