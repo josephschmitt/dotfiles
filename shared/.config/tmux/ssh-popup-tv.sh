@@ -3,6 +3,7 @@
 # Smart SSH host detection with icons and connection info
 
 tv ssh \
+  --ansi \
   --input-header "SSH Connect" \
   --input-prompt "  " \
   --no-remote \
