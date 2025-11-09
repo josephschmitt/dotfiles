@@ -12,6 +12,7 @@
     delta
     fd
     fish
+    fzf
     gh
     gum
     lazygit
