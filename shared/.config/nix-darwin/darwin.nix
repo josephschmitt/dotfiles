@@ -23,7 +23,6 @@
     oh-my-posh
     ripgrep
     sesh
-    starship
     stow
     tmux
     twm
