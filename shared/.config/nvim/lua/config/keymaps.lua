@@ -50,3 +50,8 @@ map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
 
 -- Buffers
 map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
+
+-- Dashboard
+map({ "n" }, "<leader>uB", function()
+  require("snacks").dashboard()
+end, { desc = "Show Dashboard" })

@@ -70,6 +70,25 @@ stow .
 - **Options**: Adjust `lua/config/options.lua`
 - **Auto commands**: Edit `lua/config/autocmds.lua`
 
+## Keybindings
+
+### Custom Keybindings
+
+| Keybind | Mode | Description |
+|---------|------|-------------|
+| `<leader>uB` | Normal | Show Dashboard |
+| `<leader>ba` | Normal/Visual | Close all buffers |
+| `U` | Normal/Visual | Redo |
+| `gh` | Normal/Visual | Go to beginning of line |
+| `gl` | Normal/Visual | Go to end of line |
+| `gw` | Normal/Visual | Window mode |
+| `gV` | Normal | Select all |
+| `<C-a>` | Normal | Select all (no animation) |
+| `<C-c>` | Normal/Visual | Comment line/selection |
+| `jk`/`kj`/`jj` | Insert | Exit insert mode |
+
+See `lua/config/keymaps.lua` for the complete list of custom keybindings. LazyVim default keybindings are documented at [LazyVim Keymaps](https://www.lazyvim.org/keymaps).
+
 ## Dependencies
 
 - Neovim 0.9+
