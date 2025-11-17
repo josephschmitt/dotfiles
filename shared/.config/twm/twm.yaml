@@ -34,9 +34,8 @@ layouts:
     commands:
       - tmux send-keys -t 1 'nvim .' C-m
   - name: nvim-project
-    inherits:
-      - nvim
     commands:
+      - tmux send-keys -t 1 'nvim .' C-m
       - tmux split-window -h
       - tmux split-window -v
       - tmux resize-pane -x 100

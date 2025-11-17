@@ -116,6 +116,8 @@ layouts:
       - tmux send-keys -t 2 'npm run dev' C-m
 ```
 
+**Note**: Avoid using the `inherits` directive for layouts - TWM may concatenate commands instead of executing them sequentially. Explicitly list all commands in each layout definition.
+
 ## Integration
 
 ### With Sesh
