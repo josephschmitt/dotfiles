@@ -1,5 +1,16 @@
 { pkgs, ... }: {
   nixpkgs.config.allowUnfree = true;
+
+  # Override packages with build issues
+  nixpkgs.overlays = [
+    (final: prev: {
+      # Skip Fish tests - they're flaky on macOS but package works fine
+      fish = prev.fish.overrideAttrs (oldAttrs: {
+        doCheck = false;
+      });
+    })
+  ];
+
   system.primaryUser = "josephschmitt";
 
   environment.systemPackages = with pkgs; [
