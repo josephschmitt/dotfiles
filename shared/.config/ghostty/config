@@ -11,6 +11,7 @@ quick-terminal-animation-duration = 0.15
 quick-terminal-position = right
 quick-terminal-screen = macos-menu-bar
 quick-terminal-size = 800px,100%
+quick-terminal-autohide = false
 shell-integration = fish
 theme = Catppuccin Mocha
 working-directory = $HOME/development
