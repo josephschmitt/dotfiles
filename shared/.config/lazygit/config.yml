@@ -7,8 +7,8 @@ git:
     - colorArg: always
       pager: delta --dark --paging=never
 os:
-  edit: 'popup-aware-editor {{filename}}'
-  editAtLine: 'popup-aware-editor {{filename}} +{{line}}'
+  edit: "popup-aware-editor {{filename}}"
+  editAtLine: "popup-aware-editor {{filename}} +{{line}}"
 gui:
   theme:
     activeBorderColor:
@@ -42,3 +42,23 @@ customCommands:
     context: "global"
     description: "Open repository in GitHub"
     command: 'git remote get-url origin | sed -E "s/git@github.com:(.*).git/https:\/\/github.com\/\1/" | xargs open'
+  - key: "C"
+    context: "files"
+    description: "Safe commit (warns on main branch)"
+    prompts:
+      - type: "menu"
+        title: "⚠️  You're on {{.CheckedOutBranch.Name}}"
+        key: "Action"
+        options:
+          - name: "Switch to different branch"
+            description: "Switch to (or create a new) branch"
+            value: "continue"
+        command: lazygit-check-main-branch "{{.CheckedOutBranch.Name}}"
+      - type: "input"
+        title: "Branch name (existing or new):"
+        key: "BranchName"
+        initialValue: ""
+        suggestions:
+          preset: "branches"
+    command: lazygit-switch-branch "{{.Form.BranchName}}"
+    loadingText: "Processing..."

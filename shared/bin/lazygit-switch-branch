@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Switch to or create a branch for lazygit
+# Usage: lazygit-switch-branch <branch-name>
+
+BRANCH_NAME="$1"
+
+if [ -z "$BRANCH_NAME" ]; then
+  echo "❌ Branch name cannot be empty"
+  exit 1
+fi
+
+# Check if branch exists
+if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+  # Branch exists, checkout
+  git checkout "$BRANCH_NAME" || exit 1
+  echo "✓ Switched to branch: $BRANCH_NAME"
+else
+  # Branch doesn't exist, create it
+  git checkout -b "$BRANCH_NAME" || exit 1
+  echo "✓ Created and switched to branch: $BRANCH_NAME"
+fi
+
+echo ""
+echo "Now press 'c' to commit your changes."
+exit 0
