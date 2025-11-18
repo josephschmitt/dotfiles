@@ -1,0 +1,27 @@
+# Sesh session manager channel
+# Fuzzy find and switch between tmux sessions, configs, and directories
+
+[metadata]
+name = "sesh"
+description = "Tmux session manager - search sessions, configs, zoxide directories"
+requirements = ["sesh"]
+
+[source]
+command = "sesh list --icons"
+
+# Display the full line with icon
+display = "{}"
+
+# Output only the session name (everything after the icon)
+# sesh list --icons format: "icon session_name"
+# Field 0 is the icon, field 1 onwards is the session name
+output = "{split: :1..}"
+
+[preview]
+# Extract session name (everything after first field/icon) and preview it
+command = "sesh preview $(echo '{}' | cut -d' ' -f2-)"
+
+[ui]
+# Use portrait layout for better preview visibility
+layout = "portrait"
+preview_size = 45
