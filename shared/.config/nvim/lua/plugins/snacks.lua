@@ -12,7 +12,7 @@ return {
       hidden = true, -- Show hidden files by default
       sources = {
         explorer = {
-          ignored = true,
+          ignored = false,
           layout = { preset = "sidebar" },
           auto_close = should_auto_close(),
           include = { "node_modules" },
