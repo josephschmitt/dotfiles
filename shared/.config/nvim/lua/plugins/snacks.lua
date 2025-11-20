@@ -1,3 +1,5 @@
+local EXPLORER_AUTO_CLOSE_WIDTH = 150
+
 return {
   "folke/snacks.nvim",
   opts = {
@@ -143,6 +145,22 @@ return {
         Snacks.picker.commands()
       end,
       desc = "Commands",
+    },
+    {
+      "<leader>e",
+      function()
+        Snacks.config.picker.sources.explorer.auto_close = vim.o.columns <= EXPLORER_AUTO_CLOSE_WIDTH
+        Snacks.picker.explorer()
+      end,
+      desc = "Explorer Snacks (root dir)",
+    },
+    {
+      "<leader>E",
+      function()
+        Snacks.config.picker.sources.explorer.auto_close = vim.o.columns <= EXPLORER_AUTO_CLOSE_WIDTH
+        Snacks.picker.explorer({ cwd = vim.uv.cwd() })
+      end,
+      desc = "Explorer Snacks (cwd)",
     },
   },
 }
