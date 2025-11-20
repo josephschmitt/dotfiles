@@ -9,7 +9,7 @@ exclude_path_components:
   - target
 workspace_definitions:
   - name: docker
-    default_layout: nvim-project
+    default_layout: nvim
     has_any_file:
       - docker-compose.yaml
       - docker-compose.yml
@@ -17,7 +17,7 @@ workspace_definitions:
       - Dockerfile
       - .git
   - name: node
-    default_layout: nvim-project
+    default_layout: nvim
     has_any_file:
       - package.json
       - pnpm-lock.yaml
@@ -32,12 +32,4 @@ workspace_definitions:
 layouts:
   - name: nvim
     commands:
-      - tmux send-keys -t 1 'nvim .' C-m
-  - name: nvim-project
-    commands:
-      - tmux send-keys -t 1 'nvim .' C-m
-      - tmux split-window -h
-      - tmux split-window -v
-      - tmux resize-pane -x 100
-      - tmux resize-pane -y 20
-      - tmux select-pane -t 1
+      - nvim .
