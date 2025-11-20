@@ -1,5 +1,10 @@
 local EXPLORER_AUTO_CLOSE_WIDTH = 150
 
+-- Helper function to determine if explorer should auto-close based on window width
+local function should_auto_close()
+  return vim.o.columns <= EXPLORER_AUTO_CLOSE_WIDTH
+end
+
 return {
   "folke/snacks.nvim",
   opts = {
@@ -9,7 +14,7 @@ return {
         explorer = {
           ignored = true,
           layout = { preset = "sidebar" },
-          auto_close = true,
+          auto_close = should_auto_close(),
           include = { "node_modules" },
           win = {
             list = {
@@ -149,7 +154,7 @@ return {
     {
       "<leader>e",
       function()
-        Snacks.config.picker.sources.explorer.auto_close = vim.o.columns <= EXPLORER_AUTO_CLOSE_WIDTH
+        Snacks.config.picker.sources.explorer.auto_close = should_auto_close()
         Snacks.picker.explorer()
       end,
       desc = "Explorer Snacks (root dir)",
@@ -157,7 +162,7 @@ return {
     {
       "<leader>E",
       function()
-        Snacks.config.picker.sources.explorer.auto_close = vim.o.columns <= EXPLORER_AUTO_CLOSE_WIDTH
+        Snacks.config.picker.sources.explorer.auto_close = should_auto_close()
         Snacks.picker.explorer({ cwd = vim.uv.cwd() })
       end,
       desc = "Explorer Snacks (cwd)",
