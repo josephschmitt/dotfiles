@@ -17,11 +17,17 @@ return {
           auto_close = should_auto_close(),
           include = { "node_modules" },
           win = {
+            input = {
+              keys = {
+                ["<esc>"] = "focus_list",
+              },
+            },
             list = {
               keys = {
                 ["S"] = "search_in_directory",
                 ["D"] = "diff",
                 ["<A-c>"] = "toggle_auto_close",
+                ["<esc>"] = "",
               },
             },
           },
