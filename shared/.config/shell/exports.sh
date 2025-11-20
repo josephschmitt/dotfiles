@@ -59,6 +59,7 @@ esac
 # Application paths (appended to end of PATH)
 export PATH="$PATH:$HOME/.opencode/bin"
 export PATH="$PATH:$HOME/.lmstudio/bin"
+export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
 
 # Homebrew configuration
 export HOMEBREW_NO_ENV_HINTS=1

@@ -43,6 +43,7 @@ fish_add_path --prepend "$PNPM_HOME"
 # Application paths
 fish_add_path --append $HOME/.opencode/bin
 fish_add_path --append $HOME/.lmstudio/bin
+fish_add_path --append $HOME/.antigravity/antigravity/bin
 
 # Homebrew configuration
 set -gx HOMEBREW_NO_ENV_HINTS 1
