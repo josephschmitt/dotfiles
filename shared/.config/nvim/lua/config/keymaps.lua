@@ -49,7 +49,21 @@ map({ "i" }, "kj", "<esc>", { desc = "Exit insert mode" })
 map({ "i" }, "jj", "<esc>", { desc = "Exit insert mode" })
 
 -- Buffers
-map({ "n", "v" }, "<leader>ba", "<cmd>bufdo bd<cr>", { desc = "Close all buffers" })
+map({ "n", "v" }, "<leader>ba", function()
+  -- Get all buffers and close only regular file buffers
+  local bufs = vim.api.nvim_list_bufs()
+  for _, buf in ipairs(bufs) do
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+      local buftype = vim.bo[buf].buftype
+      -- Only delete normal file buffers, not special buffers
+      if buftype == "" then
+        vim.api.nvim_buf_delete(buf, { force = false })
+      end
+    end
+  end
+
+  require("snacks").dashboard({ focus = true })
+end, { desc = "Close all buffers" })
 
 -- Dashboard
 map({ "n" }, "<leader>uB", function()

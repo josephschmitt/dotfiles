@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+#
+# fdp: Find Projects - Discovers project directories based on configurable markers
+#
+# Usage:
+#   fdp                    # List all projects
+#   fdp | fzf              # Fuzzy find projects
+#   cd $(fdp | fzf)        # cd to selected project
+#
+# Config: ~/.config/fdp/config.conf
+
+set -euo pipefail
+
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/fdp/config.conf"
+
+# Default configuration
+DEFAULT_SEARCH_PATHS=(
+  "$HOME/projects"
+  "$HOME/code"
+  "$HOME/src"
+)
+
+DEFAULT_MARKERS=(
+  ".git"
+  "package.json"
+  "Cargo.toml"
+  "go.mod"
+  "pyproject.toml"
+  "composer.json"
+  "Gemfile"
+  "mix.exs"
+  "pom.xml"
+  "build.gradle"
+  "Makefile"
+)
+
+DEFAULT_MAX_DEPTH=3
+
+# Arrays to hold config values
+SEARCH_PATHS=()
+MARKERS=()
+MAX_DEPTH="${DEFAULT_MAX_DEPTH}"
+
+# Read config file if it exists
+if [[ -f "${CONFIG_FILE}" ]]; then
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    # Skip empty lines and comments
+    [[ -z "${line}" || "${line}" =~ ^[[:space:]]*# ]] && continue
+
+    # Parse search_path entries
+    if [[ "${line}" =~ ^search_path[[:space:]]*=[[:space:]]*(.+)$ ]]; then
+      path="${BASH_REMATCH[1]}"
+      # Expand tilde
+      path="${path/#\~/$HOME}"
+      SEARCH_PATHS+=("${path}")
+    # Parse marker entries
+    elif [[ "${line}" =~ ^marker[[:space:]]*=[[:space:]]*([^#[:space:]]+) ]]; then
+      MARKERS+=("${BASH_REMATCH[1]}")
+    # Parse max_depth
+    elif [[ "${line}" =~ ^max_depth[[:space:]]*=[[:space:]]*([0-9]+) ]]; then
+      MAX_DEPTH="${BASH_REMATCH[1]}"
+    fi
+  done < "${CONFIG_FILE}"
+fi
+
+# Use defaults if config didn't provide values
+[[ ${#SEARCH_PATHS[@]} -eq 0 ]] && SEARCH_PATHS=("${DEFAULT_SEARCH_PATHS[@]}")
+[[ ${#MARKERS[@]} -eq 0 ]] && MARKERS=("${DEFAULT_MARKERS[@]}")
+
+# Filter search paths that actually exist
+EXISTING_PATHS=()
+for path in "${SEARCH_PATHS[@]}"; do
+  [[ -d "${path}" ]] && EXISTING_PATHS+=("${path}")
+done
+
+# Exit if no valid search paths
+if [[ ${#EXISTING_PATHS[@]} -eq 0 ]]; then
+  echo "Error: No valid search paths found" >&2
+  exit 1
+fi
+
+# Check if fd is available
+if ! command -v fd &> /dev/null; then
+  echo "Error: 'fd' command not found. Please install fd-find." >&2
+  echo "  macOS: brew install fd" >&2
+  echo "  Ubuntu: apt install fd-find" >&2
+  exit 1
+fi
+
+# Build fd regex pattern from markers
+# Escape special regex characters and join with |
+build_pattern() {
+  local pattern=""
+  for marker in "${MARKERS[@]}"; do
+    # Escape dots and other regex special chars
+    local escaped="${marker//./\\.}"
+    escaped="${escaped//\$/\\$}"
+
+    # Add anchors for exact match
+    if [[ "${marker}" == .* ]]; then
+      # Hidden files/dirs like .git
+      pattern="${pattern}^${escaped}\$|"
+    else
+      # Regular files like package.json
+      pattern="${pattern}^${escaped}\$|"
+    fi
+  done
+  # Remove trailing |
+  echo "${pattern%|}"
+}
+
+PATTERN=$(build_pattern)
+
+# Debug output (comment out when not debugging)
+# echo "PATTERN: ${PATTERN}" >&2
+# echo "MAX_DEPTH: ${MAX_DEPTH}" >&2
+# echo "PATHS: ${EXISTING_PATHS[@]}" >&2
+
+# Find project directories using fd
+# - Search for files/directories matching any marker
+# - Get parent directory of each match
+# - Deduplicate
+fd --hidden \
+   --no-ignore-vcs \
+   --max-depth "${MAX_DEPTH}" \
+   --regex "${PATTERN}" \
+   "${EXISTING_PATHS[@]}" \
+   --exec dirname {} \; \
+| sort -u
