@@ -27,7 +27,6 @@ return {
                 ["S"] = "search_in_directory",
                 ["D"] = "diff",
                 ["<A-c>"] = "toggle_auto_close",
-                ["<esc>"] = "",
               },
             },
           },
