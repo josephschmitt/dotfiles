@@ -52,13 +52,6 @@ if not vim.g.vscode then
     end,
   })
 
-  -- Disable tabline (force after LazyVim loads and on every buffer change)
-  vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    callback = function()
-      vim.opt.showtabline = 0
-    end,
-  })
-
   -- Show filename in winbar only when multiple splits exist
   vim.api.nvim_create_autocmd("WinEnter", {
     callback = function()
