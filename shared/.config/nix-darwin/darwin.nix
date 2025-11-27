@@ -47,8 +47,8 @@
   homebrew = {
     enable = true;
     brews = [
+      "gemini-cli"
       "helix"
-      "morantron/tmux-fingers/tmux-fingers"
       "scooter" # Updated more frequently in homebrew than nix
       "sst/tap/opencode"
       "television"
