@@ -67,6 +67,7 @@ OPTIONS:
     -H, --help               Show this help message
 
 SIZE PRESETS:
+    xsmall  - 60% width, 15 lines (good for quick commands/prompts)
     small   - 80% width, 70% height (good for fzf/selection menus)
     medium  - 90% width (max 250 cols), 90% height (max 100 lines)
     large   - 90% width, 90% height (good for lazygit, editors)
@@ -101,6 +102,10 @@ fi
 
 # Set dimensions based on size preset (custom dimensions override individual values)
 case "$SIZE" in
+    xsmall)
+        PRESET_WIDTH="60%"
+        PRESET_HEIGHT="15"
+        ;;
     small)
         PRESET_WIDTH="80%"
         PRESET_HEIGHT="70%"
@@ -137,7 +142,7 @@ case "$SIZE" in
         ;;
     *)
         echo "Error: Invalid size preset: $SIZE" >&2
-        echo "Valid sizes: small, medium, large, full" >&2
+        echo "Valid sizes: xsmall, small, medium, large, full" >&2
         exit 1
         ;;
 esac
@@ -170,7 +175,7 @@ TMUX_ARGS="$TMUX_ARGS -d $DIR"
 
 # Add title if specified
 if [ -n "$TITLE" ]; then
-    TMUX_ARGS="$TMUX_ARGS -T $TITLE"
+    TMUX_ARGS="$TMUX_ARGS -T '$TITLE'"
 fi
 
 # Execute the popup - pass all remaining args as the command
