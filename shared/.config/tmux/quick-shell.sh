@@ -9,7 +9,7 @@ if [ "$1" = "--persist" ]; then
 fi
 
 # Run Fish interactively with a custom config
-exec fish --init-command "
+fish --init-command "
     function fish_prompt
         echo -n '⚡ '
     end
@@ -23,8 +23,8 @@ exec fish --init-command "
         set -l time_diff (math \$now - \$__quick_shell_last_sigint)
         
         if test \$time_diff -le 2
-            # Second Ctrl-c within 2 seconds - exit
-            exit 130
+            # Second Ctrl-c within 2 seconds - exit cleanly
+            exit 0
         else
             # First Ctrl-c - update timestamp and show hint at bottom via tmux
             set -g __quick_shell_last_sigint \$now
@@ -35,9 +35,22 @@ exec fish --init-command "
     
     # Hook that runs after each command
     function on_command_execute --on-event fish_postexec
-        # Exit with the command status (popup closes on success) unless --persist
+        # Debug: show what's happening
+        set -l cmd_status \$status
+        
+        # Only exit on success (status 0) in quick mode
         if test $PERSIST -eq 0
-            exit \$status
+            if test \$cmd_status -eq 0
+                # Success - exit to close popup
+                exit 0
+            else
+                # Failure - stay open and continue
+                # Fish will show another prompt automatically
+                return
+            end
         end
+        # Persist mode - never auto-exit
     end
 "
+# Capture fish exit code and always return 0 to tmux
+exit 0
