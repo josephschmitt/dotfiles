@@ -151,35 +151,36 @@ esac
 WIDTH="${CUSTOM_WIDTH:-$PRESET_WIDTH}"
 HEIGHT="${CUSTOM_HEIGHT:-$PRESET_HEIGHT}"
 
-# Build tmux display-popup command
-TMUX_ARGS=""
+# Build tmux display-popup command arguments
+TMUX_CMD="tmux"
+TMUX_SUBCMD="display-popup"
 
 # Add exit-on-close flag if specified
 if [ -n "$EXIT_ON_CLOSE" ]; then
-    TMUX_ARGS="$TMUX_ARGS -E"
+    set -- "-E" "$@"
 fi
 
 # Add dimensions
-TMUX_ARGS="$TMUX_ARGS -w $WIDTH -h $HEIGHT"
+set -- "-w" "$WIDTH" "-h" "$HEIGHT" "$@"
 
 # Add position if specified
 if [ -n "$XPOS" ]; then
-    TMUX_ARGS="$TMUX_ARGS -x $XPOS"
+    set -- "-x" "$XPOS" "$@"
 fi
 if [ -n "$YPOS" ]; then
-    TMUX_ARGS="$TMUX_ARGS -y $YPOS"
+    set -- "-y" "$YPOS" "$@"
 fi
 
 # Add directory
-TMUX_ARGS="$TMUX_ARGS -d $DIR"
+set -- "-d" "$DIR" "$@"
 
 # Add title if specified
 if [ -n "$TITLE" ]; then
-    TMUX_ARGS="$TMUX_ARGS -T $TITLE"
+    set -- "-T" "$TITLE" "$@"
 fi
 
-# Execute the popup - pass all remaining args as the command
-# Set TMUX_IN_POPUP to indicate we're running in a popup context
-exec tmux display-popup $TMUX_ARGS \
-    -e "TMUX_IN_POPUP=1" \
-    "$@"
+# Add environment variable
+set -- "-e" "TMUX_IN_POPUP=1" "$@"
+
+# Execute the popup - all arguments are now properly quoted in positional parameters
+exec "$TMUX_CMD" "$TMUX_SUBCMD" "$@"
