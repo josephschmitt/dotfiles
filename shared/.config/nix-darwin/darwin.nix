@@ -51,6 +51,7 @@
       "morantron/tmux-fingers/tmux-fingers"
       "scooter" # Updated more frequently in homebrew than nix
       "sst/tap/opencode"
+      "television"
     ];
     casks = [
       "1password"
