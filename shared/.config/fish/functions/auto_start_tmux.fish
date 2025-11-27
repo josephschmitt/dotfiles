@@ -15,7 +15,12 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
         
         # If hostname session exists and has no attached clients, just attach
         if tmux has-session -t $session_name 2>/dev/null
-            set attached_clients (tmux list-clients -t $session_name 2>/dev/null | wc -l)
+            set attached_clients (tmux list-clients -t $session_name 2>/dev/null | wc -l | tr -d ' ')
+            # Ensure we have a valid number (default to 1 if empty/invalid to show picker)
+            if test -z "$attached_clients"
+                set attached_clients 1
+            end
+
             if test $attached_clients -eq 0
                 tmux attach-session -t $session_name && exit
                 return  # If attach failed, continue with normal shell
