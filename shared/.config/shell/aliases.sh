@@ -1,11 +1,12 @@
 # Shared aliases for all POSIX-compatible shells
 
 # Navigation and utilities
+alias c="clear"
+alias cat="bat"
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias lg="env TMPDIR=/tmp lazygit"
-alias c="clear"
 alias vim="nvim"
-alias cat="bat"
+alias wm="workmux"
 
 # Eza (modern ls replacement) aliases
 alias ls="eza"

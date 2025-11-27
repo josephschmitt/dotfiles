@@ -49,6 +49,7 @@
     brews = [
       "gemini-cli"
       "helix"
+      "raine/workmux/workmux"
       "scooter" # Updated more frequently in homebrew than nix
       "sst/tap/opencode"
       "television"
@@ -70,8 +71,8 @@
       "vimr"
     ];
     taps = [
+      "raine/workmux"
       "sst/tap"
-      "morantron/tmux-fingers"
     ];
 
     onActivation.autoUpdate = true;
