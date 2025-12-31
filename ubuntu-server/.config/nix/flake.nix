@@ -39,6 +39,7 @@
             ripgrep
             sesh
             stow
+            television
             tmux
             twm
             uv
