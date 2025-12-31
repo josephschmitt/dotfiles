@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# Automated Apple Photos → Immich sync
+# Exports new/modified photos from Apple Photos and uploads to Immich
+#
+
+set -euo pipefail
+
+# Configuration file path
+CONFIG_FILE="${HOME}/.config/immich-sync/config"
+
+# Default values
+EXPORT_DIR="${HOME}/Pictures/immich-sync"
+LOG_DIR="${HOME}/Library/Logs/immich-sync"
+LOG_FILE="${LOG_DIR}/sync.log"
+
+# Load configuration
+if [[ ! -f "${CONFIG_FILE}" ]]; then
+  echo "ERROR: Configuration file not found at ${CONFIG_FILE}"
+  echo "Please create it with the following variables:"
+  echo "  IMMICH_URL=https://your-immich-instance.com"
+  echo "  IMMICH_API_KEY=your-api-key-here"
+  exit 1
+fi
+
+# shellcheck source=/dev/null
+source "${CONFIG_FILE}"
+
+# Validate required configuration
+if [[ -z "${IMMICH_URL:-}" ]] || [[ -z "${IMMICH_API_KEY:-}" ]]; then
+  echo "ERROR: IMMICH_URL and IMMICH_API_KEY must be set in ${CONFIG_FILE}"
+  exit 1
+fi
+
+# Create directories if they don't exist
+mkdir -p "${EXPORT_DIR}"
+mkdir -p "${LOG_DIR}"
+
+# Function to log messages
+log() {
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" | tee -a "${LOG_FILE}"
+}
+
+# Function to log errors
+log_error() {
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $*" | tee -a "${LOG_FILE}" >&2
+}
+
+# Main sync function
+main() {
+  log "=== Starting Photos → Immich sync ==="
+
+  # Step 1: Export from Apple Photos
+  log "Exporting from Apple Photos..."
+  if osxphotos export "${EXPORT_DIR}" \
+    --update \
+    --only-new \
+    --export-by-date \
+    --directory "{created.year}/{created.month}" \
+    --album-keyword \
+    --exportdb "${LOG_DIR}/export.db" \
+    --verbose \
+    2>&1 | tee -a "${LOG_FILE}"; then
+    log "Export completed successfully"
+  else
+    log_error "Export failed with exit code $?"
+    exit 1
+  fi
+
+  # Step 2: Upload to Immich
+  log "Uploading to Immich at ${IMMICH_URL}..."
+  if immich-go upload \
+    -server="${IMMICH_URL}" \
+    -key="${IMMICH_API_KEY}" \
+    -create-albums \
+    -google-photos \
+    "${EXPORT_DIR}" \
+    2>&1 | tee -a "${LOG_FILE}"; then
+    log "Upload completed successfully"
+  else
+    log_error "Upload failed with exit code $?"
+    exit 1
+  fi
+
+  log "=== Sync completed successfully ==="
+}
+
+# Run main function
+main "$@"

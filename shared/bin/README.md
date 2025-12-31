@@ -10,6 +10,10 @@ Wrapper for nix-darwin rebuild operations (macOS only)
 ### helix-*.sh
 Various Helix editor integration scripts
 
+### immich-sync
+Automated Apple Photos → Immich sync script (macOS only, mac-mini)
+See `.config/immich-sync/README.md` for setup and usage
+
 ### assign_at_random.sh
 Random assignment utility
 

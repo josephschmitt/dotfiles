@@ -5,5 +5,6 @@
 .config/fish/completions/kubectl.fish
 **/fish/fish_variables
 .config/helix/runtime
+.config/immich-sync/config
 .env
 .tmux

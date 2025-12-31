@@ -1,0 +1,14 @@
+# Immich Sync Configuration
+# Copy this file to ~/.config/immich-sync/config and fill in your values
+
+# Your Immich instance URL (include protocol, no trailing slash)
+IMMICH_URL="https://immich.example.com"
+
+# Your Immich API key (generate from User Settings > API Keys)
+IMMICH_API_KEY="your-api-key-here"
+
+# Optional: Override default export directory
+# EXPORT_DIR="${HOME}/Pictures/immich-sync"
+
+# Optional: Override default log directory
+# LOG_DIR="${HOME}/Library/Logs/immich-sync"
