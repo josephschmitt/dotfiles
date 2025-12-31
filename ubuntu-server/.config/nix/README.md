@@ -36,6 +36,25 @@ sudo systemctl stop docker-compose@{service-name}
 sudo systemctl disable docker-compose@{service-name}
 ```
 
+### Docker NFS mount dependency
+
+Prevents Docker from starting before Tailscale and NFS mounts are ready. Without this, containers may bind to empty local directories instead of mounted NFS shares during boot.
+
+**Setup:**
+```sh
+# Copy drop-in override to system directory
+sudo mkdir -p /etc/systemd/system/docker.service.d
+sudo cp ~/dotfiles/ubuntu-server/.config/nix/docker.service.d/10-wait-for-nfs.conf \
+        /etc/systemd/system/docker.service.d/10-wait-for-nfs.conf
+sudo systemctl daemon-reload
+```
+
+**Verify:**
+```sh
+# Check that Docker waits for NFS
+systemctl show docker.service | grep -E "^(After|Wants)=" | grep -i nfs
+```
+
 ### Docker daemon crash auto-restart
 
 If Docker daemon crashes with segfaults (SIGSEGV), containers won't auto-restart because Docker treats them as "manually stopped". This service automatically restarts all compose services when Docker daemon restarts.
