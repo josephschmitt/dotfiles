@@ -108,9 +108,32 @@ needs_update() {
   return 1  # Up to date
 }
 
+# Check for required network filesystem tools
+check_mount_tools() {
+  local missing_tools=()
+
+  if ! command -v mount.cifs >/dev/null 2>&1; then
+    missing_tools+=("cifs-utils")
+  fi
+
+  if ! command -v mount.nfs >/dev/null 2>&1; then
+    missing_tools+=("nfs-common")
+  fi
+
+  if [ ${#missing_tools[@]} -gt 0 ]; then
+    print_warning "Missing required packages: ${missing_tools[*]}"
+    print_info "Install with: sudo apt-get install -y ${missing_tools[*]}"
+    print_info "These tools cannot be installed via Nix due to setuid requirements"
+    echo
+  fi
+}
+
 # Mount command: copy files (if needed) + enable + start
 cmd_mount() {
   check_root
+
+  # Check for required tools first
+  check_mount_tools
 
   local project_dir
   project_dir=$(find_project_dir "$1")
@@ -296,6 +319,19 @@ Examples:
   mounts status ~/schmitt.town
   sudo mounts unmount ~/schmitt.town
 
+Prerequisites:
+  IMPORTANT: Network filesystem tools must be installed at the system level.
+  These cannot be managed declaratively via Nix due to setuid requirements.
+
+  Install required packages:
+    sudo apt-get update
+    sudo apt-get install -y cifs-utils nfs-common
+
+  Why system-level installation is required:
+  - cifs-utils: Requires setuid root for mount.cifs to work with systemd
+  - nfs-common: Requires proper system integration for NFS mounts
+  - Nix-installed versions lack proper permissions for systemd mount units
+
 Project Setup:
   Any project can define network mounts by creating a systemd/ directory
   with .mount and .automount files. These files remain version-controlled
@@ -314,6 +350,7 @@ Notes:
   - Mounts auto-unmount after inactivity (configured per mount)
   - Files in /etc/systemd/system/ are kept in sync with project sources
   - For SMB mounts, configure credentials file first (see project README)
+  - macOS SMB shares require Windows-compatible file sharing enabled
 
 Troubleshooting:
   # View mount logs

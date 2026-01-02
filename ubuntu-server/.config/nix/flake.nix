@@ -16,7 +16,6 @@
           name = "server-env";
           paths = with pkgs; [
             bat
-            cifs-utils
             delta
             docker
             eza
@@ -32,7 +31,6 @@
             lazygit
             mosh
             neovim
-            nfs-utils
             nil
             nixpkgs-fmt
             nixpkgs-fmt
