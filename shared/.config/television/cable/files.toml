@@ -1,6 +1,3 @@
-# Television channel for file selection and editing
-# Community channel: https://github.com/alexpasmantier/television-channels
-
 [metadata]
 name = "files"
 description = "A channel to select files and directories"
@@ -15,15 +12,14 @@ env = { BAT_THEME = "ansi" }
 
 [keybindings]
 shortcut = "f1"
-enter = "actions:edit"
 f12 = "actions:edit"
 ctrl-up = "actions:goto_parent_dir"
 
 [actions.edit]
 description = "Opens the selected entries with the default editor (falls back to vim)"
-command = "popup-aware-editor '{}'"
-# Fork mode allows script to properly close popup without crashing tmux
-mode = "fork"
+command = "${EDITOR:-vim} '{}'"
+# use `mode = "fork"` if you want to return to tv afterwards
+mode = "execute"
 
 [actions.goto_parent_dir]
 description = "Re-opens tv in the parent directory"

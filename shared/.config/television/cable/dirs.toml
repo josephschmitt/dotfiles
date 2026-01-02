@@ -1,6 +1,3 @@
-# Television channel for directory selection
-# Community channel: https://github.com/alexpasmantier/television-channels
-
 [metadata]
 name = "dirs"
 description = "A channel to select from directories"
@@ -14,9 +11,3 @@ command = "ls -la --color=always '{}'"
 
 [keybindings]
 shortcut = "f2"
-enter = "actions:cd"
-
-[actions.cd]
-description = "Change to the selected directory and open files channel"
-command = "cd '{}' && tv files"
-mode = "execute"
