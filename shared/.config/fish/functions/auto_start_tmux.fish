@@ -17,7 +17,7 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
         if tmux has-session -t $session_name 2>/dev/null
             set attached_clients (tmux list-clients -t $session_name 2>/dev/null | wc -l)
             if test $attached_clients -eq 0
-                tmux attach-session -t $session_name && exit
+                tmux attach-session -t $session_name
                 return  # If attach failed, continue with normal shell
             end
 
@@ -27,7 +27,7 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
 
         # Create new session and launch sesh popup
         # If tmux fails to start, fall back to regular shell
-        tmux new-session -s $session_name \; run-shell "$TMUX_CONFIG_DIR/sesh-or-stay.sh '$session_name'" && exit
+        tmux new-session -s $session_name \; run-shell "$TMUX_CONFIG_DIR/sesh-or-stay.sh '$session_name'"
     end
 end
 

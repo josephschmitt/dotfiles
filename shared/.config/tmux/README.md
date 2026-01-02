@@ -134,7 +134,8 @@ Main-horizontal layout with fixed 20-row bottom panes:
 ### Session Management
 
 - `Ctrl-s o` - Open Sesh session switcher (small: 80% width, 70% height)
-- `Ctrl-s w` - Detach from current session
+- `Ctrl-s w` - Detach from current session (returns to shell prompt)
+- `Ctrl-s q` - Kill session and close terminal tab
 - `Ctrl-s N` - Create new session with random name
 - `Ctrl-s @` - Open SSH host selector with smart tmux handling (small: 80% width, 70% height)
 - `Ctrl-s t` - Open TWM workspace manager (small: 80% width, 70% height)
