@@ -116,16 +116,26 @@ Main-horizontal layout with fixed 20-row bottom panes:
 
 ### Application Popups
 
-- `Ctrl-s g` - Open Ripgrep search in popup (large: 90% width/height)
-- `Ctrl-s G` - Open Lazygit in popup (large: 90% width/height)
-- `Ctrl-s N` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
-- `Ctrl-s C` - Open Scooter in popup (large: 90% width/height)
-- `Ctrl-s Z` - Open Yazi in popup (large: 90% width/height)
+- `Ctrl-s c` - Open Quick Shell popup (xsmall: closes on exit)
+- `Ctrl-s C` - Open Mini Shell popup (xsmall: persistent, stays open)
+- `Ctrl-s G` - Open Lazygit in popup (medium: 90% width/height, max 250 cols/100 lines)
+- `Ctrl-s M` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
+- `Ctrl-s Z` - Open Yazi in popup (medium: 90% width/height, max 250 cols/100 lines)
 - `Ctrl-s P` - Open floating scratch terminal (Fish shell)
+
+### Television Popups
+
+[Television](https://github.com/alexpasmantier/television) is a blazing fast fuzzy finder TUI.
+
+- `Ctrl-s d` - Browse directories with `tv dirs` (large: 90% width/height)
+- `Ctrl-s f` - Browse files with `tv files` (large: 90% width/height)
+- `Ctrl-s g` - Search text with `tv text` (large: 90% width/height)
 
 ### Session Management
 
 - `Ctrl-s o` - Open Sesh session switcher (small: 80% width, 70% height)
+- `Ctrl-s w` - Detach from current session
+- `Ctrl-s N` - Create new session with random name
 - `Ctrl-s @` - Open SSH host selector with smart tmux handling (small: 80% width, 70% height)
 - `Ctrl-s t` - Open TWM workspace manager (small: 80% width, 70% height)
 - `Ctrl-s T` - Open TWM workspace manager for existing sessions (small: 80% width, 70% height)
