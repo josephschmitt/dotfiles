@@ -2,7 +2,7 @@
 
 temp_session="$1"
 
-selected=$(~/.config/tmux/sesh-popup.sh)
+selected=$(tv sesh)
 
 if [ -n "$selected" ]; then
   sesh connect "$selected"
