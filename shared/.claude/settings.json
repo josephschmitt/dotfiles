@@ -4,6 +4,9 @@
     "command": "~/.claude/statusline.sh",
     "padding": 0
   },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true
+  },
   "model": "opusplan",
   "env": {
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "sonnet",
