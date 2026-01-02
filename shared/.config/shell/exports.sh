@@ -4,6 +4,9 @@
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="$HOME/.config"
 
+# Tmux configuration directory
+export TMUX_CONFIG_DIR="$XDG_CONFIG_HOME/tmux"
+
 # Default editor
 export EDITOR="nvim"
 

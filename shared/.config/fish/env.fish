@@ -2,6 +2,7 @@
 # Environment variables and PATH setup
 
 setenv XDG_CONFIG_HOME "$HOME/.config"
+setenv TMUX_CONFIG_DIR "$XDG_CONFIG_HOME/tmux"
 setenv EDITOR nvim
 setenv COLORTERM truecolor
 setenv BAT_THEME tokyonight_night
