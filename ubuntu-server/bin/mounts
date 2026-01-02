@@ -1,0 +1,361 @@
+#!/usr/bin/env bash
+set -e
+
+# Global network mounts management script
+# Manages systemd mount units for any project with a systemd/ directory
+
+SYSTEM_SYSTEMD_DIR="/etc/systemd/system"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions
+print_error() {
+  echo -e "${RED}✗${NC} $1" >&2
+}
+
+print_success() {
+  echo -e "${GREEN}✓${NC} $1"
+}
+
+print_info() {
+  echo -e "${BLUE}ℹ${NC} $1"
+}
+
+print_warning() {
+  echo -e "${YELLOW}⚠${NC} $1"
+}
+
+check_root() {
+  if [ "$EUID" -ne 0 ]; then
+    print_error "This command requires root privileges. Please run with sudo."
+    exit 1
+  fi
+}
+
+# Find project directory with systemd/ subdirectory
+# Supports both project path (~/schmitt.town) and systemd path (~/schmitt.town/systemd)
+find_project_dir() {
+  local path="${1:-.}"
+
+  # Resolve to absolute path
+  path="$(cd "$path" 2>/dev/null && pwd)" || {
+    print_error "Directory not found: $1"
+    exit 1
+  }
+
+  # Case 1: Path has systemd/ subdirectory (path is project dir)
+  if [ -d "$path/systemd" ]; then
+    echo "$path"
+    return 0
+  fi
+
+  # Case 2: Path itself contains .mount files (path is systemd dir)
+  if ls "$path"/*.mount >/dev/null 2>&1; then
+    # Return parent directory as project dir
+    local project_dir
+    project_dir="$(dirname "$path")"
+    echo "$project_dir"
+    return 0
+  fi
+
+  # Not found
+  print_error "No systemd/ directory or .mount files found in: $path"
+  print_info "Projects with mounts should have a systemd/ directory containing .mount and .automount files"
+  print_info "You can specify either the project directory or the systemd/ subdirectory"
+  exit 1
+}
+
+# Get list of mount units from systemd/ directory
+get_mount_units() {
+  local project_dir="$1"
+  local systemd_dir="$project_dir/systemd"
+
+  # Find all .mount files (excluding .automount)
+  local units
+  units=$(find "$systemd_dir" -maxdepth 1 -name "*.mount" -type f -exec basename {} .mount \; | sort)
+
+  if [ -z "$units" ]; then
+    print_error "No .mount files found in: $systemd_dir"
+    exit 1
+  fi
+
+  echo "$units"
+}
+
+# Check if unit files need updating
+needs_update() {
+  local project_dir="$1"
+  local unit_name="$2"
+  local systemd_dir="$project_dir/systemd"
+
+  # Check if files exist in /etc
+  if [ ! -f "$SYSTEM_SYSTEMD_DIR/${unit_name}.mount" ] || \
+     [ ! -f "$SYSTEM_SYSTEMD_DIR/${unit_name}.automount" ]; then
+    return 0  # Need to install
+  fi
+
+  # Check if source files are newer than installed files
+  if [ "$systemd_dir/${unit_name}.mount" -nt "$SYSTEM_SYSTEMD_DIR/${unit_name}.mount" ] || \
+     [ "$systemd_dir/${unit_name}.automount" -nt "$SYSTEM_SYSTEMD_DIR/${unit_name}.automount" ]; then
+    return 0  # Need to update
+  fi
+
+  return 1  # Up to date
+}
+
+# Mount command: copy files (if needed) + enable + start
+cmd_mount() {
+  check_root
+
+  local project_dir
+  project_dir=$(find_project_dir "$1")
+  local systemd_dir="$project_dir/systemd"
+
+  local units
+  units=$(get_mount_units "$project_dir")
+
+  echo "Mounting network shares from: $project_dir"
+  echo
+
+  local needs_reload=false
+
+  # First pass: install/update files if needed
+  for unit_name in $units; do
+    if needs_update "$project_dir" "$unit_name"; then
+      print_info "Installing $unit_name..."
+      cp "$systemd_dir/${unit_name}.mount" "$SYSTEM_SYSTEMD_DIR/"
+      cp "$systemd_dir/${unit_name}.automount" "$SYSTEM_SYSTEMD_DIR/"
+      needs_reload=true
+    fi
+  done
+
+  # Reload systemd if any files were updated
+  if [ "$needs_reload" = true ]; then
+    print_info "Reloading systemd daemon..."
+    systemctl daemon-reload
+  fi
+
+  # Second pass: enable and start
+  for unit_name in $units; do
+    local automount_unit="${unit_name}.automount"
+
+    print_info "Enabling $unit_name..."
+
+    # Enable and start automount
+    systemctl enable "$automount_unit" 2>/dev/null || true
+    systemctl start "$automount_unit" 2>/dev/null || true
+
+    # Check status
+    if systemctl is-active --quiet "$automount_unit"; then
+      print_success "$unit_name is active"
+    else
+      print_error "$unit_name failed to start"
+      print_info "Check logs: journalctl -u $automount_unit"
+    fi
+  done
+
+  echo
+  print_success "Mount operation complete!"
+}
+
+# Unmount command: stop + disable + remove files
+cmd_unmount() {
+  check_root
+
+  local project_dir
+  project_dir=$(find_project_dir "$1")
+
+  local units
+  units=$(get_mount_units "$project_dir")
+
+  echo "Unmounting network shares from: $project_dir"
+  echo
+
+  for unit_name in $units; do
+    local mount_unit="${unit_name}.mount"
+    local automount_unit="${unit_name}.automount"
+
+    print_info "Unmounting $unit_name..."
+
+    # Stop mount and automount
+    systemctl stop "$mount_unit" 2>/dev/null || true
+    systemctl stop "$automount_unit" 2>/dev/null || true
+
+    # Disable automount
+    systemctl disable "$automount_unit" 2>/dev/null || true
+
+    # Remove files from /etc
+    rm -f "$SYSTEM_SYSTEMD_DIR/${unit_name}.mount"
+    rm -f "$SYSTEM_SYSTEMD_DIR/${unit_name}.automount"
+
+    print_success "$unit_name unmounted and removed"
+  done
+
+  echo
+  print_info "Reloading systemd daemon..."
+  systemctl daemon-reload
+
+  echo
+  print_success "Unmount operation complete!"
+}
+
+# Status command: show current status
+cmd_status() {
+  local project_dir
+  project_dir=$(find_project_dir "$1")
+
+  local units
+  units=$(get_mount_units "$project_dir")
+
+  echo "Network Mount Status: $project_dir"
+  echo "========================================"
+  echo
+
+  for unit_name in $units; do
+    local mount_unit="${unit_name}.mount"
+    local automount_unit="${unit_name}.automount"
+
+    echo -e "${BLUE}${unit_name}${NC}:"
+
+    # Check if installed
+    if [ ! -f "$SYSTEM_SYSTEMD_DIR/${mount_unit}" ]; then
+      echo -e "  Status: ${YELLOW}not installed${NC}"
+      echo
+      continue
+    fi
+
+    # Check if files need updating
+    if needs_update "$project_dir" "$unit_name"; then
+      echo -e "  Files:  ${YELLOW}out of date (run 'sudo mounts mount' to update)${NC}"
+    else
+      echo "  Files:  up to date"
+    fi
+
+    # Check automount status
+    if systemctl is-enabled --quiet "$automount_unit" 2>/dev/null; then
+      echo -n "  Automount: "
+      if systemctl is-active --quiet "$automount_unit"; then
+        echo -e "${GREEN}enabled, active${NC}"
+      else
+        echo -e "${YELLOW}enabled, inactive${NC}"
+      fi
+    else
+      echo -e "  Automount: ${RED}disabled${NC}"
+    fi
+
+    # Check mount status
+    echo -n "  Mount:     "
+    if systemctl is-active --quiet "$mount_unit"; then
+      echo -e "${GREEN}mounted${NC}"
+
+      # Show mount details
+      if mount | grep -q "$unit_name"; then
+        mount | grep "$unit_name" | sed 's/^/    /' | head -1
+      fi
+    else
+      echo "not mounted (will mount on access)"
+    fi
+
+    echo
+  done
+}
+
+# Show help
+cmd_help() {
+  cat <<EOF
+Network Mounts Management Tool
+
+Usage: mounts <command> [path]
+
+Commands:
+  mount [path]      Install/update systemd units, enable and start mounts
+  unmount [path]    Stop, disable, and remove systemd units
+  status [path]     Show status of mounts
+  help              Show this help message
+
+Arguments:
+  path              Path to project directory (e.g., ~/schmitt.town)
+                    OR path to systemd/ directory (e.g., ~/schmitt.town/systemd)
+                    (defaults to current directory if not specified)
+
+Examples:
+  # From project directory
+  cd ~/schmitt.town
+  sudo mounts mount          # Mount all shares defined in ./systemd/
+  mounts status              # Check status (no sudo needed)
+  sudo mounts unmount        # Unmount all shares
+
+  # From anywhere with explicit path (both work)
+  sudo mounts mount ~/schmitt.town           # Project directory
+  sudo mounts mount ~/schmitt.town/systemd   # systemd/ directory
+  mounts status ~/schmitt.town
+  sudo mounts unmount ~/schmitt.town
+
+Project Setup:
+  Any project can define network mounts by creating a systemd/ directory
+  with .mount and .automount files. These files remain version-controlled
+  in your project but are copied to /etc/systemd/system/ when mounted.
+
+  Example structure:
+    ~/schmitt.town/
+    └── systemd/
+        ├── mnt-synology-immich.mount
+        ├── mnt-synology-immich.automount
+        ├── mnt-mac-mini-lightroom.mount
+        └── mnt-mac-mini-lightroom.automount
+
+Notes:
+  - Mounts are configured to auto-mount on first access
+  - Mounts auto-unmount after inactivity (configured per mount)
+  - Files in /etc/systemd/system/ are kept in sync with project sources
+  - For SMB mounts, configure credentials file first (see project README)
+
+Troubleshooting:
+  # View mount logs
+  journalctl -u <unit-name>.mount -f
+
+  # Check systemd unit status
+  systemctl status <unit-name>.automount
+  systemctl status <unit-name>.mount
+
+  # Remount if needed
+  sudo mounts unmount ~/project
+  sudo mounts mount ~/project
+EOF
+}
+
+# Main command dispatcher
+main() {
+  local command="${1:-help}"
+
+  case "$command" in
+    mount)
+      shift
+      cmd_mount "$@"
+      ;;
+    unmount)
+      shift
+      cmd_unmount "$@"
+      ;;
+    status)
+      shift
+      cmd_status "$@"
+      ;;
+    help|--help|-h)
+      cmd_help
+      ;;
+    *)
+      print_error "Unknown command: $command"
+      echo
+      cmd_help
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

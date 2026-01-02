@@ -36,9 +36,37 @@ sudo systemctl stop docker-compose@{service-name}
 sudo systemctl disable docker-compose@{service-name}
 ```
 
-### Docker NFS mount dependency
+### Network Mounts Management (mounts command)
 
-Prevents Docker from starting before Tailscale and NFS mounts are ready. Without this, containers may bind to empty local directories instead of mounted NFS shares during boot.
+Global tool for managing systemd network mounts (NFS/SMB) across projects. Mount configurations are stored in project repositories (e.g., `~/schmitt.town/systemd/`), not in dotfiles.
+
+**Usage:**
+```sh
+# From project directory with systemd/ folder
+cd ~/schmitt.town
+sudo mounts mount          # Install units, enable, and start mounts
+mounts status              # Check status (no sudo needed)
+sudo mounts unmount        # Stop, disable, and remove units
+
+# From anywhere with explicit path
+sudo mounts mount ~/schmitt.town
+mounts status ~/schmitt.town
+
+# Get help
+mounts help
+```
+
+**How it works:**
+1. Projects define mount units in `systemd/` directory (version-controlled)
+2. `mounts mount` copies units to `/etc/systemd/system/` and enables them
+3. Mounts auto-mount on first access, auto-unmount after inactivity
+4. `mounts status` shows if units are out of sync with project sources
+
+See your project's README (e.g., `~/schmitt.town/README.md`) for mount-specific setup instructions.
+
+### Docker network mount dependency
+
+Prevents Docker from starting before Tailscale and network mounts (NFS/SMB) are ready. Without this, containers may bind to empty local directories instead of mounted network shares during boot.
 
 **Setup:**
 ```sh
@@ -51,8 +79,8 @@ sudo systemctl daemon-reload
 
 **Verify:**
 ```sh
-# Check that Docker waits for NFS
-systemctl show docker.service | grep -E "^(After|Wants)=" | grep -i nfs
+# Check that Docker waits for network mounts
+systemctl show docker.service | grep -E "^(After|Wants)=" | grep -E '(nfs|mac-mini)'
 ```
 
 ### Docker daemon crash auto-restart
