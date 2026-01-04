@@ -11,7 +11,7 @@
 
   homebrew = {
     brews = [
-      "immich-go"
+      "immich-cli"
       "osxphotos"
     ];
 

@@ -12,7 +12,6 @@ CONFIG_FILE="${HOME}/.config/immich-sync/config"
 # Default values
 EXPORT_DIR="${HOME}/Pictures/immich-sync"
 LOG_DIR="${HOME}/Library/Logs/immich-sync"
-LOG_FILE="${LOG_DIR}/sync.log"
 
 # Load configuration
 if [[ ! -f "${CONFIG_FILE}" ]]; then
@@ -26,6 +25,8 @@ fi
 # shellcheck source=/dev/null
 source "${CONFIG_FILE}"
 
+LOG_FILE="${LOG_DIR}/sync.log"
+
 # Validate required configuration
 if [[ -z "${IMMICH_URL:-}" ]] || [[ -z "${IMMICH_API_KEY:-}" ]]; then
   echo "ERROR: IMMICH_URL and IMMICH_API_KEY must be set in ${CONFIG_FILE}"
@@ -35,6 +36,7 @@ fi
 # Create directories if they don't exist
 mkdir -p "${EXPORT_DIR}"
 mkdir -p "${LOG_DIR}"
+touch "${LOG_FILE}"
 
 # Function to log messages
 log() {
@@ -56,7 +58,6 @@ main() {
     --update \
     --only-new \
     --export-by-date \
-    --directory "{created.year}/{created.month}" \
     --album-keyword \
     --exportdb "${LOG_DIR}/export.db" \
     --verbose \
@@ -67,14 +68,18 @@ main() {
     exit 1
   fi
 
+  if immich login "${IMMICH_URL}" "${IMMICH_API_KEY}"; then
+    log "Logged in to Immich successfully"
+  else
+    log_error "Immich login failed, url ${IMMICH_URL} key ${IMMICH_API_KEY}"
+    exit 1
+  fi
+
   # Step 2: Upload to Immich
   log "Uploading to Immich at ${IMMICH_URL}..."
-  if immich-go upload \
-    -server="${IMMICH_URL}" \
-    -key="${IMMICH_API_KEY}" \
-    -create-albums \
-    -google-photos \
-    "${EXPORT_DIR}" \
+  if immich upload \
+    --recursive "${EXPORT_DIR}" \
+    --concurrency "${IMMICH_CONCURRENCY:-6}" \
     2>&1 | tee -a "${LOG_FILE}"; then
     log "Upload completed successfully"
   else
