@@ -1,4 +1,8 @@
 {
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-sonnet-4-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-haiku-4-5"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -7,9 +11,5 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true
   },
-  "model": "opusplan",
-  "env": {
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "sonnet",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "haiku"
-  }
+  "model": "opusplan"
 }
