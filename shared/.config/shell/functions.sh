@@ -71,23 +71,8 @@ auto_start_tmux() {
 
   # Check if tmux is available and we're not already in tmux or SSH
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
-    session_name="$(hostname -s)"
-    
-    # If hostname session exists and has no attached clients, just attach
-    if tmux has-session -t "$session_name" 2>/dev/null; then
-      attached_clients=$(tmux list-clients -t "$session_name" 2>/dev/null | wc -l)
-      if [ "$attached_clients" -eq 0 ]; then
-        tmux attach-session -t "$session_name" && exit
-        return  # If attach failed, continue with normal shell
-      fi
-
-      # Session already attached, generate random name for new session
-      session_name="$(random-session-name)"
-    fi
-
-    # Create new session and launch sesh popup
-    # If tmux fails to start, fall back to regular shell
-    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/sesh-or-stay.sh '$session_name'" && exit
+    tmx --new
+    # Note: tmx --new will exit if successful, so anything after this won't run
   fi
 }
 
