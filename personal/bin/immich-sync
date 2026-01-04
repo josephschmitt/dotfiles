@@ -48,12 +48,33 @@ log_error() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $*" | tee -a "${LOG_FILE}" >&2
 }
 
+# Function to calculate and log elapsed time
+log_elapsed_time() {
+  local section="$1"
+  local start_time="$2"
+  local end_time=$(date +%s)
+  local elapsed=$((end_time - start_time))
+
+  local hours=$((elapsed / 3600))
+  local minutes=$(((elapsed % 3600) / 60))
+  local seconds=$((elapsed % 60))
+
+  if [[ $hours -gt 0 ]]; then
+    log "${section} took ${hours}h ${minutes}m ${seconds}s"
+  elif [[ $minutes -gt 0 ]]; then
+    log "${section} took ${minutes}m ${seconds}s"
+  else
+    log "${section} took ${seconds}s"
+  fi
+}
+
 # Main sync function
 main() {
   log "=== Starting Photos → Immich sync ==="
 
   # Step 1: Export from Apple Photos
   log "Exporting from Apple Photos..."
+  export_start=$(date +%s)
   if osxphotos export "${EXPORT_DIR}" \
     --update \
     --only-new \
@@ -63,6 +84,7 @@ main() {
     --verbose \
     2>&1 | tee -a "${LOG_FILE}"; then
     log "Export completed successfully"
+    log_elapsed_time "Apple Photos export" "${export_start}"
   else
     log_error "Export failed with exit code $?"
     exit 1
@@ -77,11 +99,13 @@ main() {
 
   # Step 2: Upload to Immich
   log "Uploading to Immich at ${IMMICH_URL}..."
+  upload_start=$(date +%s)
   if immich upload \
     --recursive "${EXPORT_DIR}" \
     --concurrency "${IMMICH_CONCURRENCY:-6}" \
     2>&1 | tee -a "${LOG_FILE}"; then
     log "Upload completed successfully"
+    log_elapsed_time "Immich upload" "${upload_start}"
   else
     log_error "Upload failed with exit code $?"
     exit 1
