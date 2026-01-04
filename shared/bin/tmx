@@ -1,0 +1,128 @@
+#!/bin/sh
+# TMX - Smart tmux session management
+# Handles three modes:
+# 1. Default (no args): Re-attach to last session, or create hostname session
+# 2. Force new (-n/--new): Create new session following auto_start_tmux logic
+# 3. Directory arg: Create/switch to session based on directory basename
+
+show_help() {
+  cat <<EOF
+tmx - Smart tmux session management
+
+USAGE:
+  tmx                  Attach to last session, or create new hostname session
+  tmx -n, --new        Force creating new session with hostname or random name
+  tmx <directory>      Create/attach to session based on directory name
+  tmx -h, --help       Show this help message
+
+OPTIONS:
+  -n, --new     Force creating a new tmux session (matches auto-start behavior)
+  -h, --help    Show this help message
+
+EXAMPLES:
+  tmx                          # Attach to last session
+  tmx --new                    # Create new session with sesh picker
+  tmx ~/development/myproject  # Create session from directory name
+
+EOF
+}
+
+# Parse arguments
+force_new=false
+dir=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -n|--new)
+      force_new=true
+      shift
+      ;;
+    -*)
+      echo "tmx: Unknown option: $1" >&2
+      echo "Use 'tmx --help' for usage information" >&2
+      exit 1
+      ;;
+    *)
+      if [ -n "$dir" ]; then
+        echo "tmx: Only one directory argument allowed" >&2
+        exit 1
+      fi
+      dir="$1"
+      shift
+      ;;
+  esac
+done
+
+# NEW SESSION MODE (-n flag) - matches auto_start_tmux logic exactly
+new_session_mode() {
+  local session_name="$(hostname -s)"
+
+  # Check if hostname session already exists
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    # Count attached clients
+    local attached_clients=$(tmux list-clients -t "$session_name" 2>/dev/null | wc -l)
+
+    if [ "$attached_clients" -eq 0 ]; then
+      # No clients attached - attach to existing session
+      tmux attach-session -t "$session_name"
+      exit $?
+    else
+      # Clients already attached - generate random name for new session
+      session_name="$(random-session-name)"
+    fi
+  fi
+
+  # Create new session (detached) and launch sesh popup
+  tmux new-session -d -s "$session_name" \; run-shell "${TMUX_CONFIG_DIR}/sesh-or-stay.sh '$session_name'"
+  exit $?
+}
+
+# DIRECTORY MODE - create/switch to session based on directory basename
+directory_mode() {
+  local session_name="$(basename "$dir")"
+
+  if ! cd "$dir" 2>/dev/null; then
+    echo "tmx: Failed to change to directory: $dir" >&2
+    return 1
+  fi
+
+  if [ -n "$TMUX" ]; then
+    # Already in tmux, switch to session instead of nesting
+    tmux new-session -A -d -s "$session_name"
+    tmux switch-client -t "$session_name"
+  else
+    # Not in tmux, start new session normally
+    tmux new-session -A -s "$session_name"
+  fi
+}
+
+# DEFAULT MODE - re-attach to last session, or create hostname session if none exist
+default_mode() {
+  # Check if any tmux sessions exist
+  if tmux list-sessions 2>/dev/null | grep -q .; then
+    # Sessions exist - attach to last session
+    if [ -n "$TMUX" ]; then
+      # Already in tmux, switch to last session instead
+      tmux switch-client -l
+    else
+      # Not in tmux, attach to last used session
+      tmux attach
+    fi
+  else
+    # No sessions exist - use new session mode logic
+    new_session_mode
+  fi
+}
+
+# Execute the appropriate mode
+if [ "$force_new" = true ]; then
+  new_session_mode
+elif [ -n "$dir" ]; then
+  directory_mode
+else
+  default_mode
+fi

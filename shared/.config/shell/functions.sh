@@ -68,7 +68,7 @@ auto_start_tmux() {
   if is_integrated_terminal; then
     return
   fi
-  
+
   # Check if tmux is available and we're not already in tmux or SSH
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
     session_name="$(hostname -s)"
@@ -102,22 +102,3 @@ ssh() {
   fi
 }
 
-# Launch tmux session with directory argument support
-tmx() {
-  local dir="${1:-$(pwd)}"
-  cd "$dir" || return 1
-  local session_name="$(basename "$dir")"
-  
-  if [ -n "$TMUX" ]; then
-    # Already in tmux, switch to session instead of nesting
-    if tmux has-session -t "$session_name" 2>/dev/null; then
-      tmux switch-client -t "$session_name"
-    else
-      tmux-new-session "$session_name"
-    fi
-  else
-    # Not in tmux, start new session normally
-    tmux new-session -A -s "$session_name"
-    exit
-  fi
-}
