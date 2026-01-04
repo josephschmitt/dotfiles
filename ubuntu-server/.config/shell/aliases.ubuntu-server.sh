@@ -1,8 +1,3 @@
-# Ubuntu Server specific aliases for POSIX-compatible shells
+# Ubuntu Server specific aliases for POSIX shells
 
-# Nix rebuild shortcuts for Ubuntu servers
-alias nix_rebuild="nix profile upgrade ubuntu-server/.config/nix"
-alias nix_update="nix flake update --flake ~/dotfiles/ubuntu-server/.config/nix && nix profile upgrade ubuntu-server/.config/nix"
-
-# Claude Code CLI
-alias claude="/home/josephschmitt/.config/claude/local/claude"
+alias claude="/home/josephschmitt/.claude/local/claude"

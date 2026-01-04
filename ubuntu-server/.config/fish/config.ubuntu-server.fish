@@ -1,4 +1,3 @@
-# Ubuntu Server specific Fish configuration
+# Ubuntu Server specific Fish shell configuration
 
-# Source ubuntu-server specific aliases
-source ~/.config/fish/aliases.ubuntu-server.fish
+alias claude="/home/josephschmitt/.claude/local/claude"
