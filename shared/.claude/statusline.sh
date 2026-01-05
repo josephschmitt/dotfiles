@@ -7,6 +7,33 @@ input=$(cat)
 MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
 CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 
+# Extract context window information
+CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // empty')
+CURRENT_USAGE=$(echo "$input" | jq '.context_window.current_usage // empty')
+
+# Calculate context percentage if data is available
+CONTEXT_PERCENT=""
+if [ -n "$CONTEXT_SIZE" ] && [ "$CURRENT_USAGE" != "" ] && [ "$CURRENT_USAGE" != "null" ]; then
+  INPUT_TOKENS=$(echo "$CURRENT_USAGE" | jq -r '.input_tokens // 0')
+  CACHE_CREATION=$(echo "$CURRENT_USAGE" | jq -r '.cache_creation_input_tokens // 0')
+  CACHE_READ=$(echo "$CURRENT_USAGE" | jq -r '.cache_read_input_tokens // 0')
+
+  TOTAL_USED=$((INPUT_TOKENS + CACHE_CREATION + CACHE_READ))
+  PERCENT=$((TOTAL_USED * 100 / CONTEXT_SIZE))
+
+  # Color code based on percentage
+  if [ "$PERCENT" -le 50 ]; then
+    # Green for safe usage
+    CONTEXT_PERCENT=" \033[32m🧠 ${PERCENT}%\033[0m"
+  elif [ "$PERCENT" -le 75 ]; then
+    # Yellow for moderate usage
+    CONTEXT_PERCENT=" \033[33m🧠 ${PERCENT}%\033[0m"
+  else
+    # Red for high usage
+    CONTEXT_PERCENT=" \033[31m🧠 ${PERCENT}%\033[0m"
+  fi
+fi
+
 # Determine directory name - show relative to git root if in a subdirectory
 if git -C "$CURRENT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
   # We're in a git repo
@@ -36,6 +63,6 @@ if git -C "$CURRENT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
-# Output format: [Model] 📁 directory  branch
+# Output format: [Model] [percentage] 📁 directory  branch
 # Use ANSI color codes: cyan for model, white for directory, green for branch
-echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH"
+echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH"
