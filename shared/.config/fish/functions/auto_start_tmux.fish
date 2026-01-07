@@ -3,16 +3,31 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
     if set -q SKIP_AUTO_TMUX
         return
     end
-
+    
     # Skip in IDE/editor integrated terminals
     if is_integrated_terminal
         return
     end
-
+    
     # Check if tmux is available and we're not already in tmux or SSH
     if command -q tmux; and not set -q TMUX; and not set -q SSH_CONNECTION
-        tmx --new
-        # Note: tmx --new will exit if successful, so anything after this won't run
+        set session_name (hostname -s)
+        
+        # If hostname session exists and has no attached clients, just attach
+        if tmux has-session -t $session_name 2>/dev/null
+            set attached_clients (tmux list-clients -t $session_name 2>/dev/null | wc -l)
+            if test $attached_clients -eq 0
+                tmux attach-session -t $session_name
+                return  # If attach failed, continue with normal shell
+            end
+
+            # Session already attached, generate random name for new session
+            set session_name (random-session-name)
+        end
+
+        # Create new session and launch sesh popup
+        # If tmux fails to start, fall back to regular shell
+        tmux new-session -s $session_name \; run-shell "$TMUX_CONFIG_DIR/sesh-or-stay.sh '$session_name'"
     end
 end
 
