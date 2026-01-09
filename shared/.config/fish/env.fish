@@ -24,28 +24,28 @@ setenv ZIDE_USE_FOCUS_PLUGIN true
 # fd respects .ignore files automatically, just exclude .git
 setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude=.git"
 
-fish_add_path --prepend "$HOME/.nix-profile/bin"
-fish_add_path --prepend /run/current-system/sw/bin
-fish_add_path --prepend /nix/var/nix/profiles/default/bin
+fish_add_path --global --prepend "$HOME/.nix-profile/bin"
+fish_add_path --global --prepend /run/current-system/sw/bin
+fish_add_path --global --prepend /nix/var/nix/profiles/default/bin
 
-fish_add_path --prepend /opt/homebrew/bin
-fish_add_path --prepend "$HOME/.bun/bin"
-fish_add_path --prepend "$HOME/.cargo/bin"
-fish_add_path --prepend "$HOME/.volta/bin"
+fish_add_path --global --prepend /opt/homebrew/bin
+fish_add_path --global --prepend "$HOME/.bun/bin"
+fish_add_path --global --prepend "$HOME/.cargo/bin"
+fish_add_path --global --prepend "$HOME/.volta/bin"
 
-fish_add_path --prepend "$HOME/bin"
-fish_add_path --prepend "$HOME/go/bin"
-fish_add_path --prepend "$HOME/.local/bin"
-fish_add_path --prepend "$HOME/development/zide/bin"
-fish_add_path --prepend "$HOME/development/zj/bin"
+fish_add_path --global --prepend "$HOME/bin"
+fish_add_path --global --prepend "$HOME/go/bin"
+fish_add_path --global --prepend "$HOME/.local/bin"
+fish_add_path --global --prepend "$HOME/development/zide/bin"
+fish_add_path --global --prepend "$HOME/development/zj/bin"
 
 set -gx PNPM_HOME $HOME/Library/pnpm
-fish_add_path --prepend "$PNPM_HOME"
+fish_add_path --global --prepend "$PNPM_HOME"
 
 # Application paths
-fish_add_path --append $HOME/.opencode/bin
-fish_add_path --append $HOME/.lmstudio/bin
-fish_add_path --append $HOME/.antigravity/antigravity/bin
+fish_add_path --global --append $HOME/.opencode/bin
+fish_add_path --global --append $HOME/.lmstudio/bin
+fish_add_path --global --append $HOME/.antigravity/antigravity/bin
 
 # Homebrew configuration
 set -gx HOMEBREW_NO_ENV_HINTS 1
