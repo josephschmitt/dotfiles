@@ -44,7 +44,6 @@ export PATH="/nix/var/nix/profiles/default/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.volta/bin:$PATH"
 
 # Custom bin directories
 export PATH="$HOME/bin:$PATH"

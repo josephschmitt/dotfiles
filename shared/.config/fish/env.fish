@@ -31,7 +31,6 @@ fish_add_path --global --prepend /nix/var/nix/profiles/default/bin
 fish_add_path --global --prepend /opt/homebrew/bin
 fish_add_path --global --prepend "$HOME/.bun/bin"
 fish_add_path --global --prepend "$HOME/.cargo/bin"
-fish_add_path --global --prepend "$HOME/.volta/bin"
 
 fish_add_path --global --prepend "$HOME/bin"
 fish_add_path --global --prepend "$HOME/go/bin"
