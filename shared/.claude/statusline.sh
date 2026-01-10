@@ -7,19 +7,25 @@ input=$(cat)
 MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
 CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir')
 
+# Check if we're in a git repo (cache this result for reuse)
+IS_GIT_REPO=false
+if git -C "$CURRENT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+  IS_GIT_REPO=true
+fi
+
 # Extract context window information
-CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // empty')
+CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 0 | tonumber? // 0')
 CURRENT_USAGE=$(echo "$input" | jq '.context_window.current_usage // empty')
 
 # Calculate context percentage if data is available
 CONTEXT_PERCENT=""
-if [ -n "$CONTEXT_SIZE" ] && [ "$CURRENT_USAGE" != "" ] && [ "$CURRENT_USAGE" != "null" ]; then
-  INPUT_TOKENS=$(echo "$CURRENT_USAGE" | jq -r '.input_tokens // 0')
-  CACHE_CREATION=$(echo "$CURRENT_USAGE" | jq -r '.cache_creation_input_tokens // 0')
-  CACHE_READ=$(echo "$CURRENT_USAGE" | jq -r '.cache_read_input_tokens // 0')
+if [ -n "$CONTEXT_SIZE" ] && [ "$CONTEXT_SIZE" -gt 0 ] && [ "$CURRENT_USAGE" != "" ] && [ "$CURRENT_USAGE" != "null" ]; then
+  INPUT_TOKENS=$(echo "$CURRENT_USAGE" | jq -r '.input_tokens // 0 | tonumber? // 0')
+  CACHE_CREATION=$(echo "$CURRENT_USAGE" | jq -r '.cache_creation_input_tokens // 0 | tonumber? // 0')
+  CACHE_READ=$(echo "$CURRENT_USAGE" | jq -r '.cache_read_input_tokens // 0 | tonumber? // 0')
 
-  TOTAL_USED=$((INPUT_TOKENS + CACHE_CREATION + CACHE_READ))
-  PERCENT=$((TOTAL_USED * 100 / CONTEXT_SIZE))
+  TOTAL_USED=$(( ${INPUT_TOKENS:-0} + ${CACHE_CREATION:-0} + ${CACHE_READ:-0} ))
+  PERCENT=$(( ${TOTAL_USED:-0} * 100 / ${CONTEXT_SIZE:-1} ))
 
   # Color code based on percentage
   if [ "$PERCENT" -le 50 ]; then
@@ -35,7 +41,7 @@ if [ -n "$CONTEXT_SIZE" ] && [ "$CURRENT_USAGE" != "" ] && [ "$CURRENT_USAGE" !=
 fi
 
 # Determine directory name - show relative to git root if in a subdirectory
-if git -C "$CURRENT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+if [ "$IS_GIT_REPO" = true ]; then
   # We're in a git repo
   REL_PATH=$(git -C "$CURRENT_DIR" rev-parse --show-prefix 2>/dev/null)
   # Remove trailing slash if present
@@ -55,7 +61,7 @@ fi
 
 # Show git branch if in a git repo
 GIT_BRANCH=""
-if git -C "$CURRENT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+if [ "$IS_GIT_REPO" = true ]; then
   BRANCH=$(git -C "$CURRENT_DIR" branch --show-current 2>/dev/null)
   if [ -n "$BRANCH" ]; then
     # Use ANSI color codes: green for branch name
