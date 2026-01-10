@@ -28,12 +28,14 @@
             git
             gnumake
             gum
+            lazydocker
             lazygit
             mosh
             neovim
             nil
             nixpkgs-fmt
             nixpkgs-fmt
+            nodejs
             oh-my-posh
             opencode
             ripgrep
