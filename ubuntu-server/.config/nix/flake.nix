@@ -37,7 +37,6 @@
             nixpkgs-fmt
             nodejs
             oh-my-posh
-            opencode
             ripgrep
             sesh
             stow
