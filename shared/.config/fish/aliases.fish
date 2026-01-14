@@ -7,6 +7,7 @@ alias lg="env TMPDIR=/tmp lazygit"
 alias nix_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
 alias nix_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
 alias vim="nvim"
+alias astrovim="NVIM_APPNAME=astronvim nvim"
 alias wm="workmux"
 
 alias ls="eza"

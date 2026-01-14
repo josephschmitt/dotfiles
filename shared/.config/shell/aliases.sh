@@ -6,6 +6,7 @@ alias cat="bat"
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias lg="env TMPDIR=/tmp lazygit"
 alias vim="nvim"
+alias astrovim='NVIM_APPNAME=astronvim nvim'
 alias wm="workmux"
 
 # Eza (modern ls replacement) aliases
