@@ -4,11 +4,16 @@
 
 ---@type LazySpec
 return {
-  -- Which-key configuration - use helix preset
+  -- Which-key configuration - use helix preset and add group icons
   {
     "folke/which-key.nvim",
     opts = {
       preset = "helix",
+      spec = {
+        { "<leader>e", group = "󰙅 Explorer" },
+        { "<leader>w", group = "󱂬 Window" },
+        { "<leader><Tab>", group = "󰓩 Tabs" },
+      },
     },
   },
 

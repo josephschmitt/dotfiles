@@ -61,7 +61,10 @@ return {
         -- Undo/redo
         U = { "<C-r>", desc = "Redo" },
 
-        -- Explorer keymaps (Neo-tree)
+        -- Explorer group
+        ["<Leader>e"] = { desc = " Explorer" },
+
+        -- Explorer keymaps (Neo-tree and Yazi)
         ["<Leader>ee"] = { "<Cmd>Neotree toggle<CR>", desc = "Toggle Explorer (current file)" },
         ["<Leader>eE"] = { "<Cmd>Neotree toggle dir=<CR>", desc = "Toggle Explorer (cwd)" },
         ["<Leader>eb"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
@@ -85,7 +88,7 @@ return {
         ["<A-w>"] = { "<C-w>w", desc = "Switch window" },
 
         -- Window group
-        ["<Leader>w"] = { desc = "Window" },
+        ["<Leader>w"] = { desc = " Window" },
 
         -- Split creation
         ["<Leader>ws"] = { "<Cmd>split<CR>", desc = "Split horizontal" },
@@ -111,7 +114,7 @@ return {
         ["<Leader>w<lt>"] = { "<Cmd>vertical resize -5<CR>", desc = "Decrease width" },
 
         -- Tab group
-        ["<Leader><Tab>"] = { desc = "Tabs" },
+        ["<Leader><Tab>"] = { desc = "➡ Tabs" },
 
         -- Tab creation/closing
         ["<Leader><Tab>n"] = { "<Cmd>tabnew<CR>", desc = "New tab" },
