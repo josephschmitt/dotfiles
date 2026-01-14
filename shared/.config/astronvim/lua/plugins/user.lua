@@ -307,4 +307,22 @@ return {
       { "za", "<Plug>(textobj-fold-a)", mode = { "x", "o" }, desc = "Around Fold" },
     },
   },
+
+  -- Mini AI - smart text objects based on indent, treesitter, or patterns
+  {
+    "echasnovski/mini.ai",
+    version = "*",
+    config = function()
+      require("mini.ai").setup()
+    end,
+  },
+
+  -- Mini Surround - surround text with brackets, quotes, etc.
+  {
+    "echasnovski/mini.surround",
+    version = "*",
+    config = function()
+      require("mini.surround").setup()
+    end,
+  },
 }
