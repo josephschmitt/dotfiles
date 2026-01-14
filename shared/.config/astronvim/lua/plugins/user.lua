@@ -149,9 +149,7 @@ return {
     optional = true, -- Only apply if yazi is loaded from AstroCommunity
     keys = {
       { "<leader>fy", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (current file)" },
-      { "<leader>y", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (current file)" },
       { "<leader>fY", "<cmd>Yazi cwd<cr>", desc = "Yazi (cwd)" },
-      { "<leader>Y", "<cmd>Yazi cwd<cr>", desc = "Yazi (cwd)" },
     },
   },
 
