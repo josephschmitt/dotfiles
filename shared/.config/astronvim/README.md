@@ -127,7 +127,9 @@ opts = {
 | `<S-l>` | Next buffer |
 | `]b` | Next buffer |
 | `[b` | Previous buffer |
+| `<leader>ba` | Close all buffers |
 | `<leader>bd` | Close buffer from tabline (interactive picker) |
+| `<leader>bD` | Close current buffer |
 | `<leader>be` | Open buffer explorer (Neo-tree) |
 
 ### File Explorer

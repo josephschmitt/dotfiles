@@ -148,6 +148,14 @@ return {
           end,
           desc = "Close buffer from tabline",
         },
+        ["<Leader>bD"] = {
+          function() require("astrocore.buffer").close() end,
+          desc = "Close current buffer",
+        },
+        ["<Leader>ba"] = {
+          function() require("astrocore.buffer").close_all() end,
+          desc = "Close all buffers",
+        },
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
