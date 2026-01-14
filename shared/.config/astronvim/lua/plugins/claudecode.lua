@@ -7,6 +7,11 @@ return {
     terminal_provider = "none",
     auto_start = true, -- Auto-start WebSocket server
 
+    -- Configure diff behavior to open in new tabs
+    diff_opts = {
+      open_in_current_tab = false, -- Open diffs in new tab instead of split
+    },
+
     -- Keymaps for diff review (aligned with your patterns)
     keymaps = {
       accept = "<Leader>aa", -- Accept Claude's changes
