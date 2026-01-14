@@ -5,7 +5,7 @@
 - **No Build System**: Configuration files only, no tests/linting
 - **Platforms**: macOS (primary), Ubuntu Server (secondary)
 - **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
-- **Editors**: Neovim (LazyVim primary) + Helix (secondary)
+- **Editors**: Neovim (dual setup: LazyVim + AstroNvim) + Helix (secondary)
 - **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `ubuntu-server/` (Ubuntu)
 
 ### Stow Commands
@@ -86,6 +86,48 @@ Root:
 ubuntu-server/.config/nix/     # Nix configs and services
 ```
 
+## Neovim Configuration (Dual Setup)
+
+### Critical Context: Two Separate Neovim Configs
+This repository maintains **two independent Neovim configurations** using `NVIM_APPNAME`:
+
+| Config | Location | Based On | Default Alias |
+|--------|----------|----------|---------------|
+| **LazyVim** | `shared/.config/nvim/` | [LazyVim](https://www.lazyvim.org/) | `lazyvim`, `lvim` |
+| **AstroNvim** | `shared/.config/astronvim/` | [AstroNvim v5+](https://astronvim.com/) | `vim`, `nvim`, `astrovim`, `avim` |
+
+**Key Points**:
+- Completely isolated (separate plugins, data, state, cache)
+- Current default: `nvim` command launches **AstroNvim**
+- Each has own README.md with configuration docs
+- AstroNvim has additional AGENTS.md with AI assistant guidelines
+
+### Decision Tree for Neovim Changes
+```
+User requests Neovim configuration change?
+├─ User says "neovim" or "nvim" (ambiguous)
+│  └─ ASK: "Which config? LazyVim (shared/.config/nvim/) or AstroNvim (shared/.config/astronvim/)?"
+├─ User says "lazyvim"
+│  └─ Modify shared/.config/nvim/
+├─ User says "astrovim" or "astronvim"
+│  └─ Modify shared/.config/astronvim/
+└─ User asks for both
+   └─ Modify both configurations (implement feature in each)
+```
+
+### MANDATORY: Ask for Clarification
+**Always ask which config to modify unless explicitly specified:**
+- ❌ "neovim", "nvim", "my editor" → ASK for clarification
+- ✅ "lazyvim" → Modify `shared/.config/nvim/`
+- ✅ "astrovim", "astronvim" → Modify `shared/.config/astronvim/`
+
+### AstroNvim-Specific Guidelines
+When modifying AstroNvim config (`shared/.config/astronvim/`):
+1. **Read** `shared/.config/astronvim/AGENTS.md` first (contains AstroVim-specific workflows)
+2. Follow "AstroVim way": Prefer AstroCommunity plugins over custom specs
+3. Use AstroCore/AstroLSP/AstroUI override pattern (see existing plugins)
+4. Update `shared/.config/astronvim/README.md` with new keybindings/features
+
 ### CRITICAL: .config Symlinking Rules
 **NEVER `stow` entire `.config/` directory** - symlink individual app configs only
 
@@ -107,6 +149,7 @@ stow --target=~/.config shared/.config
 | Keybinding changed | `.config/{tool}/README.md` keybindings section |
 | Theme/appearance changed | `/README.md` features + tool README |
 | Shell support added | `/README.md` + `AGENTS.md` |
+| Neovim config modified | `.config/{nvim|astronvim}/README.md` + `/README.md` (if affects "Dual Neovim Setup") |
 
 ### Update Workflow (Atomic Commits)
 1. Make config changes → Test changes
@@ -123,6 +166,13 @@ stow --target=~/.config shared/.config
 - **Cross-reference**: Link related tools and integrations
 
 ## Git Workflow (MANDATORY APPROVAL REQUIRED)
+
+### Agent Commit Policy
+**Agents MUST NOT auto-commit changes.** After completing work:
+- Stage files and show `git status` + `git diff --staged`
+- **STOP and WAIT** for user approval before committing
+- User will either commit manually or use `/commit` skill
+- Only commit after explicit user approval or `/commit` command
 
 ### Pre-Commit Checklist (Complete Before Requesting Approval)
 1. Stage files: `git add <files>`
