@@ -1,5 +1,3 @@
-if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
 -- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
@@ -17,7 +15,8 @@ return {
       cmp = true, -- enable completion at start
       diagnostics = { virtual_text = true, virtual_lines = false }, -- diagnostic settings on startup
       highlighturl = true, -- highlight URLs at start
-      notifications = true, -- enable notifications at start
+      notifications = false, -- disable notifications on startup
+      show_intro = false, -- disable intro splash, use dashboard instead
     },
     -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
     diagnostics = {
@@ -59,9 +58,60 @@ return {
       n = {
         -- second key is the lefthand side of the map
 
+        -- Undo/redo
+        U = { "<C-r>", desc = "Redo" },
+
+        -- Goto
+        gh = { "0", desc = "Go to beginning of line" },
+        gl = { "$", desc = "Go to end of line" },
+
+        -- Window
+        gw = { "<C-w>", desc = "Window mode" },
+        ["<A-w>"] = { "<C-w>w", desc = "Switch window" },
+
+        -- Indent
+        ["<"] = { "<<", desc = "Unindent line" },
+        [">"] = { ">>", desc = "Indent line" },
+
+        -- Select all
+        ["<C-a>"] = { "ggVG", desc = "Select all" },
+        gV = { "ggVG", desc = "Select all" },
+
+        -- Comment line
+        ["<C-c>"] = { "gcc", remap = true, desc = "Comment line" },
+
+        -- Buffers
+        ["<Leader>ba"] = {
+          function()
+            -- Get all buffers and close only regular file buffers
+            local bufs = vim.api.nvim_list_bufs()
+            for _, buf in ipairs(bufs) do
+              if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+                local buftype = vim.bo[buf].buftype
+                -- Only delete normal file buffers, not special buffers
+                if buftype == "" then
+                  vim.api.nvim_buf_delete(buf, { force = false })
+                end
+              end
+            end
+            require("snacks").dashboard({ focus = true })
+          end,
+          desc = "Close all buffers",
+        },
+        ["<Leader>uB"] = {
+          function()
+            require("snacks").dashboard()
+          end,
+          desc = "Show Dashboard",
+        },
+
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
         ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
+
+        -- Shift-hjkl for buffer navigation (LazyVim style)
+        ["<S-h>"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
+        ["<S-l>"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
 
         -- mappings seen under group name "Buffer"
         ["<Leader>bd"] = {
@@ -73,12 +123,56 @@ return {
           desc = "Close buffer from tabline",
         },
 
-        -- tables with just a `desc` key will be registered with which-key if it's installed
-        -- this is useful for naming menus
-        -- ["<Leader>b"] = { desc = "Buffers" },
-
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
+      },
+      v = {
+        -- Goto
+        gh = { "0", desc = "Go to beginning of line" },
+        gl = { "$", desc = "Go to end of line" },
+        gw = { "<C-w>", desc = "Window mode" },
+
+        -- Comment
+        ["<C-c>"] = { "gc", remap = true, desc = "Comment line" },
+
+        -- Helix-like
+        ["<S-v>"] = { "j", desc = "Select down" },
+
+        -- Buffers
+        ["<Leader>ba"] = {
+          function()
+            local bufs = vim.api.nvim_list_bufs()
+            for _, buf in ipairs(bufs) do
+              if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
+                local buftype = vim.bo[buf].buftype
+                if buftype == "" then
+                  vim.api.nvim_buf_delete(buf, { force = false })
+                end
+              end
+            end
+            require("snacks").dashboard({ focus = true })
+          end,
+          desc = "Close all buffers",
+        },
+        ["<Leader>uB"] = {
+          function()
+            require("snacks").dashboard()
+          end,
+          desc = "Show Dashboard",
+        },
+      },
+      i = {
+        -- Exit insert mode
+        jk = { "<esc>", desc = "Exit insert mode" },
+        kj = { "<esc>", desc = "Exit insert mode" },
+        jj = { "<esc>", desc = "Exit insert mode" },
+
+        -- Clipboard paste
+        ["<D-v>"] = { "<C-R>+", desc = "Paste from clipboard" },
+      },
+      t = {
+        -- Clipboard in terminal
+        ["<D-v>"] = { "<C-R>+", desc = "Paste from clipboard" },
       },
     },
   },
