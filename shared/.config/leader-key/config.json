@@ -161,6 +161,7 @@
         }
       ],
       "key" : "g",
+      "label" : "Github",
       "type" : "group"
     },
     {
