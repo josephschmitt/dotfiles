@@ -68,6 +68,12 @@ return {
         -- Save
         ["<Leader>s"] = { "<Cmd>w<CR>", desc = "Save buffer" },
 
+        -- Smart picker
+        ["<Leader><Space>"] = {
+          function() require("snacks").picker.smart() end,
+          desc = "Smart picker",
+        },
+
         -- Goto
         gh = { "0", desc = "Go to beginning of line" },
         gl = { "$", desc = "Go to end of line" },

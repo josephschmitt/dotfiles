@@ -107,6 +107,7 @@ opts = {
 ### Basic Editing
 | Keybinding | Mode | Action |
 |-----------|------|--------|
+| `<leader><space>` | Normal | Smart picker (find files/buffers) |
 | `<leader>s` | Normal | Save buffer |
 | `U` | Normal | Redo |
 | `jk`, `kj`, `jj` | Insert | Exit insert mode |
