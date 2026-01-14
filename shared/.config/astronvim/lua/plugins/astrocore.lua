@@ -61,9 +61,6 @@ return {
         -- Undo/redo
         U = { "<C-r>", desc = "Redo" },
 
-        -- Explorer group
-        ["<Leader>e"] = { desc = " Explorer" },
-
         -- Explorer keymaps (Neo-tree and Yazi)
         ["<Leader>ee"] = { "<Cmd>Neotree toggle<CR>", desc = "Toggle Explorer (current file)" },
         ["<Leader>eE"] = { "<Cmd>Neotree toggle dir=<CR>", desc = "Toggle Explorer (cwd)" },
