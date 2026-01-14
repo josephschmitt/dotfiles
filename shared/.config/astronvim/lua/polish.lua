@@ -8,6 +8,3 @@ require("tokyonight").setup({
   transparent = false,
   terminal_colors = true,
 })
-
--- Set tokyonight as the active colorscheme
-vim.cmd.colorscheme "tokyonight-moon"

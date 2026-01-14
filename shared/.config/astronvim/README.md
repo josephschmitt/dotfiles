@@ -65,13 +65,13 @@ nvim
 
 ## 🎨 Theme
 
-**Active**: Catppuccin Mocha
-**Available**: Tokyonight Night
+**Active**: Tokyonight Moon
+**Available**: Catppuccin Mocha, Tokyonight Night
 
 Change theme in `lua/plugins/astroui.lua`:
 ```lua
 opts = {
-  colorscheme = "catppuccin-mocha", -- or "tokyonight-night"
+  colorscheme = "tokyonight-moon", -- or "catppuccin-mocha", "tokyonight-night"
 }
 ```
 
@@ -82,21 +82,25 @@ opts = {
 - `astrocommunity.colorscheme.tokyonight-nvim`
 - `astrocommunity.pack.lua`
 - `astrocommunity.motion.flash-nvim`
+- `astrocommunity.file-explorer.yazi-nvim`
+- `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
+- `astrocommunity.git.codediff-nvim`
 
 ### Custom Plugins
-| Plugin | Purpose | Status |
-|--------|---------|--------|
-| `bufferline.nvim` | Buffer tabs with ordinal numbers | Active |
-| `multicursor.nvim` | Multi-cursor editing | Active |
-| `yazi.nvim` | Terminal file manager integration | Active |
-| `modes.nvim` | Mode-based color highlighting | Disabled (causes startup messages) |
-| `tiny-inline-diagnostic.nvim` | Inline diagnostic messages | Active |
-| `codediff.nvim` | Code diff viewer | Active |
-| `sortjson.nvim` | JSON sorting utilities | Active |
-| `vim-textobj-fold` | Fold text objects | Active |
-| `mini.ai` | Smart text objects | Active |
-| `mini.surround` | Surround operations | Active |
-| `ascii.nvim` | ASCII art for dashboard | Active |
+| Plugin | Purpose | Status | Source |
+|--------|---------|--------|--------|
+| `bufferline.nvim` | Buffer tabs | Active | Built-in (AstroNvim default) |
+| `multicursor.nvim` | Multi-cursor editing | Active | Custom |
+| `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
+| `modes.nvim` | Mode-based color highlighting | Disabled | Custom |
+| `tiny-inline-diagnostic.nvim` | Inline diagnostic messages | Active | AstroCommunity (customized) |
+| `codediff.nvim` | Code diff viewer | Active | AstroCommunity (customized) |
+| `sortjson.nvim` | JSON sorting utilities | Active | Custom |
+| `vim-textobj-fold` | Fold text objects | Active | Custom |
+| `mini.ai` | Smart text objects | Active | Custom |
+| `mini.surround` | Surround operations | Active | Custom |
+| `ascii.nvim` | ASCII art for dashboard | Active | Custom |
+| `snacks.nvim` | Dashboard (customized with ASCII art) | Active | Built-in (customized) |
 
 ## ⌨️ Keybindings
 
@@ -122,8 +126,6 @@ opts = {
 ### Buffer Navigation
 | Keybinding | Action |
 |-----------|--------|
-| `<C-1>` to `<C-9>` | Jump to buffer 1-9 (ordinal position) |
-| `<C-0>` | Jump to last buffer |
 | `<S-h>` | Previous buffer |
 | `<S-l>` | Next buffer |
 | `]b` | Next buffer |
@@ -290,7 +292,7 @@ Imports from AstroCommunity:
 Edit `lua/plugins/astroui.lua`:
 ```lua
 opts = {
-  colorscheme = "tokyonight-night", -- or "catppuccin-mocha"
+  colorscheme = "catppuccin-mocha", -- or "tokyonight-moon", "tokyonight-night"
 }
 ```
 

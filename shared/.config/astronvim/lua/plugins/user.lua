@@ -1,29 +1,15 @@
--- Custom LazyVim plugins migrated to AstroNvim
+-- Custom plugin configurations
+-- Plugins imported from AstroCommunity are configured here when customization is needed.
+-- Plugins not available in AstroCommunity are added as custom specs.
 
 ---@type LazySpec
 return {
-  -- Bufferline with ordinal numbers and buffer navigation
+  -- Which-key configuration - use helix preset
   {
-    "akinsho/bufferline.nvim",
+    "folke/which-key.nvim",
     opts = {
-      options = {
-        numbers = "ordinal",
-      },
+      preset = "helix",
     },
-    config = function(_, opts)
-      require("bufferline").setup(opts)
-      -- Maps Ctrl-1-9 to go to the Nth visible buffer
-      for i = 1, 9 do
-        vim.keymap.set({ "n", "i", "v" }, ("<C-%d>"):format(i), ("<Cmd>BufferLineGoToBuffer %d<CR>"):format(i), {
-          desc = ("Go to buffer %d"):format(i),
-        })
-      end
-      -- Map Ctrl-0 to go to the last visible buffer
-      vim.keymap.set({ "n", "i", "v" }, "<C-0>", function()
-        local count = #vim.fn.getbufinfo({ buflisted = 1 })
-        vim.cmd(("BufferLineGoToBuffer %d"):format(count))
-      end, { desc = "Go to last buffer" })
-    end,
   },
 
   -- Multi-cursor support
@@ -156,18 +142,16 @@ return {
     end,
   },
 
-  -- Yazi file manager
+  -- Yazi file manager customization (from AstroCommunity)
+  -- Add custom keybindings for Yazi
   {
     "mikavilpas/yazi.nvim",
-    dependencies = { "folke/snacks.nvim" },
+    optional = true, -- Only apply if yazi is loaded from AstroCommunity
     keys = {
       { "<leader>fy", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (current file)" },
       { "<leader>y", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (current file)" },
       { "<leader>fY", "<cmd>Yazi cwd<cr>", desc = "Yazi (cwd)" },
       { "<leader>Y", "<cmd>Yazi cwd<cr>", desc = "Yazi (cwd)" },
-    },
-    opts = {
-      floating_window_scaling_factor = 0.8,
     },
   },
 
@@ -193,92 +177,44 @@ return {
     end,
   },
 
-  -- Tiny inline diagnostics
+  -- Tiny inline diagnostics customization (from AstroCommunity)
   {
     "rachartier/tiny-inline-diagnostic.nvim",
-    priority = 1000,
-    config = function()
-      require("tiny-inline-diagnostic").setup({
-        preset = "powerline",
-        options = {
-          show_source = {
-            enabled = false,
-            if_many = true,
-          },
-          use_icons_from_diagnostic = true,
-          multilines = true,
+    optional = true, -- Only apply if tiny-inline-diagnostic is loaded from AstroCommunity
+    opts = {
+      preset = "powerline",
+      options = {
+        show_source = {
+          enabled = false,
+          if_many = true,
         },
-      })
-    end,
+        use_icons_from_diagnostic = true,
+        multilines = true,
+      },
+    },
   },
 
-  -- CodeDiff viewer
+  -- CodeDiff viewer customization (from AstroCommunity)
   {
     "esmuellert/codediff.nvim",
-    dependencies = { "MunifTanjim/nui.nvim" },
-    cmd = "CodeDiff",
-    config = function()
-      require("codediff").setup({
-        highlights = {
-          line_insert = "DiffAdd",
-          line_delete = "DiffDelete",
-          char_insert = nil,
-          char_delete = nil,
-          char_brightness = nil,
-          conflict_sign = nil,
-          conflict_sign_resolved = nil,
-          conflict_sign_accepted = nil,
-          conflict_sign_rejected = nil,
-        },
-        diff = {
-          disable_inlay_hints = true,
-          max_computation_time_ms = 5000,
-          hide_merge_artifacts = false,
-        },
-        explorer = {
-          position = "left",
-          width = 40,
-          height = 15,
-          indent_markers = true,
-          icons = {
-            folder_closed = "",
-            folder_open = "",
-          },
-          view_mode = "list",
-          file_filter = {
-            ignore = {},
-          },
-        },
-        keymaps = {
-          view = {
-            quit = "q",
-            toggle_explorer = "<leader>b",
-            next_hunk = "]c",
-            prev_hunk = "[c",
-            next_file = "]f",
-            prev_file = "[f",
-            diff_get = "do",
-            diff_put = "dp",
-          },
-          explorer = {
-            select = "<CR>",
-            hover = "K",
-            refresh = "R",
-            toggle_view_mode = "i",
-          },
-          conflict = {
-            accept_incoming = "<leader>ct",
-            accept_current = "<leader>co",
-            accept_both = "<leader>cb",
-            discard = "<leader>cx",
-            next_conflict = "]x",
-            prev_conflict = "[x",
-            diffget_incoming = "2do",
-            diffget_current = "3do",
-          },
-        },
-      })
-    end,
+    optional = true, -- Only apply if codediff is loaded from AstroCommunity
+    opts = {
+      highlights = {
+        line_insert = "DiffAdd",
+        line_delete = "DiffDelete",
+      },
+      diff = {
+        disable_inlay_hints = true,
+        max_computation_time_ms = 5000,
+        hide_merge_artifacts = false,
+      },
+      explorer = {
+        position = "left",
+        width = 40,
+        height = 15,
+        indent_markers = true,
+      },
+    },
   },
 
   -- Sort JSON

@@ -5,9 +5,24 @@
 ---@type LazySpec
 return {
   "AstroNvim/astrocommunity",
+  -- Colorschemes
   { import = "astrocommunity.colorscheme.catppuccin" },
   { import = "astrocommunity.colorscheme.tokyonight-nvim" },
+
+  -- Language packs
   { import = "astrocommunity.pack.lua" },
+
+  -- Motion
   { import = "astrocommunity.motion.flash-nvim" },
+
+  -- File explorer
+  { import = "astrocommunity.file-explorer.yazi-nvim" },
+
+  -- Diagnostics
+  { import = "astrocommunity.diagnostics.tiny-inline-diagnostic-nvim" },
+
+  -- Git
+  { import = "astrocommunity.git.codediff-nvim" },
+
   -- import/override with your plugins folder
 }

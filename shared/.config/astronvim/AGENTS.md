@@ -77,24 +77,33 @@ Would you like to:
 ## AstroVim Configuration Patterns
 
 ### File Organization
+Based on the official AstroNvim template:
 ```
 astronvim/
 ├── init.lua              # Main entry point
 ├── lua/
+│   ├── community.lua     # AstroCommunity imports (imported first)
+│   ├── lazy_setup.lua    # Lazy.nvim configuration
 │   ├── plugins/          # Plugin specifications
-│   │   ├── astrocommunity.lua  # AstroCommunity imports
-│   │   ├── core.lua      # Core overrides
-│   │   └── *.lua         # Custom plugin specs
-│   └── polish.lua        # Final customizations
+│   │   ├── astrocore.lua # Core overrides (keymaps, options, autocmds)
+│   │   ├── astrolsp.lua  # LSP configuration
+│   │   ├── astroui.lua   # UI configuration (colorscheme, highlights)
+│   │   ├── user.lua      # Custom plugin specs and overrides
+│   │   └── *.lua         # Other plugin configurations
+│   └── polish.lua        # Final customizations (runs last)
 └── AGENTS.md            # This file
 ```
 
 ### Configuration Structure
 Follow AstroVim's configuration structure:
-- Use `opts` for plugin configuration
-- Use `config` function for complex setup
-- Override AstroCore for keymaps, autocmds, and options
-- Use `polish.lua` for final tweaks after plugins load
+- **community.lua**: Import AstroCommunity plugins here (imported first via lazy_setup.lua)
+- **plugins/**: Custom plugin specs and AstroCommunity overrides
+  - Use `optional = true` when overriding AstroCommunity plugins
+  - Use `opts` for simple plugin configuration
+  - Use `config` function for complex setup
+- **astrocore.lua**: Override AstroCore for keymaps, autocmds, and vim options
+- **astroui.lua**: Set colorscheme and UI configuration
+- **polish.lua**: Final tweaks that run after all plugins load (avoid setting colorscheme here)
 
 ### Keybindings
 Use AstroCore's keybinding system:
