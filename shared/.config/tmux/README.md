@@ -111,6 +111,7 @@ Main-horizontal layout with fixed 20-row bottom panes:
 
 ### Application Splits
 
+- `Ctrl-s A` - Open Claude Code with adaptive layout (like `Ctrl-s V`)
 - `Ctrl-s O` - Open OpenCode in 100-column right split
 - `Ctrl-s /` - Open Scooter in 100-column right split
 

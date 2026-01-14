@@ -90,6 +90,7 @@ opts = {
 | Plugin | Purpose | Status | Source |
 |--------|---------|--------|--------|
 | `bufferline.nvim` | Buffer tabs | Active | Built-in (AstroNvim default) |
+| `claudecode.nvim` | Claude Code integration with diff review | Active | Custom |
 | `multicursor.nvim` | Multi-cursor editing | Active | Custom |
 | `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
 | `modes.nvim` | Mode-based color highlighting | Disabled | Custom |
@@ -134,6 +135,26 @@ opts = {
 | `<leader>bd` | Close buffer from tabline (interactive picker) |
 | `<leader>bD` | Close current buffer |
 | `<leader>be` | Open buffer explorer (Neo-tree) |
+
+### AI Agent (`<leader>a`)
+| Keybinding | Mode | Action |
+|-----------|------|--------|
+| `<leader>ac` | Normal | Launch Claude in tmux split |
+| `<leader>aC` | Normal | Focus Claude tmux pane |
+| `<leader>as` | Normal | Send current file to Claude |
+| `<leader>aS` | Normal, Visual | Send selection to Claude |
+| `<leader>aa` | Normal | Accept Claude's changes (in diff view) |
+| `<leader>ad` | Normal | Reject Claude's changes (in diff view) |
+| `<leader>ae` | Normal | Edit before accepting (in diff view) |
+
+**Claude Code Workflow:**
+1. Open Neovim (WebSocket server auto-starts)
+2. Launch Claude (choose one):
+   - Press `<leader>ac` in Neovim, OR
+   - Press `Ctrl-s A` in tmux
+3. In Claude terminal, type `/ide` to connect to Neovim
+4. Use `<leader>as` to send files or `<leader>aS` to send selections
+5. Review diffs in Neovim with `<leader>aa/ad/ae`
 
 ### File Explorer
 | Keybinding | Action |

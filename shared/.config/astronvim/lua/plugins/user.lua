@@ -10,6 +10,7 @@ return {
     opts = {
       preset = "helix",
       spec = {
+        { "<leader>a", group = " AI Agent" },
         { "<leader>e", group = "󰙅 Explorer" },
         { "<leader>m", group = " Multicursor" },
         { "<leader>w", group = "󱂬 Window" },
