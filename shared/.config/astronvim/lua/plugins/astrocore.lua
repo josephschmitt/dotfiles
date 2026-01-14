@@ -65,6 +65,9 @@ return {
         ["<Leader>be"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
         ["<Leader>ge"] = { "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
 
+        -- Save
+        ["<Leader>s"] = { "<Cmd>w<CR>", desc = "Save buffer" },
+
         -- Goto
         gh = { "0", desc = "Go to beginning of line" },
         gl = { "$", desc = "Go to end of line" },
@@ -72,6 +75,50 @@ return {
         -- Window
         gw = { "<C-w>", desc = "Window mode" },
         ["<A-w>"] = { "<C-w>w", desc = "Switch window" },
+
+        -- Window group
+        ["<Leader>w"] = { desc = "Window" },
+
+        -- Split creation
+        ["<Leader>ws"] = { "<Cmd>split<CR>", desc = "Split horizontal" },
+        ["<Leader>wv"] = { "<Cmd>vsplit<CR>", desc = "Split vertical" },
+
+        -- Window closing/management
+        ["<Leader>wc"] = { "<Cmd>close<CR>", desc = "Close window" },
+        ["<Leader>wo"] = { "<Cmd>only<CR>", desc = "Close other windows" },
+        ["<Leader>w="] = { "<C-w>=", desc = "Equalize window sizes" },
+
+        -- Window movement (move current window to position)
+        ["<Leader>wH"] = { "<C-w>H", desc = "Move window left" },
+        ["<Leader>wJ"] = { "<C-w>J", desc = "Move window down" },
+        ["<Leader>wK"] = { "<C-w>K", desc = "Move window up" },
+        ["<Leader>wL"] = { "<C-w>L", desc = "Move window right" },
+        ["<Leader>wr"] = { "<C-w>r", desc = "Rotate windows" },
+        ["<Leader>wx"] = { "<C-w>x", desc = "Swap with next window" },
+
+        -- Window resizing
+        ["<Leader>w+"] = { "<Cmd>resize +5<CR>", desc = "Increase height" },
+        ["<Leader>w-"] = { "<Cmd>resize -5<CR>", desc = "Decrease height" },
+        ["<Leader>w>"] = { "<Cmd>vertical resize +5<CR>", desc = "Increase width" },
+        ["<Leader>w<lt>"] = { "<Cmd>vertical resize -5<CR>", desc = "Decrease width" },
+
+        -- Tab group
+        ["<Leader><Tab>"] = { desc = "Tabs" },
+
+        -- Tab creation/closing
+        ["<Leader><Tab>n"] = { "<Cmd>tabnew<CR>", desc = "New tab" },
+        ["<Leader><Tab>c"] = { "<Cmd>tabclose<CR>", desc = "Close tab" },
+        ["<Leader><Tab>o"] = { "<Cmd>tabonly<CR>", desc = "Close other tabs" },
+
+        -- Tab navigation
+        ["<Leader><Tab>]"] = { "<Cmd>tabnext<CR>", desc = "Next tab" },
+        ["<Leader><Tab>["] = { "<Cmd>tabprevious<CR>", desc = "Previous tab" },
+        ["<Leader><Tab>l"] = { "<Cmd>tablast<CR>", desc = "Last tab" },
+        ["<Leader><Tab>f"] = { "<Cmd>tabfirst<CR>", desc = "First tab" },
+
+        -- Tab movement
+        ["<Leader><Tab>>"] = { "<Cmd>+tabmove<CR>", desc = "Move tab right" },
+        ["<Leader><Tab><lt>"] = { "<Cmd>-tabmove<CR>", desc = "Move tab left" },
 
         -- Indent
         ["<"] = { "<<", desc = "Unindent line" },
