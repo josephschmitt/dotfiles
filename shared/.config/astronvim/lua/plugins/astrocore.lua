@@ -61,9 +61,11 @@ return {
         -- Undo/redo
         U = { "<C-r>", desc = "Redo" },
 
-        -- Neo-tree source keymaps
-        ["<Leader>be"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
-        ["<Leader>ge"] = { "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
+        -- Explorer keymaps (Neo-tree)
+        ["<Leader>ee"] = { "<Cmd>Neotree toggle<CR>", desc = "Toggle Explorer (current file)" },
+        ["<Leader>eE"] = { "<Cmd>Neotree toggle dir=<CR>", desc = "Toggle Explorer (cwd)" },
+        ["<Leader>eb"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
+        ["<Leader>eg"] = { "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
 
         -- Save
         ["<Leader>s"] = { "<Cmd>w<CR>", desc = "Save buffer" },

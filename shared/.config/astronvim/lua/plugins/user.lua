@@ -142,15 +142,24 @@ return {
     end,
   },
 
-  -- Yazi file manager customization (from AstroCommunity)
-  -- Add custom keybindings for Yazi
+  -- Override AstroCore mappings to customize Yazi keybindings
   {
-    "mikavilpas/yazi.nvim",
-    optional = true, -- Only apply if yazi is loaded from AstroCommunity
-    keys = {
-      { "<leader>fy", mode = { "n", "v" }, "<cmd>Yazi<cr>", desc = "Yazi (current file)" },
-      { "<leader>fY", "<cmd>Yazi cwd<cr>", desc = "Yazi (cwd)" },
-    },
+    "AstroNvim/astrocore",
+    opts = function(_, opts)
+      local maps = opts.mappings
+      -- Disable default AstroCommunity yazi keybindings
+      maps.n["<Leader>-"] = false
+      maps.v["<Leader>-"] = false
+      maps.n["<Leader>Yc"] = false
+      maps.n["<Leader>Yt"] = false
+
+      -- Add custom keybindings under <leader>e (explorer)
+      local yazi_current = { function() require("yazi").yazi() end, desc = "Yazi (current file)" }
+      maps.n["<Leader>ey"] = yazi_current
+      maps.v["<Leader>ey"] = yazi_current
+      maps.n["<Leader>eY"] = { function() require("yazi").yazi(nil, vim.fn.getcwd()) end, desc = "Yazi (cwd)" }
+      maps.n["<Leader>et"] = { function() require("yazi").toggle() end, desc = "Resume Yazi" }
+    end,
   },
 
   -- Mode highlighting with tokyonight colors
