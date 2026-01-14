@@ -164,6 +164,18 @@ opts = {
 | `<leader>ge` | Neo-tree git status explorer |
 | `<leader>fy`, `<leader>y` | Open Yazi (current file) |
 | `<leader>fY`, `<leader>Y` | Open Yazi (cwd) |
+| `H` | Toggle filtered items in Neo-tree (show/hide ignored files) |
+
+#### Neo-tree File Filtering
+Neo-tree respects the global `~/.ignore` file which contains ignore patterns for:
+- Dependencies: `node_modules/`, `.pnpm-store/`, `.npm/`, `.cargo/`, `.bun/`
+- Build outputs: `dist/`, `build/`, `.next/`, `.nuxt/`, `out/`, `target/`
+- Cache directories: `.cache/`, `.turbo/`, `.parcel-cache/`
+- IDE: `.vscode/extensions/`, `.vscode-server/`, `.config/raycast/extensions/`
+- System files: `.DS_Store`, `.Trash/`, `.bash_history`, `.zsh_sessions/`
+- Other: `.adobe/`, `.local/`, `.vscode/cli/servers/`
+
+**Note**: Hidden files and directories (starting with `.`) like `.config/` are shown by default. The `.git` directory is always hidden. Press `H` to toggle visibility of files matching ignore patterns.
 
 ### Window Management (`<leader>w`)
 | Keybinding | Action |
