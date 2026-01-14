@@ -99,8 +99,8 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
   - POSIX-compliant environment setup across all shells
   - macOS login shell compatibility
 - **✏️ Editors**:
-  - **Neovim (LazyVim)** - Primary editor with extensive plugins and customizations
-  - **Neovim (AstroVim)** - Alternative Neovim distribution (via `astrovim` or `avim` aliases)
+  - **Neovim (AstroVim)** - Currently mapped to `nvim`/`vim` commands
+  - **Neovim (LazyVim)** - Available via `lazyvim` alias
   - **Helix** - Secondary modal editor for quick edits
 - **💻 Terminal**: Ghostty with optimized configuration
 - **🔀 Multiplexer**: tmux with plugin ecosystem, Zellij as alternative
@@ -124,12 +124,28 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
 
 ## ✏️ Dual Neovim Setup
 
-This configuration includes two complete Neovim setups for different use cases:
+This configuration includes two complete Neovim setups that can be switched between at any time:
 
-### LazyVim (Default - `nvim`)
+### AstroVim
+**Location**: `shared/.config/astronvim/`
+**Current aliases**: `nvim`, `vim`, `astrovim`, `avim`
+
+Built on [AstroVim](https://astronvim.com/), a community-driven Neovim distribution.
+
+**Features**:
+- Community-driven plugin ecosystem (AstroCommunity)
+- Catppuccin Mocha theme with custom dashboard
+- Multi-cursor editing, Yazi file manager integration
+- Comprehensive window/tab management keybindings
+- Custom text objects and smart motions
+
+**Documentation**: See [shared/.config/astronvim/README.md](shared/.config/astronvim/README.md)
+
+### LazyVim
 **Location**: `shared/.config/nvim/`
+**Current alias**: `lazyvim`
 
-The primary Neovim configuration built on [LazyVim](https://www.lazyvim.org/), a feature-rich starter configuration.
+Built on [LazyVim](https://www.lazyvim.org/), a feature-rich Neovim starter configuration.
 
 **Features**:
 - Full IDE experience with LSP, completion, debugging
@@ -139,33 +155,13 @@ The primary Neovim configuration built on [LazyVim](https://www.lazyvim.org/), a
 
 **Documentation**: See [shared/.config/nvim/README.md](shared/.config/nvim/README.md)
 
-### AstroVim (Alternative - `astrovim` or `avim`)
-**Location**: `shared/.config/astronvim/`
+### Switching Between Configs
 
-An alternative Neovim distribution built on [AstroVim](https://astronvim.com/), providing a different approach to Neovim configuration.
+Both configurations are completely independent and coexist without conflicts thanks to Neovim's `NVIM_APPNAME` feature.
 
-**Features**:
-- Community-driven plugin ecosystem (AstroCommunity)
-- Catppuccin Mocha theme with custom dashboard
-- Multi-cursor editing, Yazi file manager integration
-- Comprehensive window/tab management keybindings
-- Custom text objects and smart motions
+**Currently**: The `nvim` and `vim` commands launch AstroVim. To switch to LazyVim as default, swap the aliases in `shared/.config/shell/aliases.sh` and `shared/.config/fish/aliases.fish`.
 
-**Launch**:
-```bash
-astrovim     # or avim (shorter alias)
-```
-
-**Documentation**: See [shared/.config/astronvim/README.md](shared/.config/astronvim/README.md)
-
-### Why Two Configs?
-
-- **Experimentation**: Try different Neovim distributions without losing your main setup
-- **Use-case specialization**: Different configs optimized for different workflows
-- **Learning**: Compare approaches to Neovim configuration
-- **Backup**: Always have a working editor if one config breaks
-
-Both configurations are completely independent and can coexist without conflicts thanks to Neovim's `NVIM_APPNAME` feature.
+**Why two configs?** Experimentation, comparing different approaches, and always having a backup if one config breaks.
 
 ## 📁 Repository Structure
 
