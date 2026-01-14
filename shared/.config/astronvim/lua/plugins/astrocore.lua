@@ -80,30 +80,6 @@ return {
         -- Comment line
         ["<C-c>"] = { "gcc", remap = true, desc = "Comment line" },
 
-        -- Buffers
-        ["<Leader>ba"] = {
-          function()
-            -- Get all buffers and close only regular file buffers
-            local bufs = vim.api.nvim_list_bufs()
-            for _, buf in ipairs(bufs) do
-              if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
-                local buftype = vim.bo[buf].buftype
-                -- Only delete normal file buffers, not special buffers
-                if buftype == "" then
-                  vim.api.nvim_buf_delete(buf, { force = false })
-                end
-              end
-            end
-            require("snacks").dashboard({ focus = true })
-          end,
-          desc = "Close all buffers",
-        },
-        ["<Leader>uB"] = {
-          function()
-            require("snacks").dashboard()
-          end,
-          desc = "Show Dashboard",
-        },
 
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
@@ -138,28 +114,6 @@ return {
         -- Helix-like
         ["<S-v>"] = { "j", desc = "Select down" },
 
-        -- Buffers
-        ["<Leader>ba"] = {
-          function()
-            local bufs = vim.api.nvim_list_bufs()
-            for _, buf in ipairs(bufs) do
-              if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buflisted then
-                local buftype = vim.bo[buf].buftype
-                if buftype == "" then
-                  vim.api.nvim_buf_delete(buf, { force = false })
-                end
-              end
-            end
-            require("snacks").dashboard({ focus = true })
-          end,
-          desc = "Close all buffers",
-        },
-        ["<Leader>uB"] = {
-          function()
-            require("snacks").dashboard()
-          end,
-          desc = "Show Dashboard",
-        },
       },
       i = {
         -- Exit insert mode
