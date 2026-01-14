@@ -15,8 +15,8 @@ return {
       cmp = true, -- enable completion at start
       diagnostics = { virtual_text = true, virtual_lines = false }, -- diagnostic settings on startup
       highlighturl = true, -- highlight URLs at start
-      notifications = false, -- disable notifications on startup
-      show_intro = false, -- disable intro splash, use dashboard instead
+      notifications = true, -- disable notifications on startup
+      show_intro = true, -- disable intro splash, use dashboard instead
     },
     -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
     diagnostics = {
@@ -61,6 +61,10 @@ return {
         -- Undo/redo
         U = { "<C-r>", desc = "Redo" },
 
+        -- Neo-tree source keymaps
+        ["<Leader>be"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
+        ["<Leader>ge"] = { "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
+
         -- Goto
         gh = { "0", desc = "Go to beginning of line" },
         gl = { "$", desc = "Go to end of line" },
@@ -79,7 +83,6 @@ return {
 
         -- Comment line
         ["<C-c>"] = { "gcc", remap = true, desc = "Comment line" },
-
 
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
@@ -113,7 +116,6 @@ return {
 
         -- Helix-like
         ["<S-v>"] = { "j", desc = "Select down" },
-
       },
       i = {
         -- Exit insert mode
