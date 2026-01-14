@@ -11,6 +11,7 @@ return {
       preset = "helix",
       spec = {
         { "<leader>e", group = "󰙅 Explorer" },
+        { "<leader>m", group = " Multicursor" },
         { "<leader>w", group = "󱂬 Window" },
         { "<leader><Tab>", group = "󰓩 Tabs" },
       },
@@ -122,7 +123,7 @@ return {
       },
     },
     config = function()
-      local mc = require("multicursor-nvim")
+      local mc = require "multicursor-nvim"
       mc.setup()
       mc.addKeymapLayer(function(layerSet)
         layerSet({ "n", "x" }, "<left>", mc.prevCursor)
@@ -172,7 +173,7 @@ return {
     "mvllow/modes.nvim",
     enabled = false, -- Disabled: causes startup messages. Re-enable if you want mode highlighting
     opts = function()
-      local colors = require("tokyonight.colors").setup({ style = "night" })
+      local colors = require("tokyonight.colors").setup { style = "night" }
       return {
         colors = {
           copy = colors.orange,
@@ -260,18 +261,14 @@ return {
   {
     "echasnovski/mini.ai",
     version = "*",
-    config = function()
-      require("mini.ai").setup()
-    end,
+    config = function() require("mini.ai").setup() end,
   },
 
   -- Mini Surround - surround text with brackets, quotes, etc.
   {
     "echasnovski/mini.surround",
     version = "*",
-    config = function()
-      require("mini.surround").setup()
-    end,
+    config = function() require("mini.surround").setup() end,
   },
 
   -- ASCII.nvim - ASCII art generator for dashboard
@@ -288,9 +285,7 @@ return {
       if ok then
         local art = ascii.art.text.neovim.ansi_shadow
         if art then
-          if type(art) == "table" then
-            art = table.concat(art, "\n")
-          end
+          if type(art) == "table" then art = table.concat(art, "\n") end
           opts.dashboard.preset.header = art
         end
       end
