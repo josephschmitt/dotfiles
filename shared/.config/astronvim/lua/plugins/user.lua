@@ -303,6 +303,7 @@ return {
     config = function()
       local wilder = require "wilder"
 
+      vim.o.termguicolors = true
       wilder.setup { modes = { ":", "/", "?" } }
 
       -- Use `:set wildoptions=pum` to display completion in popup menu
@@ -322,7 +323,7 @@ return {
       wilder.set_option(
         "renderer",
         wilder.render_string_component(
-          wilder.result { value = wilder.make_it_concise, use_strict_truthy = true },
+          wilder.result({ value = wilder.make_it_concise, use_strict_truthy = true }),
           " > ",
           wilder.arg_base_index_component { hlgroup = "Keyword" }
         ),
