@@ -4,13 +4,14 @@
 [metadata]
 name = "sesh"
 description = "Session manager integrating tmux sessions, zoxide directories, and config paths"
-requirements = ["sesh", "fd"]
+requirements = ["sesh", "fd", "fdp"]
 
 [source]
 # Multiple source commands for cycling through different modes
 # Press Ctrl+S to cycle between sources
 command = [
   "sesh list --icons",                          # all sessions (default)
+  "fdp --path ~/development --icons --max-depth 5 --exclude node_modules --exclude .git --exclude .github",
   "sesh list -t --icons",                       # tmux sessions only
   "sesh list -c --icons",                       # config directories
   "sesh list -z --icons",                       # zoxide directories
