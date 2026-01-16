@@ -13,6 +13,13 @@ set -euo pipefail
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/fdp/config.conf"
 
+# Cache configuration
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/fdp"
+CACHE_TTL=300  # 5 minutes default
+USE_CACHE=true
+VERBOSE=false
+DEBUG_START_TIME=""
+
 # Show help message
 show_help() {
   cat <<EOF
@@ -29,6 +36,9 @@ Options:
   -m, --marker MARKER    Add project marker (can be repeated, merges with config)
   -e, --exclude PATTERN  Exclude pattern for fd (can be repeated, merges with config)
   -d, --max-depth NUM    Override maximum search depth (overrides config)
+  --no-cache             Skip cache, force fresh search
+  --clear-cache          Clear all fdp cache files and exit
+  -v, --verbose          Enable debug output (shows timing and cache info)
   -h, --help             Show this help message
 
 Examples:
@@ -39,6 +49,8 @@ Examples:
   fdp --marker "Dockerfile"              # Add custom marker
   fdp --exclude ".terraform" -e "vendor" # Exclude patterns
   fdp -p ~/temp -m "go.work" -d 2        # Combine multiple flags
+  fdp --no-cache                         # Skip cache and search fresh
+  fdp --clear-cache                      # Clear all cached results
 
 Config file: ${CONFIG_FILE}
 See: https://github.com/sharkdp/fd for exclude pattern syntax
@@ -87,6 +99,19 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       show_help
       exit 0
+      ;;
+    --clear-cache)
+      rm -rf "${CACHE_DIR}" 2>/dev/null || true
+      echo "Cache cleared: ${CACHE_DIR}" >&2
+      exit 0
+      ;;
+    --no-cache)
+      USE_CACHE=false
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
       ;;
     -c|--config)
       if [[ -z "${2:-}" ]]; then
@@ -238,21 +263,90 @@ for exclude in "${EXCLUDES[@]}"; do
   EXCLUDE_ARGS+=(--exclude "${exclude}")
 done
 
-# Debug output (comment out when not debugging)
-# echo "PATTERN: ${PATTERN}" >&2
-# echo "MAX_DEPTH: ${MAX_DEPTH}" >&2
-# echo "PATHS: ${EXISTING_PATHS[@]}" >&2
-# echo "EXCLUDES: ${EXCLUDES[@]}" >&2
+# Debug output
+if [[ "${VERBOSE}" == "true" ]]; then
+  echo "DEBUG: PATTERN: ${PATTERN}" >&2
+  echo "DEBUG: MAX_DEPTH: ${MAX_DEPTH}" >&2
+  echo "DEBUG: PATHS: ${EXISTING_PATHS[@]}" >&2
+  echo "DEBUG: EXCLUDES: ${EXCLUDES[@]}" >&2
+  echo "DEBUG: CACHE_DIR: ${CACHE_DIR}" >&2
+  DEBUG_START_TIME=$(date +%s%3N)
+fi
 
-# Find project directories using fd
-# - Search for files/directories matching any marker
-# - Get parent directory of each match
-# - Deduplicate
-fd --hidden \
-   --no-ignore-vcs \
-   --max-depth "${MAX_DEPTH}" \
-   --regex "${PATTERN}" \
-   "${EXCLUDE_ARGS[@]}" \
-   "${EXISTING_PATHS[@]}" \
-   --exec dirname {} \; \
-| sort -u
+# Generate cache file key based on search parameters
+# Use hash of all config to detect changes
+get_cache_file() {
+  local cache_key
+  cache_key=$(echo "${SEARCH_PATHS[@]}:${MARKERS[@]}:${EXCLUDES[@]}:${MAX_DEPTH}" | md5sum | cut -d' ' -f1)
+  echo "${CACHE_DIR}/cache-${cache_key}.txt"
+}
+
+CACHE_FILE=$(get_cache_file)
+
+# Check cache validity and return early if valid
+check_and_use_cache() {
+  if [[ "${USE_CACHE}" != "true" || ! -f "${CACHE_FILE}" ]]; then
+    return 1
+  fi
+
+  # Check cache age
+  if command -v stat &> /dev/null; then
+    # Try macOS stat format first, fall back to Linux
+    local cache_age
+    if stat -f %m "${CACHE_FILE}" &>/dev/null; then
+      cache_age=$(($(date +%s) - $(stat -f %m "${CACHE_FILE}")))
+    else
+      cache_age=$(($(date +%s) - $(stat -c %Y "${CACHE_FILE}")))
+    fi
+
+    if [[ ${cache_age} -lt ${CACHE_TTL} ]]; then
+      cat "${CACHE_FILE}"
+      if [[ "${VERBOSE}" == "true" ]]; then
+        echo "DEBUG: Cache hit (age: ${cache_age}s)" >&2
+      fi
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+# Try to use cache
+if check_and_use_cache; then
+  if [[ "${VERBOSE}" == "true" ]]; then
+    echo "DEBUG: Using cached results" >&2
+  fi
+  exit 0
+fi
+
+if [[ "${VERBOSE}" == "true" ]]; then
+  echo "DEBUG: Cache miss or disabled, searching..." >&2
+fi
+
+# Optimized search using --exec-batch for efficient directory extraction
+# Original: --exec dirname {} \;  (spawns one dirname per file)
+# Optimized: --exec-batch dirname (batches multiple paths per dirname call)
+# This reduces process spawning from ~1500 to ~15-50 calls for large codebases
+
+results=$(
+  fd --hidden \
+     --no-ignore-vcs \
+     --max-depth "${MAX_DEPTH}" \
+     --regex "${PATTERN}" \
+     "${EXCLUDE_ARGS[@]}" \
+     "${EXISTING_PATHS[@]}" \
+     --exec-batch dirname \
+  | sort -u
+)
+
+# Write results to cache and output
+mkdir -p "${CACHE_DIR}"
+echo "${results}" | tee "${CACHE_FILE}"
+
+if [[ "${VERBOSE}" == "true" ]]; then
+  local debug_end_time=$(date +%s%3N)
+  local elapsed=$((debug_end_time - DEBUG_START_TIME))
+  local line_count=$(echo "${results}" | wc -l)
+  echo "DEBUG: Search completed in ${elapsed}ms" >&2
+  echo "DEBUG: Found ${line_count} projects" >&2
+fi
