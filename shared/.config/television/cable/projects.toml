@@ -1,0 +1,17 @@
+[metadata]
+name = "projects"
+description = "A channel to select from directories"
+requirements = ["fd"]
+
+[source]
+command = [
+  "fdp",
+  "--path", "~/development",
+  "--max-depth", "5",
+  "--exclude", "node_modules",
+  "--exclude", ".git",
+  "--exclude", ".github"
+]
+
+[preview]
+command = "ls -la --color=always '{}'"
