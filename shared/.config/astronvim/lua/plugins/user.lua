@@ -312,11 +312,9 @@ return {
       -- Configure wilder popupmenu renderer
       wilder.set_option(
         "renderer",
-        wilder.popupmenu_renderer(wilder.popupmenu_palette_theme {
+        wilder.popupmenu_renderer(wilder.popupmenu_border_theme {
           pumblend = 20,
           highlighter = wilder.lua_fzy_highlighter(),
-          left = { " ", wilder.history_index() },
-          right = { " ", wilder.wildmenu_index() },
         })
       )
 
@@ -324,7 +322,7 @@ return {
       wilder.set_option(
         "renderer",
         wilder.render_string_component(
-          wilder.result({ value = wilder.make_it_concise, use_strict_truthy = true }),
+          wilder.result { value = wilder.make_it_concise, use_strict_truthy = true },
           " > ",
           wilder.arg_base_index_component { hlgroup = "Keyword" }
         ),
