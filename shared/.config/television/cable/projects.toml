@@ -13,11 +13,17 @@ command = "lt --color=always '{strip_ansi|split: :1}'"
 
 [keybindings]
 enter = "actions:connect"
+ctrl-e = "actions:edit"
 ctrl-c = ["actions:clear_cache", "reload_source"]
 
 [actions.connect]
 description = "Connect to selected session"
 command = "sesh connect '{strip_ansi|split: :1}'"
+mode = "execute"
+
+[actions.edit]
+description = "Open in $EDITOR"
+command = "$EDITOR '{strip_ansi|split: :1}'"
 mode = "execute"
 
 [actions.clear_cache]
