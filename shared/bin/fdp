@@ -13,6 +13,38 @@ set -euo pipefail
 
 CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/fdp/config.conf"
 
+# Show help message
+show_help() {
+  cat <<EOF
+fdp: Find Projects - Discovers project directories based on configurable markers
+
+Usage:
+  fdp [OPTIONS]
+  fdp | fzf              # Fuzzy find projects
+  cd \$(fdp | fzf)        # cd to selected project
+
+Options:
+  -c, --config FILE      Use custom config file (default: ~/.config/fdp/config.conf)
+  -p, --path PATH        Add search path (can be repeated, merges with config)
+  -m, --marker MARKER    Add project marker (can be repeated, merges with config)
+  -e, --exclude PATTERN  Exclude pattern for fd (can be repeated, merges with config)
+  -d, --max-depth NUM    Override maximum search depth (overrides config)
+  -h, --help             Show this help message
+
+Examples:
+  fdp                                    # Use config/defaults
+  fdp --config ~/my-projects.conf        # Use custom config file
+  fdp --max-depth 1                      # Shallow search
+  fdp --path ~/experimental              # Add temporary search path
+  fdp --marker "Dockerfile"              # Add custom marker
+  fdp --exclude ".terraform" -e "vendor" # Exclude patterns
+  fdp -p ~/temp -m "go.work" -d 2        # Combine multiple flags
+
+Config file: ${CONFIG_FILE}
+See: https://github.com/sharkdp/fd for exclude pattern syntax
+EOF
+}
+
 # Default configuration
 DEFAULT_SEARCH_PATHS=(
   "$HOME/projects"
@@ -35,11 +67,82 @@ DEFAULT_MARKERS=(
 )
 
 DEFAULT_MAX_DEPTH=3
+DEFAULT_EXCLUDES=()
 
 # Arrays to hold config values
-SEARCH_PATHS=()
-MARKERS=()
-MAX_DEPTH="${DEFAULT_MAX_DEPTH}"
+CONFIG_SEARCH_PATHS=()
+CONFIG_MARKERS=()
+CONFIG_MAX_DEPTH=""
+CONFIG_EXCLUDES=()
+
+# Arrays to hold CLI flag values
+CLI_SEARCH_PATHS=()
+CLI_MARKERS=()
+CLI_MAX_DEPTH=""
+CLI_EXCLUDES=()
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -c|--config)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --config requires a value" >&2
+        exit 1
+      fi
+      # Expand tilde
+      CONFIG_FILE="${2/#\~/$HOME}"
+      shift 2
+      ;;
+    -p|--path)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --path requires a value" >&2
+        exit 1
+      fi
+      # Expand tilde and environment variables
+      path="${2/#\~/$HOME}"
+      path=$(eval echo "${path}")
+      CLI_SEARCH_PATHS+=("${path}")
+      shift 2
+      ;;
+    -m|--marker)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --marker requires a value" >&2
+        exit 1
+      fi
+      CLI_MARKERS+=("$2")
+      shift 2
+      ;;
+    -e|--exclude)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --exclude requires a value" >&2
+        exit 1
+      fi
+      CLI_EXCLUDES+=("$2")
+      shift 2
+      ;;
+    -d|--max-depth)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --max-depth requires a value" >&2
+        exit 1
+      fi
+      if ! [[ "$2" =~ ^[0-9]+$ ]]; then
+        echo "Error: --max-depth must be a number" >&2
+        exit 1
+      fi
+      CLI_MAX_DEPTH="$2"
+      shift 2
+      ;;
+    *)
+      echo "Error: Unknown option: $1" >&2
+      echo "Run 'fdp --help' for usage information" >&2
+      exit 1
+      ;;
+  esac
+done
 
 # Read config file if it exists
 if [[ -f "${CONFIG_FILE}" ]]; then
@@ -52,20 +155,38 @@ if [[ -f "${CONFIG_FILE}" ]]; then
       path="${BASH_REMATCH[1]}"
       # Expand tilde
       path="${path/#\~/$HOME}"
-      SEARCH_PATHS+=("${path}")
+      CONFIG_SEARCH_PATHS+=("${path}")
     # Parse marker entries
     elif [[ "${line}" =~ ^marker[[:space:]]*=[[:space:]]*([^#[:space:]]+) ]]; then
-      MARKERS+=("${BASH_REMATCH[1]}")
+      CONFIG_MARKERS+=("${BASH_REMATCH[1]}")
+    # Parse exclude entries
+    elif [[ "${line}" =~ ^exclude[[:space:]]*=[[:space:]]*(.+)$ ]]; then
+      CONFIG_EXCLUDES+=("${BASH_REMATCH[1]}")
     # Parse max_depth
     elif [[ "${line}" =~ ^max_depth[[:space:]]*=[[:space:]]*([0-9]+) ]]; then
-      MAX_DEPTH="${BASH_REMATCH[1]}"
+      CONFIG_MAX_DEPTH="${BASH_REMATCH[1]}"
     fi
   done < "${CONFIG_FILE}"
 fi
 
-# Use defaults if config didn't provide values
+# Merge configuration: CLI flags + Config + Defaults
+# Multi-value options (search_path, marker, exclude): Additive merge
+# Single-value options (max_depth): CLI > Config > Default
+
+# Merge search paths: config + CLI (or defaults if both empty)
+SEARCH_PATHS=("${CONFIG_SEARCH_PATHS[@]}" "${CLI_SEARCH_PATHS[@]}")
 [[ ${#SEARCH_PATHS[@]} -eq 0 ]] && SEARCH_PATHS=("${DEFAULT_SEARCH_PATHS[@]}")
+
+# Merge markers: config + CLI (or defaults if both empty)
+MARKERS=("${CONFIG_MARKERS[@]}" "${CLI_MARKERS[@]}")
 [[ ${#MARKERS[@]} -eq 0 ]] && MARKERS=("${DEFAULT_MARKERS[@]}")
+
+# Merge excludes: config + CLI (or defaults if both empty)
+EXCLUDES=("${CONFIG_EXCLUDES[@]}" "${CLI_EXCLUDES[@]}")
+[[ ${#EXCLUDES[@]} -eq 0 ]] && EXCLUDES=("${DEFAULT_EXCLUDES[@]}")
+
+# Max depth: CLI overrides config, fallback to default
+MAX_DEPTH="${CLI_MAX_DEPTH:-${CONFIG_MAX_DEPTH:-$DEFAULT_MAX_DEPTH}}"
 
 # Filter search paths that actually exist
 EXISTING_PATHS=()
@@ -111,10 +232,17 @@ build_pattern() {
 
 PATTERN=$(build_pattern)
 
+# Build exclude arguments for fd
+EXCLUDE_ARGS=()
+for exclude in "${EXCLUDES[@]}"; do
+  EXCLUDE_ARGS+=(--exclude "${exclude}")
+done
+
 # Debug output (comment out when not debugging)
 # echo "PATTERN: ${PATTERN}" >&2
 # echo "MAX_DEPTH: ${MAX_DEPTH}" >&2
 # echo "PATHS: ${EXISTING_PATHS[@]}" >&2
+# echo "EXCLUDES: ${EXCLUDES[@]}" >&2
 
 # Find project directories using fd
 # - Search for files/directories matching any marker
@@ -124,6 +252,7 @@ fd --hidden \
    --no-ignore-vcs \
    --max-depth "${MAX_DEPTH}" \
    --regex "${PATTERN}" \
+   "${EXCLUDE_ARGS[@]}" \
    "${EXISTING_PATHS[@]}" \
    --exec dirname {} \; \
 | sort -u
