@@ -20,6 +20,49 @@ USE_CACHE=true
 VERBOSE=false
 DEBUG_START_TIME=""
 
+# Icon configuration
+USE_ICONS=false
+STRIP_ICONS=false  # Strip icons from output even when enabled
+DEFAULT_ICON=""  # Fallback icon
+declare -A CONFIG_ICON_MAP=()  # Icons from config file
+declare -A CLI_ICON_MAP=()     # Icons from CLI flags
+declare -A ICON_MAP=()         # Final merged icon map
+
+# Marker specificity ordering (for multiple marker resolution)
+# Higher index = more specific (language-specific > generic)
+declare -A MARKER_SPECIFICITY=(
+  # Generic markers (low priority)
+  [".git"]=1
+  ["Makefile"]=1
+
+  # Language-specific markers (high priority)
+  ["package.json"]=10
+  ["Cargo.toml"]=10
+  ["go.mod"]=10
+  ["pyproject.toml"]=10
+  ["composer.json"]=10
+  ["Gemfile"]=10
+  ["mix.exs"]=10
+  ["pom.xml"]=10
+  ["build.gradle"]=10
+)
+
+# Default icon mappings for standard markers
+# Users can override via config file or --icon-map CLI flag
+declare -A DEFAULT_MARKER_ICONS=(
+  [".git"]=""               # Git
+  ["package.json"]="󰎙"       # Node.js/npm
+  ["Cargo.toml"]=""        # Rust
+  ["go.mod"]="󰟓"            # Go
+  ["pyproject.toml"]=""    # Python
+  ["composer.json"]=""     # PHP/Composer
+  ["Gemfile"]=""           # Ruby
+  ["mix.exs"]=""           # Elixir
+  ["pom.xml"]=""           # Maven/Java
+  ["build.gradle"]=""      # Gradle/Java
+  ["Makefile"]=""          # Make/Build
+)
+
 # Show help message
 show_help() {
   cat <<EOF
@@ -36,6 +79,9 @@ Options:
   -m, --marker MARKER    Add project marker (can be repeated, merges with config)
   -e, --exclude PATTERN  Exclude pattern for fd (can be repeated, merges with config)
   -d, --max-depth NUM    Override maximum search depth (overrides config)
+  --icons                Enable marker-based icons (uses config + defaults)
+  --icon-map MARKER:ICON Add/override icon mapping (e.g., '.git:')
+  --strip                Strip icons from output (use with --icons for clean paths)
   --no-cache             Skip cache, force fresh search
   --clear-cache          Clear all fdp cache files and exit
   -v, --verbose          Enable debug output (shows timing and cache info)
@@ -51,8 +97,15 @@ Examples:
   fdp -p ~/temp -m "go.work" -d 2        # Combine multiple flags
   fdp --no-cache                         # Skip cache and search fresh
   fdp --clear-cache                      # Clear all cached results
+  fdp --icons                            # Show icons in output
+  fdp --icons | fzf                      # Icons visible in fzf picker
+  fdp --icons --strip | fzf              # Icons hidden, clean paths for cd
+  cd \$(fdp --icons --strip | fzf)       # Use with cd command
+  fdp --icon-map ".git:" --icons        # Override .git icon
 
 Config file: ${CONFIG_FILE}
+Icon syntax (in config): icon MARKER = ICON_CHARACTER
+Example: icon package.json =
 See: https://github.com/sharkdp/fd for exclude pattern syntax
 EOF
 }
@@ -161,6 +214,28 @@ while [[ $# -gt 0 ]]; do
       CLI_MAX_DEPTH="$2"
       shift 2
       ;;
+    --icons)
+      USE_ICONS=true
+      shift
+      ;;
+    --strip)
+      STRIP_ICONS=true
+      shift
+      ;;
+    --icon-map)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --icon-map requires MARKER:ICON value" >&2
+        exit 1
+      fi
+      if [[ ! "$2" =~ ^([^:]+):(.*)$ ]]; then
+        echo "Error: --icon-map format must be MARKER:ICON (e.g., '.git:')" >&2
+        exit 1
+      fi
+      marker="${BASH_REMATCH[1]}"
+      icon="${BASH_REMATCH[2]}"
+      CLI_ICON_MAP["${marker}"]="${icon}"
+      shift 2
+      ;;
     *)
       echo "Error: Unknown option: $1" >&2
       echo "Run 'fdp --help' for usage information" >&2
@@ -190,6 +265,11 @@ if [[ -f "${CONFIG_FILE}" ]]; then
     # Parse max_depth
     elif [[ "${line}" =~ ^max_depth[[:space:]]*=[[:space:]]*([0-9]+) ]]; then
       CONFIG_MAX_DEPTH="${BASH_REMATCH[1]}"
+    # Parse icon mappings
+    elif [[ "${line}" =~ ^icon[[:space:]]+([^=]+)[[:space:]]*=[[:space:]]*(.*)$ ]]; then
+      marker="${BASH_REMATCH[1]}"
+      icon="${BASH_REMATCH[2]}"
+      CONFIG_ICON_MAP["${marker}"]="${icon}"
     fi
   done < "${CONFIG_FILE}"
 fi
@@ -212,6 +292,21 @@ EXCLUDES=("${CONFIG_EXCLUDES[@]}" "${CLI_EXCLUDES[@]}")
 
 # Max depth: CLI overrides config, fallback to default
 MAX_DEPTH="${CLI_MAX_DEPTH:-${CONFIG_MAX_DEPTH:-$DEFAULT_MAX_DEPTH}}"
+
+# Merge icon maps: Defaults < Config < CLI
+# Start with defaults for standard markers
+ICON_MAP=()
+for marker in "${!DEFAULT_MARKER_ICONS[@]}"; do
+  ICON_MAP["${marker}"]="${DEFAULT_MARKER_ICONS[$marker]}"
+done
+# Config overrides defaults
+for marker in "${!CONFIG_ICON_MAP[@]}"; do
+  ICON_MAP["${marker}"]="${CONFIG_ICON_MAP[$marker]}"
+done
+# CLI overrides everything
+for marker in "${!CLI_ICON_MAP[@]}"; do
+  ICON_MAP["${marker}"]="${CLI_ICON_MAP[$marker]}"
+done
 
 # Filter search paths that actually exist
 EXISTING_PATHS=()
@@ -277,7 +372,14 @@ fi
 # Use hash of all config to detect changes
 get_cache_file() {
   local cache_key
-  cache_key=$(echo "${SEARCH_PATHS[@]}:${MARKERS[@]}:${EXCLUDES[@]}:${MAX_DEPTH}" | md5sum | cut -d' ' -f1)
+  local icon_hash=""
+
+  # Include icon map in cache key if icons enabled
+  if [[ "${USE_ICONS}" == "true" ]]; then
+    icon_hash=$(printf '%s=%s\n' "${!ICON_MAP[@]}" "${ICON_MAP[@]}" | sort | md5sum | cut -d' ' -f1)
+  fi
+
+  cache_key=$(echo "${SEARCH_PATHS[@]}:${MARKERS[@]}:${EXCLUDES[@]}:${MAX_DEPTH}:${USE_ICONS}:${icon_hash}" | md5sum | cut -d' ' -f1)
   echo "${CACHE_DIR}/cache-${cache_key}.txt"
 }
 
@@ -323,11 +425,34 @@ if [[ "${VERBOSE}" == "true" ]]; then
   echo "DEBUG: Cache miss or disabled, searching..." >&2
 fi
 
+# Function to get icon for a directory (checks which markers it contains)
+get_icon_for_dir() {
+  local dir="$1"
+  local best_marker=""
+  local best_specificity=0
+
+  # Check which markers exist in this directory
+  for marker in "${MARKERS[@]}"; do
+    if [[ -e "${dir}/${marker}" ]]; then
+      local specificity="${MARKER_SPECIFICITY[$marker]:-5}"  # Default mid-level
+      if [[ $specificity -gt $best_specificity ]]; then
+        best_specificity=$specificity
+        best_marker="$marker"
+      fi
+    fi
+  done
+
+  # Return icon for best marker, or default
+  echo "${ICON_MAP[$best_marker]:-$DEFAULT_ICON}"
+}
+
 # Optimized search using --exec-batch for efficient directory extraction
 # Original: --exec dirname {} \;  (spawns one dirname per file)
 # Optimized: --exec-batch dirname (batches multiple paths per dirname call)
 # This reduces process spawning from ~1500 to ~15-50 calls for large codebases
 
+# Use the same efficient search for both icon and non-icon modes
+# Icons are applied only to the output, not the search strategy
 results=$(
   fd --hidden \
      --no-ignore-vcs \
@@ -339,14 +464,29 @@ results=$(
   | sort -u
 )
 
+# Apply icons to results if enabled
+if [[ "${USE_ICONS}" == "true" ]]; then
+  results=$(while IFS= read -r dir; do
+    if [[ -n "${dir}" ]]; then
+      icon=$(get_icon_for_dir "${dir}")
+      echo "${icon} ${dir}"
+    fi
+  done <<< "${results}")
+fi
+
+# Strip icons if requested
+if [[ "${USE_ICONS}" == "true" ]] && [[ "${STRIP_ICONS}" == "true" ]]; then
+  results=$(echo "$results" | sed 's/^[^ ]* //')
+fi
+
 # Write results to cache and output
 mkdir -p "${CACHE_DIR}"
 echo "${results}" | tee "${CACHE_FILE}"
 
 if [[ "${VERBOSE}" == "true" ]]; then
-  local debug_end_time=$(date +%s%3N)
-  local elapsed=$((debug_end_time - DEBUG_START_TIME))
-  local line_count=$(echo "${results}" | wc -l)
-  echo "DEBUG: Search completed in ${elapsed}ms" >&2
+  debug_end_time=$(date +%s)
+  elapsed=$((debug_end_time - $(echo "${DEBUG_START_TIME}" | sed 's/[^0-9]*//g' | cut -c1-10)))
+  line_count=$(echo "${results}" | wc -l)
+  echo "DEBUG: Search completed in ${elapsed}s" >&2
   echo "DEBUG: Found ${line_count} projects" >&2
 fi
