@@ -29,14 +29,6 @@ done
 
 # Zsh-specific version of start_interactive
 start_interactive() {
-  # Prompt configuration (skip in Apple Terminal.app which has its own prompt)
-  if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
-    if command -v oh-my-posh >/dev/null 2>&1; then
-      # oh-my-posh prompt
-      eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
-    fi
-  fi
-
   # Zoxide smart directory jumping
   if command -v zoxide >/dev/null 2>&1; then
     eval "$(zoxide init zsh)"
@@ -95,6 +87,14 @@ function zvm_config() {
 
 function zvm_after_init() {
   [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+  # Initialize oh-my-posh after zsh-vi-mode to prevent prompt override
+  # (skip in Apple Terminal.app which has its own prompt)
+  if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+    if command -v oh-my-posh >/dev/null 2>&1; then
+      eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
+    fi
+  fi
 }
 
 # Download Zinit, if it's not there yet
@@ -117,6 +117,10 @@ zinit ice wait lucid
 zinit light zsh-users/zsh-completions
 zinit ice depth=1
 zinit light jeffreytse/zsh-vi-mode
+
+# Explicitly call zvm_after_init if it hasn't been called yet
+# This ensures oh-my-posh loads even if zsh-vi-mode delays initialization
+(( ${+functions[zvm_after_init]} )) && zvm_after_init
 
 # Add in snippets
 zinit ice wait lucid
