@@ -64,7 +64,7 @@ blocks:
   segments:
   # Vim mode indicator
   - template: >-
-      {{ if eq .Env.FISH__BIND_MODE "default" }}[N] {{ else if eq .Env.FISH__BIND_MODE "insert" }}[I] {{ else if eq .Env.FISH__BIND_MODE "replace_one" }}[R] {{ else if eq .Env.FISH__BIND_MODE "replace" }}[R] {{ else if eq .Env.FISH__BIND_MODE "visual" }}[V] {{ end }}
+      {{ if eq .Env.FISH__BIND_MODE "default" }}󰫻 {{ else if eq .Env.FISH__BIND_MODE "insert" }}󰫶 {{ else if eq .Env.FISH__BIND_MODE "replace_one" }}󰫿 {{ else if eq .Env.FISH__BIND_MODE "replace" }}󰫿 {{ else if eq .Env.FISH__BIND_MODE "visual" }}󰬃 {{ end }}
     type: text
     style: plain
     foreground_templates:
