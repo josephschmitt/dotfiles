@@ -53,6 +53,7 @@
       "scooter" # Updated more frequently in homebrew than nix
       "sst/tap/opencode"
       "television"
+      "tuicr"
     ];
     casks = [
       "1password"
