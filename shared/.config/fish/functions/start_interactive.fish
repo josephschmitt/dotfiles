@@ -8,6 +8,11 @@ function start_interactive -d "Load interactive shell customizations (prompt, ke
     # Vi-mode configuration
     fish_vi_key_bindings
 
+    # Initialize vim mode env var for oh-my-posh and trigger event handler registration
+    set -gx FISH__BIND_MODE $fish_bind_mode
+    # Explicitly load the rerender function to ensure event handler is registered
+    functions -q rerender_on_bind_mode_change; or source ~/.config/fish/functions/rerender_on_bind_mode_change.fish
+
     # Reduce escape timeout for faster tmux navigation
     set fish_escape_delay_ms 10
 

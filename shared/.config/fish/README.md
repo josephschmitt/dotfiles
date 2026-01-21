@@ -31,6 +31,14 @@ Fish is configured with vi-mode by default with custom keybindings:
 - `gl` - Jump to end of line
 - Different cursor shapes for insert/normal/visual modes
 
+**Mode Indicator**: The current vim mode is displayed in the oh-my-posh prompt on the same line as the prompt arrow:
+- `[I] ❯` - Insert mode (green)
+- `[N] ❯` - Normal mode (blue)
+- `[V] ❯` - Visual mode (lavender)
+- `[R] ❯` - Replace mode (pink)
+
+The indicator updates immediately when switching modes via the `rerender_on_bind_mode_change` function which bridges Fish's `$fish_bind_mode` to oh-my-posh.
+
 ### FZF Integration
 
 Provides fuzzy finding for:

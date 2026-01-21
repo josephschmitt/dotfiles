@@ -3,6 +3,7 @@
 palette:
   blue: "#8CAAEE"
   closer: p:os
+  green: "#A6D189"
   lavender: "#BABBF1"
   os: "#ACB0BE"
   pink: "#F4B8E4"
@@ -61,6 +62,18 @@ blocks:
   newline: true
   style: plain
   segments:
+  # Vim mode indicator
+  - template: >-
+      {{ if eq .Env.FISH__BIND_MODE "default" }}[N] {{ else if eq .Env.FISH__BIND_MODE "insert" }}[I] {{ else if eq .Env.FISH__BIND_MODE "replace_one" }}[R] {{ else if eq .Env.FISH__BIND_MODE "replace" }}[R] {{ else if eq .Env.FISH__BIND_MODE "visual" }}[V] {{ end }}
+    type: text
+    style: plain
+    foreground_templates:
+      - "{{ if eq .Env.FISH__BIND_MODE \"default\" }}p:blue{{ end }}"
+      - "{{ if eq .Env.FISH__BIND_MODE \"insert\" }}p:green{{ end }}"
+      - "{{ if eq .Env.FISH__BIND_MODE \"visual\" }}p:lavender{{ end }}"
+      - "{{ if eq .Env.FISH__BIND_MODE \"replace_one\" }}p:pink{{ end }}"
+      - "{{ if eq .Env.FISH__BIND_MODE \"replace\" }}p:pink{{ end }}"
+  # Main prompt arrow
   - template: 
     foreground: p:closer
     type: text
