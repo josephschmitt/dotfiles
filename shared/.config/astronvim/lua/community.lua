@@ -24,5 +24,8 @@ return {
   -- Git
   { import = "astrocommunity.git.codediff-nvim" },
 
+  -- Completion
+  { import = "astrocommunity.completion.cmp-cmdline" },
+
   -- import/override with your plugins folder
 }

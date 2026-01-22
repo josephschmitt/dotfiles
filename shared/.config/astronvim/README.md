@@ -85,11 +85,13 @@ opts = {
 - `astrocommunity.file-explorer.yazi-nvim`
 - `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
 - `astrocommunity.git.codediff-nvim`
+- `astrocommunity.completion.cmp-cmdline`
 
 ### Custom Plugins
 | Plugin | Purpose | Status | Source |
 |--------|---------|--------|--------|
 | `bufferline.nvim` | Buffer tabs | Active | Built-in (AstroNvim default) |
+| `cmp-cmdline` | Command-line completion | Active | AstroCommunity |
 | `claudecode.nvim` | Claude Code integration with diff review | Active | Custom |
 | `multicursor.nvim` | Multi-cursor editing | Active | Custom |
 | `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
