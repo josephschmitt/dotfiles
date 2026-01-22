@@ -15,6 +15,7 @@
   "claudecode.nvim": { "branch": "main", "commit": "93f8e48b1f6cbf2469b378c20b3df4115252d379" },
   "cmp-cmdline": { "branch": "main", "commit": "d126061b624e0af6c3a556428712dd4d4194ec6d" },
   "cmp-dap": { "branch": "master", "commit": "ea92773e84c0ad3288c3bc5e452ac91559669087" },
+  "cmp-help-tags": { "branch": "main", "commit": "c164a568d98a043fca09bb5076060461d69cb8db" },
   "codediff.nvim": { "branch": "main", "commit": "2f90f645f514955f1e7014b212598fff634bf467" },
   "flash.nvim": { "branch": "main", "commit": "fcea7ff883235d9024dc41e638f164a450c14ca2" },
   "friendly-snippets": { "branch": "main", "commit": "572f5660cf05f8cd8834e096d7b4c921ba18e175" },

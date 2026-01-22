@@ -293,4 +293,43 @@ return {
       return opts
     end,
   },
+
+  -- Help tags completion for :help command
+  {
+    "PhilippFeO/cmp-help-tags",
+    ft = "help", -- Load when opening help files
+  },
+
+  -- Customize cmp-cmdline to include help tag completion
+  {
+    "hrsh7th/cmp-cmdline",
+    optional = true,
+    opts = function()
+      local cmp = require "cmp"
+      return {
+        {
+          type = "/",
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = {
+            { name = "buffer" },
+          },
+        },
+        {
+          type = ":",
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = cmp.config.sources({
+            { name = "path" },
+            { name = "cmp_help_tags" }, -- Help tags completion
+          }, {
+            {
+              name = "cmdline",
+              option = {
+                ignore_cmds = { "Man", "!" },
+              },
+            },
+          }),
+        },
+      }
+    end,
+  },
 }

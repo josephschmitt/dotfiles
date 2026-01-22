@@ -91,7 +91,8 @@ opts = {
 | Plugin | Purpose | Status | Source |
 |--------|---------|--------|--------|
 | `bufferline.nvim` | Buffer tabs | Active | Built-in (AstroNvim default) |
-| `cmp-cmdline` | Command-line completion | Active | AstroCommunity |
+| `cmp-cmdline` | Command-line completion (with help tags) | Active | AstroCommunity (customized) |
+| `cmp-help-tags` | Help tag completion for :help | Active | Custom |
 | `claudecode.nvim` | Claude Code integration with diff review | Active | Custom |
 | `multicursor.nvim` | Multi-cursor editing | Active | Custom |
 | `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
