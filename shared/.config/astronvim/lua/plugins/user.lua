@@ -293,42 +293,4 @@ return {
       return opts
     end,
   },
-
-  -- Wilder - enhanced command/search mode with fuzzy matching
-  {
-    "gelguy/wilder.nvim",
-    build = ":UpdateRemotePlugins",
-    event = "CmdlineEnter",
-    dependencies = { "romgrk/fzy-lua-native", build = "make" },
-    config = function()
-      local wilder = require "wilder"
-
-      vim.o.termguicolors = true
-      wilder.setup { modes = { ":", "/", "?" } }
-
-      -- Use `:set wildoptions=pum` to display completion in popup menu
-      vim.cmd [[set wildcharm=<C-z>]]
-      vim.cmd [[cabbrev <buffer> <expr> %% getcmdline() == '%' ? shellescape(expand('%:h'), 1) . '/' : '%%']]
-
-      -- Configure wilder popupmenu renderer
-      wilder.set_option(
-        "renderer",
-        wilder.popupmenu_renderer(wilder.popupmenu_border_theme {
-          pumblend = 20,
-          highlighter = wilder.lua_fzy_highlighter(),
-        })
-      )
-
-      -- Command mode - show popupmenu
-      wilder.set_option(
-        "renderer",
-        wilder.render_string_component(
-          wilder.result({ value = wilder.make_it_concise, use_strict_truthy = true }),
-          " > ",
-          wilder.arg_base_index_component { hlgroup = "Keyword" }
-        ),
-        { mode = ":" }
-      )
-    end,
-  },
 }
