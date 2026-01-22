@@ -49,6 +49,7 @@
     brews = [
       "gemini-cli"
       "helix"
+      "pj"
       "raine/workmux/workmux"
       "scooter" # Updated more frequently in homebrew than nix
       "sst/tap/opencode"
@@ -72,6 +73,7 @@
       "vimr"
     ];
     taps = [
+      "josephschmitt/tap"
       "raine/workmux"
       "sst/tap"
     ];
