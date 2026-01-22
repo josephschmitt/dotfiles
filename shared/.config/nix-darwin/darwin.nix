@@ -73,6 +73,7 @@
       "vimr"
     ];
     taps = [
+      "agavra/tap"
       "josephschmitt/tap"
       "raine/workmux"
       "sst/tap"
