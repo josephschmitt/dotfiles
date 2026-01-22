@@ -23,5 +23,13 @@ if not pcall(require, "lazy") then
   vim.cmd.quit()
 end
 
+-- Enable RPC server for remote file opening from popups
+-- This creates a socket file that popup-aware-editor can use to send commands
+-- Skip in VSCode since it manages its own RPC
+if not vim.g.vscode then
+  local socket_file = vim.fn.stdpath("run") .. "/nvim." .. vim.fn.getpid() .. ".sock"
+  vim.fn.serverstart(socket_file)
+end
+
 require "lazy_setup"
 require "polish"
