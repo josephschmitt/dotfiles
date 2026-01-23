@@ -85,6 +85,7 @@ opts = {
 - `astrocommunity.file-explorer.yazi-nvim`
 - `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
 - `astrocommunity.git.codediff-nvim`
+- `astrocommunity.git.mini-diff`
 - `astrocommunity.completion.cmp-cmdline`
 
 ### Custom Plugins
@@ -103,6 +104,7 @@ opts = {
 | `vim-textobj-fold` | Fold text objects | Active | Custom |
 | `mini.ai` | Smart text objects | Active | Custom |
 | `mini.surround` | Surround operations | Active | Custom |
+| `mini.diff` | Git diff visualization with overlay | Active | AstroCommunity |
 | `ascii.nvim` | ASCII art for dashboard | Active | Custom |
 | `snacks.nvim` | Dashboard (customized with ASCII art) | Active | Built-in (customized) |
 
@@ -179,6 +181,32 @@ Neo-tree respects the global `~/.ignore` file which contains ignore patterns for
 - Other: `.adobe/`, `.local/`, `.vscode/cli/servers/`
 
 **Note**: Hidden files and directories (starting with `.`) like `.config/` are shown by default. The `.git` directory is always hidden. Press `H` to toggle visibility of files matching ignore patterns.
+
+### Git (`<leader>g`)
+| Keybinding | Action |
+|-----------|--------|
+| `<leader>gd` | Toggle Git diff overlay (unstaged changes) |
+| `<leader>gD` | Toggle Git diff overlay (staged changes) |
+
+**Git Diff Overlay**: Shows inline diff visualization with:
+- Added lines highlighted in green
+- Deleted lines shown as virtual text
+- Changed lines with word-level diff highlighting
+- `<leader>gd` - Shows **unstaged** changes (working tree vs index)
+- `<leader>gD` - Shows **staged** changes (index vs HEAD)
+- Press the same key again to hide the overlay
+
+Additional git features available via gitsigns (access with `<leader>g` + key):
+- `l` - View Git blame
+- `L` - View full Git blame
+- `p` - Preview Git hunk
+- `r` - Reset Git hunk
+- `R` - Reset Git buffer
+- `s` - Stage/Unstage Git hunk
+- `S` - Stage Git buffer
+- `b` - Git branches
+- `c` - Git commits (repository)
+- `C` - Git commits (current file)
 
 ### Window Management (`<leader>w`)
 | Keybinding | Action |

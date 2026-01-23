@@ -67,6 +67,38 @@ return {
         ["<Leader>eb"] = { "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
         ["<Leader>eg"] = { "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
 
+        -- Git diff
+        ["<Leader>gd"] = {
+          function() require("mini.diff").toggle_overlay() end,
+          desc = "View Git diff (unstaged)",
+        },
+        ["<Leader>gD"] = {
+          function()
+            local MiniDiff = require("mini.diff")
+            if vim.b.minidiff_showing_head then
+              vim.b.minidiff_showing_head = false
+              MiniDiff.disable()
+              MiniDiff.enable()
+            else
+              vim.b.minidiff_showing_head = true
+              local file = vim.api.nvim_buf_get_name(0)
+              local relative_path = vim.fn.fnamemodify(file, ":.")
+              local head_content = vim.fn.system("git show HEAD:" .. vim.fn.shellescape(relative_path))
+
+              if vim.v.shell_error == 0 then
+                MiniDiff.set_ref_text(0, head_content)
+                local buf_data = MiniDiff.get_buf_data()
+                if buf_data and not buf_data.overlay then
+                  vim.defer_fn(function() MiniDiff.toggle_overlay() end, 50)
+                end
+              else
+                vim.notify("Could not get HEAD version of file", vim.log.levels.WARN)
+              end
+            end
+          end,
+          desc = "View Git diff (staged)",
+        },
+
         -- Save
         ["<Leader>s"] = { "<Cmd>w<CR>", desc = "Save buffer" },
 
