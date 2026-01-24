@@ -108,6 +108,13 @@ return {
           desc = "Smart picker",
         },
 
+        -- Project pickers
+        ["<Leader>fp"] = { "<cmd>Pj<cr>", desc = "Find Projects (pj)" },
+        ["<Leader>fP"] = {
+          function() require("snacks").picker.projects() end,
+          desc = "Find Projects (snacks)",
+        },
+
         -- Goto
         gh = { "0", desc = "Go to beginning of line" },
         gl = { "$", desc = "Go to end of line" },
