@@ -332,4 +332,17 @@ return {
       }
     end,
   },
+
+  -- pj.nvim - project navigation using pj binary
+  {
+    "josephschmitt/pj.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    cmd = { "Pj", "PjCd" },
+    keys = {
+      { "<leader>fp", "<cmd>Pj<cr>", desc = "Find Projects (pj)" },
+    },
+    opts = {
+      picker = { type = "snacks" },
+    },
+  },
 }
