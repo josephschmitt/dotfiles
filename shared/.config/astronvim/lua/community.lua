@@ -22,7 +22,6 @@ return {
   { import = "astrocommunity.diagnostics.tiny-inline-diagnostic-nvim" },
 
   -- Git
-  { import = "astrocommunity.git.codediff-nvim" },
   { import = "astrocommunity.git.mini-diff" },
 
   -- Completion

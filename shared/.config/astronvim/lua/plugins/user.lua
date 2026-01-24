@@ -208,28 +208,6 @@ return {
     },
   },
 
-  -- CodeDiff viewer customization (from AstroCommunity)
-  {
-    "esmuellert/codediff.nvim",
-    optional = true, -- Only apply if codediff is loaded from AstroCommunity
-    opts = {
-      highlights = {
-        line_insert = "DiffAdd",
-        line_delete = "DiffDelete",
-      },
-      diff = {
-        disable_inlay_hints = true,
-        max_computation_time_ms = 5000,
-        hide_merge_artifacts = false,
-      },
-      explorer = {
-        position = "left",
-        width = 40,
-        height = 15,
-        indent_markers = true,
-      },
-    },
-  },
 
   -- Sort JSON
   {
@@ -331,6 +309,19 @@ return {
         },
       }
     end,
+  },
+
+  -- Deltaview - diff viewer for comparing files and changes
+  {
+    "kokusenz/deltaview.nvim",
+    cmd = { "DeltaView", "DeltaMenu", "Delta" },
+    keys = {
+      { "<leader>gv", "<cmd>DeltaView<cr>", desc = "DeltaView (inline diff)" },
+      { "<leader>gm", "<cmd>DeltaMenu<cr>", desc = "DeltaMenu (file selector)" },
+    },
+    opts = {
+      use_nerdfonts = true,
+    },
   },
 
   -- pj.nvim - project navigation using pj binary
