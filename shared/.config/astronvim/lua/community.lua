@@ -23,6 +23,7 @@ return {
 
   -- Git
   { import = "astrocommunity.git.mini-diff" },
+  { import = "astrocommunity.git.diffview-nvim" },
 
   -- Completion
   { import = "astrocommunity.completion.cmp-cmdline" },

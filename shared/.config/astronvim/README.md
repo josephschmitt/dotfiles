@@ -50,7 +50,7 @@ nvim
   - `vim-textobj-fold` - Fold-based text objects
 - **Motion**: Flash.nvim for enhanced navigation
 - **File Manager**: Yazi integration for terminal file management
-- **Code Diff**: CodeDiff viewer for comparing code changes
+- **Git Diff**: Dual diff toolset (mini.diff inline overlay, diffview.nvim full view with layout toggle)
 
 ### LSP & Formatting
 - **Format on Save**: Enabled globally (configurable per-filetype)
@@ -84,8 +84,8 @@ opts = {
 - `astrocommunity.motion.flash-nvim`
 - `astrocommunity.file-explorer.yazi-nvim`
 - `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
-- `astrocommunity.git.codediff-nvim`
 - `astrocommunity.git.mini-diff`
+- `astrocommunity.git.diffview-nvim`
 - `astrocommunity.completion.cmp-cmdline`
 
 ### Custom Plugins
@@ -99,7 +99,7 @@ opts = {
 | `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
 | `modes.nvim` | Mode-based color highlighting | Disabled | Custom |
 | `tiny-inline-diagnostic.nvim` | Inline diagnostic messages | Active | AstroCommunity (customized) |
-| `codediff.nvim` | Code diff viewer | Active | AstroCommunity (customized) |
+| `diffview.nvim` | Full diff view with layout toggle | Active | AstroCommunity (customized) |
 | `sortjson.nvim` | JSON sorting utilities | Active | Custom |
 | `vim-textobj-fold` | Fold text objects | Active | Custom |
 | `mini.ai` | Smart text objects | Active | Custom |
@@ -186,15 +186,26 @@ Neo-tree respects the global `~/.ignore` file which contains ignore patterns for
 | Keybinding | Action |
 |-----------|--------|
 | `<leader>gd` | Toggle Git diff overlay (unstaged changes) |
-| `<leader>gD` | Toggle Git diff overlay (staged changes) |
+| `<leader>gD` | Diffview Open (full diff view) |
+| `<leader>gH` | Diffview File History (current file) |
 
-**Git Diff Overlay**: Shows inline diff visualization with:
-- Added lines highlighted in green
-- Deleted lines shown as virtual text
-- Changed lines with word-level diff highlighting
-- `<leader>gd` - Shows **unstaged** changes (working tree vs index)
-- `<leader>gD` - Shows **staged** changes (index vs HEAD)
-- Press the same key again to hide the overlay
+**Git Diff Tools** - Two complementary tools for viewing diffs:
+
+1. **mini.diff** (inline overlay) - `<leader>gd`
+   - Shows inline diff visualization in the gutter
+   - Added lines highlighted in green
+   - Deleted lines shown as virtual text
+   - Changed lines with word-level diff highlighting
+   - Shows **unstaged** changes (working tree vs index)
+   - Press the same key again to hide the overlay
+
+2. **diffview.nvim** (full diff view) - `<leader>gD`, `<leader>gH`
+   - Full-featured diff view with file panel navigation
+   - `<leader>gD` - Open diff view (defaults to current branch vs index)
+   - `<leader>gH` - View file history for current file
+   - **Layout toggle**: Press `g<C-x>` to cycle through layouts (single-pane unified, horizontal, vertical)
+   - **Close diffview**: Press `q` (when in diffview) or run `:DiffviewClose`
+   - Commands: `:DiffviewOpen [commit]`, `:DiffviewFileHistory`, `:DiffviewClose`
 
 Additional git features available via gitsigns (access with `<leader>g` + key):
 - `l` - View Git blame

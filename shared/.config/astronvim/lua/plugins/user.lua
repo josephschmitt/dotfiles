@@ -208,7 +208,6 @@ return {
     },
   },
 
-
   -- Sort JSON
   {
     "2nthony/sortjson.nvim",
@@ -311,16 +310,34 @@ return {
     end,
   },
 
-  -- Deltaview - diff viewer for comparing files and changes
+  -- Diffview - full diff view with layout toggle (from AstroCommunity)
   {
-    "kokusenz/deltaview.nvim",
-    cmd = { "DeltaView", "DeltaMenu", "Delta" },
+    "sindrets/diffview.nvim",
+    optional = true, -- Only apply if diffview.nvim is loaded from AstroCommunity
     keys = {
-      { "<leader>gv", "<cmd>DeltaView<cr>", desc = "DeltaView (inline diff)" },
-      { "<leader>gm", "<cmd>DeltaMenu<cr>", desc = "DeltaMenu (file selector)" },
+      { "<leader>gv", "<cmd>DiffviewOpen<cr>", desc = "Diffview Open" },
+      { "<leader>gH", "<cmd>DiffviewFileHistory %<cr>", desc = "Diffview File History" },
     },
     opts = {
-      use_nerdfonts = true,
+      view = {
+        default = {
+          layout = "diff2_vertical", -- Top/bottom layout by default
+          winbar_info = false,
+        },
+      },
+      diff_binaries = false,
+      enhanced_diff_hl = true,
+      hooks = {
+        diff_buf_read = function() vim.opt_local.wrap = true end,
+      },
+      keymaps = {
+        view = {
+          { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
+        },
+        file_panel = {
+          { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
+        },
+      },
     },
   },
 
