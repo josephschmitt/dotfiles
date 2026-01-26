@@ -17,6 +17,12 @@ stow -R .                     # Restow (re-link)
 stow -D .                     # Uninstall
 ```
 
+## Troubleshooting
+
+When helping debug issues with tools in this repository:
+1. **Check first**: Read `TROUBLESHOOTING.md` for known issues and fixes
+2. **Document fixes**: After resolving a new issue, add it to `TROUBLESHOOTING.md` with symptom/cause/fix
+
 ## Shell Configuration Architecture
 
 ### CRITICAL RULE: Zero Duplication
