@@ -249,6 +249,13 @@ return {
     config = function() require("mini.surround").setup() end,
   },
 
+  -- Mini Pick - fuzzy picker
+  {
+    "echasnovski/mini.pick",
+    version = "*",
+    config = function() require("mini.pick").setup() end,
+  },
+
   -- ASCII.nvim - ASCII art generator for dashboard
   {
     "MaximilianLloyd/ascii.nvim",
@@ -344,7 +351,12 @@ return {
   -- pj.nvim - project navigation using pj binary
   {
     "josephschmitt/pj.nvim",
-    dependencies = { "folke/snacks.nvim" },
+    dependencies = {
+      "folke/snacks.nvim",
+      "nvim-telescope/telescope.nvim",
+      "ibhagwan/fzf-lua",
+      "nvim-mini/mini.pick",
+    },
     cmd = { "Pj", "PjCd" },
     keys = {
       { "<leader>fp", "<cmd>Pj<cr>", desc = "Find Projects (pj)" },
