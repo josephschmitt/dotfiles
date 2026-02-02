@@ -15,6 +15,8 @@ return {
         { "<leader>m", group = " Multicursor" },
         { "<leader>w", group = "󱂬 Window" },
         { "<leader><Tab>", group = "󰓩 Tabs" },
+        { "gs", group = "󰅪 Surround" },
+        { "gr", group = " LSP" },
       },
     },
   },
@@ -243,10 +245,21 @@ return {
   },
 
   -- Mini Surround - surround text with brackets, quotes, etc.
+  -- Using `gs` prefix to avoid conflict with flash.nvim's `s` mapping
   {
     "echasnovski/mini.surround",
     version = "*",
-    config = function() require("mini.surround").setup() end,
+    opts = {
+      mappings = {
+        add = "gsa",
+        delete = "gsd",
+        find = "gsf",
+        find_left = "gsF",
+        highlight = "gsh",
+        replace = "gsr",
+        update_n_lines = "gsn",
+      },
+    },
   },
 
   -- Mini Pick - fuzzy picker
@@ -350,7 +363,7 @@ return {
 
   -- pj.nvim - project navigation using pj binary
   {
-    "josephschmitt/pj.nvim",
+    dir = "~/development/pj.nvim",
     dependencies = {
       "folke/snacks.nvim",
       "nvim-telescope/telescope.nvim",
@@ -362,6 +375,7 @@ return {
       { "<leader>fp", "<cmd>Pj<cr>", desc = "Find Projects (pj)" },
     },
     opts = {
+      pj = { cmd = "auto" },
       picker = { type = "snacks" },
     },
   },

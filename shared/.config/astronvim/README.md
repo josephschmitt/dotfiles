@@ -46,7 +46,7 @@ nvim
 - **Multi-cursor**: Full multi-cursor support via `multicursor.nvim`
 - **Smart Text Objects**:
   - `mini.ai` - AI-powered text objects (indent, treesitter, patterns)
-  - `mini.surround` - Surround text with brackets/quotes
+  - `mini.surround` - Surround text with brackets/quotes (`gs` prefix)
   - `vim-textobj-fold` - Fold-based text objects
 - **Motion**: Flash.nvim for enhanced navigation
 - **File Manager**: Yazi integration for terminal file management
@@ -296,7 +296,17 @@ Additional git features available via gitsigns (access with `<leader>g` + key):
 | `zi` | Visual, Operator | Inside fold (strict) |
 | `za` | Visual, Operator | Around fold |
 | *(mini.ai provides additional smart text objects)* | | |
-| *(mini.surround provides surround operations)* | | |
+
+### Surround (mini.surround)
+| Keybinding | Mode | Action |
+|-----------|------|--------|
+| `gsa` | Normal, Visual | Add surrounding (e.g., `gsaiw)` surrounds word with parens) |
+| `gsd` | Normal | Delete surrounding |
+| `gsf` | Normal | Find surrounding (to the right) |
+| `gsF` | Normal | Find surrounding (to the left) |
+| `gsh` | Normal, Visual | Highlight surrounding |
+| `gsr` | Normal | Replace surrounding |
+| `gsn` | Normal | Update n_lines (search range) |
 
 ### LSP
 | Keybinding | Action |
