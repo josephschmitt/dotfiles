@@ -139,7 +139,6 @@ opts = {
 | `<leader>ba` | Close all buffers |
 | `<leader>bd` | Close buffer from tabline (interactive picker) |
 | `<leader>bD` | Close current buffer |
-| `<leader>be` | Open buffer explorer (Neo-tree) |
 
 ### AI Agent (`<leader>a`)
 | Keybinding | Mode | Action |
@@ -161,14 +160,15 @@ opts = {
 4. Use `<leader>as` to send files or `<leader>aS` to send selections
 5. Review diffs in Neovim with `<leader>aa/ad/ae`
 
-### File Explorer
+### File Explorer (`<leader>e`)
 | Keybinding | Action |
 |-----------|--------|
-| `<leader>e` | Toggle Neo-tree file explorer |
-| `<leader>be` | Neo-tree buffer explorer |
-| `<leader>ge` | Neo-tree git status explorer |
-| `<leader>fy`, `<leader>y` | Open Yazi (current file) |
-| `<leader>fY`, `<leader>Y` | Open Yazi (cwd) |
+| `<leader>ee` | Toggle Neo-tree file explorer |
+| `<leader>eb` | Neo-tree buffer explorer |
+| `<leader>eg` | Neo-tree git status explorer |
+| `<leader>ey` | Open Yazi (current file) |
+| `<leader>eY` | Open Yazi (cwd) |
+| `<leader>et` | Resume/toggle Yazi |
 | `H` | Toggle filtered items in Neo-tree (show/hide ignored files) |
 
 #### Neo-tree File Filtering
@@ -185,39 +185,46 @@ Neo-tree respects the global `~/.ignore` file which contains ignore patterns for
 ### Git (`<leader>g`)
 | Keybinding | Action |
 |-----------|--------|
-| `<leader>gd` | Toggle Git diff overlay (unstaged changes) |
-| `<leader>gD` | Diffview Open (full diff view) |
+| `<leader>gd` | Toggle Git diff overlay (unstaged changes via mini.diff) |
+| `<leader>gD` | Toggle Git diff overlay (staged changes via mini.diff) |
+| `<leader>gv` | Diffview Open (full diff view) |
 | `<leader>gH` | Diffview File History (current file) |
+| `<leader>ghd` | Diff this hunk (gitsigns) |
+| `<leader>ghD` | Diff this hunk ~ (gitsigns) |
 
 **Git Diff Tools** - Two complementary tools for viewing diffs:
 
-1. **mini.diff** (inline overlay) - `<leader>gd`
+1. **mini.diff** (inline overlay) - `<leader>gd`, `<leader>gD`
    - Shows inline diff visualization in the gutter
    - Added lines highlighted in green
    - Deleted lines shown as virtual text
    - Changed lines with word-level diff highlighting
-   - Shows **unstaged** changes (working tree vs index)
+   - `<leader>gd` - Shows **unstaged** changes (working tree vs index)
+   - `<leader>gD` - Toggles between unstaged and **staged** changes (index vs HEAD)
    - Press the same key again to hide the overlay
 
-2. **diffview.nvim** (full diff view) - `<leader>gD`, `<leader>gH`
+2. **diffview.nvim** (full diff view) - `<leader>gv`, `<leader>gH`
    - Full-featured diff view with file panel navigation
-   - `<leader>gD` - Open diff view (defaults to current branch vs index)
+   - `<leader>gv` - Open diff view (defaults to current branch vs index)
    - `<leader>gH` - View file history for current file
    - **Layout toggle**: Press `g<C-x>` to cycle through layouts (single-pane unified, horizontal, vertical)
    - **Close diffview**: Press `q` (when in diffview) or run `:DiffviewClose`
    - Commands: `:DiffviewOpen [commit]`, `:DiffviewFileHistory`, `:DiffviewClose`
 
-Additional git features available via gitsigns (access with `<leader>g` + key):
-- `l` - View Git blame
-- `L` - View full Git blame
-- `p` - Preview Git hunk
-- `r` - Reset Git hunk
-- `R` - Reset Git buffer
-- `s` - Stage/Unstage Git hunk
-- `S` - Stage Git buffer
-- `b` - Git branches
-- `c` - Git commits (repository)
-- `C` - Git commits (current file)
+3. **gitsigns** (hunk operations) - `<leader>g*`
+   | Keybinding | Action |
+   |-----------|--------|
+   | `]g` / `[g` | Navigate to next/previous hunk |
+   | `<leader>gs` | Stage hunk |
+   | `<leader>gr` | Reset hunk |
+   | `<leader>gS` | Stage buffer |
+   | `<leader>gu` | Undo stage hunk |
+   | `<leader>gR` | Reset buffer |
+   | `<leader>gp` | Preview hunk |
+   | `<leader>gb` | Blame line (full) |
+   | `<leader>ghd` | Diff this hunk |
+   | `<leader>ghD` | Diff this hunk ~ |
+   | `ig` | Select git hunk (text object) |
 
 ### Window Management (`<leader>w`)
 | Keybinding | Action |

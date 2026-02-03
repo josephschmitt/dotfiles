@@ -109,7 +109,6 @@ return {
         },
 
         -- Project pickers
-        ["<Leader>fp"] = { "<cmd>Pj<cr>", desc = "Find Projects (pj)" },
         ["<Leader>fP"] = {
           function() require("snacks").picker.projects() end,
           desc = "Find Projects (snacks)",
