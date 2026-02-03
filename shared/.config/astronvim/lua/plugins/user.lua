@@ -206,8 +206,8 @@ return {
         map("n", "<leader>gR", gs.reset_buffer, { desc = "Reset buffer" })
         map("n", "<leader>gp", gs.preview_hunk, { desc = "Preview hunk" })
         map("n", "<leader>gb", function() gs.blame_line { full = true } end, { desc = "Blame line" })
-        map("n", "<leader>gd", gs.diffthis, { desc = "Diff this" })
-        map("n", "<leader>gD", function() gs.diffthis "~" end, { desc = "Diff this ~" })
+        map("n", "<leader>ghd", gs.diffthis, { desc = "Diff this hunk" })
+        map("n", "<leader>ghD", function() gs.diffthis "~" end, { desc = "Diff this hunk ~" })
 
         -- Text object
         map({ "o", "x" }, "ig", ":<C-U>Gitsigns select_hunk<CR>", { desc = "Select git hunk" })
