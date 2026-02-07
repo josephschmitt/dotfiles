@@ -205,7 +205,7 @@ bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 
 - [tmux-sensible](https://github.com/tmux-plugins/tmux-sensible) - Sensible default settings
 - [tmux-fzf](https://github.com/sainnhe/tmux-fzf) - Fuzzy finder integration
 - [tmux-fzf-url](https://github.com/wfxr/tmux-fzf-url) - URL extraction and opening
-- [catppuccin-tmux](https://github.com/catppuccin/tmux) - Catppuccin Mocha theme
+- [tmux-powerkit](https://github.com/fabioluciano/tmux-powerkit) - Status bar framework (Catppuccin Mocha theme)
 - [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) - Seamless vim/tmux navigation
 - [tmux-tilish](https://github.com/jabirali/tmux-tilish) - i3-like window management
 - [tmux-floating-terminal](https://github.com/lloydbond/tmux-floating-terminal) - Floating terminal windows
