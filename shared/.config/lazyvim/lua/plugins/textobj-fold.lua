@@ -1,4 +1,4 @@
--- ~/.config/nvim/lua/plugins/textobj-fold.lua
+-- ~/.config/lazyvim/lua/plugins/textobj-fold.lua
 return {
   {
     -- Change the repository URL to the fork

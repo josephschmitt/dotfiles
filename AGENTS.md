@@ -76,7 +76,8 @@ New configuration needed?
 ## File Organization
 ```
 .config/
-├── nvim/lua/plugins/          # Neovim plugins
+├── nvim/lua/plugins/          # Neovim plugins (custom kickstart config)
+├── lazyvim/lua/plugins/       # LazyVim plugins
 ├── fish/functions/            # Fish functions
 ├── shell/                     # Shared POSIX configs (exports, aliases, functions)
 └── opencode/agents/           # ⚠️ MUST be 'agents/' plural (not 'agent/' - conflicts with Copilot)
@@ -99,7 +100,7 @@ This repository maintains **two independent Neovim configurations** using `NVIM_
 
 | Config | Location | Based On | Default Alias |
 |--------|----------|----------|---------------|
-| **LazyVim** | `shared/.config/nvim/` | [LazyVim](https://www.lazyvim.org/) | `lazyvim`, `lvim` |
+| **LazyVim** | `shared/.config/lazyvim/` | [LazyVim](https://www.lazyvim.org/) | `lazyvim`, `lvim` |
 | **AstroNvim** | `shared/.config/astronvim/` | [AstroNvim v5+](https://astronvim.com/) | `vim`, `nvim`, `astrovim`, `avim` |
 
 **Key Points**:
@@ -112,9 +113,9 @@ This repository maintains **two independent Neovim configurations** using `NVIM_
 ```
 User requests Neovim configuration change?
 ├─ User says "neovim" or "nvim" (ambiguous)
-│  └─ ASK: "Which config? LazyVim (shared/.config/nvim/) or AstroNvim (shared/.config/astronvim/)?"
+│  └─ ASK: "Which config? LazyVim (shared/.config/lazyvim/) or AstroNvim (shared/.config/astronvim/)?"
 ├─ User says "lazyvim"
-│  └─ Modify shared/.config/nvim/
+│  └─ Modify shared/.config/lazyvim/
 ├─ User says "astrovim" or "astronvim"
 │  └─ Modify shared/.config/astronvim/
 └─ User asks for both
@@ -124,7 +125,7 @@ User requests Neovim configuration change?
 ### MANDATORY: Ask for Clarification
 **Always ask which config to modify unless explicitly specified:**
 - ❌ "neovim", "nvim", "my editor" → ASK for clarification
-- ✅ "lazyvim" → Modify `shared/.config/nvim/`
+- ✅ "lazyvim" → Modify `shared/.config/lazyvim/`
 - ✅ "astrovim", "astronvim" → Modify `shared/.config/astronvim/`
 
 ### AstroNvim-Specific Guidelines
@@ -139,7 +140,7 @@ When modifying AstroNvim config (`shared/.config/astronvim/`):
 
 ```bash
 # ✅ CORRECT
-stow --target=~/.config/nvim shared/.config/nvim
+stow --target=~/.config/lazyvim shared/.config/lazyvim
 
 # ❌ WRONG - includes local-only configs (.config/gh/, .config/1Password/, etc.)
 stow --target=~/.config shared/.config
@@ -155,7 +156,7 @@ stow --target=~/.config shared/.config
 | Keybinding changed | `.config/{tool}/README.md` keybindings section |
 | Theme/appearance changed | `/README.md` features + tool README |
 | Shell support added | `/README.md` + `AGENTS.md` |
-| Neovim config modified | `.config/{nvim|astronvim}/README.md` + `/README.md` (if affects "Dual Neovim Setup") |
+| Neovim config modified | `.config/{nvim|lazyvim|astronvim}/README.md` + `/README.md` (if affects "Neovim Setup") |
 
 ### Update Workflow (Atomic Commits)
 1. Make config changes → Test changes

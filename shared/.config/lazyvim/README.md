@@ -13,7 +13,7 @@ This configuration extends LazyVim with custom plugins and settings focused on:
 ## Structure
 
 ```
-.config/nvim/
+.config/lazyvim/
 ├── init.lua              # Entry point - bootstraps lazy.nvim
 ├── lua/
 │   ├── config/           # Core configuration

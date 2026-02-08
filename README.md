@@ -142,8 +142,8 @@ Built on [AstroVim](https://astronvim.com/), a community-driven Neovim distribut
 **Documentation**: See [shared/.config/astronvim/README.md](shared/.config/astronvim/README.md)
 
 ### LazyVim
-**Location**: `shared/.config/nvim/`
-**Current alias**: `lazyvim`
+**Location**: `shared/.config/lazyvim/`
+**Current aliases**: `lazyvim`, `lvim`
 
 Built on [LazyVim](https://www.lazyvim.org/), a feature-rich Neovim starter configuration.
 
@@ -153,13 +153,13 @@ Built on [LazyVim](https://www.lazyvim.org/), a feature-rich Neovim starter conf
 - Optimized for daily development work
 - Custom keybindings and workflow integrations
 
-**Documentation**: See [shared/.config/nvim/README.md](shared/.config/nvim/README.md)
+**Documentation**: See [shared/.config/lazyvim/README.md](shared/.config/lazyvim/README.md)
 
 ### Switching Between Configs
 
 Both configurations are completely independent and coexist without conflicts thanks to Neovim's `NVIM_APPNAME` feature.
 
-**Currently**: The `nvim` and `vim` commands launch AstroVim. To switch to LazyVim as default, swap the aliases in `shared/.config/shell/aliases.sh` and `shared/.config/fish/aliases.fish`.
+**Currently**: The `nvim` and `vim` commands launch AstroVim. LazyVim is accessed via the `lazyvim` or `lvim` aliases (uses `NVIM_APPNAME=lazyvim`).
 
 **Why two configs?** Experimentation, comparing different approaches, and always having a backup if one config breaks.
 
@@ -171,7 +171,7 @@ dotfiles/
 │   ├── .config/     # Application configurations
 │   │   ├── nix-darwin/    # Declarative macOS system configuration
 │   │   ├── fish/          # Fish shell configuration
-│   │   ├── nvim/          # Neovim configuration (LazyVim)
+│   │   ├── lazyvim/       # Neovim configuration (LazyVim)
 │   │   ├── astronvim/     # Neovim configuration (AstroVim)
 │   │   ├── tmux/          # Tmux multiplexer
 │   │   ├── ghostty/       # Ghostty terminal emulator
