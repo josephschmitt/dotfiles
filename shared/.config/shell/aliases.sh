@@ -5,6 +5,8 @@ alias c="clear"
 alias cat="bat"
 alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias lg="env TMPDIR=/tmp lazygit"
+alias kickstart='command nvim'
+alias knvim='command nvim'
 alias lazyvim='NVIM_APPNAME=lazyvim command nvim'
 alias lvim='NVIM_APPNAME=lazyvim command nvim'
 alias vim='NVIM_APPNAME=astronvim command nvim'
