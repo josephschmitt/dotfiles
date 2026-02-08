@@ -36,7 +36,6 @@
     sesh
     stow
     tmux
-    twm
     uv
     zellij
     zoxide
