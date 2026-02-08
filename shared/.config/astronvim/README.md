@@ -82,6 +82,7 @@ opts = {
 - `astrocommunity.colorscheme.tokyonight-nvim`
 - `astrocommunity.pack.lua`
 - `astrocommunity.motion.flash-nvim`
+- `astrocommunity.motion.mini-move`
 - `astrocommunity.file-explorer.yazi-nvim`
 - `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
 - `astrocommunity.git.mini-diff`
@@ -314,6 +315,14 @@ Neo-tree respects the global `~/.ignore` file which contains ignore patterns for
 | `gsh` | Normal, Visual | Highlight surrounding |
 | `gsr` | Normal | Replace surrounding |
 | `gsn` | Normal | Update n_lines (search range) |
+
+### Move (mini.move, visual mode only)
+| Keybinding | Mode | Action |
+|-----------|------|--------|
+| `<S-h>` | Visual | Move selection left |
+| `<S-l>` | Visual | Move selection right |
+| `<S-j>` | Visual | Move selection down |
+| `<S-k>` | Visual | Move selection up |
 
 ### LSP
 | Keybinding | Action |

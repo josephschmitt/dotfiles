@@ -215,6 +215,26 @@ return {
     },
   },
 
+  -- Override mini.move: Shift+hjkl visual only (Alt+hjkl used by tmux, normal mode conflicts with S-h/S-l buffer nav, J join, K hover)
+  {
+    "echasnovski/mini.move",
+    optional = true,
+    opts = {
+      mappings = {
+        -- Visual mode: Shift+hjkl to move selections
+        left = "<S-h>",
+        right = "<S-l>",
+        down = "<S-j>",
+        up = "<S-k>",
+        -- Normal mode: disabled
+        line_left = "",
+        line_right = "",
+        line_down = "",
+        line_up = "",
+      },
+    },
+  },
+
   -- Override mini.diff to disable gh mappings (freeing gh for goto)
   {
     "echasnovski/mini.diff",

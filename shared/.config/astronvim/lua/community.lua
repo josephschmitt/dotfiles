@@ -14,6 +14,7 @@ return {
 
   -- Motion
   { import = "astrocommunity.motion.flash-nvim" },
+  { import = "astrocommunity.motion.mini-move" },
 
   -- File explorer
   { import = "astrocommunity.file-explorer.yazi-nvim" },
