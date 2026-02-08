@@ -1,0 +1,41 @@
+[metadata]
+name = "pj"
+description = "A channel to select from directories using pj"
+requirements = ["pj"]
+
+[source]
+command = [
+  "pj --icons --ansi --shorten",
+  "pj --icons --ansi --shorten --no-nested"
+]
+ansi = true
+output = "{strip_ansi|split: :1}"
+
+[preview]
+command = "lt --color=always '{strip_ansi|split: :1}'"
+
+[keybindings]
+ctrl-e = "actions:edit"
+ctrl-t = "actions:connect"
+ctrl-n = "actions:new_tab"
+ctrl-r = ["actions:clear_cache", "reload_source"]
+
+[actions.edit]
+description = "Open in $EDITOR"
+command = "$EDITOR '{strip_ansi|split: :1}'"
+mode = "execute"
+
+[actions.connect]
+description = "Connect to selected tmux session"
+command = "sh -c 'n=$(basename $1|tr .: _); tmux new -ds $n -c $1 2>/dev/null; tmux switchc -t $n' _ '{strip_ansi|split: :1}'"
+mode = "execute"
+
+[actions.new_tab]
+description = "Open in new tmux tab"
+command = "tmux new-window -c '{strip_ansi|split: :1}'"
+mode = "execute"
+
+[actions.clear_cache]
+description = "Clear pj cache"
+command = "pj --clear-cache"
+mode = "fork"
