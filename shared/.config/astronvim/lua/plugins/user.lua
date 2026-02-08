@@ -235,6 +235,15 @@ return {
     },
   },
 
+  -- Override mini.bracketed: disable buffer target (]b/[b already used for buffer nav)
+  {
+    "echasnovski/mini.bracketed",
+    optional = true,
+    opts = {
+      buffer = { suffix = "" },
+    },
+  },
+
   -- Override mini.diff to disable gh mappings (freeing gh for goto)
   {
     "echasnovski/mini.diff",

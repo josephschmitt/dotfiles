@@ -15,6 +15,10 @@ return {
   -- Motion
   { import = "astrocommunity.motion.flash-nvim" },
   { import = "astrocommunity.motion.mini-move" },
+  { import = "astrocommunity.motion.mini-bracketed" },
+
+  -- Editing support
+  { import = "astrocommunity.editing-support.mini-splitjoin" },
 
   -- File explorer
   { import = "astrocommunity.file-explorer.yazi-nvim" },

@@ -48,7 +48,8 @@ nvim
   - `mini.ai` - AI-powered text objects (indent, treesitter, patterns)
   - `mini.surround` - Surround text with brackets/quotes (`gs` prefix)
   - `vim-textobj-fold` - Fold-based text objects
-- **Motion**: Flash.nvim for enhanced navigation
+- **Motion**: Flash.nvim for enhanced navigation, mini.bracketed for bracket navigation
+- **Editing**: mini.splitjoin for toggling single/multi-line code
 - **File Manager**: Yazi integration for terminal file management
 - **Git Diff**: Dual diff toolset (mini.diff inline overlay, diffview.nvim full view with layout toggle)
 
@@ -83,6 +84,8 @@ opts = {
 - `astrocommunity.pack.lua`
 - `astrocommunity.motion.flash-nvim`
 - `astrocommunity.motion.mini-move`
+- `astrocommunity.motion.mini-bracketed`
+- `astrocommunity.editing-support.mini-splitjoin`
 - `astrocommunity.file-explorer.yazi-nvim`
 - `astrocommunity.diagnostics.tiny-inline-diagnostic-nvim`
 - `astrocommunity.git.mini-diff`
@@ -105,6 +108,8 @@ opts = {
 | `vim-textobj-fold` | Fold text objects | Active | Custom |
 | `mini.ai` | Smart text objects | Active | Custom |
 | `mini.surround` | Surround operations | Active | Custom |
+| `mini.bracketed` | Bracket navigation for targets (comment, diagnostic, etc.) | Active | AstroCommunity (customized) |
+| `mini.splitjoin` | Toggle between single-line and multi-line code | Active | AstroCommunity |
 | `mini.diff` | Git diff visualization with overlay | Active | AstroCommunity |
 | `ascii.nvim` | ASCII art for dashboard | Active | Custom |
 | `snacks.nvim` | Dashboard (customized with ASCII art) | Active | Built-in (customized) |
@@ -324,6 +329,32 @@ Neo-tree respects the global `~/.ignore` file which contains ignore patterns for
 | `<S-j>` | Visual | Move selection down |
 | `<S-k>` | Visual | Move selection up |
 
+### Bracket Navigation (mini.bracketed)
+Navigate forward/backward through various targets using `]`/`[` + suffix. Uppercase suffix goes to first/last.
+
+| Suffix | Target | Example |
+|--------|--------|---------|
+| `c` | Comment block | `]c` next comment, `[C` first comment |
+| `d` | Diagnostic | `]d` next diagnostic, `[D` first diagnostic |
+| `f` | File on disk | `]f` next file, `[f` previous file |
+| `i` | Indent change | `]i` next indent change, `[i` previous |
+| `j` | Jump (current buffer) | `]j` next jump, `[j` previous jump |
+| `l` | Location list | `]l` next location, `[l` previous |
+| `o` | Old files | `]o` next old file, `[o` previous |
+| `q` | Quickfix | `]q` next quickfix, `[q` previous |
+| `t` | Tree-sitter node | `]t` next node, `[t` previous |
+| `u` | Undo history | `]u` next undo state, `[u` previous |
+| `w` | Window | `]w` next window, `[w` previous |
+| `x` | Conflict marker | `]x` next conflict, `[x` previous |
+| `y` | Yank history | `]y` next yank, `[y` previous |
+
+**Note**: Buffer target (`]b`/`[b`) is disabled — use `<S-h>`/`<S-l>` or `]b`/`[b` from AstroNvim's built-in buffer navigation instead.
+
+### Split/Join (mini.splitjoin)
+| Keybinding | Mode | Action |
+|-----------|------|--------|
+| `gS` | Normal | Toggle between single-line and multi-line |
+
 ### LSP
 | Keybinding | Action |
 |-----------|--------|
@@ -385,7 +416,8 @@ Custom plugin configurations:
 Imports from AstroCommunity:
 - Colorschemes (Catppuccin, Tokyonight)
 - Lua language pack
-- Flash.nvim motion
+- Flash.nvim motion, mini.move, mini.bracketed
+- mini.splitjoin editing support
 
 ## 🔧 Customization Tips
 
