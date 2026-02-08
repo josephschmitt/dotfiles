@@ -30,7 +30,7 @@ declare -gA THEME_COLORS=(
     # =========================================================================
     # WINDOW (active) - use blue for better text contrast
     # =========================================================================
-    [window-active-base]="#8aadf4"       # blue (better contrast than pink)
+    [window-active-base]="#f5c2e7"       # pink
     [window-active-style]="bold"
 
     # =========================================================================
@@ -71,7 +71,7 @@ declare -gA THEME_COLORS=(
     # =========================================================================
     # POPUP & MENU
     # =========================================================================
-    # [popup-bg]="#1e1e2e"                 # Popup background
+    # [popup-bg]="#1e1e2e"               # Popup no background
     [popup-fg]="#cdd6f4"                 # Popup foreground
     [popup-border]="#cba6f7"             # Popup border
     [menu-bg]="#313244"                  # Menu background
