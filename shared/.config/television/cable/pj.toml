@@ -11,7 +11,7 @@ command = [
 ansi = true
 
 [preview]
-command = "lt --color=always \"$(eval echo '{strip_ansi|split: :1}')\""
+command = "eza --tree --color=always \"$(echo {strip_ansi|split: :1} | sed 's|^~|$HOME|')\""
 
 [keybindings]
 enter = "actions:expand"
@@ -22,22 +22,22 @@ ctrl-r = ["actions:clear_cache", "reload_source"]
 
 [actions.expand]
 description = "Expand to absolute path"
-command = "eval echo '{strip_ansi|split: :1}'"
+command = "echo {strip_ansi|split: :1} | sed 's|^~|$HOME|'"
 mode = "execute"
 
 [actions.edit]
 description = "Open in $EDITOR"
-command = "$EDITOR \"$(eval echo '{strip_ansi|split: :1}')\""
+command = "$EDITOR \"$(echo {strip_ansi|split: :1} | sed 's|^~|$HOME|')\""
 mode = "execute"
 
 [actions.connect]
 description = "Connect to selected tmux session"
-command = "sh -c 'n=$(basename $1|tr .: _); tmux new -ds $n -c $1 2>/dev/null; tmux switchc -t $n' _ \"$(eval echo '{strip_ansi|split: :1}')\""
+command = "sh -c 'n=$(basename $1|tr .: _); tmux new -ds $n -c $1 2>/dev/null; tmux switchc -t $n' _ \"$(echo {strip_ansi|split: :1} | sed 's|^~|$HOME|')\""
 mode = "execute"
 
 [actions.new_tab]
 description = "Open in new tmux tab"
-command = "tmux new-window -c \"$(eval echo '{strip_ansi|split: :1}')\""
+command = "tmux new-window -c \"$(echo {strip_ansi|split: :1} | sed 's|^~|$HOME|')\""
 mode = "execute"
 
 [actions.clear_cache]
