@@ -45,6 +45,7 @@
             twm
             uv
             volta
+            yq
             zellij
             zoxide
             zsh
