@@ -5,8 +5,8 @@ requirements = ["pj"]
 
 [source]
 command = [
-  "pj --icons --ansi --shorten",
-  "pj --icons --ansi --shorten --no-nested"
+  "pj --icons --ansi",
+  "pj --icons --ansi --no-nested"
 ]
 ansi = true
 output = "{strip_ansi|split: :1}"
