@@ -2,6 +2,8 @@
 
 A bespoke [Neovim](https://neovim.io/) configuration built from scratch on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim).
 
+![IMG_0586](https://github.com/user-attachments/assets/c60822c1-5e65-44c4-8f06-22be623d3fec)
+
 ## Why Build From Scratch?
 
 After months of daily-driving [AstroNvim](https://astronvim.com/) and [LazyVim](https://www.lazyvim.org/), I had a config that worked — but I didn't *understand* it. Distros are powerful, but they're someone else's opinions wrapped in layers of abstraction. When something broke, I was debugging framework internals instead of Neovim.
