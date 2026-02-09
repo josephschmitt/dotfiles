@@ -53,9 +53,17 @@ return {
       })
 
       -- mini.indentscope: animated vertical line showing the current scope
+      -- draw.predicate filters out non-file buffers (dashboard, neo-tree, etc.)
       require("mini.indentscope").setup({
         symbol = "│",
         options = { try_as_border = true },
+        draw = {
+          predicate = function(scope)
+            if scope.body.is_incomplete then return false end
+            if vim.bo.buftype ~= "" then return false end
+            return true
+          end,
+        },
       })
     end,
   },
