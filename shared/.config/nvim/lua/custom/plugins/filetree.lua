@@ -1,6 +1,14 @@
 -- Neo-tree: file tree sidebar (like VS Code's explorer panel).
 -- Provides three views: filesystem, open buffers, and git status.
+-- Auto-opens on wide screens, auto-closes after opening a file on narrow screens.
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
+
+local AUTO_CLOSE_WIDTH = 150
+
+local function should_auto_close()
+  return vim.o.columns <= AUTO_CLOSE_WIDTH
+end
+
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -33,6 +41,26 @@ return {
           ["h"] = "close_node", -- Collapse folder
           ["H"] = "prev_source", -- Switch to previous source tab
           ["L"] = "next_source", -- Switch to next source tab
+        },
+      },
+      event_handlers = {
+        -- Auto-close neo-tree after opening a file when screen is narrow
+        {
+          event = "file_opened",
+          handler = function()
+            if should_auto_close() then
+              require("neo-tree.command").execute({ action = "close" })
+            end
+          end,
+        },
+        -- Auto-close neo-tree on focus lost when screen is narrow
+        {
+          event = "neo_tree_buffer_leave",
+          handler = function()
+            if should_auto_close() then
+              require("neo-tree.command").execute({ action = "close" })
+            end
+          end,
         },
       },
       filesystem = {
