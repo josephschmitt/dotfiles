@@ -26,6 +26,7 @@ return {
         { "<Leader>g", group = "Git", icon = "" },
         { "<Leader>gh", group = "Hunk diff", icon = "󰊢" },
 
+        { "<Leader><Tab>", group = "Tabs", icon = "󰓩" },
         { "<Leader>w", group = "Window", icon = "󱂬" },
 
         -- Window: splits
@@ -50,6 +51,17 @@ return {
         { "<Leader>wL", "<C-w>L", desc = "Move window right" },
         { "<Leader>wr", "<C-w>r", desc = "Rotate windows" },
         { "<Leader>wx", "<C-w>x", desc = "Swap with next window" },
+
+        -- Tabs: Vim tab pages (not bufferline tabs)
+        { "<Leader><Tab>n", "<Cmd>tabnew<CR>", desc = "New tab" },
+        { "<Leader><Tab>c", "<Cmd>tabclose<CR>", desc = "Close tab" },
+        { "<Leader><Tab>o", "<Cmd>tabonly<CR>", desc = "Close other tabs" },
+        { "<Leader><Tab>]", "<Cmd>tabnext<CR>", desc = "Next tab" },
+        { "<Leader><Tab>[", "<Cmd>tabprevious<CR>", desc = "Previous tab" },
+        { "<Leader><Tab>l", "<Cmd>tablast<CR>", desc = "Last tab" },
+        { "<Leader><Tab>f", "<Cmd>tabfirst<CR>", desc = "First tab" },
+        { "<Leader><Tab>>", "<Cmd>+tabmove<CR>", desc = "Move tab right" },
+        { "<Leader><Tab><lt>", "<Cmd>-tabmove<CR>", desc = "Move tab left" },
       },
     },
   },
