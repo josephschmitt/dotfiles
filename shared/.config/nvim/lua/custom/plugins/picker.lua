@@ -67,16 +67,18 @@ return {
     },
 
     config = function(_, opts)
-      -- Load ascii art for dashboard header (from dashboard.lua's opts)
+      -- Custom "JoeVim" header in ANSI Shadow style
       if opts.dashboard and opts.dashboard.preset then
-        local ok, ascii = pcall(require, "ascii")
-        if ok then
-          local art = ascii.art.text.neovim.ansi_shadow
-          if art then
-            if type(art) == "table" then art = table.concat(art, "\n") end
-            opts.dashboard.preset.header = art
-          end
-        end
+        opts.dashboard.preset.header = table.concat({
+          [[                                                ]],
+          [[      ██╗ ██████╗ ███████╗██╗   ██╗██╗███╗   ███╗ ]],
+          [[      ██║██╔═══██╗██╔════╝██║   ██║██║████╗ ████║ ]],
+          [[      ██║██║   ██║█████╗  ██║   ██║██║██╔████╔██║ ]],
+          [[ ██   ██║██║   ██║██╔══╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
+          [[ ╚█████╔╝╚██████╔╝███████╗ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
+          [[  ╚════╝  ╚═════╝ ╚══════╝  ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
+          [[                                                ]],
+        }, "\n")
       end
 
       require("snacks").setup(opts)
