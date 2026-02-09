@@ -19,6 +19,7 @@
 
     casks = [
       "backblaze"
+      "claude"
       "jump-desktop-connect"
       "lm-studio"
       "orbstack"
