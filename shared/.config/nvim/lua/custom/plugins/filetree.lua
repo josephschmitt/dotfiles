@@ -24,6 +24,13 @@ return {
       { "<Leader>eb", "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
       { "<Leader>eg", "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
       {
+        "<Leader>er",
+        function()
+          require("neo-tree.sources.manager").refresh("filesystem")
+        end,
+        desc = "Refresh Explorer",
+      },
+      {
         "<Leader>o",
         function()
           if vim.bo.filetype == "neo-tree" then
