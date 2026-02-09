@@ -8,7 +8,8 @@ return {
     opts = {
       preset = "helix", -- Centered floating popup (vs default bottom panel)
       icons = {
-        mappings = false, -- Disable icons on individual keys; group icons still render separately
+        mappings = false, -- Disable auto-detected icons on individual keys
+        group = "", -- We embed icons directly in group names below
       },
       spec = {
         -- Top-level shortcuts (single key after leader)
@@ -33,18 +34,18 @@ return {
         },
         { "<Leader>s", "<Cmd>w<CR>", desc = "Save buffer" },
 
-        -- Groups
-        { "<Leader>b", group = "Buffer", icon = "󰓩" },
-        { "<Leader>bs", group = "Sort", icon = "󰒺" },
-        { "<Leader>e", group = "Explorer", icon = "󰙅" },
-        { "<Leader>f", group = "Find", icon = "󰈞" },
-        { "<Leader>g", group = "Git", icon = "󰊢" },
-        { "<Leader>gh", group = "Hunk diff", icon = "󰊢" },
-        { "<Leader>m", group = "Multicursor", icon = "" },
-        { "<Leader>t", group = "Toggle", icon = "󰙵" },
+        -- Groups (icons embedded in name since mappings=false blocks the icon property)
+        { "<Leader>b", group = "󰓩 Buffer" },
+        { "<Leader>bs", group = "󰒺 Sort" },
+        { "<Leader>e", group = "󰙅 Explorer" },
+        { "<Leader>f", group = "󰈞 Find" },
+        { "<Leader>g", group = "󰊢 Git" },
+        { "<Leader>gh", group = "󰊢 Hunk diff" },
+        { "<Leader>m", group = "󰇀 Multicursor" },
+        { "<Leader>t", group = "󰙵 Toggle" },
 
-        { "<Leader><Tab>", group = "Tabs", icon = "󰓩" },
-        { "<Leader>w", group = "Window", icon = "󱂬" },
+        { "<Leader><Tab>", group = "󰓩 Tabs" },
+        { "<Leader>w", group = "󱂬 Window" },
 
         -- Window: splits
         { "<Leader>ws", "<Cmd>split<CR>", desc = "Split horizontal" },
