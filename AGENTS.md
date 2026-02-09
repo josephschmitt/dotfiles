@@ -5,7 +5,7 @@
 - **No Build System**: Configuration files only, no tests/linting
 - **Platforms**: macOS (primary), Ubuntu Server (secondary)
 - **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
-- **Editors**: Neovim (dual setup: LazyVim + AstroNvim) + Helix (secondary)
+- **Editors**: Neovim (triple setup: Kickstart + LazyVim + AstroNvim) + Helix (secondary)
 - **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `ubuntu-server/` (Ubuntu)
 
 ### Stow Commands
@@ -76,8 +76,9 @@ New configuration needed?
 ## File Organization
 ```
 .config/
-├── nvim/lua/plugins/          # Neovim plugins (custom kickstart config)
+├── nvim/lua/custom/plugins/   # Kickstart Neovim plugins (default config)
 ├── lazyvim/lua/plugins/       # LazyVim plugins
+├── astronvim/lua/plugins/     # AstroNvim plugins
 ├── fish/functions/            # Fish functions
 ├── shell/                     # Shared POSIX configs (exports, aliases, functions)
 └── opencode/agents/           # ⚠️ MUST be 'agents/' plural (not 'agent/' - conflicts with Copilot)
@@ -93,40 +94,50 @@ Root:
 ubuntu-server/.config/nix/     # Nix configs and services
 ```
 
-## Neovim Configuration (Dual Setup)
+## Neovim Configuration (Triple Setup)
 
-### Critical Context: Two Separate Neovim Configs
-This repository maintains **two independent Neovim configurations** using `NVIM_APPNAME`:
+### Critical Context: Three Separate Neovim Configs
+This repository maintains **three independent Neovim configurations** using `NVIM_APPNAME`:
 
-| Config | Location | Based On | Default Alias |
-|--------|----------|----------|---------------|
-| **LazyVim** | `shared/.config/lazyvim/` | [LazyVim](https://www.lazyvim.org/) | `lazyvim`, `lvim` |
-| **AstroNvim** | `shared/.config/astronvim/` | [AstroNvim v5+](https://astronvim.com/) | `vim`, `nvim`, `astrovim`, `avim` |
+| Config | Location | Based On | Aliases |
+|--------|----------|----------|---------|
+| **Kickstart (default)** | `shared/.config/nvim/` | [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) | `nvim`, `vim` (bare command) |
+| **LazyVim** | `shared/.config/lazyvim/` | [LazyVim](https://www.lazyvim.org/) | `lazyvim` |
+| **AstroNvim** | `shared/.config/astronvim/` | [AstroNvim v5+](https://astronvim.com/) | `astrovim` |
 
 **Key Points**:
 - Completely isolated (separate plugins, data, state, cache)
-- Current default: `nvim` command launches **AstroNvim**
-- Each has own README.md with configuration docs
-- AstroNvim has additional AGENTS.md with AI assistant guidelines
+- Current default: `nvim`/`vim` launches **Kickstart** (bare `command nvim`, no `NVIM_APPNAME`)
+- Each has own README.md and/or CLAUDE.md with configuration docs
 
 ### Decision Tree for Neovim Changes
 ```
 User requests Neovim configuration change?
-├─ User says "neovim" or "nvim" (ambiguous)
-│  └─ ASK: "Which config? LazyVim (shared/.config/lazyvim/) or AstroNvim (shared/.config/astronvim/)?"
+├─ User says "neovim" or "nvim" or "my editor" (ambiguous)
+│  └─ ASK: "Which config? Kickstart (shared/.config/nvim/), LazyVim, or AstroNvim?"
+├─ User says "kickstart" or context is clearly about the default config
+│  └─ Modify shared/.config/nvim/
 ├─ User says "lazyvim"
 │  └─ Modify shared/.config/lazyvim/
 ├─ User says "astrovim" or "astronvim"
 │  └─ Modify shared/.config/astronvim/
-└─ User asks for both
-   └─ Modify both configurations (implement feature in each)
+└─ User asks for all / multiple
+   └─ Modify each specified configuration
 ```
 
 ### MANDATORY: Ask for Clarification
 **Always ask which config to modify unless explicitly specified:**
 - ❌ "neovim", "nvim", "my editor" → ASK for clarification
+- ✅ "kickstart" → Modify `shared/.config/nvim/`
 - ✅ "lazyvim" → Modify `shared/.config/lazyvim/`
 - ✅ "astrovim", "astronvim" → Modify `shared/.config/astronvim/`
+
+### Kickstart-Specific Guidelines
+When modifying Kickstart config (`shared/.config/nvim/`):
+1. **Read** `shared/.config/nvim/CLAUDE.md` first (philosophy, architecture, lazy-loading rules)
+2. Keep `init.lua` close to upstream kickstart.nvim — all customizations in `lua/custom/plugins/`
+3. Every plugin must have a lazy-loading trigger (see nvim CLAUDE.md for details)
+4. One feature per file, one feature per commit
 
 ### AstroNvim-Specific Guidelines
 When modifying AstroNvim config (`shared/.config/astronvim/`):

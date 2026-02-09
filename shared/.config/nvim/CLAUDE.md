@@ -12,7 +12,7 @@ The existing AstroNvim config (`shared/.config/astronvim/`) serves as **inspirat
 2. **One feature at a time** — Add features incrementally, test each one, commit, then move on. No large batch changes.
 3. **Stock kickstart as foundation** — Keep `init.lua` as close to upstream kickstart.nvim as possible. All customizations go in `lua/custom/plugins/`.
 4. **Simplicity over cleverness** — Prefer straightforward configs. Don't over-engineer or add options "just in case."
-5. **Commit hygiene** — Each feature gets its own commit. Include `lazy-lock.json` changes. Amend when restructuring.
+5. **Commit hygiene** — Each feature gets its own commit. Include `lazy-lock.json` changes.
 
 ## Architecture
 
@@ -22,11 +22,32 @@ shared/.config/nvim/
 ├── init.lua                        # Stock kickstart.nvim (minimal tweaks)
 ├── lazy-lock.json                  # Plugin version pins
 ├── stylua.toml                     # Lua formatter config
-├── CLAUDE.md                       # This file
+├── CLAUDE.md                       # This file (agent guidelines)
+├── README.md                       # User-facing documentation
 └── lua/custom/plugins/             # All customizations go here
-    ├── dashboard.lua               # Snacks dashboard + ASCII art header
+    ├── ai.lua                      # Claude Code integration
+    ├── bufferline.lua              # Tab bar with ordinal numbering
+    ├── cmdline.lua                 # Command-line completion sources
     ├── colorscheme.lua             # Tokyonight moon style override
-    └── (future feature files...)
+    ├── dashboard.lua               # Snacks dashboard keys
+    ├── diagnostics.lua             # Inline diagnostic styling
+    ├── filetree.lua                # Neo-tree file explorer
+    ├── flash.lua                   # Flash jump motions
+    ├── git.lua                     # Gitsigns, mini.diff, diffview, lazygit
+    ├── indent-blankline.lua        # Static indent guides
+    ├── keymaps.lua                 # Global keybindings
+    ├── mason-auto-install.lua      # On-demand LSP server installation
+    ├── mini.lua                    # mini.nvim modules (ai, surround, statusline, move, bracketed, indentscope)
+    ├── multicursor.lua             # Multi-cursor editing
+    ├── notifier.lua                # Snacks toast notifications
+    ├── options.lua                 # Vim options, netrw replacement, autocmds
+    ├── persistence.lua             # Session save/restore
+    ├── picker.lua                  # Snacks picker + JoeVim dashboard header
+    ├── pj.lua                      # Project switcher
+    ├── sortjson.lua                # JSON key sorting
+    ├── tmux-navigator.lua          # Ctrl+hjkl tmux/nvim navigation
+    ├── toggles.lua                 # Toggle keybindings (wrap, inlay hints, format-on-save)
+    └── which-key.lua               # Keybinding popup groups
 ```
 
 ### How Custom Plugins Work
@@ -37,33 +58,59 @@ When a custom plugin file references the same plugin as `init.lua` (e.g., `folke
 ### Adding a New Feature
 1. Create `lua/custom/plugins/<feature>.lua`
 2. Return a table of plugin specs
-3. Test with `kickstart` alias
+3. Test with `nvim`
 4. Commit the new file + updated `lazy-lock.json`
 
 ### What NOT to Do
-- Don't modify `init.lua` unless absolutely necessary (e.g., enabling the custom plugins import)
+- Don't modify `init.lua` unless absolutely necessary (e.g., adding a lazy-loading event)
 - Don't add plugins without explaining what they do
 - Don't batch multiple unrelated features into one file
 - Don't assume AstroNvim's approach is the right one — evaluate each choice
 
-## Reference: AstroNvim Features to Evaluate
+## Performance: Lazy-Loading Guidelines
 
-Features from the AstroNvim config that may be worth porting (each evaluated individually):
+Dashboard startup should load minimal plugins (~5). Every plugin must justify loading before the user opens a file.
 
-- [ ] File tree (neo-tree)
-- [ ] File/buffer picker (Snacks picker vs Telescope)
-- [ ] Buffer line / tab bar
-- [ ] Keybinding structure (which-key groups, leader mappings)
-- [ ] Git integration (gitsigns, diffview, mini.diff)
-- [ ] Editor enhancements (flash, yazi, multicursor, mini.move/surround/ai)
-- [ ] Developer tools (claudecode, tiny-inline-diagnostic, sortjson)
-- [ ] Vim options (relativenumber, signcolumn, nowrap, etc.)
+### Lazy-loading triggers by category
+
+| Category | Event / Trigger | Examples |
+|----------|----------------|----------|
+| **Must load at startup** | No event needed | colorscheme, statusline (mini.nvim), dashboard (snacks.nvim) |
+| **File-editing plugins** | `event = { "BufReadPost", "BufNewFile" }` | LSP, treesitter, gitsigns, guess-indent, todo-comments |
+| **Completion** | `event = { "InsertEnter", "CmdlineEnter" }` | blink.cmp, LuaSnip |
+| **Non-critical UI** | `event = "VeryLazy"` | which-key, claudecode, flash, diagnostics |
+| **Multi-buffer UI** | `event = "BufAdd"` | bufferline |
+| **On-demand tools** | `cmd` or `keys` triggers | neo-tree, diffview, sortjson, pj |
+
+### Rules for new plugins
+1. **Always add a lazy-loading trigger** — never leave a plugin without `event`, `cmd`, `keys`, or `ft`
+2. **Ask**: "Does this need to load before the user opens a file?" If no → defer it
+3. **Dependencies inherit**: if plugin A depends on B, B loads when A loads (no need to eager-load B separately)
+4. **Test with `:Lazy`** — check startup plugin count after adding
 
 ## Shell Aliases
 
 | Alias | Command | Description |
 |-------|---------|-------------|
-| `kickstart` | `command nvim` | Launch this config (default nvim) |
-| `knvim` | `command nvim` | Short alias |
+| `nvim` / `vim` | `command nvim` | Default — launches this config |
+| `lazyvim` | `NVIM_APPNAME=lazyvim command nvim` | Launch LazyVim config |
+| `astrovim` | `NVIM_APPNAME=astronvim command nvim` | Launch AstroNvim config |
 
-This config uses the default `~/.config/nvim/` path, so bare `nvim` without `NVIM_APPNAME` loads it. The aliases exist for clarity while developing alongside AstroNvim and LazyVim.
+This config uses the default `~/.config/nvim/` path, so bare `nvim` without `NVIM_APPNAME` loads it.
+
+## Reference: Ported Features
+
+Features ported from AstroNvim/LazyVim (each evaluated and adapted individually):
+
+- [x] File tree (neo-tree)
+- [x] File/buffer picker (Snacks picker, replaced Telescope)
+- [x] Buffer line / tab bar (bufferline.nvim)
+- [x] Keybinding structure (which-key groups, leader mappings)
+- [x] Git integration (gitsigns, diffview, mini.diff, lazygit)
+- [x] Editor enhancements (flash, multicursor, mini.move/surround/ai)
+- [x] Developer tools (claudecode, tiny-inline-diagnostic, sortjson)
+- [x] Vim options (relativenumber, nowrap, cmdheight=0, etc.)
+- [x] Dashboard (Snacks dashboard with custom JoeVim header)
+- [x] Indent guides (indent-blankline + mini.indentscope)
+- [x] Session persistence (persistence.nvim)
+- [x] Auto-install LSP servers (mason-auto-install)

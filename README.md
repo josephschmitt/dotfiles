@@ -99,7 +99,8 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
   - POSIX-compliant environment setup across all shells
   - macOS login shell compatibility
 - **✏️ Editors**:
-  - **Neovim (AstroVim)** - Currently mapped to `nvim`/`vim` commands
+  - **Neovim (Kickstart)** - Default, mapped to `nvim`/`vim` commands
+  - **Neovim (AstroVim)** - Available via `astrovim` alias
   - **Neovim (LazyVim)** - Available via `lazyvim` alias
   - **Helix** - Secondary modal editor for quick edits
 - **💻 Terminal**: Ghostty with optimized configuration
@@ -122,13 +123,29 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
 - **⌨️ Custom keybindings** for efficient navigation
 - **🤖 AI assistance** with OpenCode integration
 
-## ✏️ Dual Neovim Setup
+## ✏️ Neovim Setup
 
-This configuration includes two complete Neovim setups that can be switched between at any time:
+This configuration includes three complete Neovim setups that coexist independently via Neovim's `NVIM_APPNAME` feature:
+
+### Kickstart (Default)
+**Location**: `shared/.config/nvim/`
+**Aliases**: `nvim`, `vim` (bare command, no `NVIM_APPNAME`)
+
+A bespoke, from-scratch configuration built on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). Every plugin is intentionally chosen and understood.
+
+**Features**:
+- Snacks dashboard with custom JoeVim ASCII art
+- Neo-tree file explorer with tmux-style navigation
+- Snacks picker (fuzzy finder for files, grep, LSP symbols)
+- Bufferline tab bar with ordinal numbering
+- Tokyonight Moon theme with custom highlights
+- Fast startup (~50ms) via aggressive lazy-loading
+
+**Documentation**: See [shared/.config/nvim/README.md](shared/.config/nvim/README.md)
 
 ### AstroVim
 **Location**: `shared/.config/astronvim/`
-**Current aliases**: `nvim`, `vim`, `astrovim`, `avim`
+**Aliases**: `astrovim`
 
 Built on [AstroVim](https://astronvim.com/), a community-driven Neovim distribution.
 
@@ -137,31 +154,29 @@ Built on [AstroVim](https://astronvim.com/), a community-driven Neovim distribut
 - Catppuccin Mocha theme with custom dashboard
 - Multi-cursor editing, Yazi file manager integration
 - Comprehensive window/tab management keybindings
-- Custom text objects and smart motions
 
 **Documentation**: See [shared/.config/astronvim/README.md](shared/.config/astronvim/README.md)
 
 ### LazyVim
 **Location**: `shared/.config/lazyvim/`
-**Current aliases**: `lazyvim`, `lvim`
+**Aliases**: `lazyvim`
 
 Built on [LazyVim](https://www.lazyvim.org/), a feature-rich Neovim starter configuration.
 
 **Features**:
 - Full IDE experience with LSP, completion, debugging
 - Extensive plugin ecosystem via lazy.nvim
-- Optimized for daily development work
-- Custom keybindings and workflow integrations
+- AI-powered coding (Avante, CodeCompanion, Copilot)
 
 **Documentation**: See [shared/.config/lazyvim/README.md](shared/.config/lazyvim/README.md)
 
 ### Switching Between Configs
 
-Both configurations are completely independent and coexist without conflicts thanks to Neovim's `NVIM_APPNAME` feature.
+All three configurations are completely independent (separate plugins, data, state, cache) and coexist without conflicts.
 
-**Currently**: The `nvim` and `vim` commands launch AstroVim. LazyVim is accessed via the `lazyvim` or `lvim` aliases (uses `NVIM_APPNAME=lazyvim`).
+**Currently**: The `nvim` and `vim` commands launch the Kickstart config. AstroVim and LazyVim are accessed via their respective aliases (which set `NVIM_APPNAME`).
 
-**Why two configs?** Experimentation, comparing different approaches, and always having a backup if one config breaks.
+**Why three configs?** The Kickstart config is the daily driver — built from scratch for full understanding. AstroVim and LazyVim serve as references and fallbacks.
 
 ## 📁 Repository Structure
 
@@ -171,6 +186,7 @@ dotfiles/
 │   ├── .config/     # Application configurations
 │   │   ├── nix-darwin/    # Declarative macOS system configuration
 │   │   ├── fish/          # Fish shell configuration
+│   │   ├── nvim/          # Neovim configuration (Kickstart — default)
 │   │   ├── lazyvim/       # Neovim configuration (LazyVim)
 │   │   ├── astronvim/     # Neovim configuration (AstroVim)
 │   │   ├── tmux/          # Tmux multiplexer
