@@ -74,5 +74,20 @@ return {
         },
       },
     },
+    config = function(_, opts)
+      require("neo-tree").setup(opts)
+
+      -- Auto-open/close neo-tree when the terminal is resized across the threshold
+      vim.api.nvim_create_autocmd("VimResized", {
+        group = vim.api.nvim_create_augroup("neotree-auto-resize", { clear = true }),
+        callback = function()
+          if should_auto_close() then
+            pcall(require("neo-tree.command").execute, { action = "close" })
+          else
+            pcall(require("neo-tree.command").execute, { action = "show" })
+          end
+        end,
+      })
+    end,
   },
 }
