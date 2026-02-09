@@ -13,4 +13,15 @@ vim.o.wrap = false
 local socket_path = vim.fn.stdpath("state") .. "/nvim." .. vim.fn.getpid() .. ".sock"
 pcall(vim.fn.serverstart, socket_path)
 
+-- Auto-cd when opening a directory (e.g. `nvim .` or `nvim some-dir/`)
+vim.api.nvim_create_autocmd("BufEnter", {
+  group = vim.api.nvim_create_augroup("custom-autocd", { clear = true }),
+  callback = function(args)
+    local bufname = vim.api.nvim_buf_get_name(args.buf)
+    if bufname ~= "" and vim.fn.isdirectory(bufname) == 1 then
+      vim.cmd.cd(bufname)
+    end
+  end,
+})
+
 return {}
