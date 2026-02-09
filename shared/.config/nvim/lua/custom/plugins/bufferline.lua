@@ -10,6 +10,7 @@ return {
     event = "VimEnter",
     opts = {
       options = {
+        always_show_bufferline = false, -- Hide when only one buffer is open (e.g. dashboard)
         numbers = "ordinal", -- Show 1, 2, 3... on each tab
         diagnostics = "nvim_lsp", -- Show LSP error/warning indicators on tabs
         offsets = {
