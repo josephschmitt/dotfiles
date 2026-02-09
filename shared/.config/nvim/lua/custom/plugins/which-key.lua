@@ -7,6 +7,9 @@ return {
     "folke/which-key.nvim",
     opts = {
       preset = "helix", -- Centered floating popup (vs default bottom panel)
+      icons = {
+        mappings = false, -- Disable icons on individual keys; group icons still render separately
+      },
       spec = {
         -- Top-level shortcuts (single key after leader)
         { "<Leader>c", "<Cmd>bdelete<CR>", desc = "Close buffer" },
