@@ -11,6 +11,8 @@ return {
         { "<Leader>b", group = "Buffer", icon = "󰓩" },
         { "<Leader>bs", group = "Sort", icon = "󰒺" },
         { "<Leader>e", group = "Explorer", icon = "󰙅" },
+        { "<Leader>f", group = "Find", icon = "󰈞" },
+        { "<Leader>s", group = "Search", icon = "󰊄", mode = { "n", "v" } },
         { "<Leader>w", group = "Window", icon = "󱂬" },
 
         -- Window: splits
