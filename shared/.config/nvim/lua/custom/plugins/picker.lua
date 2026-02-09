@@ -20,7 +20,7 @@ return {
       { "<Leader>ff", function() require("snacks").picker.files() end, desc = "Find Files" },
       { "<Leader>fb", function() require("snacks").picker.buffers() end, desc = "Find Buffers" },
       { "<Leader>fr", function() require("snacks").picker.recent() end, desc = "Find Recent Files" },
-      { "<Leader>fn", function() require("snacks").picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Neovim files" },
+      -- "<Leader>fn" is used for Find Notifications (notifier.lua)
       { "<Leader>fP", function() require("snacks").picker.pickers() end, desc = "Find Pickers" },
       { "<Leader>fg", function() require("snacks").picker.grep() end, desc = "Find by Grep" },
       { "<Leader>fw", function() require("snacks").picker.grep_word() end, mode = { "n", "v" }, desc = "Find current Word" },
