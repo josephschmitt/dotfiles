@@ -71,7 +71,7 @@ declare -gA THEME_COLORS=(
     # =========================================================================
     # POPUP & MENU
     # =========================================================================
-    # [popup-bg]="#1e1e2e"               # Popup no background
+    [popup-bg]="#1e1e2e"                 # Popup no background
     [popup-fg]="#cdd6f4"                 # Popup foreground
     [popup-border]="#cba6f7"             # Popup border
     [menu-bg]="#313244"                  # Menu background
