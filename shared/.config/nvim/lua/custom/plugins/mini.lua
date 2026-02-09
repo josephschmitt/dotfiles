@@ -28,7 +28,32 @@ return {
       local statusline = require("mini.statusline")
       statusline.setup({ use_icons = vim.g.have_nerd_font })
       ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function() return "%2l:%-2v" end
+      statusline.section_location = function()
+        return "%2l:%-2v"
+      end
+
+      -- Add offset when neo-tree is open (matches bufferline offset of 40 columns)
+      local original_combine_groups = statusline.combine_groups
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.combine_groups = function(groups)
+        -- Check if neo-tree is open
+        local neotree_open = false
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          local buf = vim.api.nvim_win_get_buf(win)
+          if vim.bo[buf].filetype == "neo-tree" then
+            neotree_open = true
+            break
+          end
+        end
+
+        -- Add padding with separator to match neo-tree width (40 columns)
+        if neotree_open then
+          -- Use WinSeparator highlight for the divider to match bufferline
+          table.insert(groups, 1, string.rep(" ", 40) .. "%#WinSeparator#│%*")
+        end
+
+        return original_combine_groups(groups)
+      end
 
       -- mini.move: move lines/selections with Shift+hjkl
       -- Visual mode only — normal mode disabled to avoid conflicts:
@@ -59,8 +84,12 @@ return {
         options = { try_as_border = true },
         draw = {
           predicate = function(scope)
-            if scope.body.is_incomplete then return false end
-            if vim.bo.buftype ~= "" then return false end
+            if scope.body.is_incomplete then
+              return false
+            end
+            if vim.bo.buftype ~= "" then
+              return false
+            end
             return true
           end,
         },
