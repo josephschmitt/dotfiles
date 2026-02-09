@@ -4,7 +4,7 @@
 return {
   "coder/claudecode.nvim",
   dependencies = { "folke/snacks.nvim" },
-  lazy = false, -- Load at startup to ensure WebSocket server starts
+  event = "VeryLazy", -- Start WebSocket server shortly after UI renders
   opts = {
     -- Use "none" provider - Claude runs in external tmux pane
     terminal_provider = "none",

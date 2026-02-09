@@ -7,7 +7,7 @@ return {
     "akinsho/bufferline.nvim",
     version = "*",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    event = "VimEnter",
+    event = "BufAdd",
     opts = {
       options = {
         always_show_bufferline = false, -- Hide when only one buffer is open (e.g. dashboard)
