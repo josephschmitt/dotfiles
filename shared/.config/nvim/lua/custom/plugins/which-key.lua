@@ -23,6 +23,9 @@ return {
         { "<Leader>bs", group = "Sort", icon = "󰒺" },
         { "<Leader>e", group = "Explorer", icon = "󰙅" },
         { "<Leader>f", group = "Find", icon = "󰈞" },
+        { "<Leader>g", group = "Git", icon = "" },
+        { "<Leader>gh", group = "Hunk diff", icon = "󰊢" },
+
         { "<Leader>w", group = "Window", icon = "󱂬" },
 
         -- Window: splits
