@@ -96,6 +96,10 @@ return {
           end,
         },
       })
+
+      -- mini.bufremove: smart buffer deletion that preserves window layout
+      -- Switches to another buffer before deleting to prevent neo-tree takeover
+      require("mini.bufremove").setup()
     end,
   },
 }

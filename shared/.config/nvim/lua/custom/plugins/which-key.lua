@@ -13,8 +13,20 @@ return {
       },
       spec = {
         -- Top-level shortcuts (single key after leader)
-        { "<Leader>c", "<Cmd>bdelete<CR>", desc = "Close buffer" },
-        { "<Leader>C", "<Cmd>bdelete!<CR>", desc = "Force close buffer" },
+        {
+          "<Leader>c",
+          function()
+            require("mini.bufremove").delete()
+          end,
+          desc = "Close buffer",
+        },
+        {
+          "<Leader>C",
+          function()
+            require("mini.bufremove").delete(0, true)
+          end,
+          desc = "Force close buffer",
+        },
         {
           "<Leader>h",
           function()

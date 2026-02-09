@@ -16,6 +16,9 @@ return {
         offsets = {
           { filetype = "neo-tree", text = "Explorer", highlight = "Comment", separator = true },
         },
+        close_command = function(buf)
+          require("mini.bufremove").delete(buf, false)
+        end,
       },
     },
     config = function(_, opts)
@@ -37,12 +40,32 @@ return {
       { "<Leader>bb", "<Cmd>BufferLinePick<CR>", desc = "Select buffer from tabline" },
       { "<Leader>bp", "<Cmd>BufferLineCyclePrev<CR>", desc = "Previous buffer" },
 
-      -- Close buffers
-      { "<Leader>ba", "<Cmd>BufferLineCloseOthers<CR><Cmd>bdelete<CR>", desc = "Close all buffers" },
+      -- Close buffers (close_command routes bufferline operations through mini.bufremove)
+      {
+        "<Leader>ba",
+        function()
+          vim.cmd("BufferLineCloseOthers")
+          require("mini.bufremove").delete()
+        end,
+        desc = "Close all buffers",
+      },
       { "<Leader>bc", "<Cmd>BufferLineCloseOthers<CR>", desc = "Close all except current" },
-      { "<Leader>bC", "<Cmd>BufferLineCloseOthers<CR><Cmd>bdelete<CR>", desc = "Close all buffers" },
+      {
+        "<Leader>bC",
+        function()
+          vim.cmd("BufferLineCloseOthers")
+          require("mini.bufremove").delete()
+        end,
+        desc = "Close all buffers",
+      },
       { "<Leader>bd", "<Cmd>BufferLinePickClose<CR>", desc = "Close buffer from tabline" },
-      { "<Leader>bD", "<Cmd>bdelete<CR>", desc = "Close current buffer" },
+      {
+        "<Leader>bD",
+        function()
+          require("mini.bufremove").delete()
+        end,
+        desc = "Close current buffer",
+      },
       { "<Leader>bl", "<Cmd>BufferLineCloseLeft<CR>", desc = "Close all to the left" },
       { "<Leader>br", "<Cmd>BufferLineCloseRight<CR>", desc = "Close all to the right" },
 
