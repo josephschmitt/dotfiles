@@ -24,4 +24,13 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
+-- Markdown: show all syntax characters (disable concealing)
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("custom-markdown", { clear = true }),
+  pattern = { "markdown" },
+  callback = function()
+    vim.wo.conceallevel = 0
+  end,
+})
+
 return {}
