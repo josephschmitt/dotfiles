@@ -8,6 +8,8 @@ return {
     opts = {
       preset = "helix", -- Centered floating popup (vs default bottom panel)
       spec = {
+        { "<Leader>b", group = "Buffer", icon = "󰓩" },
+        { "<Leader>bs", group = "Sort", icon = "󰒺" },
         { "<Leader>e", group = "Explorer", icon = "󰙅" },
         { "<Leader>w", group = "Window", icon = "󱂬" },
 
