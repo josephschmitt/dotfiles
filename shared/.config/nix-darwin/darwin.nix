@@ -60,7 +60,6 @@
       "1password"
       "adobe-creative-cloud"
       "arc"
-      "chatgpt"
       "ghostty"
       "hyperkey"
       "leader-key"

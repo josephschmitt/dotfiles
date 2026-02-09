@@ -19,6 +19,7 @@
 
     casks = [
       "backblaze"
+      "chatgpt"
       "claude"
       "jump-desktop-connect"
       "lm-studio"
