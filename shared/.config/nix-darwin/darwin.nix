@@ -48,33 +48,28 @@
     enable = true;
     brews = [
       "gemini-cli"
-      "helix"
-      "pj"
+      "josephschmitt/tap/pj"
       "raine/workmux/workmux"
-      "scooter" # Updated more frequently in homebrew than nix
-      "sst/tap/opencode"
+      "scooter"
       "television"
-      "tuicr"
     ];
     casks = [
       "1password"
       "adobe-creative-cloud"
       "arc"
+      "fantastical"
       "ghostty"
       "hyperkey"
       "leader-key"
+      "notion"
       "raycast"
-      "runjs"
       "setapp"
       "tailscale-app"
       "visual-studio-code"
-      "vimr"
     ];
     taps = [
-      "agavra/tap"
       "josephschmitt/tap"
       "raine/workmux"
-      "sst/tap"
     ];
 
     onActivation.autoUpdate = true;
