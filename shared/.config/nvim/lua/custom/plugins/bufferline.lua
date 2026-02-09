@@ -14,7 +14,7 @@ return {
         numbers = "ordinal", -- Show 1, 2, 3... on each tab
         diagnostics = "nvim_lsp", -- Show LSP error/warning indicators on tabs
         offsets = {
-          { filetype = "neo-tree", text = "Explorer", highlight = "Directory", separator = true },
+          { filetype = "neo-tree", text = "Explorer", highlight = "Comment", separator = true },
         },
       },
     },
