@@ -10,6 +10,10 @@ vim.o.wrap = false
 -- Hide command line when not in use (no blank gap below statusline)
 vim.o.cmdheight = 0
 
+-- Global statusline (one at the bottom instead of per-window)
+-- Prevents statusline from appearing in neo-tree and other splits
+vim.o.laststatus = 3
+
 -- RPC server: create a socket so external tools (terminal popups, git
 -- commit editors, etc.) can open files in this running Neovim instance.
 -- Socket path: ~/.local/state/nvim/nvim.<pid>.sock
@@ -65,11 +69,14 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Smart winbar: show filename only when multiple splits exist.
--- Skips floating windows (pickers, notifications, etc.)
+-- Skips floating windows (pickers, notifications, etc.) and neo-tree (has its own winbar)
 vim.api.nvim_create_autocmd("WinEnter", {
   group = vim.api.nvim_create_augroup("custom-winbar", { clear = true }),
   callback = function()
     if vim.api.nvim_win_get_config(0).relative ~= "" then return end
+
+    -- Skip neo-tree windows (they manage their own winbar for source tabs)
+    if vim.bo.filetype == "neo-tree" then return end
 
     local wins = vim.api.nvim_tabpage_list_wins(0)
     local normal_wins = vim.tbl_filter(function(win)
