@@ -7,6 +7,9 @@ vim.o.relativenumber = true
 -- Disable line wrapping (toggleable with <Leader>tw)
 vim.o.wrap = false
 
+-- Hide command line when not in use (no blank gap below statusline)
+vim.o.cmdheight = 0
+
 -- RPC server: create a socket so external tools (terminal popups, git
 -- commit editors, etc.) can open files in this running Neovim instance.
 -- Socket path: ~/.local/state/nvim/nvim.<pid>.sock
