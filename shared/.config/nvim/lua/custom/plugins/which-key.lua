@@ -35,6 +35,7 @@ return {
         { "<Leader>s", "<Cmd>w<CR>", desc = "Save buffer" },
 
         -- Groups (icons embedded in name since mappings=false blocks the icon property)
+        { "<Leader>a", group = "󰚩 AI" },
         { "<Leader>b", group = "󰓩 Buffer" },
         { "<Leader>bs", group = "󰒺 Sort" },
         { "<Leader>e", group = "󰙅 Explorer" },
