@@ -149,6 +149,21 @@ return {
         desc = "Toggle autocompletion (global)",
       },
 
+      -- Color column (vertical ruler at column 100)
+      {
+        "<Leader>tl",
+        function()
+          if vim.wo.colorcolumn == "" then
+            vim.wo.colorcolumn = "100"
+            notify("Color column", true)
+          else
+            vim.wo.colorcolumn = ""
+            notify("Color column", false)
+          end
+        end,
+        desc = "Toggle color column",
+      },
+
       -- Conceal
       {
         "<Leader>tS",
