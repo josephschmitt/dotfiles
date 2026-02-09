@@ -51,6 +51,12 @@ return {
       require("mini.bracketed").setup({
         buffer = { suffix = "" },
       })
+
+      -- mini.indentscope: animated vertical line showing the current scope
+      require("mini.indentscope").setup({
+        symbol = "│",
+        options = { try_as_border = true },
+      })
     end,
   },
 }
