@@ -23,6 +23,17 @@ return {
       { "<Leader>eE", "<Cmd>Neotree toggle dir=<CR>", desc = "Toggle Explorer (cwd)" },
       { "<Leader>eb", "<Cmd>Neotree buffers<CR>", desc = "Buffer Explorer" },
       { "<Leader>eg", "<Cmd>Neotree git_status<CR>", desc = "Git Explorer" },
+      {
+        "<Leader>o",
+        function()
+          if vim.bo.filetype == "neo-tree" then
+            vim.cmd("wincmd p")
+          else
+            vim.cmd("Neotree focus")
+          end
+        end,
+        desc = "Toggle explorer focus",
+      },
     },
     opts = {
       source_selector = {
@@ -90,6 +101,7 @@ return {
           end
         end,
       })
+
     end,
   },
 }
