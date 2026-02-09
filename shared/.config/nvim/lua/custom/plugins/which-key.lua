@@ -11,11 +11,23 @@ return {
         -- Top-level shortcuts (single key after leader)
         { "<Leader>c", "<Cmd>bdelete<CR>", desc = "Close buffer" },
         { "<Leader>C", "<Cmd>bdelete!<CR>", desc = "Force close buffer" },
-        { "<Leader>h", function() require("snacks").dashboard() end, desc = "Home Screen" },
+        {
+          "<Leader>h",
+          function()
+            require("snacks").dashboard()
+          end,
+          desc = "Home Screen",
+        },
         { "<Leader>n", "<Cmd>enew<CR>", desc = "New File" },
         { "<Leader>q", "<Cmd>q<CR>", desc = "Quit Window" },
         { "<Leader>Q", "<Cmd>qa<CR>", desc = "Exit Neovim" },
-        { "<Leader>r", function() require("snacks").rename.rename_file() end, desc = "Rename file" },
+        {
+          "<Leader>r",
+          function()
+            require("snacks").rename.rename_file()
+          end,
+          desc = "Rename file",
+        },
         { "<Leader>s", "<Cmd>w<CR>", desc = "Save buffer" },
 
         -- Groups
@@ -23,8 +35,9 @@ return {
         { "<Leader>bs", group = "Sort", icon = "󰒺" },
         { "<Leader>e", group = "Explorer", icon = "󰙅" },
         { "<Leader>f", group = "Find", icon = "󰈞" },
-        { "<Leader>g", group = "Git", icon = "" },
+        { "<Leader>g", group = "Git", icon = "󰊢" },
         { "<Leader>gh", group = "Hunk diff", icon = "󰊢" },
+        { "<Leader>m", group = "Multicursor", icon = "" },
 
         { "<Leader><Tab>", group = "Tabs", icon = "󰓩" },
         { "<Leader>w", group = "Window", icon = "󱂬" },
