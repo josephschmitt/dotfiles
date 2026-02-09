@@ -16,25 +16,23 @@ return {
       -- Smart picker: finds files if in a clean dir, recent buffers if you have some open
       { "<Leader><Space>", function() require("snacks").picker.smart() end, desc = "Smart picker" },
 
-      -- Find group (<Leader>f*) — locating files, buffers, and specific items
+      -- Find group (<Leader>f*) — files, buffers, grep, and metadata
       { "<Leader>ff", function() require("snacks").picker.files() end, desc = "Find Files" },
       { "<Leader>fb", function() require("snacks").picker.buffers() end, desc = "Find Buffers" },
       { "<Leader>fr", function() require("snacks").picker.recent() end, desc = "Find Recent Files" },
       { "<Leader>fn", function() require("snacks").picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Neovim files" },
       { "<Leader>fp", function() require("snacks").picker.pickers() end, desc = "Find Pickers" },
+      { "<Leader>fg", function() require("snacks").picker.grep() end, desc = "Find by Grep" },
+      { "<Leader>fw", function() require("snacks").picker.grep_word() end, mode = { "n", "v" }, desc = "Find current Word" },
+      { "<Leader>fh", function() require("snacks").picker.help() end, desc = "Find Help" },
+      { "<Leader>fk", function() require("snacks").picker.keymaps() end, desc = "Find Keymaps" },
+      { "<Leader>fd", function() require("snacks").picker.diagnostics() end, desc = "Find Diagnostics" },
+      { "<Leader>fc", function() require("snacks").picker.commands() end, desc = "Find Commands" },
+      { "<Leader>f.", function() require("snacks").picker.resume() end, desc = "Find Resume (repeat last)" },
+      { "<Leader>f/", function() require("snacks").picker.grep_buffers() end, desc = "Find in Open Files" },
 
-      -- Search group (<Leader>s*) — searching content, help, and metadata
-      { "<Leader>sg", function() require("snacks").picker.grep() end, desc = "Search by Grep" },
-      { "<Leader>sw", function() require("snacks").picker.grep_word() end, mode = { "n", "v" }, desc = "Search current Word" },
-      { "<Leader>sh", function() require("snacks").picker.help() end, desc = "Search Help" },
-      { "<Leader>sk", function() require("snacks").picker.keymaps() end, desc = "Search Keymaps" },
-      { "<Leader>sd", function() require("snacks").picker.diagnostics() end, desc = "Search Diagnostics" },
-      { "<Leader>sc", function() require("snacks").picker.commands() end, desc = "Search Commands" },
-      { "<Leader>sr", function() require("snacks").picker.resume() end, desc = "Search Resume" },
-      { "<Leader>s/", function() require("snacks").picker.grep_buffers() end, desc = "Search in Open Files" },
-
-      -- Standalone shortcuts
-      { "<Leader>/", function() require("snacks").picker.lines() end, desc = "Fuzzy search in current buffer" },
+      -- Top-level shortcut (also in which-key spec, but needs to be here for lazy-loading)
+      { "<Leader>/", function() require("snacks").picker.lines() end, desc = "Search buffer" },
     },
 
     opts = {

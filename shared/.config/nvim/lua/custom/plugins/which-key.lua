@@ -8,11 +8,21 @@ return {
     opts = {
       preset = "helix", -- Centered floating popup (vs default bottom panel)
       spec = {
+        -- Top-level shortcuts (single key after leader)
+        { "<Leader>c", "<Cmd>bdelete<CR>", desc = "Close buffer" },
+        { "<Leader>C", "<Cmd>bdelete!<CR>", desc = "Force close buffer" },
+        { "<Leader>h", function() require("snacks").dashboard() end, desc = "Home Screen" },
+        { "<Leader>n", "<Cmd>enew<CR>", desc = "New File" },
+        { "<Leader>q", "<Cmd>q<CR>", desc = "Quit Window" },
+        { "<Leader>Q", "<Cmd>qa<CR>", desc = "Exit Neovim" },
+        { "<Leader>r", function() require("snacks").rename.rename_file() end, desc = "Rename file" },
+        { "<Leader>s", "<Cmd>w<CR>", desc = "Save buffer" },
+
+        -- Groups
         { "<Leader>b", group = "Buffer", icon = "󰓩" },
         { "<Leader>bs", group = "Sort", icon = "󰒺" },
         { "<Leader>e", group = "Explorer", icon = "󰙅" },
         { "<Leader>f", group = "Find", icon = "󰈞" },
-        { "<Leader>s", group = "Search", icon = "󰊄", mode = { "n", "v" } },
         { "<Leader>w", group = "Window", icon = "󱂬" },
 
         -- Window: splits
