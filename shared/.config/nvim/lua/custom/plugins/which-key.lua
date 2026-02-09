@@ -38,6 +38,7 @@ return {
         { "<Leader>g", group = "Git", icon = "󰊢" },
         { "<Leader>gh", group = "Hunk diff", icon = "󰊢" },
         { "<Leader>m", group = "Multicursor", icon = "" },
+        { "<Leader>t", group = "Toggle", icon = "󰙵" },
 
         { "<Leader><Tab>", group = "Tabs", icon = "󰓩" },
         { "<Leader>w", group = "Window", icon = "󱂬" },
