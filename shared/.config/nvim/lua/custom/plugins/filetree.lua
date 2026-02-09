@@ -3,10 +3,10 @@
 -- Auto-opens on wide screens, auto-closes after opening a file on narrow screens.
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
 
-local AUTO_CLOSE_WIDTH = 150
+local config = require("custom.config")
 
 local function should_auto_close()
-  return vim.o.columns <= AUTO_CLOSE_WIDTH
+  return vim.o.columns <= config.neotree_auto_close_width
 end
 
 return {
@@ -46,7 +46,7 @@ return {
       },
       window = {
         position = "left", -- Open on left side
-        width = 40, -- 40 columns wide
+        width = config.neotree_width, -- Width in columns
         mappings = {
           ["l"] = "open", -- Expand folder or open file
           ["h"] = "close_node", -- Collapse folder

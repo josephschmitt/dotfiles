@@ -1,5 +1,7 @@
 -- Override stock kickstart mini.nvim config to add mini.move, mini.bracketed,
 -- and change mini.surround to use gs prefix (matching AstroNvim).
+local config = require("custom.config")
+
 return {
   {
     "nvim-mini/mini.nvim",
@@ -46,10 +48,10 @@ return {
           end
         end
 
-        -- Add padding with separator to match neo-tree width (40 columns)
+        -- Add padding with separator to match neo-tree width
         if neotree_open then
           -- Use WinSeparator highlight for the divider to match bufferline
-          table.insert(groups, 1, string.rep(" ", 40) .. "%#WinSeparator#│%*")
+          table.insert(groups, 1, string.rep(" ", config.neotree_width) .. "%#WinSeparator#│%*")
         end
 
         return original_combine_groups(groups)
