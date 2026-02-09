@@ -40,6 +40,29 @@ return {
         -- Use the picker's built-in UI select to replace vim.ui.select
         -- (equivalent to telescope-ui-select.nvim)
         ui_select = true,
+        -- Remap toggle keys from Alt to Shift (normal mode only).
+        -- Alt conflicts with tmux navigation (Alt+hjkl).
+        win = {
+          input = {
+            keys = {
+              ["H"] = { "toggle_hidden", mode = { "n" } },
+              ["I"] = { "toggle_ignored", mode = { "n" } },
+              ["F"] = { "toggle_follow", mode = { "n" } },
+              ["R"] = { "toggle_regex", mode = { "n" } },
+              ["M"] = { "toggle_maximize", mode = { "n" } },
+              ["P"] = { "toggle_preview", mode = { "n" } },
+              ["D"] = { "inspect", mode = { "n" } },
+              ["W"] = { "cycle_win", mode = { "n" } },
+            },
+          },
+        },
+        -- Show hidden files (dotfiles) by default in file/grep pickers.
+        -- Essential for dotfiles repos and .config/ directories.
+        sources = {
+          files = { hidden = true },
+          grep = { hidden = true },
+          smart = { hidden = true },
+        },
       },
     },
 
