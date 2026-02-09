@@ -13,14 +13,42 @@ vim.o.wrap = false
 local socket_path = vim.fn.stdpath("state") .. "/nvim." .. vim.fn.getpid() .. ".sock"
 pcall(vim.fn.serverstart, socket_path)
 
--- Auto-cd when opening a directory (e.g. `nvim .` or `nvim some-dir/`)
+-- Disable netrw (replaced by neo-tree + dashboard for directory browsing)
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
+
+-- Directory opener: when Neovim is launched with a directory argument,
+-- set the cwd, show the Snacks dashboard, and reveal neo-tree.
 vim.api.nvim_create_autocmd("BufEnter", {
-  group = vim.api.nvim_create_augroup("custom-autocd", { clear = true }),
+  group = vim.api.nvim_create_augroup("custom-dir-opener", { clear = true }),
   callback = function(args)
     local bufname = vim.api.nvim_buf_get_name(args.buf)
-    if bufname ~= "" and vim.fn.isdirectory(bufname) == 1 then
-      vim.cmd.cd(bufname)
-    end
+    if bufname == "" or vim.fn.isdirectory(bufname) ~= 1 then return end
+
+    -- Set working directory
+    vim.cmd.cd(bufname)
+
+    -- Delete the directory buffer (no longer needed)
+    vim.api.nvim_buf_delete(args.buf, { force = true })
+
+    -- Open dashboard in the current window (not as a float), then neo-tree.
+    -- Passing buf/win to dashboard.open() makes it render into the window
+    -- like the normal VimEnter startup path does.
+    vim.schedule(function()
+      local ok_snacks = pcall(require, "snacks")
+      if ok_snacks then
+        local buf = vim.api.nvim_get_current_buf()
+        local win = vim.api.nvim_get_current_win()
+        require("snacks").dashboard.open({ buf = buf, win = win })
+      end
+
+      vim.schedule(function()
+        local ok_neotree = pcall(require, "neo-tree.command")
+        if ok_neotree then
+          require("neo-tree.command").execute({ action = "focus" })
+        end
+      end)
+    end)
   end,
 })
 

@@ -64,6 +64,7 @@ return {
         },
       },
       filesystem = {
+        hijack_netrw_behavior = "disabled", -- We handle directory opening in options.lua
         follow_current_file = { enabled = true }, -- Tree highlights the file you're editing
         use_libuv_file_watcher = true, -- Auto-refresh when files change on disk
         filtered_items = {
