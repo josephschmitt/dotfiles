@@ -57,6 +57,7 @@ return {
         "<Leader>tw",
         function()
           vim.wo.wrap = not vim.wo.wrap
+          vim.wo.linebreak = vim.wo.wrap -- Enable linebreak when wrap is on
           notify("Word wrap", vim.wo.wrap)
         end,
         desc = "Toggle word wrap",

@@ -68,6 +68,16 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Text files: enable word wrap by default
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("custom-text-wrap", { clear = true }),
+  pattern = { "markdown", "text", "rst", "tex" },
+  callback = function()
+    vim.wo.wrap = true
+    vim.wo.linebreak = true
+  end,
+})
+
 -- Smart winbar: show filename only when multiple splits exist.
 -- Skips floating windows (pickers, notifications, etc.) and neo-tree (has its own winbar)
 vim.api.nvim_create_autocmd("WinEnter", {
