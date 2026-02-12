@@ -454,7 +454,7 @@ return {
 
   -- pj.nvim - project navigation using pj binary
   {
-    dir = "~/development/pj.nvim",
+    "josephschmitt/pj.nvim",
     dependencies = {
       "folke/snacks.nvim",
       "nvim-telescope/telescope.nvim",

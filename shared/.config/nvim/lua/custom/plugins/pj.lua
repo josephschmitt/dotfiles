@@ -3,7 +3,7 @@
 -- Uses Snacks picker for the UI.
 return {
   {
-    dir = "~/development/pj.nvim",
+    "josephschmitt/pj.nvim",
     dependencies = { "folke/snacks.nvim" },
     cmd = { "Pj", "PjCd" },
     keys = {
