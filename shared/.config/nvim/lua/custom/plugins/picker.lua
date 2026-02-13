@@ -97,6 +97,7 @@ return {
           vim.keymap.set("n", "gri", function() picker.lsp_implementations() end, { buffer = buf, desc = "Goto Implementation" })
 
           -- Jump to the definition (press <C-t> to go back)
+          vim.keymap.set("n", "gd", function() picker.lsp_definitions() end, { buffer = buf, desc = "Goto Definition" })
           vim.keymap.set("n", "grd", function() picker.lsp_definitions() end, { buffer = buf, desc = "Goto Definition" })
 
           -- Fuzzy find all symbols in current document
