@@ -89,7 +89,7 @@ sudo nix --extra-experimental-features nix-command --extra-experimental-features
 
 3. **Apply configuration using the convenience alias:**
 ```bash
-darwin_rebuild
+nix_rebuild
 ```
 
 Or manually:
@@ -105,18 +105,18 @@ This configuration includes shell aliases for easier management:
 
 ```bash
 # Apply configuration changes
-darwin_rebuild
+nix_rebuild
 
 # Update flake dependencies
-darwin_update
+nix_update
 
 # Update and rebuild in one command
-darwin_update && darwin_rebuild
+nix_update && nix_rebuild
 ```
 
 #### What the Wrapper Does
 
-The `darwin_rebuild` alias uses a smart wrapper script (`darwin-rebuild-wrapper.sh`) that:
+The `nix_rebuild` alias uses a smart wrapper script (`darwin-rebuild-wrapper.sh`) that:
 
 1. **Detects your machine** by hostname
 2. **Determines if you're on a work or personal machine**
@@ -170,7 +170,7 @@ Managed Nerd Fonts for terminal and editor compatibility:
 darwin-rebuild --list-generations
 
 # Rollback to previous generation
-darwin-rebuild rollback
+sudo darwin-rebuild rollback
 
 # Garbage collect old generations
 nix-collect-garbage -d

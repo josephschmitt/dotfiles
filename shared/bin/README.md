@@ -5,7 +5,7 @@ This directory contains utility scripts available across all profiles.
 ## Utilities
 
 ### darwin-rebuild-wrapper.sh
-Wrapper for nix-darwin rebuild operations (macOS only)
+Wrapper for nix-darwin rebuild operations (macOS only). Called via the `nix_rebuild` alias.
 
 ### helix-*.sh
 Various Helix editor integration scripts

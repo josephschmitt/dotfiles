@@ -94,6 +94,21 @@ Root:
 ubuntu-server/.config/nix/     # Nix configs and services
 ```
 
+## Nix-Darwin (macOS System Management)
+
+### Convenience Aliases
+| Alias | Purpose |
+|-------|---------|
+| `nix_rebuild` | Rebuild nix-darwin config (auto-detects machine) |
+| `nix_update` | Update flake lockfile |
+
+**NEVER use raw `darwin-rebuild` commands** — always use the `nix_rebuild` alias, which wraps `darwin-rebuild-wrapper.sh` with automatic machine detection (personal vs work, pure vs impure).
+
+### Configuration Location
+- Shared config: `shared/.config/nix-darwin/darwin.nix`
+- Machine configs: `shared/.config/nix-darwin/machines/` and `work/.config/nix-darwin/machines/`
+- Flake: `shared/.config/nix-darwin/flake.nix`
+
 ## Neovim Configuration (Triple Setup)
 
 ### Critical Context: Three Separate Neovim Configs

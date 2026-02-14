@@ -192,7 +192,7 @@ dotfiles/
 │   │   ├── tmux/          # Tmux multiplexer
 │   │   ├── ghostty/       # Ghostty terminal emulator
 │   │   └── ...            # Other tool configurations
-│   ├── bin/         # Utility scripts (darwin-rebuild-wrapper, etc.)
+│   ├── bin/         # Utility scripts (nix_rebuild wrapper, etc.)
 │   ├── .zshrc       # Shell configurations
 │   └── README.md    # Detailed setup instructions
 ├── personal/        # Personal-specific configurations
