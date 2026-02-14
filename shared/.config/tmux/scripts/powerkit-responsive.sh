@@ -2,7 +2,7 @@
 # Width-aware powerkit plugin configuration
 # Called by: client-resized hook
 # Progressively hides status bar plugins as terminal narrows
-# Hide order: datetime → hostname → git → directory → session
+# Hide order: datetime → hostname → directory+git → session
 
 set -uo pipefail
 
@@ -14,7 +14,6 @@ WIDTH=$(tmux display-message -p '#{client_width}' 2>/dev/null) || exit 0
 BP_FULL=$(tmux show-option -gqv @powerkit_bp_full 2>/dev/null); BP_FULL="${BP_FULL:-130}"
 BP_NO_DT=$(tmux show-option -gqv @powerkit_bp_no_datetime 2>/dev/null); BP_NO_DT="${BP_NO_DT:-100}"
 BP_NO_HOST=$(tmux show-option -gqv @powerkit_bp_no_hostname 2>/dev/null); BP_NO_HOST="${BP_NO_HOST:-80}"
-BP_NO_GIT=$(tmux show-option -gqv @powerkit_bp_no_git 2>/dev/null); BP_NO_GIT="${BP_NO_GIT:-60}"
 
 # External plugin definition (directory display)
 EXT='external("󰉋"|"#{b:pane_current_path}"|"#fab387"|"#fcc9a3"|"0")'
@@ -26,8 +25,6 @@ elif (( WIDTH >= BP_NO_DT )); then
   target_plugins="hostname,${EXT},git"
 elif (( WIDTH >= BP_NO_HOST )); then
   target_plugins="${EXT},git"
-elif (( WIDTH >= BP_NO_GIT )); then
-  target_plugins="${EXT}"
 else
   target_plugins=""
 fi
