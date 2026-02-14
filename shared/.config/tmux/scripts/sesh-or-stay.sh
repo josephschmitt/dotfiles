@@ -7,7 +7,7 @@ current_session=$(tmux display-message -p '#S')
 
 # Launch television sesh picker in a popup
 # tv sesh handles session switching internally
-"$TMUX_CONFIG_DIR/tmux-popup" -s small -t 'Sesh' -E "tv sesh"
+"$TMUX_CONFIG_DIR/scripts/tmux-popup" -s small -t 'Sesh' -E "tv sesh"
 
 # Check if we're still in the temp session
 new_session=$(tmux display-message -p '#S')

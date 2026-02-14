@@ -77,7 +77,7 @@ auto_start_tmux() {
 
     # Create new session and launch sesh popup
     # If tmux fails to start, fall back to regular shell
-    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/sesh-or-stay.sh '$session_name'" && exit
+    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'" && exit
   fi
 }
 

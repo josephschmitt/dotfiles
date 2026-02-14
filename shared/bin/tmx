@@ -77,7 +77,7 @@ new_session_mode() {
   fi
 
   # Create new session and launch sesh popup
-  tmux new-session -s "$session_name" \; run-shell "${TMUX_CONFIG_DIR}/sesh-or-stay.sh '$session_name'"
+  tmux new-session -s "$session_name" \; run-shell "${TMUX_CONFIG_DIR}/scripts/sesh-or-stay.sh '$session_name'"
 }
 
 # DIRECTORY MODE - create/switch to session based on directory basename

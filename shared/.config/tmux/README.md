@@ -2,6 +2,31 @@
 
 Configuration for [tmux](https://github.com/tmux/tmux) - terminal multiplexer for session management and productivity.
 
+## Configuration Structure
+
+The tmux configuration is split into modular `conf.d/` files, each owning a single feature. The main `tmux.conf` is a minimal orchestrator that sources the reset config, globs all `conf.d/*.conf` files in order, and runs TPM last.
+
+```
+tmux/
+├── tmux.conf              # Orchestrator (~15 lines)
+├── tmux.reset.conf        # Clean slate for key unbinds
+├── conf.d/
+│   ├── 00-terminal.conf   # Terminal type, RGB, titles, passthrough
+│   ├── 10-options.conf    # Prefix, mouse, indexing, history, vi-mode
+│   ├── 20-appearance.conf # Status line dimensions, pane borders
+│   ├── 30-plugins.conf    # Plugin declarations + all plugin configs
+│   ├── 40-layouts.conf    # Pane collapse (H/J/K/L) + smart layouts (V, S)
+│   ├── 50-apps.conf       # App splits, popups, television
+│   └── 60-sessions.conf   # Sesh, new session, detach, kill, SSH
+└── scripts/
+    ├── tmux-popup             # Standardized popup sizing script
+    ├── powerkit-theme.sh      # Catppuccin Mocha theme for PowerKit
+    ├── powerkit-responsive.sh # Responsive status bar breakpoints
+    └── ... (other scripts)
+```
+
+Numbered prefixes ensure deterministic load order. Keybindings live alongside the feature they control (e.g., plugin reload in `30-plugins.conf`, layout keys in `40-layouts.conf`).
+
 ## Installation
 
 ### 1. Ensure proper Stow setup
@@ -189,14 +214,14 @@ This is achieved through:
 
 ### Custom Popup Usage
 
-You can create custom popup keybindings using the `~/.config/tmux/tmux-popup` script:
+You can create custom popup keybindings using the `~/.config/tmux/scripts/tmux-popup` script:
 
 ```tmux
 # Example: Add a popup for htop
-bind-key H run-shell "~/.config/tmux/tmux-popup -s medium -t 'System Monitor' -E htop"
+bind-key H run-shell "~/.config/tmux/scripts/tmux-popup -s medium -t 'System Monitor' -E htop"
 
 # Example: Add a popup with custom dimensions
-bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'fd . | fzf'"
+bind-key F run-shell "~/.config/tmux/scripts/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'fd . | fzf'"
 ```
 
 ## Responsive Status Bar
