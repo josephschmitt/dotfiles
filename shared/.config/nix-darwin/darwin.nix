@@ -8,6 +8,20 @@
       fish = prev.fish.overrideAttrs (oldAttrs: {
         doCheck = false;
       });
+
+      # Patch foreign-env to skip env vars with invalid Fish names (e.g., TRZSZ-SSHD-BACKGROUND)
+      fishPlugins = prev.fishPlugins // {
+        foreign-env = prev.fishPlugins.foreign-env.overrideAttrs (oldAttrs: {
+          postPatch = (oldAttrs.postPatch or "") + ''
+            substituteInPlace functions/fenv.main.fish \
+              --replace-fail \
+                "string match -rq '^BASH_.*%%\$' \$kv[1]; and continue" \
+                "string match -rq '^BASH_.*%%\$' \$kv[1]; and continue
+      # Skip variables with names invalid in Fish (e.g., containing hyphens)
+      string match -rq '^[a-zA-Z_][a-zA-Z0-9_]*\$' \$kv[1]; or continue"
+          '';
+        });
+      };
     })
   ];
 
