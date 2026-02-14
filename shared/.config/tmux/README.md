@@ -199,6 +199,33 @@ bind-key H run-shell "~/.config/tmux/tmux-popup -s medium -t 'System Monitor' -E
 bind-key F run-shell "~/.config/tmux/tmux-popup -w 150 -h 40 -t 'Find Files' -E 'fd . | fzf'"
 ```
 
+## Responsive Status Bar
+
+The status bar progressively hides plugins as the terminal narrows, preventing truncation and overlap. Powered by the `powerkit-responsive.sh` script, which runs automatically on terminal resize via tmux hooks.
+
+### Breakpoints
+
+| Width | Plugins Shown |
+|-------|--------------|
+| >= 160 | session + hostname + directory + git + datetime |
+| 120-159 | session + hostname + directory + git |
+| 100-119 | session + directory + git |
+| 80-99 | session + directory |
+| < 80 | session only |
+
+### Customizing Breakpoints
+
+Override any breakpoint in `tmux.conf`:
+
+```tmux
+set -g @powerkit_bp_full "160"
+set -g @powerkit_bp_no_datetime "120"
+set -g @powerkit_bp_no_hostname "100"
+set -g @powerkit_bp_no_git "80"
+```
+
+Changes take effect within ~5 seconds of resize (next status interval) or immediately on session switch.
+
 ## Plugins
 
 - [tpm](https://github.com/tmux-plugins/tpm) - Tmux Plugin Manager
