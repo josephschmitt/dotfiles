@@ -11,10 +11,10 @@ WIDTH=$(tmux display-message -p '#{client_width}' 2>/dev/null) || exit 0
 [[ -z "$WIDTH" ]] && exit 0
 
 # Breakpoints (configurable via tmux options)
-BP_FULL=$(tmux show-option -gqv @powerkit_bp_full 2>/dev/null); BP_FULL="${BP_FULL:-160}"
-BP_NO_DT=$(tmux show-option -gqv @powerkit_bp_no_datetime 2>/dev/null); BP_NO_DT="${BP_NO_DT:-120}"
-BP_NO_HOST=$(tmux show-option -gqv @powerkit_bp_no_hostname 2>/dev/null); BP_NO_HOST="${BP_NO_HOST:-100}"
-BP_NO_GIT=$(tmux show-option -gqv @powerkit_bp_no_git 2>/dev/null); BP_NO_GIT="${BP_NO_GIT:-80}"
+BP_FULL=$(tmux show-option -gqv @powerkit_bp_full 2>/dev/null); BP_FULL="${BP_FULL:-130}"
+BP_NO_DT=$(tmux show-option -gqv @powerkit_bp_no_datetime 2>/dev/null); BP_NO_DT="${BP_NO_DT:-100}"
+BP_NO_HOST=$(tmux show-option -gqv @powerkit_bp_no_hostname 2>/dev/null); BP_NO_HOST="${BP_NO_HOST:-80}"
+BP_NO_GIT=$(tmux show-option -gqv @powerkit_bp_no_git 2>/dev/null); BP_NO_GIT="${BP_NO_GIT:-60}"
 
 # External plugin definition (directory display)
 EXT='external("󰉋"|"#{b:pane_current_path}"|"#fab387"|"#fcc9a3"|"0")'
