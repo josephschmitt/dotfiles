@@ -140,13 +140,16 @@ Main-horizontal layout with fixed 20-row bottom panes:
 - `Ctrl-s O` - Open OpenCode in 100-column right split
 - `Ctrl-s /` - Open Scooter in 100-column right split
 
+### Application Windows
+
+- `Ctrl-s Y` - Open Yazi in new window (tab) named "yazi"
+
 ### Application Popups
 
 - `Ctrl-s c` - Open Quick Shell popup (xsmall: closes on exit)
 - `Ctrl-s C` - Open Mini Shell popup (xsmall: persistent, stays open)
 - `Ctrl-s G` - Open Lazygit in popup (medium: 90% width/height, max 250 cols/100 lines)
 - `Ctrl-s M` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
-- `Ctrl-s Z` - Open Yazi in popup (medium: 90% width/height, max 250 cols/100 lines)
 - `Ctrl-s P` - Open floating scratch terminal (Fish shell)
 
 ### Television Popups
