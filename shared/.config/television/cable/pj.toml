@@ -5,10 +5,11 @@ requirements = ["pj"]
 
 [source]
 command = [
-  "pj --icons --ansi --shorten",
-  "pj --icons --ansi --shorten --no-nested"
+  "pj --icons --ansi --shorten --sort alpha",
+  "pj --icons --ansi --shorten --sort alpha --no-nested"
 ]
 ansi = true
+frecency = false
 
 [preview]
 command = "eza --tree --color=always \"$(echo {strip_ansi|split: :1} | sed 's|^~|$HOME|')\""
