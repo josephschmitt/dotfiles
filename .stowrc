@@ -1,0 +1,5 @@
+--ignore=\.DS_Store
+--ignore=AGENTS\.md
+--ignore=CLAUDE\.md
+--ignore=\.claude
+--ignore=node_modules
