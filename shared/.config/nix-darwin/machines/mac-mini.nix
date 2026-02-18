@@ -58,6 +58,24 @@ in
   };
 
   # LaunchAgents for automated tasks
+  launchd.user.agents.vibe-kanban = {
+    serviceConfig = {
+      ProgramArguments = [
+        "/opt/homebrew/bin/npx"
+        "vibe-kanban"
+      ];
+      EnvironmentVariables = {
+        PORT = "3033";
+        HOST = "0.0.0.0";
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";
+      };
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/vibe-kanban.log";
+      StandardErrorPath = "/tmp/vibe-kanban.err";
+    };
+  };
+
   launchd.user.agents.immich-sync = {
     serviceConfig = {
       ProgramArguments = [
