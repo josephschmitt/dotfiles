@@ -1,10 +1,5 @@
 {
-  "env": {
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
-  },
-  "model": "claude-opus-4-6",
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -16,7 +11,8 @@
     "commit-commands@claude-code-plugins": true,
     "feature-dev@claude-code-plugins": true,
     "pr-review-toolkit@claude-code-plugins": true,
-    "security-guidance@claude-code-plugins": true
+    "security-guidance@claude-code-plugins": true,
+    "agent-sdk-dev@claude-code-plugins": true
   },
   "effortLevel": "medium"
 }
