@@ -148,22 +148,24 @@ Main-horizontal layout with fixed 20-row bottom panes:
 
 - `Ctrl-s c` - Open Quick Shell popup (xsmall: closes on exit)
 - `Ctrl-s C` - Open Mini Shell popup (xsmall: persistent, stays open)
+- `Ctrl-s g` - Toggle Lazygit tab (opens or switches to it; switches back if already focused)
 - `Ctrl-s G` - Open Lazygit in popup (medium: 90% width/height, max 250 cols/100 lines)
+- `Ctrl-s E` - Open `$EDITOR` in popup (medium: 90% width/height, max 250 cols/100 lines)
 - `Ctrl-s M` - Open Neovim scratch buffer in popup (custom: 120 columns wide)
-- `Ctrl-s P` - Open floating scratch terminal (Fish shell)
 
 ### Television Popups
 
 [Television](https://github.com/alexpasmantier/television) is a blazing fast fuzzy finder TUI.
 
-- `Ctrl-s d` - Browse directories with `tv dirs` (large: 90% width/height)
 - `Ctrl-s f` - Browse files with `tv files` (large: 90% width/height)
-- `Ctrl-s g` - Search text with `tv text` (large: 90% width/height)
+- `Ctrl-s P` - Browse projects with `tv pj` (large: 90% width/height)
+- `Ctrl-s T` - Browse remote channels with `tv --show-remote` (large: 90% width/height)
 
 ### Session Management
 
 - `Ctrl-s o` - Open Sesh session switcher (small: 80% width, 70% height)
-- `Ctrl-s w` - Detach from current session (returns to shell prompt)
+- `Ctrl-s d` - Detach from current session with confirmation
+- `Ctrl-s D` - Detach from current session immediately (no confirmation)
 - `Ctrl-s q` - Kill session and close terminal tab
 - `Ctrl-s N` - Create new session with random name
 - `Ctrl-s @` - Open SSH host selector with smart tmux handling (small: 80% width, 70% height)
@@ -206,7 +208,7 @@ This is achieved through:
 - If no Neovim instance found: opens the editor in the popup itself
 
 **Supported in:**
-- Ripgrep search popup (`Ctrl-s g`)
+- Ripgrep search popup
 - Yazi file manager popup (`Ctrl-s Z`)
 - Lazygit popup (`Ctrl-s G`) - when pressing `e` to edit files
 - Any custom popup that calls `popup-aware-editor`
@@ -267,7 +269,7 @@ Changes take effect within ~5 seconds of resize (next status interval) or immedi
 
 ## Ripgrep Search
 
-The Ripgrep search popup (`Ctrl-s g`) provides fast, interactive code search across your current directory. Based on [junegunn's ripgrep integration guide](https://junegunn.github.io/fzf/tips/ripgrep-integration/).
+The Ripgrep search popup provides fast, interactive code search across your current directory. Based on [junegunn's ripgrep integration guide](https://junegunn.github.io/fzf/tips/ripgrep-integration/).
 
 ### Features
 
