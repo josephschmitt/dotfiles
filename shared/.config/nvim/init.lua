@@ -585,20 +585,9 @@ require('lazy').setup({
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-      --  See `:help lsp-config` for information about keys and how to configure
-      local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-      }
+      -- LSP servers are defined in lua/custom/config.lua for easy editing.
+      -- Each entry enables the server and mason-auto-install downloads it on first use.
+      local servers = require('custom.lsp-servers')
 
       -- Ensure the servers and tools above are installed
       --
@@ -607,12 +596,11 @@ require('lazy').setup({
       --    :Mason
       --
       -- You can press `g?` for help in this menu.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'lua-language-server', -- Lua Language server
+      -- LSP servers are auto-installed by mason-auto-install when needed.
+      -- This list is only for non-LSP tools (formatters, linters, etc.).
+      local ensure_installed = {
         'stylua', -- Used to format Lua code
-        -- You can add other tools here that you want Mason to install
-      })
+      }
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -657,10 +645,10 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        'grf',
         function() require('conform').format { async = true, lsp_format = 'fallback' } end,
         mode = '',
-        desc = '[F]ormat buffer',
+        desc = 'Format buffer',
       },
     },
     opts = {

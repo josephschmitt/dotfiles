@@ -57,6 +57,10 @@ return {
         { "<Leader>m", group = "󰇀 Multicursor" },
         { "<Leader>t", group = "󰙵 Toggle" },
 
+        { "gc", group = "󰅺 Comment" },
+        { "gr", group = "󰒕 LSP" },
+        { "gs", group = "󰅪 Surround" },
+
         { "<Leader><Tab>", group = "󰓩 Tabs" },
         { "<Leader>w", group = "󱂬 Window" },
 

@@ -13,6 +13,7 @@ The existing AstroNvim config (`shared/.config/astronvim/`) serves as **inspirat
 3. **Stock kickstart as foundation** — Keep `init.lua` as close to upstream kickstart.nvim as possible. All customizations go in `lua/custom/plugins/`.
 4. **Simplicity over cleverness** — Prefer straightforward configs. Don't over-engineer or add options "just in case."
 5. **Commit hygiene** — Each feature gets its own commit. Include `lazy-lock.json` changes.
+6. **Keep CLAUDE.md current** — When adding/removing plugins, changing keybindings, or making architectural decisions, update this file in the same commit.
 
 ## Architecture
 
@@ -24,30 +25,33 @@ shared/.config/nvim/
 ├── stylua.toml                     # Lua formatter config
 ├── CLAUDE.md                       # This file (agent guidelines)
 ├── README.md                       # User-facing documentation
-└── lua/custom/plugins/             # All customizations go here
-    ├── ai.lua                      # Claude Code integration
-    ├── bufferline.lua              # Tab bar with ordinal numbering
-    ├── cmdline.lua                 # Command-line completion sources
-    ├── colorscheme.lua             # Tokyonight moon style override
-    ├── dashboard.lua               # Snacks dashboard keys
-    ├── diagnostics.lua             # Inline diagnostic styling
-    ├── filetree.lua                # Neo-tree file explorer
-    ├── flash.lua                   # Flash jump motions
-    ├── git.lua                     # Gitsigns, mini.diff, diffview, lazygit
-    ├── indent-blankline.lua        # Static indent guides
-    ├── keymaps.lua                 # Global keybindings
-    ├── mason-auto-install.lua      # On-demand LSP server installation
-    ├── mini.lua                    # mini.nvim modules (ai, surround, statusline, move, bracketed, indentscope)
-    ├── multicursor.lua             # Multi-cursor editing
-    ├── notifier.lua                # Snacks toast notifications
-    ├── options.lua                 # Vim options, netrw replacement, autocmds
-    ├── persistence.lua             # Session save/restore
-    ├── picker.lua                  # Snacks picker + JoeVim dashboard header
-    ├── pj.lua                      # Project switcher
-    ├── sortjson.lua                # JSON key sorting
-    ├── tmux-navigator.lua          # Ctrl+hjkl tmux/nvim navigation
-    ├── toggles.lua                 # Toggle keybindings (wrap, inlay hints, format-on-save)
-    └── which-key.lua               # Keybinding popup groups
+└── lua/custom/
+    ├── config.lua                  # Shared constants (neo-tree width, etc.)
+    ├── lsp-servers.lua             # LSP server list (lspconfig names + config)
+    └── plugins/                    # All plugin customizations go here
+        ├── ai.lua                  # Claude Code integration
+        ├── bufferline.lua          # Tab bar with ordinal numbering
+        ├── cmdline.lua             # Command-line completion sources
+        ├── colorscheme.lua         # Tokyonight moon style override
+        ├── dashboard.lua           # Snacks dashboard keys
+        ├── diagnostics.lua         # Inline diagnostic styling
+        ├── filetree.lua            # Neo-tree file explorer
+        ├── flash.lua               # Flash jump motions
+        ├── git.lua                 # Gitsigns, mini.diff, diffview, lazygit
+        ├── indent-blankline.lua    # Static indent guides
+        ├── keymaps.lua             # Global keybindings
+        ├── mason-auto-install.lua  # On-demand LSP server installation
+        ├── mini.lua                # mini.nvim modules (ai, surround, statusline, move, bracketed, indentscope)
+        ├── multicursor.lua         # Multi-cursor editing
+        ├── notifier.lua            # Snacks toast notifications
+        ├── options.lua             # Vim options, netrw replacement, autocmds
+        ├── persistence.lua         # Session save/restore
+        ├── picker.lua              # Snacks picker + JoeVim dashboard header
+        ├── pj.lua                  # Project switcher
+        ├── sortjson.lua            # JSON key sorting
+        ├── tmux-navigator.lua      # Ctrl+hjkl tmux/nvim navigation
+        ├── toggles.lua             # Toggle keybindings (wrap, inlay hints, format-on-save)
+        └── which-key.lua           # Keybinding popup groups
 ```
 
 ### How Custom Plugins Work
@@ -66,6 +70,36 @@ When a custom plugin file references the same plugin as `init.lua` (e.g., `folke
 - Don't add plugins without explaining what they do
 - Don't batch multiple unrelated features into one file
 - Don't assume AstroNvim's approach is the right one — evaluate each choice
+
+## LSP & Formatting
+
+### LSP Server Management
+LSP servers are listed in `lua/custom/lsp-servers.lua` using **lspconfig names** (e.g., `ts_ls`, `jsonls`, `gopls`). The setup chain:
+
+1. `lsp-servers.lua` — defines which servers to enable and their config
+2. `init.lua` — calls `vim.lsp.enable()` for each server
+3. `mason-auto-install` — detects enabled servers and installs them via Mason on first use
+4. `mason-tool-installer` — only for **non-LSP tools** (formatters, linters like `stylua`)
+
+**IMPORTANT**: Do NOT add lspconfig names to `mason-tool-installer`'s `ensure_installed` list. Mason registry names differ from lspconfig names (e.g., `jsonls` vs `json-lsp`) and will error. Let `mason-auto-install` handle LSP servers.
+
+### Formatting
+Formatting uses `conform.nvim` with `lsp_format = 'fallback'`:
+- If conform has a formatter configured for the filetype → uses that
+- Otherwise → falls back to LSP formatting (if the attached server supports it)
+- Manual format: `grf` (under the `gr` LSP group)
+- Format-on-save is enabled by default, toggled via `<Leader>tf` (buffer) / `<Leader>tF` (global)
+
+### Keybinding Prefixes
+LSP and editing bindings use Neovim's native `g` prefixes (not `<Leader>`):
+
+| Prefix | Group | Examples |
+|--------|-------|----------|
+| `gr` | LSP | `grn` rename, `gra` code action, `grr` references, `grd` definition, `grf` format |
+| `gs` | Surround | `gsa` add, `gsd` delete, `gsr` replace |
+| `gc` | Comment | `gcc` line, `gc` selection |
+
+These are registered as which-key groups with icons in `which-key.lua`.
 
 ## Performance: Lazy-Loading Guidelines
 
@@ -114,3 +148,5 @@ Features ported from AstroNvim/LazyVim (each evaluated and adapted individually)
 - [x] Indent guides (indent-blankline + mini.indentscope)
 - [x] Session persistence (persistence.nvim)
 - [x] Auto-install LSP servers (mason-auto-install)
+- [x] LSP formatting via conform.nvim (`grf`, format-on-save)
+- [x] LSP server config (lua/custom/lsp-servers.lua)
