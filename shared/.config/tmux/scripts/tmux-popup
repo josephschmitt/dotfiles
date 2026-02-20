@@ -67,7 +67,7 @@ OPTIONS:
     -H, --help               Show this help message
 
 SIZE PRESETS:
-    xsmall  - 60% width, 15 lines (good for quick commands/prompts)
+    xsmall  - 60% width, 20 lines (good for quick commands/prompts)
     small   - 80% width, 70% height (good for fzf/selection menus)
     medium  - 90% width (max 250 cols), 90% height (max 100 lines)
     large   - 90% width, 90% height (good for lazygit, editors)
@@ -104,7 +104,7 @@ fi
 case "$SIZE" in
     xsmall)
         PRESET_WIDTH="60%"
-        PRESET_HEIGHT="15"
+        PRESET_HEIGHT="20"
         ;;
     small)
         PRESET_WIDTH="80%"

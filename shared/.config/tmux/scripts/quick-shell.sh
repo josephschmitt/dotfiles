@@ -10,9 +10,7 @@ fi
 
 # Run Fish interactively with a custom config
 fish --init-command "
-    function fish_prompt
-        echo -n '⚡ '
-    end
+    oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
     
     # Track Ctrl-c presses for double-tap exit
     set -g __quick_shell_last_sigint 0
