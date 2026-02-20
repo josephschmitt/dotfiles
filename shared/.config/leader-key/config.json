@@ -148,10 +148,10 @@
           "value" : "https://github.com/UrbanCompass/urbancompass"
         },
         {
-          "key" : "C",
-          "label" : "@CopilotUsers",
+          "key" : "m",
+          "label" : "machine setup",
           "type" : "url",
-          "value" : "https://github.com/orgs/UrbanCompass/teams/copilot-users"
+          "value" : "https://github.com/UrbanCompass/compass-engineer-machine-setup"
         },
         {
           "key" : "U",
