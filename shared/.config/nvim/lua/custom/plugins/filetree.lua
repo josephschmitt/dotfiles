@@ -59,6 +59,13 @@ return {
           ["h"] = "close_node", -- Collapse folder
           ["H"] = "prev_source", -- Switch to previous source tab
           ["L"] = "next_source", -- Switch to next source tab
+          ["."] = "toggle_hidden", -- Toggle dotfiles visibility
+          ["I"] = function(state) -- Toggle gitignored files visibility
+            state.filtered_items = state.filtered_items or {}
+            state.filtered_items.hide_gitignored = not state.filtered_items.hide_gitignored
+            require("neo-tree.log").info("Toggling gitignored files: " .. tostring(not state.filtered_items.hide_gitignored))
+            require("neo-tree.sources.manager").refresh("filesystem")
+          end,
         },
       },
       event_handlers = {
