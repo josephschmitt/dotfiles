@@ -34,9 +34,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
     -- Select all
     map("n", "gV", "ggVG", { desc = "Select all" })
-
-    -- Window mode shortcut
-    map({ "n", "v" }, "gw", "<C-w>", { desc = "Window mode" })
   end,
 })
 

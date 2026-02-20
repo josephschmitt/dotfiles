@@ -59,6 +59,8 @@ return {
 
         { "gO", hidden = true }, -- Moved to grs (Document Symbols)
         { "g%", hidden = true }, -- Reverse matchit cycling (niche, use g[/g] instead)
+        { "gt", hidden = true }, -- Use <Leader><Tab>] instead
+        { "gT", hidden = true }, -- Use <Leader><Tab>[ instead
         { "gc", group = "󰅺 Comment" },
         { "gr", group = "󰒕 LSP" },
         { "gra", desc = "Code Action" },
