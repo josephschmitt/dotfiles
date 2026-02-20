@@ -7,3 +7,4 @@ session_name="${1:-$(random-session-name)}"
 
 tmux new-session -d -s "$session_name"
 tmux switch-client -t "$session_name"
+tmux command-prompt -I "$session_name" -p "Session name:" "rename-session '%%'"
