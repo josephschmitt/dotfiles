@@ -151,6 +151,21 @@ esac
 WIDTH="${CUSTOM_WIDTH:-$PRESET_WIDTH}"
 HEIGHT="${CUSTOM_HEIGHT:-$PRESET_HEIGHT}"
 
+# Clamp absolute dimensions to 90% of terminal size to prevent tmux errors
+TERM_WIDTH=${TERM_WIDTH:-$(tmux display -p '#{window_width}')}
+TERM_HEIGHT=${TERM_HEIGHT:-$(tmux display -p '#{window_height}')}
+MAX_WIDTH=$((TERM_WIDTH * 90 / 100))
+MAX_HEIGHT=$((TERM_HEIGHT * 90 / 100))
+
+case "$WIDTH" in
+    *%) ;; # percentages are handled by tmux
+    *) [ "$WIDTH" -gt "$MAX_WIDTH" ] && WIDTH="$MAX_WIDTH" ;;
+esac
+case "$HEIGHT" in
+    *%) ;; # percentages are handled by tmux
+    *) [ "$HEIGHT" -gt "$MAX_HEIGHT" ] && HEIGHT="$MAX_HEIGHT" ;;
+esac
+
 # Build tmux display-popup command arguments
 TMUX_CMD="tmux"
 TMUX_SUBCMD="display-popup"
