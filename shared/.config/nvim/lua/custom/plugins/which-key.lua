@@ -57,9 +57,22 @@ return {
         { "<Leader>m", group = "󰇀 Multicursor" },
         { "<Leader>t", group = "󰙵 Toggle" },
 
+        { "gO", hidden = true }, -- Moved to grs (Document Symbols)
+        { "g%", hidden = true }, -- Reverse matchit cycling (niche, use g[/g] instead)
         { "gc", group = "󰅺 Comment" },
         { "gr", group = "󰒕 LSP" },
+        { "gra", desc = "Code Action" },
+        { "grD", desc = "Goto Declaration" },
+        { "grd", desc = "Goto Definition" },
+        { "grf", desc = "Format Buffer" },
+        { "gri", desc = "Goto Implementation" },
+        { "grn", desc = "Rename" },
+        { "grr", desc = "Goto References" },
+        { "grs", desc = "Document Symbols" },
+        { "grS", desc = "Workspace Symbols" },
+        { "grt", desc = "Goto Type Definition" },
         { "gs", group = "󰅪 Surround" },
+        { "gx", group = "󰁕 Transform" },
 
         { "<Leader><Tab>", group = "󰓩 Tabs" },
         { "<Leader>w", group = "󱂬 Window" },

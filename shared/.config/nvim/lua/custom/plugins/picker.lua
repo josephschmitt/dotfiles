@@ -90,23 +90,11 @@ return {
           local buf = event.buf
           local picker = require("snacks").picker
 
-          -- Find references for the word under your cursor
           vim.keymap.set("n", "grr", function() picker.lsp_references() end, { buffer = buf, desc = "Goto References" })
-
-          -- Jump to the implementation
           vim.keymap.set("n", "gri", function() picker.lsp_implementations() end, { buffer = buf, desc = "Goto Implementation" })
-
-          -- Jump to the definition (press <C-t> to go back)
-          vim.keymap.set("n", "gd", function() picker.lsp_definitions() end, { buffer = buf, desc = "Goto Definition" })
           vim.keymap.set("n", "grd", function() picker.lsp_definitions() end, { buffer = buf, desc = "Goto Definition" })
-
-          -- Fuzzy find all symbols in current document
-          vim.keymap.set("n", "gO", function() picker.lsp_symbols() end, { buffer = buf, desc = "Document Symbols" })
-
-          -- Fuzzy find all symbols in workspace
-          vim.keymap.set("n", "gW", function() picker.lsp_workspace_symbols() end, { buffer = buf, desc = "Workspace Symbols" })
-
-          -- Jump to the type definition
+          vim.keymap.set("n", "grs", function() picker.lsp_symbols() end, { buffer = buf, desc = "Document Symbols" })
+          vim.keymap.set("n", "grS", function() picker.lsp_workspace_symbols() end, { buffer = buf, desc = "Workspace Symbols" })
           vim.keymap.set("n", "grt", function() picker.lsp_type_definitions() end, { buffer = buf, desc = "Goto Type Definition" })
         end,
       })
