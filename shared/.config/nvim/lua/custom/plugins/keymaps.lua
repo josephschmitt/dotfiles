@@ -34,6 +34,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
     -- Select all
     map("n", "gV", "ggVG", { desc = "Select all" })
+
+    -- Quit (replaces default macro replay, which we don't use)
+    map("n", "Q", "<Cmd>qa<CR>", { desc = "Quit Neovim" })
   end,
 })
 

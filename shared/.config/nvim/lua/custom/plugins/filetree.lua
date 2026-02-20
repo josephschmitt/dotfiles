@@ -59,7 +59,6 @@ return {
           ["h"] = "close_node", -- Collapse folder
           ["H"] = "prev_source", -- Switch to previous source tab
           ["L"] = "next_source", -- Switch to next source tab
-          ["Q"] = function() vim.cmd("qa") end, -- Quit Neovim
         },
       },
       event_handlers = {
