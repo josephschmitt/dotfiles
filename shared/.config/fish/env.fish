@@ -1,6 +1,9 @@
 # Fish Shell Environment Configuration
 # Environment variables and PATH setup
 
+# Force English for git and other i18n-aware tools
+setenv LANGUAGE en_US.UTF-8
+
 setenv XDG_CONFIG_HOME "$HOME/.config"
 setenv TMUX_CONFIG_DIR "$XDG_CONFIG_HOME/tmux"
 setenv EDITOR nvim

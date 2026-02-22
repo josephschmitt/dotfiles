@@ -1,6 +1,9 @@
 # Shared environment variables for all POSIX-compatible shells
 # This file should contain only environment variable exports
 
+# Force English for git and other i18n-aware tools
+export LANGUAGE=en_US.UTF-8
+
 # XDG Base Directory Specification
 export XDG_CONFIG_HOME="$HOME/.config"
 
