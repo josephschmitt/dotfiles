@@ -2,7 +2,7 @@
 name: implement-linear-issue
 description: Implement a Linear issue. Use when the user wants to work on a Linear ticket, provides a Linear issue ID (e.g., JJS-78) or Linear URL.
 argument-hint: <issue-id-or-url>
-allowed-tools: mcp__claude_ai_Linear__*, Skill(commit-commands:commit-push-pr)
+allowed-tools: mcp__claude_ai_Linear__*, Skill(commit-commands:commit-push-pr), Bash(git add *), Bash(git commit *), Bash(git push *), Bash(gh pr *)
 disable-model-invocation: true
 ---
 
@@ -32,7 +32,16 @@ Use the `mcp__claude_ai_Linear__get_issue` tool with the parsed issue ID to retr
 
 Display the issue details to understand what needs to be implemented.
 
-### 3. Understand and Implement
+### 3. Mark Issue as In Progress
+
+Update the issue status to "In Progress":
+```
+mcp__claude_ai_Linear__update_issue with:
+- id: <issue-id>
+- state: "In Progress"
+```
+
+### 4. Understand and Implement
 
 Read the issue requirements carefully. If the issue description contains images, use `mcp__claude_ai_Linear__extract_images` to view them.
 
@@ -41,7 +50,7 @@ Implement the feature/fix as described in the issue:
 - Make the necessary code changes
 - Test the implementation
 
-### 4. After Implementation Complete
+### 5. After Implementation Complete
 
 Once the implementation is done:
 
@@ -73,6 +82,7 @@ Once the implementation is done:
 
 ## Notes
 
+- **Prefer `/commit-commands:commit-push-pr` over raw git commands** - Use the skill for committing, pushing, and creating PRs rather than running `git add`, `git commit`, `git push` directly
 - If the issue has sub-issues or dependencies, consider implementing those first
 - Include the Linear issue ID in your commit message for traceability
 - The PR title should match or reference the Linear issue title
