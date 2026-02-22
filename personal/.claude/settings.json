@@ -1,6 +1,15 @@
 {
   "permissions": {
-    "defaultMode": "plan"
+    "defaultMode": "plan",
+    "allow": [
+      "Bash(gh pr *)"
+    ]
+  },
+  "sandbox": {
+    "excludedCommands": ["gh"],
+    "network": {
+      "allowedHosts": ["github.com", "*.github.com"]
+    }
   },
   "model": "claude-opus-4-5",
   "statusLine": {
