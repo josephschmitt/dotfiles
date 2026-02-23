@@ -61,17 +61,10 @@ auto_start_tmux() {
 
   # Check if tmux is available and we're not already in tmux or SSH
   if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
-    session_name="$(hostname -s)"
-    
-    # If hostname session exists and has no attached clients, just attach
-    if tmux has-session -t "$session_name" 2>/dev/null; then
-      attached_clients=$(tmux list-clients -t "$session_name" 2>/dev/null | wc -l)
-      if [ "$attached_clients" -eq 0 ]; then
-        tmux attach-session -t "$session_name" && exit
-        return  # If attach failed, continue with normal shell
-      fi
+    session_name="main"
 
-      # Session already attached, generate random name for new session
+    # If main session already exists, generate random name for new session
+    if tmux has-session -t "$session_name" 2>/dev/null; then
       session_name="$(random-session-name)"
     fi
 

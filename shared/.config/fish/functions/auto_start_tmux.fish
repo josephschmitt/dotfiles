@@ -11,17 +11,10 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
     
     # Check if tmux is available and we're not already in tmux or SSH
     if command -q tmux; and not set -q TMUX; and not set -q SSH_CONNECTION
-        set session_name (hostname -s)
-        
-        # If hostname session exists and has no attached clients, just attach
-        if tmux has-session -t $session_name 2>/dev/null
-            set attached_clients (tmux list-clients -t $session_name 2>/dev/null | wc -l)
-            if test $attached_clients -eq 0
-                tmux attach-session -t $session_name
-                return  # If attach failed, continue with normal shell
-            end
+        set session_name "main"
 
-            # Session already attached, generate random name for new session
+        # If main session already exists, generate random name for new session
+        if tmux has-session -t $session_name 2>/dev/null
             set session_name (random-session-name)
         end
 
