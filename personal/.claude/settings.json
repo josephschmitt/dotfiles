@@ -1,4 +1,11 @@
 {
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [{ "type": "command", "command": "~/.claude/hooks/tmux-notify.sh" }]
+      }
+    ]
+  },
   "permissions": {
     "defaultMode": "plan",
     "allow": [
