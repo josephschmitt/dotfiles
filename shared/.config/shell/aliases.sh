@@ -22,27 +22,27 @@ alias nix_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"
 
 # Git-spice workflow aliases
 # Branch management
-alias gsb="gs branch"
-alias gsbc="gs branch checkout"
-alias gsbcr="gs branch create"
-alias gsbs="gs branch submit"
-alias gsbt="gs branch track"
+alias gsb="git-spice branch"
+alias gsbc="git-spice branch checkout"
+alias gsbcr="git-spice branch create"
+alias gsbs="git-spice branch submit"
+alias gsbt="git-spice branch track"
 
 # Commit operations
-alias gsc="gs commit"
-alias gsca="gs commit amend"
-alias gscc="gs commit commit"
+alias gsc="git-spice commit"
+alias gsca="git-spice commit amend"
+alias gscc="git-spice commit commit"
 
 # Log viewing
-alias gsl="gs log long -a"
-alias gsll="gs log long"
-alias gsls="gs log short"
+alias gsl="git-spice log long -a"
+alias gsll="git-spice log long"
+alias gsls="git-spice log short"
 
 # Repository operations
-alias gsr="gs repo"
-alias gsrs="gs repo sync"
+alias gsr="git-spice repo"
+alias gsrs="git-spice repo sync"
 
 # Stack management
-alias gss="gs stack"
-alias gssr="gs stack restack"
-alias gsss="gs stack submit"
+alias gss="git-spice stack"
+alias gssr="git-spice stack restack"
+alias gsss="git-spice stack submit"
