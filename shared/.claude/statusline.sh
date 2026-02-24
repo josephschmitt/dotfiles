@@ -69,6 +69,46 @@ if [ "$IS_GIT_REPO" = true ]; then
   fi
 fi
 
-# Output format: [Model] [percentage] 📁 directory  branch
+# Show git diff stats (lines added/removed) if in a git repo
+GIT_DIFF_STATS=""
+if [ "$IS_GIT_REPO" = true ]; then
+  TOTAL_ADDED=0
+  TOTAL_DELETED=0
+
+  # Sum unstaged and staged changes
+  while IFS=$'\t' read -r added deleted _; do
+    [[ "$added" =~ ^[0-9]+$ ]] && TOTAL_ADDED=$(( TOTAL_ADDED + added ))
+    [[ "$deleted" =~ ^[0-9]+$ ]] && TOTAL_DELETED=$(( TOTAL_DELETED + deleted ))
+  done < <(cat <(git -C "$CURRENT_DIR" diff --numstat 2>/dev/null) <(git -C "$CURRENT_DIR" diff --cached --numstat 2>/dev/null))
+
+  if [ "$TOTAL_ADDED" -gt 0 ] || [ "$TOTAL_DELETED" -gt 0 ]; then
+    DIFF_PARTS=""
+    [ "$TOTAL_ADDED" -gt 0 ] && DIFF_PARTS="\033[32m+${TOTAL_ADDED}\033[0m"
+    if [ "$TOTAL_DELETED" -gt 0 ]; then
+      [ -n "$DIFF_PARTS" ] && DIFF_PARTS="$DIFF_PARTS "
+      DIFF_PARTS="${DIFF_PARTS}\033[31m-${TOTAL_DELETED}\033[0m"
+    fi
+    GIT_DIFF_STATS=" $DIFF_PARTS"
+  fi
+fi
+
+# Show commits ahead/behind remote if in a git repo
+GIT_SYNC_STATUS=""
+if [ "$IS_GIT_REPO" = true ]; then
+  AHEAD_BEHIND=$(git -C "$CURRENT_DIR" rev-list --left-right --count 'HEAD...@{upstream}' 2>/dev/null)
+  if [ -n "$AHEAD_BEHIND" ]; then
+    AHEAD=$(echo "$AHEAD_BEHIND" | awk '{print $1}')
+    BEHIND=$(echo "$AHEAD_BEHIND" | awk '{print $2}')
+    SYNC_PARTS=""
+    [ "$AHEAD" -gt 0 ] && SYNC_PARTS="\033[36m⇡${AHEAD}\033[0m"
+    if [ "$BEHIND" -gt 0 ]; then
+      [ -n "$SYNC_PARTS" ] && SYNC_PARTS="$SYNC_PARTS "
+      SYNC_PARTS="${SYNC_PARTS}\033[33m⇣${BEHIND}\033[0m"
+    fi
+    [ -n "$SYNC_PARTS" ] && GIT_SYNC_STATUS=" $SYNC_PARTS"
+  fi
+fi
+
+# Output format: [Model] [percentage] 📁 directory  branch +added -deleted ⇡ahead ⇣behind
 # Use ANSI color codes: cyan for model, white for directory, green for branch
-echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH"
+echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
