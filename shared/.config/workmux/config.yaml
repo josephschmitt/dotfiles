@@ -13,3 +13,4 @@ files:
     - node_modules
 
 agent: claude
+nerdfont: true
