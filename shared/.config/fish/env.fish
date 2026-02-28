@@ -51,3 +51,6 @@ fish_add_path --global --append $HOME/.antigravity/antigravity/bin
 
 # Homebrew configuration
 set -gx HOMEBREW_NO_ENV_HINTS 1
+
+# Claude Code MCP servers
+setenv ENABLE_CLAUDEAI_MCP_SERVERS false

@@ -70,6 +70,9 @@ export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
 # Homebrew configuration
 export HOMEBREW_NO_ENV_HINTS=1
 
+# Claude Code MCP servers
+export ENABLE_CLAUDEAI_MCP_SERVERS=false
+
 # Source personal environment file if it exists
 if [ -f "$HOME/.env" ]; then
   . "$HOME/.env"
