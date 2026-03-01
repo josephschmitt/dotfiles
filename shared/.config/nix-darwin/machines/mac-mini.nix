@@ -46,8 +46,10 @@ in
       "chatgpt"
       "claude"
       "jump-desktop-connect"
-      "lm-studio"
       "orbstack"
+    ];
+
+    taps = [
     ];
 
     onActivation.cleanup = "zap";
@@ -73,6 +75,21 @@ in
       KeepAlive = true;
       StandardOutPath = "/tmp/vibe-kanban.log";
       StandardErrorPath = "/tmp/vibe-kanban.err";
+    };
+  };
+
+  launchd.user.agents.cyrus = {
+    serviceConfig = {
+      ProgramArguments = [
+        "/opt/homebrew/bin/cyrus"
+      ];
+      EnvironmentVariables = {
+        PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin";
+      };
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/cyrus.log";
+      StandardErrorPath = "/tmp/cyrus.err";
     };
   };
 
