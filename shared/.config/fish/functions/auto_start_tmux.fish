@@ -18,9 +18,15 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
             set session_name (random-session-name)
         end
 
+        # Default starting directory (fallback to $HOME if ~/development doesn't exist)
+        set -l start_dir "$HOME/development"
+        if not test -d $start_dir
+            set start_dir "$HOME"
+        end
+
         # Create new session and launch sesh popup
         # If tmux fails to start, fall back to regular shell
-        tmux new-session -s $session_name \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
+        tmux new-session -s $session_name -c $start_dir \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
     end
 end
 
