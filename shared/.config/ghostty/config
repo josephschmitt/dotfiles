@@ -4,6 +4,7 @@ auto-update = download
 clipboard-read = allow
 clipboard-write = allow
 cursor-style = bar
+desktop-notifications = true
 font-family = Monaco Nerd Font Mono
 font-size = 13
 font-thicken = true
