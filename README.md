@@ -44,10 +44,7 @@ cd ~/.dotfiles
 nix_rebuild
 
 # Install user-level configuration files
-# Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
-# (Stow symlinks entire directories unless they already exist at the target)
-mkdir -p ~/.config/tmux
-stow shared personal
+./install.sh shared personal
 ```
 
 ### 💼 Work Machine
@@ -62,10 +59,7 @@ git submodule update --init --recursive
 nix_rebuild
 
 # Install user-level configuration files
-# Ensure Stow symlinks individual .config subdirectories, not the entire .config folder
-# (Stow symlinks entire directories unless they already exist at the target)
-mkdir -p ~/.config/tmux
-stow shared work
+./install.sh shared work
 ```
 
 #### Removing Work Submodule
@@ -85,7 +79,7 @@ git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
 # Install user-level configuration files
-stow shared ubuntu-server
+./install.sh shared ubuntu-server
 ```
 
 See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix configuration and system services included.

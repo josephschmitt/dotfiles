@@ -57,15 +57,10 @@ echo 'export PATH="$HOME/.basher/bin:$PATH"' >> ~/.bashrc
 export PATH="$HOME/.basher/bin:$PATH"
 
 # Pre-create directories that need to be merged across stow packages
-# This forces stow to symlink individual files/subdirs instead of the entire directory
-# See README.md for why this is necessary
+# Delegated to install.sh to keep directory list in one place
 echo ""
-echo "Pre-creating directories for stow package merging..."
-mkdir -p "$HOME/.config/fish"
-mkdir -p "$HOME/.config/shell"
-mkdir -p "$HOME/.config/nix-darwin"
-mkdir -p "$HOME/.claude"
-mkdir -p "$HOME/bin"
+DOTFILES_DIR="$(cd "$(dirname "$0")/../../.." && pwd)"
+"$DOTFILES_DIR/install.sh" --dirs-only
 
 # Verify installations
 echo ""

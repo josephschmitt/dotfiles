@@ -30,14 +30,11 @@ sudo pacman -S stow
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
-# 2. Create directories that need to exist before stowing
-mkdir -p ~/.config/tmux
-
-# 3. Update personal email in personal/.gitconfig
+# 2. Update personal email in personal/.gitconfig
 # Edit personal/.gitconfig and replace "your-personal@email.com" with your actual email
 
-# 4. Apply configurations
-stow shared personal
+# 3. Apply configurations (pre-creates required directories, then runs stow)
+./install.sh shared personal
 
 # 5. Restart your shell or source configs
 exec $SHELL
@@ -54,11 +51,8 @@ cd ~/.dotfiles
 # 2. Initialize work submodule (requires access to private work repo)
 git submodule update --init --recursive
 
-# 3. Create directories that need to exist before stowing
-mkdir -p ~/.config/tmux
-
-# 4. Apply configurations
-stow shared work
+# 3. Apply configurations (pre-creates required directories, then runs stow)
+./install.sh shared work
 
 # 5. Restart your shell or source configs
 exec $SHELL
