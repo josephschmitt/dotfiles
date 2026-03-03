@@ -41,9 +41,3 @@ fi
 # Auto-start tmux if available
 auto_start_tmux
 
-# TWM shell completions (lazy-loaded)
-twm() {
-  unset -f twm
-  eval "$(command twm --print-bash-completion)"
-  command twm "$@"
-}

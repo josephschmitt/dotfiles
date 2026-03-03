@@ -175,9 +175,3 @@ fzf() {
   command fzf "$@"
 }
 
-# TWM shell completions (lazy-loaded)
-twm() {
-  unfunction twm
-  eval "$(command twm --print-zsh-completion)"
-  command twm "$@"
-}

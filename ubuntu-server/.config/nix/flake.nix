@@ -63,7 +63,6 @@
             stow
             television
             tmux
-            twm
             uv
             volta
             yq
