@@ -35,3 +35,15 @@ Then start tmux normally.
 **References:**
 - tmux issue: https://github.com/tmux/tmux/issues/4329
 - yazi issue: https://github.com/sxyazi/yazi/issues/2308
+
+## television
+
+### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)
+
+**Symptom:** Running `tv sesh` or `tv pj` from a directory like `~/development` opens the default `files` channel instead of the requested cable channel.
+
+**Cause:** Television's CLI has ambiguous positional args `[CHANNEL] [PATH]`. When a filesystem entry matching the argument name exists in the CWD (e.g. `~/development/sesh/` or `~/development/pj`), tv treats the argument as a PATH and falls back to the default channel.
+
+**Fix:** Pass `-d $HOME` to `tmux-popup` so the popup opens with CWD set to `$HOME`, which is unlikely to contain files/dirs named after tv channels. The `tmux-popup` script forwards `-d` directly to `tmux display-popup`.
+
+All affected bindings (`Prefix+o`, `Prefix+f`, `Prefix+P`) and `sesh-or-stay.sh` have been updated to use `-d $HOME`.
