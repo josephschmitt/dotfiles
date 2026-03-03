@@ -64,6 +64,7 @@ echo "Pre-creating directories for stow package merging..."
 mkdir -p "$HOME/.config/fish"
 mkdir -p "$HOME/.config/shell"
 mkdir -p "$HOME/.config/nix-darwin"
+mkdir -p "$HOME/.claude"
 mkdir -p "$HOME/bin"
 
 # Verify installations
