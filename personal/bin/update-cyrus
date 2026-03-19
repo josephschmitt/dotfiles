@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Update Cyrus globally via npm and restart the launchd daemon
+#
+
+set -euo pipefail
+
+echo "Updating Cyrus..."
+npm update -g cyrus
+
+echo "Restarting Cyrus daemon..."
+launchctl kickstart -k "gui/$(id -u)/org.nixos.cyrus"
+
+echo "Done. Cyrus updated and restarted."
