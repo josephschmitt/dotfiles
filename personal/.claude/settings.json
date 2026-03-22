@@ -69,7 +69,9 @@
     "github@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "pr-review-toolkit@claude-code-plugins": false,
-    "security-guidance@claude-code-plugins": false
+    "security-guidance@claude-code-plugins": false,
+    "typescript-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   },
   "sandbox": {
     "network": {},
