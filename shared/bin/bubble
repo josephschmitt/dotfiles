@@ -32,6 +32,7 @@ OPTIONS:
       --affirmative TEXT   Yes button label (confirm)
       --negative TEXT      No button label (confirm)
       --default            Default to yes (confirm)
+      --allow-empty        Allow empty input (run command with no argument)
   -h, --help               Show this help
 
 COMMAND TEMPLATE:
@@ -93,6 +94,7 @@ HEIGHT=""
 AFFIRMATIVE=""
 NEGATIVE=""
 DEFAULT=""
+ALLOW_EMPTY=""
 CHOICES=""
 CMD_ARGS=""
 HAS_CMD=false
@@ -144,6 +146,10 @@ while [ $# -gt 0 ]; do
       ;;
     --default)
       DEFAULT=true
+      shift
+      ;;
+    --allow-empty)
+      ALLOW_EMPTY=true
       shift
       ;;
     -h|--help)
@@ -241,7 +247,7 @@ else
 fi
 
 # Check for empty result
-if [ -z "$RESULT" ]; then
+if [ -z "$RESULT" ] && [ "$ALLOW_EMPTY" != true ]; then
   exit 1
 fi
 
@@ -261,7 +267,11 @@ case "$SAVED_CMD" in
     exec sh -c "$EXPANDED_CMD"
     ;;
   *)
-    # Append result as last argument
-    exec sh -c "$SAVED_CMD \"\$1\"" _ "$RESULT"
+    # Append result as last argument (skip if empty)
+    if [ -n "$RESULT" ]; then
+      exec sh -c "$SAVED_CMD \"\$1\"" _ "$RESULT"
+    else
+      exec sh -c "$SAVED_CMD"
+    fi
     ;;
 esac
