@@ -1,4 +1,5 @@
 window_prefix: wm-
+merge_strategy: rebase
 
 panes:
   - command: <agent>
