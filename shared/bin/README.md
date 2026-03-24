@@ -14,9 +14,6 @@ Various Helix editor integration scripts
 Automated Apple Photos → Immich sync script (macOS only, mac-mini)
 See `.config/immich-sync/README.md` for setup and usage
 
-### bubble
-Interactive dialog wrapper around [gum](https://github.com/charmbracelet/gum). Prompts for user input (text, choice, confirmation) and runs a command with the result. Works standalone or inside tmux popups.
-
 ### assign_at_random.sh
 Random assignment utility
 
