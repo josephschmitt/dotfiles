@@ -10,5 +10,5 @@ files:
   symlink:
     - node_modules
 
-agent: claude --dangerously-load-development-channels server:monocle
+agent: claude --dangerously-load-development-channels plugin:monocle@monocle
 nerdfont: true
