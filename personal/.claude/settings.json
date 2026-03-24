@@ -71,7 +71,16 @@
     "pr-review-toolkit@claude-code-plugins": false,
     "security-guidance@claude-code-plugins": false,
     "typescript-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "monocle@monocle": true
+  },
+  "extraKnownMarketplaces": {
+    "monocle": {
+      "source": {
+        "source": "github",
+        "repo": "josephschmitt/monocle"
+      }
+    }
   },
   "sandbox": {
     "network": {},
