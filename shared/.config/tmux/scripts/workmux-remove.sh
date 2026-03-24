@@ -13,7 +13,8 @@ else
   HEADER="Branch to remove"
 fi
 
-BRANCH=$(gum input --header "$HEADER" --placeholder "current worktree") || exit 0
+BRANCHES=$(workmux ls 2>/dev/null | tail -n +2 | awk '{print $1}')
+BRANCH=$(printf '%s\n' "$BRANCHES" | gum filter --header "$HEADER" --placeholder "current worktree" --no-strict) || exit 0
 
 if [ -n "$BRANCH" ]; then
   exec workmux remove $FORCE "$BRANCH"

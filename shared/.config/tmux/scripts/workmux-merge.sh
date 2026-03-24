@@ -10,11 +10,13 @@ if [ -f "$CONFIG" ]; then
   [ -n "$parsed" ] && DEFAULT_STRATEGY="$parsed"
 fi
 
-# Step 1: Choose merge strategy
-STRATEGY=$(gum choose --header "Merge strategy" --selected "$DEFAULT_STRATEGY" merge rebase squash) || exit 0
+# Step 1: Pick target branch (optional, defaults to main branch)
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+BRANCHES=$(git branch --format='%(refname:short)' 2>/dev/null)
+TARGET=$(printf '%s\n' "$BRANCHES" | gum filter --header "Merge into branch" --placeholder "default branch" --no-strict --value "$DEFAULT_BRANCH") || exit 0
 
-# Step 2: Input target branch (optional)
-TARGET=$(gum input --header "Merge into branch" --placeholder "default branch") || exit 0
+# Step 2: Choose merge strategy
+STRATEGY=$(gum choose --header "Merge strategy" --selected "$DEFAULT_STRATEGY" merge rebase squash) || exit 0
 
 # Build command
 CMD="workmux merge"
