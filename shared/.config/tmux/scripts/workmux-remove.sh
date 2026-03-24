@@ -17,7 +17,17 @@ BRANCHES=$(workmux ls 2>/dev/null | tail -n +2 | awk '{print $1}')
 BRANCH=$(printf '%s\n' "$BRANCHES" | gum filter --header "$HEADER" --placeholder "current worktree" --no-strict) || exit 0
 
 if [ -n "$BRANCH" ]; then
-  exec workmux remove $FORCE "$BRANCH"
+  CMD="workmux remove $FORCE $BRANCH"
 else
-  exec workmux remove $FORCE
+  CMD="workmux remove $FORCE"
+fi
+
+if ! ERROR=$(eval "$CMD" 2>&1); then
+  gum style --foreground 1 --bold "ERROR"
+  echo ""
+  echo "$ERROR"
+  echo ""
+  gum style --faint "Press any key to close..."
+  read -r _ || true
+  exit 0
 fi
