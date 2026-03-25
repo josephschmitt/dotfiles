@@ -14,7 +14,8 @@ else
 fi
 
 BRANCHES=$(workmux ls 2>/dev/null | tail -n +2 | awk '{print $1}')
-BRANCH=$(printf '%s\n' "$BRANCHES" | gum filter --header "$HEADER" --placeholder "current worktree" --no-strict) || exit 0
+CURRENT=$(git branch --show-current 2>/dev/null || echo "")
+BRANCH=$(printf '%s\n' "$BRANCHES" | gum filter --header "$HEADER" --value "$CURRENT" --placeholder "current worktree" --no-strict) || exit 0
 
 if [ -n "$BRANCH" ]; then
   CMD="workmux remove $FORCE $BRANCH"
