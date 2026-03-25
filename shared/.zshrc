@@ -86,7 +86,10 @@ function zvm_config() {
 }
 
 function zvm_after_init() {
-  [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+  # Television shell integration (Ctrl+R history, Ctrl+T autocomplete)
+  if command -v tv >/dev/null 2>&1; then
+    eval "$(tv init zsh)"
+  fi
 
   # Initialize oh-my-posh after zsh-vi-mode to prevent prompt override
   # (skip in Apple Terminal.app which has its own prompt)
@@ -168,10 +171,4 @@ zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 # Zsh-specific aliases  
 # ls alias is now provided by shared aliases (eza)
 
-# Shell integrations (lazy-loaded)
-fzf() {
-  unfunction fzf
-  eval "$(command fzf --zsh)"
-  command fzf "$@"
-}
 

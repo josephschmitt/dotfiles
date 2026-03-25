@@ -41,3 +41,8 @@ fi
 # Auto-start tmux if available
 auto_start_tmux
 
+# Television shell integration (Ctrl+R history, Ctrl+T autocomplete)
+if command -v tv >/dev/null 2>&1; then
+  eval "$(tv init bash)"
+fi
+
