@@ -1,6 +1,9 @@
 # Bash interactive shell configuration
 # This file is sourced for interactive bash sessions
 
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
 # Source shared aliases and functions
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   . "$HOME/.config/shell/aliases.sh"
