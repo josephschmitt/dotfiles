@@ -74,14 +74,8 @@ auto_start_tmux() {
   fi
 }
 
-# SSH wrapper that detaches from tmux before connecting
+# SSH wrapper - run SSH directly (no tmux detach)
 ssh() {
-  if [ -n "$TMUX" ]; then
-    # Detach from tmux and run SSH outside it
-    tmux detach-client -E "command ssh $*"
-  else
-    # Not in tmux, just run SSH normally
-    command ssh "$@"
-  fi
+  command ssh "$@"
 }
 

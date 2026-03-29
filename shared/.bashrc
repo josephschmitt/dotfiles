@@ -1,6 +1,9 @@
 # Bash interactive shell configuration
 # This file is sourced for interactive bash sessions
 
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
 # Source shared aliases and functions
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   . "$HOME/.config/shell/aliases.sh"
@@ -41,8 +44,8 @@ fi
 # Auto-start tmux if available
 auto_start_tmux
 
-# Unified shell history (local only — no cloud sync)
-if command -v atuin &>/dev/null; then
-  eval "$(atuin init bash)"
+# Television shell integration (Ctrl+R history, Ctrl+T autocomplete)
+if command -v tv >/dev/null 2>&1; then
+  eval "$(tv init bash)"
 fi
 
