@@ -59,6 +59,15 @@ New configuration needed?
 3. Test in all three shells
 4. Document shell-specific workarounds if needed
 
+### PATH Priority vs Homebrew (nix-darwin)
+Nix-darwin generates system shell configs (`/etc/fish/config.fish`, `/etc/zshrc`, `/etc/bashrc`) that run `brew shellenv`, which prepends `/opt/homebrew/bin` to PATH. This runs **after** the initial PATH setup in `exports.sh`/`env.fish` but **before** user rc files (`.bashrc`/`.zshrc`/`config.fish`).
+
+To ensure custom paths (go, cargo, etc.) take priority over Homebrew:
+- **Fish**: `fish_add_path` must use `--move` flag (without it, existing paths aren't repositioned)
+- **Bash/Zsh**: `.bashrc`/`.zshrc` re-source `exports.sh` to re-prepend custom paths after `brew shellenv`
+
+When adding new PATH entries that should beat Homebrew, ensure they follow this pattern in all three shells.
+
 ### CI Performance Tracking
 **When modifying shell startup:** Update `.github/workflows/shell-performance.yml`
 

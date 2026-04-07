@@ -27,22 +27,22 @@ setenv ZIDE_USE_FOCUS_PLUGIN true
 # fd respects .ignore files automatically, just exclude .git
 setenv FZF_DEFAULT_COMMAND "fd --type f --hidden --follow --exclude=.git"
 
-fish_add_path --global --prepend "$HOME/.nix-profile/bin"
-fish_add_path --global --prepend /run/current-system/sw/bin
-fish_add_path --global --prepend /nix/var/nix/profiles/default/bin
+fish_add_path --global --move --prepend "$HOME/.nix-profile/bin"
+fish_add_path --global --move --prepend /run/current-system/sw/bin
+fish_add_path --global --move --prepend /nix/var/nix/profiles/default/bin
 
-fish_add_path --global --prepend /opt/homebrew/bin
-fish_add_path --global --prepend "$HOME/.bun/bin"
-fish_add_path --global --prepend "$HOME/.cargo/bin"
+fish_add_path --global --move --prepend /opt/homebrew/bin
+fish_add_path --global --move --prepend "$HOME/.bun/bin"
+fish_add_path --global --move --prepend "$HOME/.cargo/bin"
 
-fish_add_path --global --prepend "$HOME/bin"
-fish_add_path --global --prepend "$HOME/go/bin"
-fish_add_path --global --prepend "$HOME/.local/bin"
-fish_add_path --global --prepend "$HOME/development/zide/bin"
-fish_add_path --global --prepend "$HOME/development/zj/bin"
+fish_add_path --global --move --prepend "$HOME/bin"
+fish_add_path --global --move --prepend "$HOME/go/bin"
+fish_add_path --global --move --prepend "$HOME/.local/bin"
+fish_add_path --global --move --prepend "$HOME/development/zide/bin"
+fish_add_path --global --move --prepend "$HOME/development/zj/bin"
 
 set -gx PNPM_HOME $HOME/Library/pnpm
-fish_add_path --global --prepend "$PNPM_HOME"
+fish_add_path --global --move --prepend "$PNPM_HOME"
 
 # Application paths
 fish_add_path --global --append $HOME/.opencode/bin

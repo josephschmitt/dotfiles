@@ -4,6 +4,12 @@
 # Enable nullglob for profile-specific file loading
 setopt nullglob
 
+# Re-source exports to restore PATH priority after system-level brew shellenv
+# (nix-darwin's /etc/zshrc runs `brew shellenv` which prepends Homebrew paths)
+if [ -f "$HOME/.config/shell/exports.sh" ]; then
+  . "$HOME/.config/shell/exports.sh"
+fi
+
 # Source shared aliases and functions
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   . "$HOME/.config/shell/aliases.sh"
