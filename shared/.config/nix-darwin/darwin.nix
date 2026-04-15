@@ -63,6 +63,7 @@
     enable = true;
     brews = [
       "gemini-cli"
+      "josephschmitt/tap/monocle"
       "josephschmitt/tap/pj"
       "raine/workmux/workmux"
       "scooter"
