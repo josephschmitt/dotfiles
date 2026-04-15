@@ -4,13 +4,25 @@ Personal configuration files for development environment using [GNU Stow](https:
 
 ## Quick Start
 
-### Prerequisites
+### Fresh Machine (one-liner)
+
+On a brand-new Mac, clone this repo and run the interactive bootstrap — it installs Nix, bootstraps nix-darwin, clones TPM and installs plugins, offers to set the hostname, and runs stow at the end:
+
+```bash
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./install.sh --bootstrap
+```
+
+The bootstrap is idempotent — re-running it on a configured machine will skip completed steps. See the top-level [README.md](../README.md) for the full flow description.
+
+### Prerequisites (existing-machine install)
 
 **Required:**
-- [GNU Stow](https://www.gnu.org/software/stow/) for symlink management
+- [GNU Stow](https://www.gnu.org/software/stow/) for symlink management (installed automatically by nix-darwin)
 - Git with SSH keys configured for GitHub
 
-**Install Stow:**
+**Install Stow manually if not using nix-darwin:**
 ```bash
 # macOS
 brew install stow

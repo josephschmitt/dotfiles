@@ -10,6 +10,7 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, ... }:
     let
+      lib = nixpkgs.lib;
       darwinConfig = import ./darwin.nix;
       nixHomebrewConfig = {
         nix-homebrew = {
@@ -27,30 +28,31 @@
         };
       };
 
-      # Base configuration set
-      baseConfigs = {
-        # Personal Mac mini server
-        "mac-mini" = nix-darwin.lib.darwinSystem {
-          modules = [
-            darwinConfig
-            (import ./machines/mac-mini.nix)
-            nix-homebrew.darwinModules.nix-homebrew
-            nixHomebrewConfig
-          ];
-        };
-	"Antoinettes-MacBook" = nix-darwin.lib.darwinSystem {
-          modules = [
-            darwinConfig
-            (import ./machines/Antoinettes-MacBook.nix)
-            nix-homebrew.darwinModules.nix-homebrew
-            nixHomebrewConfig
-          ];
-        };
+      # Build a darwinSystem from a machine-specific override module.
+      mkDarwinSystem = machineModule: nix-darwin.lib.darwinSystem {
+        modules = [
+          darwinConfig
+          machineModule
+          nix-homebrew.darwinModules.nix-homebrew
+          nixHomebrewConfig
+        ];
       };
+
+      # Auto-discover personal machine configs from ./machines/*.nix.
+      # Drop a file in `machines/` named after `hostname -s` and it becomes
+      # an available darwinConfiguration — no edits to this flake required.
+      personalMachineNames = lib.pipe (builtins.readDir ./machines) [
+        (lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".nix" n))
+        builtins.attrNames
+        (map (lib.removeSuffix ".nix"))
+      ];
+
+      baseConfigs = lib.genAttrs personalMachineNames
+        (name: mkDarwinSystem (import (./machines + "/${name}.nix")));
 
       # Path to work directory (relative to this flake)
       workPath = ../../../work;
-      
+
       # Helper function to conditionally import work machine configs
       workMachineConfig = name:
         let
@@ -65,24 +67,10 @@
         if builtins.pathExists (workPath + "/.config/nix-darwin/machines")
         then {
           # Compass M1 MacBook Pro
-          "W2TD37NJKN" = nix-darwin.lib.darwinSystem {
-            modules = [
-              darwinConfig
-              (workMachineConfig "W2TD37NJKN")
-              nix-homebrew.darwinModules.nix-homebrew
-              nixHomebrewConfig
-            ];
-          };
+          "W2TD37NJKN" = mkDarwinSystem (workMachineConfig "W2TD37NJKN");
 
           # Compass M4 MacBook Pro
-          "G5FXQQ0D00" = nix-darwin.lib.darwinSystem {
-            modules = [
-              darwinConfig
-              (workMachineConfig "G5FXQQ0D00")
-              nix-homebrew.darwinModules.nix-homebrew
-              nixHomebrewConfig
-            ];
-          };
+          "G5FXQQ0D00" = mkDarwinSystem (workMachineConfig "G5FXQQ0D00");
         }
         else { };
     in

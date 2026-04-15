@@ -2,6 +2,34 @@
 
 Common issues and fixes for tools in this dotfiles repository.
 
+## Fresh-machine setup
+
+### `darwin-rebuild` fails with "attribute 'X' missing" / hostname not in flake
+
+**Symptom:** Running `nix_rebuild` on a new Mac fails because the short hostname (`hostname -s`) doesn't match any key under `darwinConfigurations`.
+
+**Cause:** `shared/.config/nix-darwin/flake.nix` auto-discovers personal machine configs from `shared/.config/nix-darwin/machines/*.nix`. If no file exists for the current hostname, the flake has no entry to build.
+
+**Fix:** Run `./install.sh --bootstrap` from the repo root. It creates an empty-overrides stub at `shared/.config/nix-darwin/machines/<hostname>.nix` and then runs `nix_rebuild`. Alternatively, create the file by hand:
+```nix
+{ pkgs, lib, ... }:
+{
+  nixpkgs.hostPlatform = "aarch64-darwin";  # or "x86_64-darwin"
+}
+```
+
+### tmux plugins not loading (`prefix + I` does nothing useful)
+
+**Symptom:** tmux starts but bindings from configured plugins (sessionx, floax, etc.) don't work.
+
+**Cause:** TPM (tmux plugin manager) is not installed or its plugins directory is empty. Nothing in nix-darwin or stow puts TPM on disk.
+
+**Fix:** Run `./install.sh --bootstrap`, which clones TPM into `~/.config/tmux/plugins/tpm` and runs `~/.config/tmux/plugins/tpm/bin/install_plugins` non-interactively. Or do it manually:
+```bash
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+~/.config/tmux/plugins/tpm/bin/install_plugins
+```
+
 ## tmux
 
 ### Server exited unexpectedly

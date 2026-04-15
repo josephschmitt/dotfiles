@@ -22,43 +22,41 @@ This repository contains my complete development environment setup, organized fo
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 🆕 Fresh Machine (one command)
 
-1. **Install Nix with flakes support:**
-```bash
-sh <(curl -L https://nixos.org/nix/install)
-```
-
-2. **Install nix-darwin** (see [nix-darwin README](shared/.config/nix-darwin/README.md) for details):
-```bash
-sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/shared/.config/nix-darwin
-```
-
-### 🏠 Personal Machine
+On a brand-new Mac with nothing but a shell, clone the repo and run the interactive bootstrap:
 
 ```bash
 git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-
-# Apply nix-darwin configuration (installs packages, sets system preferences)
-nix_rebuild
-
-# Install user-level configuration files
-./install.sh shared personal
+./install.sh --bootstrap
 ```
 
-### 💼 Work Machine
+`--bootstrap` is idempotent and handles each step only if needed:
+
+- Generates an SSH key (and pauses for you to add it to GitHub)
+- Offers to rename the host via `scutil`
+- Installs Nix if it's missing
+- Creates an empty `shared/.config/nix-darwin/machines/<hostname>.nix` for new hosts (auto-discovered by the flake — no manual edits)
+- Bootstraps nix-darwin on first run, or calls `nix_rebuild` thereafter
+- Clones TPM and installs tmux plugins non-interactively
+- Prompts to initialize the private `work/` submodule
+- Runs `stow` with profiles you pick (defaults to `shared personal` on macOS)
+
+### 🏠 Personal Machine (existing setup)
 
 ```bash
-git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+nix_rebuild                    # Apply nix-darwin config
+./install.sh shared personal   # Symlink user-level configs
+```
+
+### 💼 Work Machine (existing setup)
+
+```bash
 cd ~/.dotfiles
 git submodule update --init --recursive
-
-# Apply nix-darwin configuration (installs packages, sets system preferences)
-# The nix_rebuild wrapper automatically detects work machines and uses work configurations
-nix_rebuild
-
-# Install user-level configuration files
+nix_rebuild                    # Auto-detects work machines via hostname
 ./install.sh shared work
 ```
 
