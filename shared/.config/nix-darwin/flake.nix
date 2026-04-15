@@ -38,6 +38,14 @@
             nixHomebrewConfig
           ];
         };
+	"Antoinettes-MacBook" = nix-darwin.lib.darwinSystem {
+          modules = [
+            darwinConfig
+            (import ./machines/Antoinettes-MacBook.nix)
+            nix-homebrew.darwinModules.nix-homebrew
+            nixHomebrewConfig
+          ];
+        };
       };
 
       # Path to work directory (relative to this flake)
