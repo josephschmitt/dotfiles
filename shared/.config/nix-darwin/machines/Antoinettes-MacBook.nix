@@ -37,7 +37,6 @@ in
 
     casks = [
       "claude"
-      "jump-desktop-connect"
     ];
 
     taps = [];
@@ -46,7 +45,7 @@ in
   };
 
   system.defaults = {
-    dock.tilesize = 64;
+    dock.tilesize = 56;
   };
 
   # The platform the configuration will be used on.
