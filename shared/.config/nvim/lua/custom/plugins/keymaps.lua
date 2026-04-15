@@ -9,6 +9,17 @@ vim.api.nvim_create_autocmd("VimEnter", {
     -- Undo/redo: U for redo (mirrors u for undo)
     map({ "n", "v" }, "U", "<C-r>", { desc = "Redo" })
 
+    -- Display-line j/k: move by visual row on wrapped lines.
+    -- With a count (e.g. 5j), fall back to logical j/k so counted jumps
+    -- keep working intuitively with relativenumber.
+    map({ "n", "v" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, desc = "Down (display line)" })
+    map({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, desc = "Up (display line)" })
+
+    -- Mousewheel-style viewport scroll (2 lines per press).
+    -- Old J (join) and K (hover) are rehomed to <Leader>J / <Leader>K in which-key.lua.
+    map({ "n", "v" }, "J", "2<C-e>", { desc = "Scroll down (2 lines)" })
+    map({ "n", "v" }, "K", "2<C-y>", { desc = "Scroll up (2 lines)" })
+
     -- Exit insert mode shortcuts
     map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
     map("i", "kj", "<Esc>", { desc = "Exit insert mode" })

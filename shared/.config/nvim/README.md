@@ -117,6 +117,10 @@ Leader key: **Space**
 | `<Leader>fr` | Find recent files |
 | `<Leader>ee` | Toggle file explorer |
 | `<Leader>ef` | Find file in explorer |
+| `j` / `k` | Move by display line (logical with a count, e.g. `5j`) |
+| `J` / `K` | Scroll viewport down / up (3 lines, mousewheel-style) |
+| `<Leader>J` | Join lines (was `J`) |
+| `<Leader>K` | LSP hover (was `K`) |
 | `S-h` / `S-l` | Previous / next buffer |
 | `Ctrl+1-9` | Jump to buffer by number |
 | `<Leader>gs` | Stage git hunk |
