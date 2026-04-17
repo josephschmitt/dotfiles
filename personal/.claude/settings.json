@@ -89,6 +89,7 @@
       "gh"
     ]
   },
-  "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }
