@@ -104,6 +104,22 @@ function zvm_after_init() {
       eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
     fi
   fi
+
+  # Fish-like line navigation in vi insert mode.
+  # zsh-autosuggestions auto-wraps forward-char (full accept) and
+  # forward-word (partial accept); we just bind the keys fish uses.
+  #   →  / Ctrl-F  → accept entire suggestion   |  ← / Ctrl-B  → back one char
+  #   ⌥→ / Alt-F  → accept one word              |  ⌥← / Alt-B → back one word
+  bindkey -M viins '^[[C' forward-char      # Right arrow
+  bindkey -M viins '^F' forward-char        # Ctrl-F
+  bindkey -M viins '^[f' forward-word       # Alt-F
+  bindkey -M viins '^[[1;3C' forward-word   # Alt-Right (xterm/iTerm2/Ghostty)
+  bindkey -M viins '^[^[[C' forward-word    # Alt-Right (Terminal.app)
+  bindkey -M viins '^[[D' backward-char     # Left arrow
+  bindkey -M viins '^B' backward-char       # Ctrl-B
+  bindkey -M viins '^[b' backward-word      # Alt-B
+  bindkey -M viins '^[[1;3D' backward-word  # Alt-Left (xterm/iTerm2/Ghostty)
+  bindkey -M viins '^[^[[D' backward-word   # Alt-Left (Terminal.app)
 }
 
 # Download Zinit, if it's not there yet
