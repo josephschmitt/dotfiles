@@ -2,12 +2,35 @@
   description = "Package set for my Ubuntu server";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs.multica-bin = {
+    url = "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz";
+    flake = false;
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, multica-bin }:
     let
       # Your server's architecture.  Change if you're not x86_64.
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+
+      multica = pkgs.stdenv.mkDerivation {
+        pname = "multica";
+        version = "latest";
+        src = multica-bin;
+        nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+        buildInputs = [ pkgs.stdenv.cc.cc.lib ];
+        dontConfigure = true;
+        dontBuild = true;
+        installPhase = ''
+          runHook preInstall
+          install -Dm755 multica $out/bin/multica
+          runHook postInstall
+        '';
+        meta = {
+          description = "Multica CLI — managed agents platform";
+          homepage = "https://github.com/multica-ai/multica";
+        };
+      };
 
       tsshd = pkgs.buildGoModule rec {
         pname = "tsshd";
@@ -70,6 +93,7 @@
             zoxide
             zsh
             tsshd
+            multica
           ];
         };
       };
