@@ -25,7 +25,6 @@ in
   environment.systemPackages = with pkgs; [
     devbox
     direnv
-    git
     gum
     lf
     mosh
