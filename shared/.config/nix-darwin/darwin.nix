@@ -39,6 +39,7 @@
     fish
     fzf
     gh
+    git
     gum
     lazygit
     neovim
