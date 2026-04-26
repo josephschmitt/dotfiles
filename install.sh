@@ -91,6 +91,43 @@ bootstrap_xcode_clt() {
   read -r _
 }
 
+bootstrap_apt_prereqs() {
+  $IS_DARWIN && return 0
+  command -v apt-get >/dev/null 2>&1 || return 0
+  if command -v git >/dev/null 2>&1 && command -v curl >/dev/null 2>&1; then
+    ok "apt prerequisites already installed"
+    return 0
+  fi
+  info "Installing apt prerequisites (git, curl, ca-certificates)"
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq git curl ca-certificates
+}
+
+bootstrap_convert_to_repo() {
+  if git -C "$DOTFILES_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+    ok "Dotfiles directory is already a git repository"
+    return 0
+  fi
+  info "Dotfiles directory is not a git repo (likely unzipped) — converting"
+  local remote
+  remote="$(prompt "Git remote URL" "git@github.com:josephschmitt/dotfiles.git")"
+  git -C "$DOTFILES_DIR" init -q
+  git -C "$DOTFILES_DIR" remote add origin "$remote"
+  if ! git -C "$DOTFILES_DIR" fetch origin; then
+    warn "Fetch failed — leaving repo initialized but unsynced"
+    return 0
+  fi
+  local default_branch
+  default_branch="$(git -C "$DOTFILES_DIR" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')"
+  [ -z "$default_branch" ] && default_branch="main"
+  if confirm "Reset working tree to origin/$default_branch? (overwrites unzipped contents)"; then
+    git -C "$DOTFILES_DIR" checkout -B "$default_branch" "origin/$default_branch"
+    ok "Repo synced to origin/$default_branch"
+  else
+    warn "Skipped reset — repo is initialized but working tree differs from origin/$default_branch"
+  fi
+}
+
 bootstrap_ssh_key() {
   if ls "$HOME/.ssh"/id_ed25519 "$HOME/.ssh"/id_rsa 2>/dev/null | grep -q .; then
     ok "SSH key already exists"
@@ -235,7 +272,9 @@ run_bootstrap() {
     warn "Not on macOS — skipping Darwin-specific steps (hostname, machine config, nix-darwin)"
   fi
   bootstrap_xcode_clt
+  bootstrap_apt_prereqs
   bootstrap_ssh_key
+  bootstrap_convert_to_repo
   bootstrap_hostname
   bootstrap_nix
   bootstrap_machine_config
