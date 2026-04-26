@@ -156,6 +156,8 @@ User requests Neovim configuration change?
 - ✅ "lazyvim" → Modify `shared/.config/lazyvim/`
 - ✅ "astrovim", "astronvim" → Modify `shared/.config/astronvim/`
 
+**Use the `AskUserQuestion` tool** when prompting for clarification — not plain text. Offer Kickstart, LazyVim, and AstroNvim as options (Kickstart first, marked "(Recommended)" since it's the default).
+
 ### Kickstart-Specific Guidelines
 When modifying Kickstart config (`shared/.config/nvim/`):
 1. **Read** `shared/.config/nvim/CLAUDE.md` first (philosophy, architecture, lazy-loading rules)

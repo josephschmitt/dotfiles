@@ -72,7 +72,7 @@
     "security-guidance@claude-code-plugins": false,
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "monocle@monocle": true
+    "linear@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "monocle": {
