@@ -158,6 +158,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: .github/workflows/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
 
       - name: Upload performance results
@@ -287,6 +288,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: .github/workflows/scripts/post-performance-comment.sh "${{ env.OS_NAME }}" comment.md
 
       - name: Upload performance results

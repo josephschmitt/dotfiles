@@ -18,7 +18,19 @@ if [ ! -f "$COMMENT_FILE" ]; then
 fi
 
 COMMENT_BODY=$(cat "$COMMENT_FILE")
-PR_NUMBER="${GITHUB_REF##*/}"
+
+# On pull_request events GITHUB_REF is `refs/pull/<n>/merge`, so a trailing-component
+# strip yields `merge` instead of the PR number. Prefer the explicit PR_NUMBER env
+# var set by the workflow, and fall back to parsing the ref.
+if [ -z "${PR_NUMBER:-}" ]; then
+  ref="${GITHUB_REF#refs/pull/}"
+  PR_NUMBER="${ref%%/*}"
+fi
+
+if [ -z "$PR_NUMBER" ] || ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+  echo "Error: could not determine PR number (GITHUB_REF=$GITHUB_REF, PR_NUMBER=$PR_NUMBER)"
+  exit 1
+fi
 
 # Find existing comment with this OS name
 EXISTING_COMMENT_ID=$(gh pr view "$PR_NUMBER" --json comments --jq ".comments[] | select(.body | contains(\"Shell Startup Performance Report ($OS_NAME)\")) | .id")
