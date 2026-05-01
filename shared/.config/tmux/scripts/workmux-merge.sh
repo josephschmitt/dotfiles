@@ -26,12 +26,8 @@ case "$STRATEGY" in
 esac
 [ -n "$TARGET" ] && CMD="$CMD --into $TARGET"
 
-if ! ERROR=$(eval "$CMD" 2>&1); then
-  gum style --foreground 1 --bold "ERROR"
-  echo ""
-  echo "$ERROR"
+if ! eval "$CMD"; then
   echo ""
   gum style --faint "Press any key to close..."
   read -r _ || true
-  exit 0
 fi
