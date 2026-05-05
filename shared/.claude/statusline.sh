@@ -40,6 +40,14 @@ if [ -n "$CONTEXT_SIZE" ] && [ "$CONTEXT_SIZE" -gt 0 ] && [ "$CURRENT_USAGE" != 
   fi
 fi
 
+# Extract session cost
+SESSION_COST=""
+COST_USD=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
+if [ -n "$COST_USD" ] && [ "$COST_USD" != "null" ] && [ "$COST_USD" != "0" ]; then
+  COST_FORMATTED=$(echo "$COST_USD" | awk '{printf "%.2f", $1}')
+  SESSION_COST=" \033[33m💸 \$${COST_FORMATTED}\033[0m"
+fi
+
 # Determine directory name - show relative to git root if in a subdirectory
 if [ "$IS_GIT_REPO" = true ]; then
   # We're in a git repo
@@ -111,4 +119,4 @@ fi
 
 # Output format: [Model] [percentage] 📁 directory  branch +added -deleted ⇡ahead ⇣behind
 # Use ANSI color codes: cyan for model, white for directory, green for branch
-echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
+echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT$SESSION_COST \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
