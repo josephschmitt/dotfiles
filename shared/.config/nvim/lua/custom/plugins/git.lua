@@ -122,6 +122,17 @@ return {
     },
   },
 
+  -- gitlinker.nvim: generate shareable GitHub permalinks for the current line/selection.
+  -- <Leader>gy yanks the link, <Leader>gG opens it in the browser.
+  {
+    "linrongbin16/gitlinker.nvim",
+    keys = {
+      { "<Leader>gy", "<Cmd>GitLink<CR>", mode = { "n", "v" }, desc = "Yank GitHub permalink" },
+      { "<Leader>gG", "<Cmd>GitLink!<CR>", mode = { "n", "v" }, desc = "Open GitHub permalink" },
+    },
+    opts = {},
+  },
+
   -- diffview.nvim: full-screen side-by-side diff viewer.
   -- Opens a tab with all changed files, diff view, and file history.
   {
