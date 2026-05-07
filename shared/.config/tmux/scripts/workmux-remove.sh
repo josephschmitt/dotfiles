@@ -30,7 +30,11 @@ else
   CMD="workmux remove $FORCE"
 fi
 
-if ! eval "$CMD"; then
+if [ -z "$FORCE" ]; then
+  gum confirm "Remove worktree '$BRANCH'?" || exit 0
+fi
+
+if ! echo "y" | eval "$CMD"; then
   echo ""
   gum style --faint "Press any key to close..."
   read -r _ || true
