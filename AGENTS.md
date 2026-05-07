@@ -172,6 +172,26 @@ When modifying AstroNvim config (`shared/.config/astronvim/`):
 3. Use AstroCore/AstroLSP/AstroUI override pattern (see existing plugins)
 4. Update `shared/.config/astronvim/README.md` with new keybindings/features
 
+### Vimrc Companion (`shared/.vimrc`)
+
+A plain-Vim port of the Kickstart config lives at `shared/.vimrc` for use on SSH boxes without Neovim. Neovim ignores `~/.vimrc`, so it only loads under plain `vim`.
+
+**When adding/modifying a feature in any Neovim config, evaluate whether it's worth porting to the vimrc.**
+
+| Type of change | Action for `shared/.vimrc` |
+|---|---|
+| Vim option (e.g. `relativenumber`, `scrolloff`) | Port directly — almost always 1:1 |
+| Keybinding that uses only built-ins (`gh`/`gl`, `<C-hjkl>`, `J`/`K` scroll, `jk` escape) | Port directly |
+| Plugin-driven feature with a pure-vimscript equivalent (commentary, surround, fugitive, fzf.vim) | Port using the equivalent plugin |
+| LSP / treesitter / blink.cmp / mason / snacks / mini.* / which-key | **Skip** — no realistic plain-vim equivalent |
+| Colorscheme highlight tweak | Port to the inline tokyonight-moon palette in `shared/.vimrc` |
+
+**Workflow:**
+1. After making the Neovim change, ask: "Is this an option, a vim-builtin keybinding, or a colorscheme tweak?" If yes → port it.
+2. If it's a plugin-driven feature, check whether a pure-vimscript plugin offers the same UX (e.g. `tpope/*`, `junegunn/fzf.vim`, `Yggdroot/LeaderF`).
+3. If neither applies, **skip silently** — don't add a half-baked stub. The vimrc explicitly accepts feature gaps.
+4. Commit vimrc changes alongside the Neovim change in the same PR/branch when possible, with a `(also vimrc)` note in the commit body.
+
 ### CRITICAL: .config Symlinking Rules
 **NEVER `stow` entire `.config/` directory** - symlink individual app configs only
 
