@@ -128,6 +128,11 @@ This is why we create `~/.config/tmux` before running stow. The `-p` flag create
   - Custom keybindings for navigation
   - Yazi file picker integration
   - Git permalink generation
+- **Vim** (`.vimrc`) - Plain-Vim port of the Kickstart Neovim config for SSH boxes
+  - Inline tokyonight-moon palette (no plugin needed for colors)
+  - Same options/keymaps as `shared/.config/nvim/` where Vim 8+ supports them
+  - Auto-bootstraps vim-plug; minimal plugin set: vim-commentary, vim-surround, vim-repeat, vim-fugitive, fzf.vim
+  - Neovim ignores this file, so it only loads when running plain `vim`
 
 ### Terminal Multiplexer
 - **tmux** (`.config/tmux/`) - Terminal session management
