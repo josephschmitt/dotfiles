@@ -18,6 +18,7 @@ command = [
   "fd -H -d 2 -t d -E .Trash . ~"               # find directories
 ]
 ansi = true
+frecency = false
 output = "{strip_ansi|split: :1}"
 
 [preview]
