@@ -64,6 +64,29 @@ Then start tmux normally.
 - tmux issue: https://github.com/tmux/tmux/issues/4329
 - yazi issue: https://github.com/sxyazi/yazi/issues/2308
 
+## Homebrew / nix-darwin
+
+### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`
+
+**Symptom:** `nix_rebuild` fails during the Homebrew bundle step:
+```
+Error: undefined method 'to_sym' for nil
+.../cask_struct_generator.rb:100:in 'block in ...process_depends_on'
+Failed to fetch <cask names>...
+`brew bundle` failed!
+```
+
+**Cause:** Homebrew 5.1.7 (pinned by nix-homebrew) has a regression where `process_depends_on` crashes on casks that return empty `depends_on: { macos: {} }` metadata from the API. This was introduced by a bump in `flake.lock` from `brew-src` 5.0.12 → 5.1.7. Tracked upstream as [nix-homebrew #138](https://github.com/zhaofengli/nix-homebrew/issues/138).
+
+**Fix:** Pin `brew-src` explicitly in `flake.nix` to Homebrew 5.1.10, which includes the fix. The `flake.nix` already has this override set. Run:
+```bash
+cd shared/.config/nix-darwin && nix flake update nix-homebrew
+```
+
+Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different method — `first` instead of `to_sym`). Only 5.1.10+ is known to work against the current Homebrew API.
+
+**Resume:** Once nix-homebrew pins its own `brew-src` to a version ≥ 5.1.10, the explicit override in `flake.nix` (the `nix-homebrew.inputs.brew-src.url` line) can be removed.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)

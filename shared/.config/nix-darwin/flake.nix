@@ -6,6 +6,9 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    # Pin brew to 5.1.10 which fixes the cask_struct_generator nil crash (issue zhaofengli/nix-homebrew#138)
+    nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew/5.1.10";
+    nix-homebrew.inputs.brew-src.flake = false;
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, ... }:
