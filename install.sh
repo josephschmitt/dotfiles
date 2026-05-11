@@ -4,11 +4,13 @@
 # Usage:
 #   ./install.sh shared personal          # Personal machine (stow only)
 #   ./install.sh shared work              # Work machine (stow only)
+#   ./install.sh shared rca               # RCA machine (stow only)
 #   ./install.sh shared ubuntu-server     # Ubuntu server (stow only)
 #   ./install.sh --dirs-only              # CI: only pre-create directories, skip stow
 #   ./install.sh --bootstrap              # Fresh machine: install Nix, nix-darwin,
 #                                         #   etc., then stow + TPM (interactive)
 #   ./install.sh --bootstrap shared work  # Bootstrap with profiles pre-selected
+#   ./install.sh --bootstrap shared rca   # Bootstrap with profiles pre-selected
 #
 # Why directory pre-creation is required:
 #   Stow symlinks entire directories unless they already exist at the target.
@@ -245,7 +247,18 @@ bootstrap_work_submodule() {
   fi
   if confirm "Initialize the private work submodule? (requires repo access)"; then
     info "Initializing work submodule"
-    (cd "$DOTFILES_DIR" && git submodule update --init --recursive)
+    (cd "$DOTFILES_DIR" && git submodule update --init --recursive work)
+  fi
+}
+
+bootstrap_rca_submodule() {
+  if [ -f "$DOTFILES_DIR/rca/.git" ] || [ -d "$DOTFILES_DIR/rca/.git" ]; then
+    ok "RCA submodule already initialized"
+    return 0
+  fi
+  if confirm "Initialize the private rca submodule? (requires repo access)"; then
+    info "Initializing rca submodule"
+    (cd "$DOTFILES_DIR" && git submodule update --init --recursive rca)
   fi
 }
 
@@ -259,7 +272,7 @@ select_profiles_interactively() {
     default="shared ubuntu-server"
   fi
   info "Stow profile selection"
-  echo "Common choices: 'shared personal', 'shared work', 'shared ubuntu-server'" >&2
+  echo "Common choices: 'shared personal', 'shared work', 'shared rca', 'shared ubuntu-server'" >&2
   local answer
   answer="$(prompt "Profiles to stow (space-separated)" "$default")"
   # shellcheck disable=SC2206
@@ -281,6 +294,7 @@ run_bootstrap() {
   bootstrap_nix_darwin
   bootstrap_tpm
   bootstrap_work_submodule
+  bootstrap_rca_submodule
   select_profiles_interactively
 }
 

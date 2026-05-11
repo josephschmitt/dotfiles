@@ -6,7 +6,7 @@
 - **Platforms**: macOS (primary), Ubuntu Server (secondary)
 - **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
 - **Editors**: Neovim (triple setup: Kickstart + LazyVim + AstroNvim) + Helix (secondary)
-- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `ubuntu-server/` (Ubuntu)
+- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `rca/` (macOS), `ubuntu-server/` (Ubuntu)
 
 ### Stow Commands
 ```bash

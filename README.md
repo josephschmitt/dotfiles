@@ -40,7 +40,7 @@ cd ~/.dotfiles
 - Creates an empty `shared/.config/nix-darwin/machines/<hostname>.nix` for new hosts (auto-discovered by the flake — no manual edits)
 - Bootstraps nix-darwin on first run, or calls `nix_rebuild` thereafter
 - Clones TPM and installs tmux plugins non-interactively
-- Prompts to initialize the private `work/` submodule
+- Prompts to initialize the private `work/` and `rca/` submodules
 - Runs `stow` with profiles you pick (defaults to `shared personal` on macOS)
 
 ### 🏠 Personal Machine (existing setup)
@@ -69,6 +69,25 @@ git submodule deinit -f work
 ```
 
 This clears the `work/` directory and unregisters the submodule without affecting the main repository.
+
+### 🏢 RCA Machine (existing setup)
+
+```bash
+cd ~/.dotfiles
+git submodule update --init --recursive rca
+nix_rebuild                    # Auto-detects RCA machines via hostname
+./install.sh shared rca
+```
+
+#### Removing RCA Submodule
+
+When you're done working with the RCA submodule and want to remove it from your machine:
+
+```bash
+git submodule deinit -f rca
+```
+
+This clears the `rca/` directory and unregisters the submodule without affecting the main repository.
 
 ### 🐧 Ubuntu Server
 
@@ -192,10 +211,12 @@ dotfiles/
 │   └── .gitconfig   # Personal git settings
 ├── ubuntu-server/   # Ubuntu server-specific configurations
 │   └── .config/nix/ # Nix configuration for Ubuntu servers
-└── work/           # Work-specific configurations (private submodule)
-    ├── .config/nix-darwin/machines/   # Work machine configurations
-    ├── .gitconfig   # Work git settings
-    └── .compassrc   # Company-specific tools
+├── work/           # Work-specific configurations (private submodule)
+│   ├── .config/nix-darwin/machines/   # Work machine configurations
+│   ├── .gitconfig   # Work git settings
+│   └── .compassrc   # Company-specific tools
+└── rca/            # RCA-specific configurations (private submodule)
+    └── .config/nix-darwin/machines/   # RCA machine configurations
 ```
 
 ## 📚 Documentation

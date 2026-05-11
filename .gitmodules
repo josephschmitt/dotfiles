@@ -1,3 +1,6 @@
 [submodule "work"]
 	path = work
 	url = git@github.com:josephschmitt/dotfiles-work-private.git
+[submodule "rca"]
+	path = rca
+	url = git@github.com:josephschmitt/dotfiles-rca-private.git

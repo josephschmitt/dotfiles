@@ -53,31 +53,38 @@
       baseConfigs = lib.genAttrs personalMachineNames
         (name: mkDarwinSystem (import (./machines + "/${name}.nix")));
 
-      # Path to work directory (relative to this flake)
-      workPath = ../../../work;
+      # --- Private profile machine configs (submodules: work, rca, etc.) ---
+      # Each private profile lives at ../../../<name> relative to this flake.
+      # Machine hostnames must be listed explicitly (unlike personal machines
+      # which are auto-discovered) because the submodule may not be initialised.
 
-      # Helper function to conditionally import work machine configs
-      workMachineConfig = name:
+      mkPrivateProfileConfig = profile: hostname:
         let
-          configPath = workPath + "/.config/nix-darwin/machines/${name}.nix";
+          profilePath = ../../../${profile};
+          configPath = profilePath + "/.config/nix-darwin/machines/${hostname}.nix";
         in
         if builtins.pathExists configPath
         then import configPath
-        else { }; # Empty config if file doesn't exist
-
-      # Work configurations (only if work configs exist)
-      workConfigs =
-        if builtins.pathExists (workPath + "/.config/nix-darwin/machines")
-        then {
-          # Compass M1 MacBook Pro
-          "W2TD37NJKN" = mkDarwinSystem (workMachineConfig "W2TD37NJKN");
-
-          # Compass M4 MacBook Pro
-          "G5FXQQ0D00" = mkDarwinSystem (workMachineConfig "G5FXQQ0D00");
-        }
         else { };
+
+      mkPrivateProfileConfigs = profile: hostnames:
+        let
+          profilePath = ../../../${profile};
+        in
+        if builtins.pathExists (profilePath + "/.config/nix-darwin/machines")
+        then lib.genAttrs hostnames (name: mkDarwinSystem (mkPrivateProfileConfig profile name))
+        else { };
+
+      privateProfileConfigs = { }
+        // mkPrivateProfileConfigs "work" [
+          "W2TD37NJKN"  # Compass M1 MacBook Pro
+          "G5FXQQ0D00"  # Compass M4 MacBook Pro
+        ]
+        // mkPrivateProfileConfigs "rca" [
+          # Add RCA machine hostnames here as they are provisioned
+        ];
     in
     {
-      darwinConfigurations = baseConfigs // workConfigs;
+      darwinConfigurations = baseConfigs // privateProfileConfigs;
     };
 }
