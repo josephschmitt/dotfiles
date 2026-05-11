@@ -59,6 +59,20 @@ alias lgtheme='~/.config/lazygit/switch-theme.sh'
 
 Then use: `lgtheme tokyonight` or `lgtheme catppuccin`
 
+## Work-Specific Overlay
+
+On work machines, a `config-work.yml` overlay is loaded alongside the main config to disable auto-fetch. Large monorepos with many tags make lazygit's auto-fetch unusable, so the work profile suppresses it entirely.
+
+The overlay is applied via the `lg` alias override in `work/.config/fish/config.work.fish` and `work/.config/shell/aliases.work.sh`:
+
+```sh
+alias lg='env TMPDIR=/tmp lazygit --use-config-file="$HOME/.config/lazygit/config.yml,$HOME/.config/lazygit/config-work.yml"'
+```
+
+The tmux lazygit tab script (`lazygit-tab.sh`) also detects and includes `config-work.yml` when present, so the overlay applies there too.
+
+On personal machines (where `work/` is not stowed), neither the alias override nor the overlay file exist — everything falls back to the shared config.
+
 ## File Structure
 
 ```
@@ -66,6 +80,8 @@ Then use: `lgtheme tokyonight` or `lgtheme catppuccin`
 ├── config.yml              # Main configuration file
 ├── config-catppuccin.yml   # Catppuccin theme config
 ├── config-tokyonight.yml   # Tokyo Night theme config
+├── config-tab.yml          # Overlay for tmux lazygit tab (e.g. full-screen layout)
+├── config-work.yml         # Work overlay: disables auto-fetch (symlinked from work profile)
 ├── switch-theme.sh         # Theme switcher script
 └── README.md               # This file
 ```
