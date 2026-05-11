@@ -7,7 +7,7 @@
 #   ./install.sh shared ubuntu-server     # Ubuntu server (stow only)
 #   ./install.sh --dirs-only              # CI: only pre-create directories, skip stow
 #   ./install.sh --bootstrap              # Fresh machine: install Nix, nix-darwin,
-#                                         #   TPM, etc., then stow (interactive)
+#                                         #   etc., then stow + TPM (interactive)
 #   ./install.sh --bootstrap shared work  # Bootstrap with profiles pre-selected
 #
 # Why directory pre-creation is required:
@@ -317,4 +317,7 @@ fi
 info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
 stow -v --target="$HOME" "${PROFILES[@]}"
+
+bootstrap_tpm
+
 ok "Done."
