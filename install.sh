@@ -341,6 +341,11 @@ info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
 stow -v --target="$HOME" "${PROFILES[@]}"
 
+if command -v bat >/dev/null 2>&1; then
+  info "Rebuilding bat cache"
+  bat cache --build
+fi
+
 bootstrap_tpm
 
 ok "Done."
