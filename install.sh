@@ -328,6 +328,15 @@ if [ ${#PROFILES[@]} -eq 0 ]; then
   PROFILES=("shared")
 fi
 
+# Run RCA dependency installer before stow (installs stow + userland tools)
+for p in "${PROFILES[@]}"; do
+  if [ "$p" = "rca" ]; then
+    info "Installing RCA userland dependencies"
+    "$DOTFILES_DIR/rca/bin/install-deps.sh"
+    break
+  fi
+done
+
 info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
 stow -v --target="$HOME" "${PROFILES[@]}"
