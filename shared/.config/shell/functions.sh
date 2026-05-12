@@ -1,6 +1,14 @@
 # Shared functions for all POSIX-compatible shells
 
 start_interactive() {
+  # Vi mode (bash only — Zsh uses zsh-vi-mode plugin, Fish uses fish_vi_key_bindings)
+  if [ -n "$BASH_VERSION" ]; then
+    set -o vi
+    bind -m vi-command '"U": redo'
+    bind -m vi-command '"gh": beginning-of-line'
+    bind -m vi-command '"gl": end-of-line'
+  fi
+
   # Prompt configuration
   if command -v oh-my-posh >/dev/null 2>&1; then
     # oh-my-posh prompt for bash
