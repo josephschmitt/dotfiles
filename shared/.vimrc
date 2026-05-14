@@ -55,7 +55,7 @@ set signcolumn=yes                  " always-on gutter (matches kickstart)
 set updatetime=250                  " faster CursorHold, swap writes
 set timeoutlen=300                  " shorter mapping timeout (which-key feel)
 set splitright splitbelow           " new splits go right / down
-set list listchars=tab:»\ ,trail:·,nbsp:␣  " visible whitespace
+set list listchars=tab:»\ ,trail:.,nbsp:+   " visible whitespace (ASCII-safe for old Vim)
 set cursorline                      " highlight the current line
 set scrolloff=10                    " keep 10 lines of context above/below cursor
 set confirm                         " prompt instead of failing on :q with changes
@@ -70,7 +70,7 @@ set encoding=utf-8
 set fileencoding=utf-8
 set ttimeoutlen=10                  " near-instant <Esc> in terminals
 set wildmenu wildmode=longest:full,full
-set fillchars+=vert:│,horiz:─,horizup:┴,horizdown:┬
+set fillchars+=vert:\|
 set shortmess+=I                    " no intro screen
 set history=1000
 
