@@ -1,7 +1,9 @@
 # Shared environment variables for all POSIX-compatible shells
 # This file should contain only environment variable exports
 
-# Force English for git and other i18n-aware tools
+# Locale — LANG is the primary variable most programs check for UTF-8 support
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 
 # XDG Base Directory Specification
