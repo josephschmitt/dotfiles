@@ -279,6 +279,14 @@ select_profiles_interactively() {
   PROFILES=($answer)
 }
 
+has_profile() {
+  local target="$1"
+  for p in "${PROFILES[@]}"; do
+    [ "$p" = "$target" ] && return 0
+  done
+  return 1
+}
+
 run_bootstrap() {
   info "Bootstrap mode — setting up a fresh machine"
   if ! $IS_DARWIN; then
@@ -286,15 +294,17 @@ run_bootstrap() {
   fi
   bootstrap_xcode_clt
   bootstrap_apt_prereqs
-  bootstrap_ssh_key
+  has_profile rca || bootstrap_ssh_key
   bootstrap_convert_to_repo
-  bootstrap_hostname
-  bootstrap_nix
-  bootstrap_machine_config
-  bootstrap_nix_darwin
+  if ! has_profile rca; then
+    bootstrap_hostname
+    bootstrap_nix
+    bootstrap_machine_config
+    bootstrap_nix_darwin
+  fi
   bootstrap_tpm
-  bootstrap_work_submodule
-  bootstrap_rca_submodule
+  has_profile work && bootstrap_work_submodule
+  has_profile rca && bootstrap_rca_submodule
   select_profiles_interactively
 }
 
