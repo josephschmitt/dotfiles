@@ -131,6 +131,15 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
+# Load completions before plugins so compdef is available for deferred snippets
+autoload -Uz compinit
+typeset -g ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -n $ZCOMPDUMP(#qN.mh+24) ]]; then
+  compinit -d "$ZCOMPDUMP"
+else
+  compinit -C -d "$ZCOMPDUMP"
+fi
+
 # Add in zsh plugins (with turbo-mode for faster startup)
 zinit ice wait lucid
 zinit light zsh-users/zsh-syntax-highlighting
@@ -154,15 +163,6 @@ zinit ice wait lucid
 zinit snippet OMZP::aws
 zinit ice wait lucid
 zinit snippet OMZP::command-not-found
-
-# Load completions with daily caching
-autoload -Uz compinit
-typeset -g ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
-if [[ -n $ZCOMPDUMP(#qN.mh+24) ]]; then
-  compinit -d "$ZCOMPDUMP"
-else
-  compinit -C -d "$ZCOMPDUMP"
-fi
 
 # Replay all cached completions
 zinit cdreplay -q
