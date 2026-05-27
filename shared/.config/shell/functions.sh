@@ -68,7 +68,7 @@ auto_start_tmux() {
   fi
 
   # Check if tmux is available and we're not already in tmux or SSH
-  if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
+  if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ] && [ -z "$HERDR" ]; then
     session_name="main"
 
     # If main session already exists, generate random name for new session
@@ -79,6 +79,15 @@ auto_start_tmux() {
     # Create new session and launch sesh popup
     # If tmux fails to start, fall back to regular shell
     tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
+  fi
+}
+
+# Herdr wrapper that detaches from tmux and sets HERDR env var
+herdr() {
+  if [ -n "$TMUX" ]; then
+    tmux detach-client -E "HERDR=1 command herdr $*"
+  else
+    HERDR=1 command herdr "$@"
   fi
 }
 
