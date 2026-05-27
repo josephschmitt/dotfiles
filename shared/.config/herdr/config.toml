@@ -38,7 +38,7 @@ zoom = "prefix+z"
 
 # Lazygit (matches tmux Alt+g)
 [[keys.command]]
-key = "alt+g"
+key = "prefix+g"
 type = "pane"
 command = "lazygit"
 
