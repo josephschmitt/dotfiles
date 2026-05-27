@@ -1,0 +1,50 @@
+onboarding = false
+
+[keys]
+prefix = "ctrl+s"
+
+# Pane navigation — Alt+hjkl (matches tmux-tilish / vim-tmux-navigator)
+focus_pane_left = "alt+h"
+focus_pane_down = "alt+j"
+focus_pane_up = "alt+k"
+focus_pane_right = "alt+l"
+
+# Pane cycling — Alt+`/~ (matches tmux)
+cycle_pane_next = "alt+backtick"
+cycle_pane_previous = "alt+shift+backtick"
+
+# Tab switching — Alt+1-9 (matches tmux-tilish window switching)
+switch_tab = "alt+1..9"
+
+# Tab navigation — Alt+[/] (matches tmux window nav)
+previous_tab = "alt+["
+next_tab = "alt+]"
+
+# New tab — Alt+n (matches tmux new-window)
+new_tab = "alt+n"
+
+# Workspace navigation
+workspace_picker = "alt+w"
+new_workspace = "alt+shift+n"
+previous_workspace = "alt+shift+["
+next_workspace = "alt+shift+]"
+
+# Split panes (matches tmux)
+split_horizontal = "prefix+\\"
+split_vertical = "prefix+|"
+
+# Zoom — prefix+z (matches tmux)
+zoom = "prefix+z"
+
+# Lazygit (matches tmux Alt+g)
+[[keys.command]]
+key = "alt+g"
+type = "pane"
+command = "lazygit"
+
+[ui]
+show_agent_labels_on_pane_borders = false
+agent_panel_scope = "all"
+
+[ui.toast]
+delivery = "terminal"

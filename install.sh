@@ -325,6 +325,7 @@ mkdir -p "$HOME/.config/nix-darwin/machines"
 mkdir -p "$HOME/.config/tmux"
 mkdir -p "$HOME/.config/tmux/plugins"
 mkdir -p "$HOME/.claude"
+mkdir -p "$HOME/.config/herdr"
 mkdir -p "$HOME/.ssh"
 mkdir -p "$HOME/bin"
 
