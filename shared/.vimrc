@@ -69,6 +69,14 @@ set backspace=indent,eol,start      " sane backspace
 set encoding=utf-8
 set fileencoding=utf-8
 set ttimeoutlen=10                  " near-instant <Esc> in terminals
+
+" Cursor shape: block in normal, line in insert, underline in replace
+" Works in xterm-compatible terminals (including tmux and most SSH terminals)
+let &t_SI = "\e[6 q"   " insert  → blinking bar
+let &t_SR = "\e[4 q"   " replace → blinking underline
+let &t_EI = "\e[2 q"   " normal  → steady block
+" Reset to block on startup
+autocmd VimEnter * silent execute '!echo -ne "\e[2 q"'
 set wildmenu wildmode=longest:full,full
 set fillchars+=vert:\|
 set shortmess+=I                    " no intro screen
