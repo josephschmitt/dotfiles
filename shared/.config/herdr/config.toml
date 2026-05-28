@@ -16,16 +16,16 @@ cycle_pane_previous = "alt+shift+backtick"
 # Tab switching — Alt+1-9 (matches tmux-tilish window switching)
 switch_tab = "alt+1..9"
 
-# Tab navigation — Alt+[/] (matches tmux window nav)
-previous_tab = "alt+["
-next_tab = "alt+]"
+# Tab navigation — prefix+[/]
+previous_tab = "prefix+["
+next_tab = "prefix+]"
 
 # New tab — Alt+n (matches tmux new-window)
 new_tab = "alt+n"
 
-# Agent navigation — prefix+[/]
-previous_agent = "prefix+["
-next_agent = "prefix+]"
+# Agent navigation — Alt+[/]
+previous_agent = "alt+["
+next_agent = "alt+]"
 focus_agent = "prefix+1..9"
 
 # Workspace navigation
