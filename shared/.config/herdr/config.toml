@@ -33,6 +33,7 @@ workspace_picker = "alt+w"
 new_workspace = "alt+shift+n"
 previous_workspace = "alt+shift+["
 next_workspace = "alt+shift+]"
+switch_workspace = "alt+shift+1..9"
 
 # Split panes (matches tmux)
 split_horizontal = "prefix+\\"
