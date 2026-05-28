@@ -23,6 +23,11 @@ next_tab = "alt+]"
 # New tab — Alt+n (matches tmux new-window)
 new_tab = "alt+n"
 
+# Agent navigation — prefix+[/]
+previous_agent = "prefix+["
+next_agent = "prefix+]"
+focus_agent = "prefix+1..9"
+
 # Workspace navigation
 workspace_picker = "alt+w"
 new_workspace = "alt+shift+n"
