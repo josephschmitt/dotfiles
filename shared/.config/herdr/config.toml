@@ -45,6 +45,12 @@ zoom = "prefix+z"
 # New worktree — moved from default prefix+G to free up prefix+G for lazygit
 new_worktree = "prefix+w"
 
+# Quick shell (closes on exit)
+[[keys.command]]
+key = "prefix+C"
+type = "pane"
+command = "$SHELL"
+
 # Lazygit
 [[keys.command]]
 key = "prefix+G"
