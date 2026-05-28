@@ -39,8 +39,8 @@ switch_workspace = "alt+shift+1..9"
 split_horizontal = "prefix+\\"
 split_vertical = "prefix+|"
 
-# Zoom — prefix+z (matches tmux)
-zoom = "prefix+z"
+# Zoom — Alt+z
+zoom = "alt+z"
 
 # New worktree — moved from default prefix+G to free up prefix+G for lazygit
 new_worktree = "prefix+w"
