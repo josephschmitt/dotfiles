@@ -16,7 +16,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map({ "n", "v" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, desc = "Up (display line)" })
 
     -- Mousewheel-style viewport scroll (2 lines per press).
-    -- Old J (join) and K (hover) are rehomed to <Leader>J / <Leader>K in which-key.lua.
+    -- Old J (join) and K (hover) are rehomed to _ / <Leader>K in which-key.lua.
     map({ "n", "v" }, "J", "2<C-e>", { desc = "Scroll down (2 lines)" })
     map({ "n", "v" }, "K", "2<C-y>", { desc = "Scroll up (2 lines)" })
 

@@ -36,9 +36,12 @@ split_vertical = "prefix+|"
 # Zoom — prefix+z (matches tmux)
 zoom = "prefix+z"
 
-# Lazygit (matches tmux Alt+g)
+# New worktree — moved from default prefix+G to free up prefix+G for lazygit
+new_worktree = "prefix+w"
+
+# Lazygit
 [[keys.command]]
-key = "prefix+g"
+key = "prefix+G"
 type = "pane"
 command = "lazygit"
 

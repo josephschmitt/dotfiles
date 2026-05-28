@@ -44,6 +44,12 @@ cdd() {
   cd ~/development/"$1" || exit
 }
 
+# Project picker: launch tv pj and cd to the selected project via zoxide
+pjp() {
+  local dir
+  dir=$(tv pj) && [ -n "$dir" ] && cd "$dir"
+}
+
 # Find the given path in zoxide, or enter interactive mode
 zq() {
   zoxide query "$@" || zoxide query -i

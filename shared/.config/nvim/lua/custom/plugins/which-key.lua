@@ -46,7 +46,7 @@ return {
         },
         { "<Leader>s", "<Cmd>w<CR>", desc = "Save buffer" },
         -- Rehomed from J/K, which are now mousewheel-style viewport scroll.
-        { "<Leader>J", "J", mode = { "n", "v" }, desc = "Join lines" },
+        { "_", "J", mode = { "n", "v" }, desc = "Join lines" },
         { "<Leader>K", vim.lsp.buf.hover, desc = "LSP hover" },
 
         -- Groups (icons embedded in name since mappings=false blocks the icon property)
