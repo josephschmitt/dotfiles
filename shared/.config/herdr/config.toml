@@ -28,7 +28,8 @@ previous_agent = "alt+["
 next_agent = "alt+]"
 focus_agent = "prefix+1..9"
 
-# Workspace navigation
+# Workspace navigation (picker disabled — default conflicts with new_worktree)
+workspace_picker = ""
 new_workspace = "prefix+shift+n"
 previous_workspace = "alt+shift+["
 next_workspace = "alt+shift+]"
