@@ -1,5 +1,6 @@
 onboarding = false
 new_cwd = "~/development"
+prompt_new_tab_name = false
 
 [keys]
 prefix = "ctrl+s"
