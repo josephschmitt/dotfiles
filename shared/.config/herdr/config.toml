@@ -22,6 +22,9 @@ switch_tab = "alt+1..9"
 previous_tab = "prefix+["
 next_tab = "prefix+]"
 
+# Copy mode — prefix+v (matches tmux; default prefix+[ conflicts with previous_tab)
+copy_mode = "prefix+v"
+
 # New tab — Alt+n (matches tmux new-window)
 new_tab = "prefix+n"
 
@@ -65,3 +68,6 @@ agent_panel_scope = "all"
 
 [ui.toast]
 delivery = "terminal"
+
+[theme]
+name = "terminal"
