@@ -32,13 +32,18 @@ When helping debug issues with tools in this repository:
 | File | Purpose | Sources |
 |------|---------|---------|
 | `.profile` | POSIX environment (PATH, exports) | - |
+| `.profile.d/*.sh` | Profile-specific `.profile` extensions | - |
 | `.config/shell/exports.sh` | Shared environment variables | - |
 | `.config/shell/aliases.sh` | Shared aliases (POSIX) | - |
 | `.config/shell/functions.sh` | Shared functions (POSIX) | - |
 | `.bash_profile` | Bash login shell | `.profile`, `.bashrc` |
 | `.bashrc` | Bash interactive | `shell/{exports,aliases,functions}.sh` |
+| `.bashrc.d/*.sh` | Profile-specific `.bashrc` extensions | - |
 | `.zshenv` | Zsh environment | `.profile` |
 | `.zshrc` | Zsh interactive | `shell/{exports,aliases,functions}.sh` |
+| `.zshrc.d/*.sh` | Profile-specific `.zshrc` extensions | - |
+| `.zprofile` | Zsh login shell | - |
+| `.zprofile.d/*.sh` | Profile-specific `.zprofile` extensions | - |
 | `fish/config.fish` | Fish (self-contained) | Fish-specific equivalents |
 
 ### Decision Tree for Configuration Changes
@@ -48,7 +53,9 @@ New configuration needed?
 ├─ Alias/Function → Is it profile-specific?
 │  ├─ YES → `{profile}/.config/shell/aliases.{profile}.sh` + Fish equivalent
 │  └─ NO → `.config/shell/aliases.sh` + Fish equivalent
-└─ Interactive feature → Shell-specific rc file only
+├─ Interactive feature → Shell-specific rc file only
+└─ Profile-specific shell init logic (not an alias/export/function)?
+   └─ `{profile}/.bashrc.d/{profile}.sh` / `.zshrc.d/` / `.profile.d/` / `.zprofile.d/`
 ```
 
 ### Multi-Shell Requirements (NON-NEGOTIABLE)
@@ -96,8 +103,15 @@ When adding new PATH entries that should beat Homebrew, ensure they follow this 
 ├── shell/aliases.{profile}.sh # Profile-specific POSIX configs
 └── fish/config.{profile}.fish # Profile-specific Fish configs
 
+{profile}/
+├── .bashrc.d/{profile}.sh     # Profile-specific .bashrc extensions
+├── .zshrc.d/{profile}.sh      # Profile-specific .zshrc extensions
+├── .profile.d/{profile}.sh    # Profile-specific .profile extensions
+└── .zprofile.d/{profile}.sh   # Profile-specific .zprofile extensions
+
 Root:
 ├── .profile, .zshrc, .bashrc  # Shell init files
+├── .profile.d/, .bashrc.d/, .zshrc.d/, .zprofile.d/  # Profile extension dirs
 └── bin/                       # Utilities
 
 ubuntu-server/.config/nix/     # Nix configs and services

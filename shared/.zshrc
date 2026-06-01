@@ -193,4 +193,9 @@ zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 # Zsh-specific aliases  
 # ls alias is now provided by shared aliases (eza)
 
-
+# Source profile-specific overrides from .zshrc.d/
+for config_file in "$HOME/.zshrc.d/"*.sh; do
+  if [ -f "$config_file" ]; then
+    . "$config_file"
+  fi
+done

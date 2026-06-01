@@ -7,11 +7,15 @@ This directory contains shared shell configuration files that follow Unix best p
 ```
 shared/
 ├── .profile              # POSIX environment variables (sourced by all shells)
+├── .profile.d/          # Profile-specific .profile extensions (*.sh)
 ├── .bashrc              # Bash interactive configuration
+├── .bashrc.d/           # Profile-specific .bashrc extensions (*.sh)
 ├── .bash_profile        # Bash login shell (sources .profile + .bashrc)
 ├── .zshenv              # Zsh environment (sources .profile)
 ├── .zshrc               # Zsh interactive configuration
+├── .zshrc.d/            # Profile-specific .zshrc extensions (*.sh)
 ├── .zprofile            # Zsh login shell (minimal, macOS Terminal.app compatibility)
+├── .zprofile.d/         # Profile-specific .zprofile extensions (*.sh)
 └── .config/
     ├── shell/
     │   ├── exports.sh   # Shared environment variables
@@ -81,6 +85,21 @@ shared/
 ### `functions.sh`
 - Shell functions that work across bash and zsh
 - Custom utilities
+
+## Profile-Specific Overrides (`.d/` directories)
+
+Each root shell init file has a companion `.d/` directory that sources `*.sh` files via glob. Profiles add their extensions as files in those directories — Stow merges the directories without conflict, since each profile contributes its own uniquely-named file.
+
+| Init File | Override Directory | Example |
+|-----------|-------------------|---------|
+| `.profile` | `.profile.d/` | `work/.profile.d/work.sh` |
+| `.bashrc` | `.bashrc.d/` | `rca/.bashrc.d/rca.sh` |
+| `.zshrc` | `.zshrc.d/` | `work/.zshrc.d/work.sh` |
+| `.zprofile` | `.zprofile.d/` | `personal/.zprofile.d/personal.sh` |
+
+The `shared/` profile establishes each `.d/` directory (with a `.gitkeep`). The globs are no-ops when no `*.sh` files are present.
+
+This complements the existing `.config/shell/` pattern (`aliases.*.sh`, `exports.*.sh`, `functions.*.sh`) for cases where profile-specific logic needs to live in the root init files rather than the shared shell config directory.
 
 ## Benefits
 

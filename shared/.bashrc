@@ -55,3 +55,13 @@ if command -v tv >/dev/null 2>&1; then
   eval "$(tv init bash)"
 fi
 
+# Source profile-specific overrides from .bashrc.d/
+for config_file in "$HOME/.bashrc.d/"*.sh; do
+  case "$config_file" in
+    *"*"*) continue ;;
+  esac
+  if [ -f "$config_file" ]; then
+    . "$config_file"
+  fi
+done
+
