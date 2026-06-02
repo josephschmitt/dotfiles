@@ -2,15 +2,16 @@
 # install.sh — Initialize dotfiles: pre-create directories and run stow
 #
 # Usage:
-#   ./install.sh shared personal          # Personal machine (stow only)
-#   ./install.sh shared work              # Work machine (stow only)
-#   ./install.sh shared rca               # RCA machine (stow only)
-#   ./install.sh shared ubuntu-server     # Ubuntu server (stow only)
-#   ./install.sh --dirs-only              # CI: only pre-create directories, skip stow
-#   ./install.sh --bootstrap              # Fresh machine: install Nix, nix-darwin,
-#                                         #   etc., then stow + TPM (interactive)
-#   ./install.sh --bootstrap shared work  # Bootstrap with profiles pre-selected
-#   ./install.sh --bootstrap shared rca   # Bootstrap with profiles pre-selected
+#   ./install.sh shared personal                    # Personal machine (stow only)
+#   ./install.sh shared work                        # Work machine (stow only)
+#   ./install.sh shared remote-sandbox rca          # RCA machine (stow only)
+#   ./install.sh shared remote-sandbox crafting     # Crafting sandbox (stow only)
+#   ./install.sh shared ubuntu-server               # Ubuntu server (stow only)
+#   ./install.sh --dirs-only                        # CI: only pre-create directories, skip stow
+#   ./install.sh --bootstrap                        # Fresh machine: install Nix, nix-darwin,
+#                                                   #   etc., then stow + TPM (interactive)
+#   ./install.sh --bootstrap shared work            # Bootstrap with profiles pre-selected
+#   ./install.sh --bootstrap shared remote-sandbox rca  # Bootstrap with profiles pre-selected
 #
 # Why directory pre-creation is required:
 #   Stow symlinks entire directories unless they already exist at the target.
@@ -262,6 +263,28 @@ bootstrap_rca_submodule() {
   fi
 }
 
+bootstrap_remote_sandbox_submodule() {
+  if [ -f "$DOTFILES_DIR/remote-sandbox/.git" ] || [ -d "$DOTFILES_DIR/remote-sandbox/.git" ]; then
+    ok "remote-sandbox submodule already initialized"
+    return 0
+  fi
+  if confirm "Initialize the private remote-sandbox submodule? (requires repo access)"; then
+    info "Initializing remote-sandbox submodule"
+    (cd "$DOTFILES_DIR" && git submodule update --init --recursive remote-sandbox)
+  fi
+}
+
+bootstrap_crafting_submodule() {
+  if [ -f "$DOTFILES_DIR/crafting/.git" ] || [ -d "$DOTFILES_DIR/crafting/.git" ]; then
+    ok "crafting submodule already initialized"
+    return 0
+  fi
+  if confirm "Initialize the private crafting submodule? (requires repo access)"; then
+    info "Initializing crafting submodule"
+    (cd "$DOTFILES_DIR" && git submodule update --init --recursive crafting)
+  fi
+}
+
 select_profiles_interactively() {
   # Only prompt if user ran --bootstrap without explicit profiles.
   [ ${#PROFILES[@]} -eq 0 ] || return 0
@@ -272,7 +295,7 @@ select_profiles_interactively() {
     default="shared ubuntu-server"
   fi
   info "Stow profile selection"
-  echo "Common choices: 'shared personal', 'shared work', 'shared rca', 'shared ubuntu-server'" >&2
+  echo "Common choices: 'shared personal', 'shared work', 'shared remote-sandbox rca', 'shared remote-sandbox crafting', 'shared ubuntu-server'" >&2
   local answer
   answer="$(prompt "Profiles to stow (space-separated)" "$default")"
   # shellcheck disable=SC2206
@@ -294,9 +317,9 @@ run_bootstrap() {
   fi
   bootstrap_xcode_clt
   bootstrap_apt_prereqs
-  has_profile rca || bootstrap_ssh_key
+  has_profile remote-sandbox || bootstrap_ssh_key
   bootstrap_convert_to_repo
-  if ! has_profile rca; then
+  if ! has_profile remote-sandbox; then
     bootstrap_hostname
     bootstrap_nix
     bootstrap_machine_config
@@ -304,7 +327,9 @@ run_bootstrap() {
   fi
   bootstrap_tpm
   has_profile work && bootstrap_work_submodule
+  has_profile remote-sandbox && bootstrap_remote_sandbox_submodule
   has_profile rca && bootstrap_rca_submodule
+  has_profile crafting && bootstrap_crafting_submodule
   select_profiles_interactively
 }
 
@@ -339,11 +364,11 @@ if [ ${#PROFILES[@]} -eq 0 ]; then
   PROFILES=("shared")
 fi
 
-# Run RCA dependency installer before stow (installs stow + userland tools)
+# Run dependency installer before stow (installs stow + userland tools)
 for p in "${PROFILES[@]}"; do
-  if [ "$p" = "rca" ]; then
-    info "Installing RCA userland dependencies"
-    "$DOTFILES_DIR/rca/bin/install-deps.sh"
+  if [ "$p" = "remote-sandbox" ]; then
+    info "Installing userland dependencies"
+    "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh"
     break
   fi
 done

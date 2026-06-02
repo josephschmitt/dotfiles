@@ -4,3 +4,9 @@
 [submodule "rca"]
 	path = rca
 	url = git@github.com:josephschmitt/dotfiles-rca-private.git
+[submodule "remote-sandbox"]
+	path = remote-sandbox
+	url = git@github.com:josephschmitt/dotfiles-remote-sandbox-private.git
+[submodule "crafting"]
+	path = crafting
+	url = git@github.com:josephschmitt/dotfiles-crafting-private.git

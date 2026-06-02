@@ -6,15 +6,17 @@
 - **Platforms**: macOS (primary), Ubuntu Server (secondary)
 - **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
 - **Editors**: Neovim (triple setup: Kickstart + LazyVim + AstroNvim) + Helix (secondary)
-- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `rca/` (macOS), `ubuntu-server/` (Ubuntu)
+- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `remote-sandbox/` (remote Linux base), `rca/` (RCA overlay), `crafting/` (crafting.dev overlay), `ubuntu-server/` (Ubuntu)
 
 ### Stow Commands
 ```bash
-stow .                        # Install all
-stow shared personal          # Install specific profiles (macOS)
-stow shared ubuntu-server     # Install specific profiles (Ubuntu)
-stow -R .                     # Restow (re-link)
-stow -D .                     # Uninstall
+stow .                                 # Install all
+stow shared personal                   # Install specific profiles (macOS)
+stow shared ubuntu-server              # Install specific profiles (Ubuntu)
+stow shared remote-sandbox rca         # RCA machine
+stow shared remote-sandbox crafting    # Crafting.dev sandbox
+stow -R .                              # Restow (re-link)
+stow -D .                              # Uninstall
 ```
 
 ## Troubleshooting
