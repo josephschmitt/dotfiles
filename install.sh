@@ -234,21 +234,6 @@ bootstrap_nix_darwin() {
   fi
 }
 
-bootstrap_tpm() {
-  local tpm_dir="$HOME/.config/tmux/plugins/tpm"
-  if [ ! -d "$tpm_dir" ]; then
-    info "Cloning TPM into $tpm_dir"
-    mkdir -p "$HOME/.config/tmux/plugins"
-    git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
-  else
-    ok "TPM already installed"
-  fi
-  if [ -x "$tpm_dir/bin/install_plugins" ]; then
-    info "Installing/updating tmux plugins via TPM"
-    "$tpm_dir/bin/install_plugins" || warn "TPM plugin install reported errors — you can retry with prefix+I inside tmux"
-  fi
-}
-
 bootstrap_work_submodule() {
   local work_machines="$DOTFILES_DIR/work/.config/nix-darwin/machines"
   if [ -d "$work_machines" ]; then
@@ -334,7 +319,6 @@ run_bootstrap() {
     bootstrap_machine_config
     bootstrap_nix_darwin
   fi
-  bootstrap_tpm
   has_profile work && bootstrap_work_submodule
   has_profile remote-sandbox && bootstrap_remote_sandbox_submodule
   has_profile rca && bootstrap_rca_submodule
@@ -385,25 +369,15 @@ for p in "${PROFILES[@]}"; do
   done
 done
 
-# Run dependency installer before stow (installs stow + userland tools)
-for p in "${PROFILES[@]}"; do
-  if [ "$p" = "remote-sandbox" ]; then
-    info "Installing userland dependencies"
-    if [ -n "$DEPS_PRESET" ]; then
-      "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh" --preset "$DEPS_PRESET"
-    else
-      "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh"
-    fi
-    export PATH="$HOME/.local/bin:$PATH"
-    break
-  fi
-done
+# Export for hooks to consume
+export DEPS_PRESET
 
-# Run profile pre-stow hooks
+# Run profile pre-stow hooks (sourced so PATH changes propagate)
 for p in "${PROFILES[@]}"; do
   if [ -x "$DOTFILES_DIR/$p/.hooks/pre-stow.sh" ]; then
     info "Running $p pre-stow hook"
-    "$DOTFILES_DIR/$p/.hooks/pre-stow.sh"
+    # shellcheck disable=SC1090
+    . "$DOTFILES_DIR/$p/.hooks/pre-stow.sh"
   fi
 done
 
@@ -411,11 +385,12 @@ info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
 stow -v --target="$HOME" "${PROFILES[@]}"
 
-if command -v bat >/dev/null 2>&1; then
-  info "Rebuilding bat cache"
-  bat cache --build
-fi
-
-bootstrap_tpm
+# Run profile post-stow hooks
+for p in "${PROFILES[@]}"; do
+  if [ -x "$DOTFILES_DIR/$p/.hooks/post-stow.sh" ]; then
+    info "Running $p post-stow hook"
+    "$DOTFILES_DIR/$p/.hooks/post-stow.sh"
+  fi
+done
 
 ok "Done."

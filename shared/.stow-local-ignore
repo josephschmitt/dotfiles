@@ -1,0 +1,11 @@
+# Default stow ignores (overridden when .stow-local-ignore exists)
+\.git
+\.gitignore
+\.gitmodules
+README.*
+AGENTS\.md
+CLAUDE\.md
+LICENSE.*
+
+# Profile metadata
+\.hooks
