@@ -119,6 +119,32 @@ Root:
 ubuntu-server/.config/nix/     # Nix configs and services
 ```
 
+## Profile Hooks (`.hooks/`)
+
+Profiles can define lifecycle scripts in a `.hooks/` directory. `install.sh` runs them automatically — no profile-specific logic belongs in install.sh itself.
+
+| Hook | When | Sourced? | Use case |
+|------|------|----------|----------|
+| `.hooks/pre-stow.sh` | After submodule init, before `stow` | Yes (PATH changes propagate) | Install deps, remove conflicting files |
+| `.hooks/post-stow.sh` | After `stow` completes | No | Build caches, install plugins |
+
+**Environment variables available to hooks:**
+- `DEPS_PRESET` — value of `--deps-preset` flag (empty if not specified)
+- `DOTFILES_DIR` — absolute path to the dotfiles repo
+
+**Rules:**
+- Hooks must be executable (`chmod +x`)
+- Hooks must be excluded from stow via `.stow-local-ignore` (add `\.hooks` entry)
+- Pre-stow hooks are **sourced** (`. script`), so `export` and PATH changes persist
+- Post-stow hooks are **executed** in a subshell
+- Keep hooks idempotent — `install.sh` may be re-run
+
+**Existing hooks:**
+| Profile | Hook | Does |
+|---------|------|------|
+| `remote-sandbox` | `pre-stow` | Installs userland deps, removes conflicting default configs |
+| `shared` | `post-stow` | Rebuilds bat cache, installs/updates TPM + tmux plugins |
+
 ## Nix-Darwin (macOS System Management)
 
 ### Convenience Aliases
