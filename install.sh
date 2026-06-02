@@ -6,6 +6,7 @@
 #   ./install.sh shared work                        # Work machine (stow only)
 #   ./install.sh shared remote-sandbox rca          # RCA machine (stow only)
 #   ./install.sh shared remote-sandbox crafting     # Crafting sandbox (stow only)
+#   ./install.sh --deps-preset core shared remote-sandbox crafting  # Minimal deps
 #   ./install.sh shared ubuntu-server               # Ubuntu server (stow only)
 #   ./install.sh --dirs-only                        # CI: only pre-create directories, skip stow
 #   ./install.sh --bootstrap                        # Fresh machine: install Nix, nix-darwin,
@@ -26,13 +27,21 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Parse flags
 DIRS_ONLY=false
 BOOTSTRAP=false
+DEPS_PRESET=""
 PROFILES=()
 
 for arg in "$@"; do
   case "$arg" in
     --dirs-only) DIRS_ONLY=true ;;
     --bootstrap) BOOTSTRAP=true ;;
-    *) PROFILES+=("$arg") ;;
+    --deps-preset) DEPS_PRESET="__next__" ;;
+    *)
+      if [ "$DEPS_PRESET" = "__next__" ]; then
+        DEPS_PRESET="$arg"
+      else
+        PROFILES+=("$arg")
+      fi
+      ;;
   esac
 done
 
@@ -380,7 +389,11 @@ done
 for p in "${PROFILES[@]}"; do
   if [ "$p" = "remote-sandbox" ]; then
     info "Installing userland dependencies"
-    "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh"
+    if [ -n "$DEPS_PRESET" ]; then
+      "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh" --preset "$DEPS_PRESET"
+    else
+      "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh"
+    fi
     export PATH="$HOME/.local/bin:$PATH"
     break
   fi
