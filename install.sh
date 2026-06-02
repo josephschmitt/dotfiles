@@ -364,6 +364,18 @@ if [ ${#PROFILES[@]} -eq 0 ]; then
   PROFILES=("shared")
 fi
 
+# Initialize submodules for selected profiles
+SUBMODULE_PROFILES="work rca remote-sandbox crafting"
+for p in "${PROFILES[@]}"; do
+  for sm in $SUBMODULE_PROFILES; do
+    if [ "$p" = "$sm" ] && [ ! -f "$DOTFILES_DIR/$sm/.git" ] && [ ! -d "$DOTFILES_DIR/$sm/.git" ]; then
+      info "Initializing $sm submodule"
+      (cd "$DOTFILES_DIR" && git submodule update --init --recursive "$sm")
+      break
+    fi
+  done
+done
+
 # Run dependency installer before stow (installs stow + userland tools)
 for p in "${PROFILES[@]}"; do
   if [ "$p" = "remote-sandbox" ]; then
