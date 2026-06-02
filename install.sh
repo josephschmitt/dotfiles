@@ -381,6 +381,7 @@ for p in "${PROFILES[@]}"; do
   if [ "$p" = "remote-sandbox" ]; then
     info "Installing userland dependencies"
     "$DOTFILES_DIR/remote-sandbox/bin/install-deps.sh"
+    export PATH="$HOME/.local/bin:$PATH"
     break
   fi
 done
