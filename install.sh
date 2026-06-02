@@ -399,6 +399,19 @@ for p in "${PROFILES[@]}"; do
   fi
 done
 
+# Remove default configs that conflict with stow (remote sandbox environments)
+for p in "${PROFILES[@]}"; do
+  if [ "$p" = "remote-sandbox" ]; then
+    for f in ~/.bashrc ~/.profile ~/.bash_logout ~/.claude/settings.json ~/.claude/statusline.sh; do
+      if [ -f "$f" ] && [ ! -L "$f" ]; then
+        rm -f "$f"
+        ok "Removed conflicting $f"
+      fi
+    done
+    break
+  fi
+done
+
 info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
 stow -v --target="$HOME" "${PROFILES[@]}"
