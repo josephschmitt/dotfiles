@@ -154,8 +154,8 @@ function! s:TokyonightMoon() abort
   execute 'highlight EndOfBuffer  guifg=' . l:bg      . ' guibg=' . l:bg
   execute 'highlight LineNr       guifg=' . l:gutter  . ' guibg=NONE'
   execute 'highlight CursorLineNr guifg=' . l:orange  . ' guibg=NONE gui=bold'
-  execute 'highlight CursorLine   guibg=' . l:bg_hl
-  execute 'highlight CursorColumn guibg=' . l:bg_hl
+  execute 'highlight CursorLine   guibg=' . l:bg_hl . ' gui=NONE cterm=NONE term=NONE'
+  execute 'highlight CursorColumn guibg=' . l:bg_hl . ' gui=NONE cterm=NONE term=NONE'
   execute 'highlight ColorColumn  guibg=#292e42'
   execute 'highlight SignColumn   guifg=' . l:fg_dark . ' guibg=NONE'
   execute 'highlight VertSplit    guifg=' . l:blue    . ' guibg=NONE gui=bold'
