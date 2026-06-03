@@ -67,8 +67,14 @@ set ttyfast                         " faster redraw on local + ssh terms
 set hidden                          " allow buffer switch without saving
 set backspace=indent,eol,start      " sane backspace
 set encoding=utf-8
-set fileencoding=utf-8
 set ttimeoutlen=10                  " near-instant <Esc> in terminals
+
+" fileencoding is buffer-local and cannot be set on a loaded buffer (E21 on
+" re-source); set it for new/read files instead
+augroup SetFileEncoding
+  autocmd!
+  autocmd BufNewFile,BufRead * setlocal fileencoding=utf-8
+augroup END
 
 " Cursor shape: block in normal, line in insert, underline in replace
 " Works in xterm-compatible terminals (including tmux and most SSH terminals)
@@ -240,7 +246,7 @@ endfunction
 
 call s:TokyonightMoon()
 
-" Re-apply on :colorscheme tokyonight-moon, e.g. after :hi clear
+" Re-apply after :colorscheme tokyonight-moon (e.g. after :hi clear)
 augroup TokyonightMoon
   autocmd!
   autocmd ColorScheme tokyonight-moon call s:TokyonightMoon()
