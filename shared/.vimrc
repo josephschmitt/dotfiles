@@ -417,13 +417,37 @@ augroup END
 " =============================================================================
 function! s:HighlightYank() abort
   if v:event.operator !=# 'y' | return | endif
-  let l:start = line("'[")
-  let l:end = line("']")
-  if l:start <= 0 || l:end <= 0 | return | endif
-  let l:lines = []
-  for l:i in range(l:start, l:end) | call add(l:lines, l:i) | endfor
-  let l:m = matchaddpos('IncSearch', l:lines)
-  call timer_start(150, {-> execute('silent! call matchdelete(' . l:m . ')')})
+  let [l:sl, l:sc] = [line("'["), col("'[")]
+  let [l:el, l:ec] = [line("']"), col("']")]
+  if l:sl <= 0 || l:el <= 0 | return | endif
+
+  " Build a list of [line, col, len] specs for matchaddpos (max 8 per call)
+  let l:regions = []
+  if l:sl ==# l:el
+    " Single line: highlight exactly from start col to end col
+    call add(l:regions, [l:sl, l:sc, l:ec - l:sc + 1])
+  else
+    " First line: from start col to end of line
+    call add(l:regions, [l:sl, l:sc, strlen(getline(l:sl)) - l:sc + 1])
+    " Middle lines: whole lines (matchaddpos takes just [lnum] for whole line)
+    for l:i in range(l:sl + 1, l:el - 1)
+      call add(l:regions, [l:i])
+    endfor
+    " Last line: from col 1 to end col
+    call add(l:regions, [l:el, 1, l:ec])
+  endif
+
+  " matchaddpos accepts at most 8 positions per call; chunk if needed
+  let l:matches = []
+  let l:i = 0
+  while l:i < len(l:regions)
+    call add(l:matches, matchaddpos('IncSearch', l:regions[l:i : l:i + 7]))
+    let l:i += 8
+  endwhile
+
+  call timer_start(150, {->
+        \ map(copy(l:matches), {_,m -> execute('silent! call matchdelete(' . m . ')')})
+        \ })
 endfunction
 
 if exists('##TextYankPost')
