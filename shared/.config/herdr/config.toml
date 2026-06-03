@@ -38,8 +38,8 @@ focus_agent = "prefix+1..9"
 
 # Workspace navigation (picker disabled — default prefix+w conflicts with open_worktree)
 workspace_picker = ""
-# Rename workspace disabled — default prefix+shift+w conflicts with new_worktree
-rename_workspace = ""
+# Rename workspace — moved from default prefix+shift+w (conflicts with new_worktree)
+rename_workspace = "prefix+shift+e"
 # open_notification_target disabled — default prefix+o conflicts with worktree command
 open_notification_target = ""
 new_workspace = "prefix+shift+n"
