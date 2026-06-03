@@ -33,8 +33,12 @@ previous_agent = "alt+["
 next_agent = "alt+]"
 focus_agent = "prefix+1..9"
 
-# Workspace navigation (picker disabled — default conflicts with new_worktree)
+# Workspace navigation (picker disabled — default prefix+w conflicts with open_worktree)
 workspace_picker = ""
+# Rename workspace disabled — default prefix+shift+w conflicts with new_worktree
+rename_workspace = ""
+# open_notification_target disabled — default prefix+o conflicts with worktree command
+open_notification_target = ""
 new_workspace = "prefix+shift+n"
 previous_workspace = "alt+shift+["
 next_workspace = "alt+shift+]"
@@ -47,8 +51,11 @@ split_vertical = "prefix+|"
 # Zoom — Alt+z
 zoom = "alt+z"
 
-# New worktree — moved from default prefix+G to free up prefix+G for lazygit
-new_worktree = "prefix+w"
+# Open worktree picker — prefix+w (lists existing checkouts; focuses open ones, opens closed ones)
+open_worktree = "prefix+w"
+
+# New worktree — prefix+shift+w (matches new_workspace = prefix+shift+n pattern)
+new_worktree = "prefix+shift+w"
 
 # Quick shell (closes on exit)
 [[keys.command]]
@@ -61,6 +68,12 @@ command = "$SHELL"
 key = "prefix+G"
 type = "pane"
 command = "lazygit"
+
+# Open existing branch as a herdr worktree (local + remote branches via fzf)
+[[keys.command]]
+key = "prefix+shift+o"
+type = "pane"
+command = """sh -c 'branch=$(git branch -a --format "%(refname:short)" | sed "s|^origin/||" | sort -u | fzf --prompt "Open branch as worktree: " --height 40% --reverse) && [ -n "$branch" ] && herdr worktree open --branch "$branch" --focus'"""
 
 [ui]
 show_agent_labels_on_pane_borders = true
