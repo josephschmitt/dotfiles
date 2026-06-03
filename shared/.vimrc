@@ -81,8 +81,8 @@ augroup END
 let &t_SI = "\e[6 q"   " insert  → blinking bar
 let &t_SR = "\e[4 q"   " replace → blinking underline
 let &t_EI = "\e[2 q"   " normal  → steady block
-" Reset to block on startup
-autocmd VimEnter * silent execute '!echo -ne "\e[2 q"'
+" Reset to block on startup (write directly to terminal, no shell subprocess)
+autocmd VimEnter * call echoraw(&t_EI)
 set wildmenu wildmode=longest:full,full
 set fillchars+=vert:\|
 set shortmess+=I                    " no intro screen
