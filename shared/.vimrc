@@ -242,6 +242,9 @@ function! s:TokyonightMoon() abort
 
   " Cursor / selection
   execute 'highlight QuickFixLine guibg=' . l:bg_visual
+
+  " Yank flash — orange background, no foreground change
+  execute 'highlight YankFlash guibg=' . l:orange . ' guifg=' . l:bg . ' gui=NONE cterm=NONE term=NONE'
 endfunction
 
 call s:TokyonightMoon()
@@ -441,7 +444,7 @@ function! s:HighlightYank() abort
   let l:matches = []
   let l:i = 0
   while l:i < len(l:regions)
-    call add(l:matches, matchaddpos('IncSearch', l:regions[l:i : l:i + 7]))
+    call add(l:matches, matchaddpos('YankFlash', l:regions[l:i : l:i + 7]))
     let l:i += 8
   endwhile
 
