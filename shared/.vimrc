@@ -156,7 +156,7 @@ function! s:TokyonightMoon() abort
   execute 'highlight CursorLineNr guifg=' . l:orange  . ' guibg=NONE gui=bold'
   execute 'highlight CursorLine   guibg=' . l:bg_hl . ' gui=NONE cterm=NONE term=NONE'
   execute 'highlight CursorColumn guibg=' . l:bg_hl . ' gui=NONE cterm=NONE term=NONE'
-  execute 'highlight ColorColumn  guibg=#292e42'
+  execute 'highlight ColorColumn  guibg=' . l:gutter . ' gui=NONE cterm=NONE term=NONE'
   execute 'highlight SignColumn   guifg=' . l:fg_dark . ' guibg=NONE'
   execute 'highlight VertSplit    guifg=' . l:blue    . ' guibg=NONE gui=bold'
   execute 'highlight WinSeparator guifg=' . l:blue    . ' guibg=NONE gui=bold'
