@@ -303,6 +303,9 @@ nnoremap gl $
 xnoremap gh 0
 xnoremap gl $
 
+" Y yanks from cursor to end of line (Neovim default; Vim's default is yy)
+nnoremap Y y$
+
 " Select all
 nnoremap gV ggVG
 
