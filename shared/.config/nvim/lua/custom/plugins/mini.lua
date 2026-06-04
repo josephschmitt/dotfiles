@@ -34,26 +34,32 @@ return {
         return "%2l:%-2v"
       end
 
-      -- Add offset when neo-tree is open (matches bufferline offset of 40 columns)
+      -- Add offset when the file tree is open (matches bufferline offset width).
+      -- Cache open/closed state via autocmd so combine_groups (called on every redraw)
+      -- doesn't have to iterate windows each time.
+      local filetree_open = false
+      local function update_filetree_state()
+        filetree_open = false
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == config.filetree.filetype then
+            filetree_open = true
+            return
+          end
+        end
+      end
+      vim.api.nvim_create_autocmd({ "WinEnter", "WinClosed", "BufWinEnter", "BufWinLeave" }, {
+        group = vim.api.nvim_create_augroup("mini-statusline-filetree", { clear = true }),
+        callback = update_filetree_state,
+      })
+
       local original_combine_groups = statusline.combine_groups
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.combine_groups = function(groups)
-        -- Check if neo-tree is open
-        local neotree_open = false
-        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-          local buf = vim.api.nvim_win_get_buf(win)
-          if vim.bo[buf].filetype == "neo-tree" then
-            neotree_open = true
-            break
-          end
-        end
-
-        -- Add padding with separator to match neo-tree width
-        if neotree_open then
+        -- Add padding with separator to match file tree width
+        if filetree_open then
           -- Use WinSeparator highlight for the divider to match bufferline
-          table.insert(groups, 1, string.rep(" ", config.neotree_width) .. "%#WinSeparator#│%*")
+          table.insert(groups, 1, string.rep(" ", config.filetree_width) .. "%#WinSeparator#│%*")
         end
-
         return original_combine_groups(groups)
       end
 
@@ -98,7 +104,7 @@ return {
       })
 
       -- mini.bufremove: smart buffer deletion that preserves window layout
-      -- Switches to another buffer before deleting to prevent neo-tree takeover
+      -- Switches to another buffer before deleting to prevent file tree takeover
       require("mini.bufremove").setup()
     end,
   },

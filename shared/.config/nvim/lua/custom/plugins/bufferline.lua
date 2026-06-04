@@ -2,6 +2,8 @@
 -- Each tab shows the filename with an ordinal number (1, 2, 3...),
 -- and you can jump to any buffer with Ctrl+1-9 or navigate with Shift+h/l.
 -- https://github.com/akinsho/bufferline.nvim
+local config = require("custom.config")
+
 return {
   {
     "akinsho/bufferline.nvim",
@@ -14,7 +16,8 @@ return {
         numbers = "ordinal", -- Show 1, 2, 3... on each tab
         diagnostics = "nvim_lsp", -- Show LSP error/warning indicators on tabs
         offsets = {
-          { filetype = "neo-tree", text = "Explorer", highlight = "Comment", separator = true },
+          -- Reserve space on the left matching the file tree width
+          { filetype = config.filetree.filetype, text = "Explorer", highlight = "Comment", separator = true },
         },
         close_command = function(buf)
           require("mini.bufremove").delete(buf, false)

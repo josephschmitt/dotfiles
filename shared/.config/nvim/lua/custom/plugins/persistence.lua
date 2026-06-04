@@ -2,21 +2,14 @@
 -- Sessions are saved on exit and can be restored from the dashboard or via commands.
 -- Integrates with Snacks dashboard's session section.
 
-local AUTO_CLOSE_WIDTH = 150
+local config = require("custom.config")
 
--- Wipe any neo-tree buffers/windows (stale from session or live)
-local function wipe_neotree()
-  -- Close via neo-tree API first (if it's loaded)
-  pcall(function()
-    require("neo-tree.command").execute({ action = "close" })
-  end)
-  -- Force-wipe any leftover neo-tree buffers by name
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    local name = vim.api.nvim_buf_get_name(buf)
-    if name:match("neo%-tree ") then
-      pcall(vim.api.nvim_buf_delete, buf, { force = true })
-    end
-  end
+-- Wipe any file tree buffers/windows (stale from session or live)
+local function wipe_filetree()
+  -- Close via the adapter API first (if the plugin is loaded)
+  pcall(config.filetree.close)
+  -- Force-wipe any leftover file tree buffers
+  config.filetree.wipe_buffers()
 end
 
 return {
@@ -24,25 +17,25 @@ return {
     "folke/persistence.nvim",
     event = "BufReadPre",
     opts = {
-      -- Wipe neo-tree before saving so ghost buffers don't end up in the session
-      pre_save = wipe_neotree,
+      -- Wipe file tree before saving so ghost buffers don't end up in the session
+      pre_save = wipe_filetree,
     },
     config = function(_, opts)
       require("persistence").setup(opts)
 
-      -- After a session is restored: clean up stale neo-tree state,
-      -- then auto-open neo-tree if screen is wide enough
-      local group = vim.api.nvim_create_augroup("persistence-neotree", { clear = true })
+      -- After a session is restored: clean up stale file tree state,
+      -- then auto-open the file tree if screen is wide enough
+      local group = vim.api.nvim_create_augroup("persistence-filetree", { clear = true })
       vim.api.nvim_create_autocmd("SessionLoadPost", {
         group = group,
         callback = function()
-          -- Wipe ghost neo-tree buffers from the restored session
-          wipe_neotree()
+          -- Wipe ghost file tree buffers from the restored session
+          wipe_filetree()
 
-          -- Auto-open neo-tree on wide screens after restore
-          if vim.o.columns > AUTO_CLOSE_WIDTH then
+          -- Auto-open file tree on wide screens after restore
+          if vim.o.columns > config.filetree_auto_close_width then
             vim.defer_fn(function()
-              pcall(require("neo-tree.command").execute, { action = "show" })
+              pcall(config.filetree.open)
             end, 100)
           end
         end,
