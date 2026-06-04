@@ -59,6 +59,7 @@ return {
           ["h"] = "close_node", -- Collapse folder
           ["H"] = "prev_source", -- Switch to previous source tab
           ["L"] = "next_source", -- Switch to next source tab
+          ["<Esc>"] = "close_window", -- Close neo-tree with Escape
           ["."] = "toggle_hidden", -- Toggle dotfiles visibility
           ["I"] = function(state) -- Toggle gitignored files visibility
             state.filtered_items = state.filtered_items or {}
