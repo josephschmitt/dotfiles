@@ -43,7 +43,7 @@ local adapters = {
     end,
     focus = function()
       local p = Snacks.picker.get({ source = "explorer" })[1]
-      if p then p:focus() else Snacks.picker.explorer() end
+      if p then p:focus("list") else Snacks.picker.explorer() end
     end,
     reload = function()
       local p = Snacks.picker.get({ source = "explorer" })[1]

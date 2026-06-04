@@ -90,18 +90,6 @@ return {
           return vim.o.columns <= filetree_config.filetree_auto_close_width
         end
 
-        -- Close the explorer when you leave its window on a narrow screen
-        vim.api.nvim_create_autocmd("WinLeave", {
-          group = vim.api.nvim_create_augroup("snacks-explorer-auto-close", { clear = true }),
-          callback = function()
-            if should_auto_close() and vim.bo.filetype == "snacks_picker_list" then
-              vim.schedule(function()
-                pcall(filetree_config.filetree.close)
-              end)
-            end
-          end,
-        })
-
         -- Auto-open/close when terminal is resized across the threshold
         vim.api.nvim_create_autocmd("VimResized", {
           group = vim.api.nvim_create_augroup("snacks-explorer-auto-resize", { clear = true }),

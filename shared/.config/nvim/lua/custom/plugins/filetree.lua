@@ -31,24 +31,29 @@ return {
           explorer = {
             -- Sidebar layout, no preview pane by default (toggle with <Tab>)
             layout = { preset = "sidebar", preview = false },
-            -- Close the explorer after jumping to a file on narrow screens
+            -- Dynamically set jump.close based on screen width at confirm time:
+            -- closes after opening a file on narrow screens, stays open on wide ones.
             actions = {
-              close_if_narrow = function(picker)
-                if should_auto_close() then
-                  picker:close()
-                end
+              confirm_smart = function(picker, item)
+                picker.opts.jump.close = vim.o.columns <= require("custom.config").filetree_auto_close_width
+                picker:action("confirm", item)
               end,
             },
             win = {
               list = {
                 keys = {
-                  -- Esc closes the explorer (mirrors nvim-tree/neo-tree behaviour)
+                  -- Esc closes the explorer from the list (mirrors nvim-tree/neo-tree)
                   ["<Esc>"] = "close",
-                  -- Toggle hidden files (. prefix) with the same key as other providers
-                  ["."] = "toggle_hidden",
-                  -- Open file and close explorer on narrow screens
-                  ["<CR>"] = { "confirm", "close_if_narrow" },
-                  ["l"] = { "confirm", "close_if_narrow" },
+                  -- Override confirm to dynamically decide whether to close based on width
+                  ["l"] = "confirm_smart",
+                  ["<CR>"] = "confirm_smart",
+                  -- / is already toggle_focus by default: jumps to the search input
+                },
+              },
+              input = {
+                keys = {
+                  -- Esc from the search input returns to the list (not close)
+                  ["<Esc>"] = { "focus_list", mode = { "n", "i" } },
                 },
               },
             },
@@ -77,6 +82,10 @@ return {
         function()
           if vim.bo.filetype == config.filetree.filetype then
             vim.cmd("wincmd p")
+            -- Close the explorer after jumping away on narrow screens
+            if vim.o.columns <= config.filetree_auto_close_width then
+              pcall(config.filetree.close)
+            end
           else
             pcall(config.filetree.focus)
           end
