@@ -1,7 +1,7 @@
 -- Shared configuration constants used across multiple plugin files
 local M = {
-  -- Which file explorer to use: "nvim-tree" | "neo-tree"
-  filetree_provider = "nvim-tree",
+  -- Which file explorer to use: "snacks" | "nvim-tree" | "neo-tree"
+  filetree_provider = "snacks",
 
   -- Sidebar width (used in filetree.lua, mini.lua for statusline offset, bufferline for offset)
   filetree_width = 40,
@@ -25,6 +25,37 @@ local function wipe_bufs_matching(predicate)
 end
 
 local adapters = {
+  ["snacks"] = {
+    -- The explorer is a snacks picker in sidebar layout. The list window has
+    -- filetype "snacks_picker_list" — that's what bufferline/mini see.
+    filetype = "snacks_picker_list",
+    open = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then p:show() else Snacks.picker.explorer() end
+    end,
+    close = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then p:close() end
+    end,
+    toggle = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then p:close() else Snacks.picker.explorer() end
+    end,
+    focus = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then p:focus() else Snacks.picker.explorer() end
+    end,
+    reload = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then p:refresh() end
+    end,
+    wipe_buffers = function()
+      wipe_bufs_matching(function(buf)
+        return vim.bo[buf].filetype == "snacks_picker_list"
+      end)
+    end,
+  },
+
   ["neo-tree"] = {
     filetype = "neo-tree",
     open = function()

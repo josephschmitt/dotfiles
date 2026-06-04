@@ -1,8 +1,9 @@
 -- File tree sidebar (like VS Code's explorer panel).
--- Supports two providers controlled by config.filetree_provider:
---   "nvim-tree"  — nvim-tree.lua (default, stable)
---   "neo-tree"   — neo-tree.nvim  (three views: filesystem, buffers, git status)
--- Only the active provider's spec is enabled; the other is disabled by lazy.nvim.
+-- Supports three providers controlled by config.filetree_provider:
+--   "snacks"     — snacks.nvim explorer (picker in sidebar layout, default)
+--   "nvim-tree"  — nvim-tree.lua (standalone, stable)
+--   "neo-tree"   — neo-tree.nvim (three views: filesystem, buffers, git status)
+-- Only the active provider's spec is enabled; the others are disabled by lazy.nvim.
 -- To switch: change filetree_provider in config.lua and run :Lazy sync.
 
 local config = require("custom.config")
@@ -12,6 +13,81 @@ local function should_auto_close()
 end
 
 return {
+  -- ──────────────────────────────────────────────────────────────────────────
+  -- snacks.nvim explorer
+  -- Picker-based sidebar explorer built into snacks.nvim (already a dep).
+  -- No extra plugin install needed; configured via opts.picker.sources.explorer.
+  -- https://github.com/folke/snacks.nvim/blob/main/docs/explorer.md
+  -- ──────────────────────────────────────────────────────────────────────────
+  {
+    "folke/snacks.nvim",
+    enabled = config.filetree_provider == "snacks",
+    opts = {
+      explorer = {
+        replace_netrw = true, -- snacks handles netrw; options.lua guard is a no-op
+      },
+      picker = {
+        sources = {
+          explorer = {
+            -- Sidebar layout, no preview pane by default (toggle with <Tab>)
+            layout = { preset = "sidebar", preview = false },
+            -- Close the explorer after jumping to a file on narrow screens
+            actions = {
+              close_if_narrow = function(picker)
+                if should_auto_close() then
+                  picker:close()
+                end
+              end,
+            },
+            win = {
+              list = {
+                keys = {
+                  -- Esc closes the explorer (mirrors nvim-tree/neo-tree behaviour)
+                  ["<Esc>"] = "close",
+                  -- Toggle hidden files (. prefix) with the same key as other providers
+                  ["."] = "toggle_hidden",
+                  -- Open file and close explorer on narrow screens
+                  ["<CR>"] = { "confirm", "close_if_narrow" },
+                  ["l"] = { "confirm", "close_if_narrow" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    keys = {
+      {
+        "<Leader>ee",
+        function() config.filetree.toggle() end,
+        desc = "Toggle Explorer (current file)",
+      },
+      {
+        "<Leader>eE",
+        function() Snacks.picker.explorer({ cwd = vim.uv.cwd() }) end,
+        desc = "Toggle Explorer (cwd)",
+      },
+      {
+        "<Leader>er",
+        function() config.filetree.reload() end,
+        desc = "Refresh Explorer",
+      },
+      {
+        "<Leader>o",
+        function()
+          if vim.bo.filetype == config.filetree.filetype then
+            vim.cmd("wincmd p")
+          else
+            pcall(config.filetree.focus)
+          end
+        end,
+        desc = "Toggle explorer focus",
+      },
+    },
+    -- Auto-close autocmds are registered in picker.lua's config function,
+    -- which owns the snacks.nvim setup call.
+  },
+
   -- ──────────────────────────────────────────────────────────────────────────
   -- nvim-tree.lua
   -- Simple, fast file explorer. No multi-source views, but very stable.
@@ -107,12 +183,14 @@ return {
         end
       end)
 
-      -- Auto-close on focus lost when screen is narrow
-      vim.api.nvim_create_autocmd("BufLeave", {
+      -- Auto-close on focus lost when screen is narrow.
+      -- WinLeave fires when leaving the tree window; vim.schedule defers the
+      -- close until after the new window has focus so nvim-tree's internal
+      -- "is_visible" state is stable when we call close().
+      vim.api.nvim_create_autocmd("WinLeave", {
         group = vim.api.nvim_create_augroup("nvimtree-auto-close-focus", { clear = true }),
-        pattern = "NvimTree_*",
         callback = function()
-          if should_auto_close() then
+          if should_auto_close() and vim.bo.filetype == "NvimTree" then
             vim.schedule(function()
               api.tree.close()
             end)
