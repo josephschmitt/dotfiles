@@ -64,19 +64,19 @@ new_worktree = "prefix+shift+w"
 [[keys.command]]
 key = "prefix+C"
 type = "pane"
-command = "$SHELL"
+command = "bash -lc '$SHELL'"
 
 # Lazygit
 [[keys.command]]
 key = "prefix+G"
 type = "pane"
-command = "lazygit"
+command = "bash -lc lazygit"
 
 # Open existing branch as a herdr worktree (local + remote branches via fzf)
 [[keys.command]]
 key = "prefix+shift+o"
 type = "pane"
-command = """sh -c 'branch=$(git branch -a --format "%(refname:short)" | sed "s|^origin/||" | sort -u | fzf --prompt "Open branch as worktree: " --height 40% --reverse) && [ -n "$branch" ] && herdr worktree open --branch "$branch" --focus'"""
+command = """bash -lc 'branch=$(git branch -a --format "%(refname:short)" | sed "s|^origin/||" | sort -u | fzf --prompt "Open branch as worktree: " --height 40% --reverse) && [ -n "$branch" ] && herdr worktree open --branch "$branch" --focus'"""
 
 [ui]
 show_agent_labels_on_pane_borders = true
