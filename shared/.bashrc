@@ -65,3 +65,4 @@ for config_file in "$HOME/.bashrc.d/"*.sh; do
   fi
 done
 
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
