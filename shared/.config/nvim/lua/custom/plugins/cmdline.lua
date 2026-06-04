@@ -7,6 +7,7 @@ return {
     opts = {
       cmdline = {
         completion = { menu = { auto_show = true } },
+        keymap = { preset = "super-tab" },
       },
     },
   },
