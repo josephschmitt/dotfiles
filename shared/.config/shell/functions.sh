@@ -97,6 +97,11 @@ herdr() {
   fi
 }
 
+# Herdr remote attach with server-side keybindings
+herdr-remote() {
+  herdr --remote-keybindings server --remote "$@"
+}
+
 # SSH wrapper that detaches from tmux before connecting
 ssh() {
   if [ -n "$TMUX" ]; then
