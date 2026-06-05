@@ -46,7 +46,7 @@ This configuration manages macOS systems declaratively using Nix, providing:
 - **AI**: `claude-code`, `codex`
 
 ### Homebrew Integration
-- **CLI tools**: `helix`, `opencode`
+- **CLI tools**: `helix`, `opencode`, `herdr` (terminal workspace manager for AI agents — installed via brew for fast release tracking)
 - **Applications**: 1Password, Arc, ChatGPT, Claude, Ghostty, VS Code
 - **Productivity**: Raycast, Hyperkey, Leader Key
 - **Creative**: Adobe Creative Cloud

@@ -63,6 +63,7 @@
   homebrew = {
     enable = true;
     brews = [
+      "herdr"
       "josephschmitt/tap/monocle"
       "josephschmitt/tap/pj"
       "raine/workmux/workmux"
