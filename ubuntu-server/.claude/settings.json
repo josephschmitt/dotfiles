@@ -7,9 +7,13 @@
   "enabledPlugins": {
     "commit-commands@claude-code-plugins": true,
     "security-guidance@claude-code-plugins": true,
-    "safety-net@cc-marketplace": true
+    "safety-net@cc-marketplace": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {},
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "editorMode": "vim",
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true
