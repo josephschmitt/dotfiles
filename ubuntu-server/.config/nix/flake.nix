@@ -61,6 +61,7 @@
           paths = with pkgs; [
             bat
             delta
+            devbox
             docker
             eza
             fd
