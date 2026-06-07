@@ -102,6 +102,9 @@ function zvm_after_init() {
   if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
     if command -v oh-my-posh >/dev/null 2>&1; then
       eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
+      # OMP's cached init pins the absolute nix store path of the binary.
+      # Resolve via PATH instead so long-lived shells survive nix GC.
+      _omp_executable=oh-my-posh
     fi
   fi
 

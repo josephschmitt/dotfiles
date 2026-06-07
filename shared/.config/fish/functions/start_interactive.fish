@@ -3,6 +3,9 @@ function start_interactive -d "Load interactive shell customizations (prompt, ke
     if type -q oh-my-posh
         # oh-my-posh prompt
         oh-my-posh init fish --config ~/.config/oh-my-posh/themes/custom.omp.yaml | source
+        # OMP's cached init pins the absolute nix store path of the binary.
+        # Resolve via PATH instead so long-lived shells survive nix GC.
+        set --global _omp_executable oh-my-posh
     end
 
     # Vi-mode configuration
