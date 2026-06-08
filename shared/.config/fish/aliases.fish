@@ -2,7 +2,6 @@
 
 alias c="clear"
 alias cat="bat"
-alias groot="echo 'I am Groot!' && cd (git rev-parse --show-toplevel)"
 alias lg="env TMPDIR=/tmp lazygit"
 alias nix_rebuild="~/dotfiles/shared/bin/darwin-rebuild-wrapper.sh"
 alias nix_update="nix flake update --flake ~/dotfiles/shared/.config/nix-darwin"

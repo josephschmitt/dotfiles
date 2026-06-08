@@ -3,7 +3,6 @@
 # Navigation and utilities
 alias c="clear"
 alias cat="bat"
-alias groot="echo 'I am Groot!' && cd \$(git rev-parse --show-toplevel)"
 alias lg="env TMPDIR=/tmp lazygit"
 alias lazyvim='NVIM_APPNAME=lazyvim command nvim'
 alias astrovim='NVIM_APPNAME=astronvim command nvim'

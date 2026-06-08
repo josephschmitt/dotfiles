@@ -39,6 +39,14 @@ start_interactive() {
   fi
 }
 
+# cd to git repo root with a friendly greeting
+groot() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo" >&2; return 1; }
+  printf "I am Groot! \033[90m%s\033[0m\n" "$(echo "${root}" | sed "s|^${HOME}|~|")"
+  cd "$root"
+}
+
 # Change directories from ~/development
 cdd() {
   cd ~/development/"$1" || exit
