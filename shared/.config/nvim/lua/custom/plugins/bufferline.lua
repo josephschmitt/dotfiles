@@ -61,14 +61,14 @@ return {
         end,
         desc = "Close all buffers",
       },
-      { "<Leader>bd", "<Cmd>BufferLinePickClose<CR>", desc = "Close buffer from tabline" },
       {
-        "<Leader>bD",
+        "<Leader>bd",
         function()
           require("mini.bufremove").delete()
         end,
         desc = "Close current buffer",
       },
+      { "<Leader>bD", "<Cmd>BufferLinePickClose<CR>", desc = "Close buffer from tabline" },
       { "<Leader>bl", "<Cmd>BufferLineCloseLeft<CR>", desc = "Close all to the left" },
       { "<Leader>br", "<Cmd>BufferLineCloseRight<CR>", desc = "Close all to the right" },
 
