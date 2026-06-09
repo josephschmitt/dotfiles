@@ -31,6 +31,9 @@ return {
           explorer = {
             -- Sidebar layout, no preview pane by default (toggle with <Tab>)
             layout = { preset = "sidebar", preview = false },
+            -- Show hidden (dotfiles) by default; toggle with `.` in the list.
+            -- `ignored = false` still hides git-ignored files.
+            hidden = true,
             -- Dynamically set jump.close based on screen width at confirm time:
             -- closes after opening a file on narrow screens, stays open on wide ones.
             actions = {
