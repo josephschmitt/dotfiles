@@ -100,6 +100,7 @@
             gh
             ghostty
             git
+            git-spice
             gnumake
             gum
             lazydocker
