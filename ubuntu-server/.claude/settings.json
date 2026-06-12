@@ -1,4 +1,5 @@
 {
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -9,10 +10,26 @@
     "security-guidance@claude-code-plugins": true,
     "safety-net@cc-marketplace": true,
     "claude-code-setup@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true
+    "commit-commands@claude-plugins-official": true,
+    "knowledge@tools": true,
+    "linear@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {},
+  "extraKnownMarketplaces": {
+    "tools": {
+      "source": {
+        "source": "github",
+        "repo": "josephschmitt/knowledge-tools"
+      }
+    }
+  },
   "effortLevel": "xhigh",
+  "pluginConfigs": {
+    "knowledge@tools": {
+      "options": {
+        "mcp_url": "https://knowledge.schmitt.town/mcp"
+      }
+    }
+  },
   "tui": "fullscreen",
   "editorMode": "vim",
   "remoteControlAtStartup": true,
