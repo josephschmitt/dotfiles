@@ -52,6 +52,35 @@
           homepage = "https://github.com/trzsz/tsshd";
         };
       };
+
+      monocle = pkgs.buildGoModule rec {
+        pname = "monocle";
+        version = "0.47.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "josephschmitt";
+          repo = "monocle";
+          rev = "v${version}";
+          hash = "sha256-llXFwyygAR0Et83UGDiWNRh5F+FnaYa0csu/LggNrds=";
+        };
+
+        vendorHash = "sha256-oajKuhbP+DRXefoJbrOVoyE1rOdtZaPS4c3u0HUP4Kc=";
+
+        subPackages = [ "cmd/monocle" ];
+
+        # Match GoReleaser's version stamp (-X main.version) so `monocle
+        # --version` reports the tag instead of "dev".
+        ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+
+        # E2E test spawns a server needing a writable $HOME, unavailable in the
+        # Nix build sandbox (HOME=/homeless-shelter).
+        doCheck = false;
+
+        meta = {
+          description = "monocle-review — terminal code review tool";
+          homepage = "https://github.com/josephschmitt/monocle";
+        };
+      };
     in
     {
       packages.${system} = {
@@ -95,6 +124,7 @@
             zsh
             tsshd
             multica
+            monocle
           ];
         };
       };
