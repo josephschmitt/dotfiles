@@ -72,7 +72,8 @@
     "security-guidance@claude-code-plugins": false,
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "linear@claude-plugins-official": true
+    "linear@claude-plugins-official": true,
+    "vault@knowledge-tools": true
   },
   "extraKnownMarketplaces": {
     "monocle": {
@@ -81,6 +82,19 @@
         "repo": "josephschmitt/monocle"
       },
       "autoUpdate": true
+    },
+    "knowledge-tools": {
+      "source": {
+        "source": "github",
+        "repo": "josephschmitt/knowledge-tools"
+      }
+    }
+  },
+  "pluginConfigs": {
+    "vault@knowledge-tools": {
+      "options": {
+        "mcp_url": "https://knowledge.schmitt.town/mcp"
+      }
     }
   },
   "sandbox": {
