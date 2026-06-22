@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Read JSON input from stdin
 input=$(cat)
@@ -109,81 +109,6 @@ if [ "$IS_GIT_REPO" = true ]; then
   fi
 fi
 
-# --- LLM Budget Usage ---
-BUDGET_DISPLAY=""
-CACHE_FILE="/tmp/claude-budget-usage-$(whoami).json"
-CACHE_TTL="${LLM_BUDGET_CACHE_TTL:-60}"  # Default 1 minute; override with LLM_BUDGET_CACHE_TTL env var — if this grows significantly, consider adding a "last updated" age indicator to BUDGET_DISPLAY
-COMPASS_API_V3_HOST="${COMPASS_API_V3_HOST:-www.compass.com}"
-
-fetch_budget() {
-  local key
-  key=$(compass config get llm-proxy-key 2>/dev/null)
-  if [ -n "$key" ]; then
-    local resp
-    if resp=$(curl -s --max-time 5 -X POST \
-      "https://${COMPASS_API_V3_HOST}/api/v3/litellm_management/budget_usage" \
-      -H 'Content-Type: application/json' \
-      -d "$(jq -n --arg key "$key" '{key: $key}')") && echo "$resp" | jq -e '.spend' >/dev/null 2>&1; then
-      echo "$resp" | jq --arg ts "$(date +%s)" '. + {timestamp: ($ts|tonumber)}' > "${CACHE_FILE}.tmp" \
-        && chmod 600 "${CACHE_FILE}.tmp" \
-        && mv "${CACHE_FILE}.tmp" "$CACHE_FILE"
-    fi
-  fi
-}
-
-# Check cache freshness
-NOW=$(date +%s)
-if [ -f "$CACHE_FILE" ]; then
-  CACHE_TS=$(jq -r '.timestamp // 0' "$CACHE_FILE" 2>/dev/null)
-  AGE=$(( NOW - CACHE_TS ))
-  if [ "$AGE" -gt "$CACHE_TTL" ]; then
-    # Refresh in background, use stale data this render
-    fetch_budget >/dev/null 2>&1 &
-    disown
-  fi
-else
-  # No cache — fetch in background; budget will appear on next render
-  fetch_budget >/dev/null 2>&1 &
-  disown
-fi
-
-# Read from cache (stale or fresh) — cache only exists after a successful fetch with a valid key
-if [ -f "$CACHE_FILE" ]; then
-  SPEND=$(jq -r '.spend // empty' "$CACHE_FILE" 2>/dev/null)
-  MAX_BUDGET=$(jq -r '.maxBudget // empty' "$CACHE_FILE" 2>/dev/null)
-
-  if [ -n "$SPEND" ]; then
-    # Add current session cost to cached spend for real-time tracking between cache refreshes
-    if [ -n "$COST_USD" ]; then
-      SPEND=$(echo "$SPEND $COST_USD" | awk '{printf "%.8f", $1 + $2}')
-    fi
-    SPEND_FMT=$(echo "$SPEND" | awk '{v=$1+0; if(v==int(v)) printf "%\47d", v; else printf "%\47.2f", v}')
-    if [ -n "$MAX_BUDGET" ]; then
-      # 999999 is the Compass LLM proxy sentinel for the "Unlimited" tier
-      if echo "$MAX_BUDGET" | awk '{exit !($1 >= 999999)}'; then
-        BUDGET_DISPLAY=" \033[32m💰 \$${SPEND_FMT} · Unlimited\033[0m"
-      else
-        MAX_FMT=$(echo "$MAX_BUDGET" | awk '{v=$1+0; if(v==int(v)) printf "%\47d", v; else printf "%\47.2f", v}')
-        # Calculate percentage for color
-        PCT=$(echo "$SPEND $MAX_BUDGET" | awk '{if ($2 == 0) print 0; else printf "%d", ($1/$2)*100}')
-        if [ "$PCT" -le 50 ]; then
-          BUDGET_COLOR="\033[32m"
-        elif [ "$PCT" -le 80 ]; then
-          BUDGET_COLOR="\033[33m"
-        else
-          BUDGET_COLOR="\033[31m"
-        fi
-        BUDGET_DURATION=$(jq -r '.budgetDuration // empty' "$CACHE_FILE" 2>/dev/null)
-        DURATION_SUFFIX=""
-        [ -n "$BUDGET_DURATION" ] && DURATION_SUFFIX="/${BUDGET_DURATION}"
-        BUDGET_DISPLAY=" ${BUDGET_COLOR}💰 \$${SPEND_FMT}/\$${MAX_FMT}${DURATION_SUFFIX}\033[0m"
-      fi
-    else
-      BUDGET_DISPLAY=" \033[37m💰 \$${SPEND_FMT}\033[0m"
-    fi
-  fi
-fi
-
 # Output format: [Model] [percentage] 📁 directory  branch +added -deleted ⇡ahead ⇣behind
 # Use ANSI color codes: cyan for model, white for directory, green for branch
-echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT$SESSION_COST$BUDGET_DISPLAY \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
+echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
