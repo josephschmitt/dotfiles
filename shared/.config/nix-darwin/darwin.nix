@@ -81,9 +81,11 @@
       "raycast"
       "setapp"
       "tailscale-app"
+      "veil-default-editor"
       "visual-studio-code"
     ];
     taps = [
+      "0x1b2c/veil"
       "josephschmitt/tap"
       "raine/workmux"
     ];

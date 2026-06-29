@@ -1,0 +1,89 @@
+# Veil configuration file
+# Latest version: https://github.com/0x1b2c/Veil/blob/master/veil.sample.toml
+
+# Line height multiplier for the editor grid.
+# A value of 1.2 is recommended for comfortable reading.
+# line_height = 1.2
+
+# Letter spacing multiplier for the editor grid.
+# Values below 1.0 tighten character spacing, above 1.0 loosen it.
+# letter_spacing = 1.0
+
+# Enable font ligatures (e.g. -> becomes →  in supported fonts).
+# ligatures = true
+
+# Path to the nvim binary. Veil uses multi-layer automatic detection
+# (cached path, login shell PATH, common Homebrew locations) which
+# works in the vast majority of cases. Only set this if automatic
+# detection resolves to a binary you don't want.
+# nvim_path = ""
+
+# Default NVIM_APPNAME for new windows. Leave empty to use "nvim".
+# nvim_appname = ""
+
+# By default, Veil lets nvim handle the tabline so you get the best
+# experience from awesome tabline plugins. Set to true for a basic
+# native macOS tab bar as a fallback.
+# native_tabs = false
+
+# Brightness offset for the title bar and tab bar, relative to the
+# colorscheme background. Positive values lighten, negative values darken.
+# titlebar_brightness_offset = -0.08
+# tabbar_brightness_offset = 0.05
+
+# Check for new Veil releases on GitHub at startup.
+# Disable if you prefer not to make network requests.
+# update_check = true
+
+
+# Font. See https://github.com/0x1b2c/Veil/blob/master/FONT.md for full
+# documentation. On a local connection Veil reads each field from nvim's
+# `guifont`, with the values below as fallback. On a remote connection
+# Veil uses the values below directly (the remote machine's `guifont`
+# rarely makes sense locally). Set `force = true` to use the values
+# below on local connections too; the trade-off is losing per-profile
+# font differentiation, which is fine if you want a simpler setup.
+# All fields are optional; an empty [font] block has no effect.
+#
+[font]
+family = "Monaco Nerd Font Mono"
+size = 13.0
+force = false
+
+
+# Keyboard shortcuts. See https://github.com/0x1b2c/Veil/blob/master/KEYBOARD.md
+# for full documentation. To enable any of the options below, leave [keyboard]
+# uncommented and uncomment the specific lines you want to override.
+[keyboard]
+
+# When true (default), Veil binds a set of Vim-friendly default keymaps:
+# Cmd+S → :w, Cmd+Z → u, Cmd+1-9 → switch tab, Ctrl+Tab → gt, etc.
+# Set to false to let these keys pass through to Neovim as <D-s>, <D-1>,
+# <C-Tab>, etc. You can then map them yourself in your nvim config.
+bind_default_neovim_keymaps = true
+
+# Rebind Veil's GUI actions. Set to "" to disable a shortcut
+# (the menu item remains and stays clickable).
+# new_window = "cmd+n"
+# new_window_with_profile = "cmd+shift+n"
+# close_tab = "cmd+w"
+# close_window = "cmd+shift+w"
+# quit = "cmd+q"
+# hide = "cmd+h"
+# minimize = "cmd+m"
+# toggle_fullscreen = "cmd+ctrl+f"
+# open_settings = "cmd+,"
+# connect_remote = "cmd+ctrl+shift+n"
+
+
+# Saved remote nvim connections. Start nvim on the remote host with
+# `nvim --headless --listen 127.0.0.1:6666`, forward the port via SSH,
+# then connect via Cmd+Ctrl+Shift+N. See README for SSH forwarding setup.
+#
+# [[remote]]
+# name = "Dev Server"
+# address = "127.0.0.1:6666"
+#
+# [[remote]]
+# name = "Staging"
+# address = "127.0.0.1:6667"
