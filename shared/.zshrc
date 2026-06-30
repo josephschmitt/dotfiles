@@ -148,7 +148,7 @@ zinit ice wait lucid
 zinit light zsh-users/zsh-syntax-highlighting
 zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
-zinit ice wait lucid
+zinit ice wait lucid has"fzf"
 zinit light Aloxaf/fzf-tab
 zinit ice wait lucid
 zinit light zsh-users/zsh-completions
@@ -190,7 +190,9 @@ setopt hist_find_no_dups
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Case-insensitive completion
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Use LS_COLORS for completion colors
-zstyle ':completion:*' menu no # Disable completion menu since we're using fzf
+if (( $+commands[fzf] )); then
+  zstyle ':completion:*' menu no # Disable completion menu since fzf-tab handles it
+fi
 zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 
 # Zsh-specific aliases  
