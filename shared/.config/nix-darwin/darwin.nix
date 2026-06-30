@@ -33,13 +33,14 @@
     bat
     bun
     csvq
-    eza
     delta
+    eza
     fd
     fish
     fzf
     gh
     git
+    gofumpt
     gum
     lazygit
     neovim
@@ -47,9 +48,11 @@
     nixpkgs-fmt
     nushell
     oh-my-posh
+    prettierd
     ripgrep
     sesh
     stow
+    stylua
     terminal-notifier
     tmux
     tree-sitter # Required by nvim-treesitter to compile parsers
