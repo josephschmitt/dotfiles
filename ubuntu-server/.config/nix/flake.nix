@@ -140,6 +140,7 @@
             git
             git-spice
             gnumake
+            gofumpt
             gum
             lazydocker
             lazygit
@@ -147,12 +148,13 @@
             neovim
             nil
             nixpkgs-fmt
-            nixpkgs-fmt
             nodejs
             oh-my-posh
+            prettierd
             ripgrep
             sesh
             stow
+            stylua
             television
             tmux
             uv
