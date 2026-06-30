@@ -28,7 +28,7 @@
 
 # Brightness offset for the title bar and tab bar, relative to the
 # colorscheme background. Positive values lighten, negative values darken.
-# titlebar_brightness_offset = -0.08
+titlebar_brightness_offset = 0
 # tabbar_brightness_offset = 0.05
 
 # Check for new Veil releases on GitHub at startup.
@@ -46,7 +46,7 @@
 # All fields are optional; an empty [font] block has no effect.
 #
 [font]
-family = "Monaco Nerd Font Mono"
+family = "FiraCode Nerd Font Mono"
 size = 13.0
 force = false
 
