@@ -81,6 +81,44 @@
           homepage = "https://github.com/josephschmitt/monocle";
         };
       };
+
+      knowledge-tools = pkgs.buildGoModule rec {
+        pname = "knowledge-tools";
+        version = "0.3.0";
+
+        src = pkgs.fetchFromGitHub {
+          owner = "josephschmitt";
+          repo = "knowledge-tools";
+          # CLI releases are tagged under the cli/ namespace, not bare vX.Y.Z.
+          rev = "cli/v${version}";
+          hash = "sha256-+dviTY+gYpMOLRMoOGMxmuki4/JC17qfIqIt4/oiqEQ=";
+        };
+
+        # go.mod lives in the cli/ subdirectory of the monorepo.
+        modRoot = "cli";
+
+        vendorHash = "sha256-Ob4MiOsaB81bXAA3Q2CTU20+E1IAtPB2x4i9j52ju9k=";
+
+        subPackages = [ "cmd/knowledge-tools" ];
+
+        # Match GoReleaser's version stamp (-X main.version) so `kt --version`
+        # reports the tag instead of "dev".
+        ldflags = [ "-s" "-w" "-X main.version=${version}" ];
+
+        # The CLI manages a daemon (fsnotify/cron); its tests need a writable
+        # $HOME / spawn processes, unavailable in the Nix build sandbox.
+        doCheck = false;
+
+        # GoReleaser's brew formula also installs a `kt` alias; replicate it.
+        postInstall = ''
+          ln -s knowledge-tools $out/bin/kt
+        '';
+
+        meta = {
+          description = "knowledge-tools — vault automation CLI (kt)";
+          homepage = "https://github.com/josephschmitt/knowledge-tools";
+        };
+      };
     in
     {
       packages.${system} = {
@@ -126,6 +164,7 @@
             tsshd
             multica
             monocle
+            knowledge-tools
           ];
         };
       };
