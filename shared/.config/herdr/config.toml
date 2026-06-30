@@ -40,7 +40,7 @@ focus_agent = "prefix+1..9"
 workspace_picker = ""
 # Rename workspace — moved from default prefix+shift+w (conflicts with new_worktree)
 rename_workspace = "prefix+shift+e"
-# open_notification_target disabled — default prefix+o conflicts with worktree command
+# open_notification_target disabled — default prefix+o freed up for pj-herdr plugin
 open_notification_target = ""
 new_workspace = "prefix+shift+n"
 previous_workspace = "alt+shift+["
@@ -71,6 +71,12 @@ command = "bash -lc '$SHELL'"
 key = "prefix+G"
 type = "pane"
 command = "bash -lc lazygit"
+
+# pj project picker — prefix+o (pj-herdr plugin)
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "pj.open-picker"
 
 # Open existing branch as a herdr worktree (local + remote branches via fzf)
 [[keys.command]]
