@@ -184,7 +184,12 @@ vim.diagnostic.config {
   virtual_lines = false, -- Teest shows up underneath the line, with virtual lines
 
   -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
-  jump = { float = true },
+  -- `jump.float` is deprecated in favor of `jump.on_jump` in 0.12 (removal planned for 0.14),
+  -- but `on_jump` doesn't exist yet on 0.11, where it's silently a no-op (no crash, but the
+  -- float never opens). Version-gate so this config works unmodified across a mixed 0.11/0.12 fleet.
+  jump = (vim.fn.has 'nvim-0.12' == 1) and {
+    on_jump = function(_, bufnr) vim.diagnostic.open_float { bufnr = bufnr, scope = 'cursor', focus = false } end,
+  } or { float = true },
 }
 
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -233,7 +238,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then error('Error cloning lazy.nvim:\n' .. out) end

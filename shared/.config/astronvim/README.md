@@ -101,7 +101,6 @@ opts = {
 | `claudecode.nvim` | Claude Code integration with diff review | Active | Custom |
 | `multicursor.nvim` | Multi-cursor editing | Active | Custom |
 | `yazi.nvim` | Terminal file manager integration | Active | AstroCommunity (customized) |
-| `modes.nvim` | Mode-based color highlighting | Disabled | Custom |
 | `tiny-inline-diagnostic.nvim` | Inline diagnostic messages | Active | AstroCommunity (customized) |
 | `diffview.nvim` | Full diff view with layout toggle | Active | AstroCommunity (customized) |
 | `sortjson.nvim` | JSON sorting utilities | Active | Custom |
@@ -478,10 +477,6 @@ The `treesitter.lua` file is currently disabled. To activate:
 - **Format on save**: Enabled globally (configure in `astrolsp.lua`)
 - **Large file threshold**: 256KB or 10,000 lines (disables heavy features)
 - **Disabled RTP plugins**: gzip, netrw, tar, tohtml, zip (for performance)
-
-## 🐛 Known Issues
-
-- **modes.nvim**: Disabled due to startup messages. Re-enable in `lua/plugins/user.lua` (line 177) if desired.
 
 ## 📚 Resources
 

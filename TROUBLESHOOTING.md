@@ -119,6 +119,25 @@ Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different meth
 
 **Note on nvim-treesitter itself:** The upstream `nvim-treesitter/nvim-treesitter` repo was archived by its maintainer in April 2026 after a contentious rewrite requiring Neovim 0.12+. This repo's `shared/.config/nvim/init.lua` and `lazy-lock.json` still point at that now-archived (read-only) repo, pinned to a commit on its `main` branch (the post-rewrite API this config already uses). It still works as pinned, but will receive no further fixes/parsers from upstream. The community has organized a continuation at `neovim-treesitter/nvim-treesitter`; migrating `init.lua`'s plugin source to that fork is a separate, not-yet-done follow-up (tracked here so it isn't lost, not yet actioned).
 
+### `:checkhealth` shows `opts.jump.float is deprecated` after upgrading to Neovim 0.12
+
+**Symptom:** `:checkhealth vim.deprecated` reports:
+```
+WARNING opts.jump.float is deprecated. Feature will be removed in Nvim 0.14
+ADVICE: use opts.jump.on_jump instead.
+```
+pointing at the `vim.diagnostic.config { jump = { float = true } }` call in `init.lua`.
+
+**Cause:** Neovim 0.12 replaced `vim.diagnostic.Opts.Jump.float` with an `on_jump` callback. But `on_jump` **does not exist on 0.11** — setting it there doesn't error, it's just silently ignored (confirmed by testing against a real 0.11.4 binary: `vim.diagnostic.jump()` moves the cursor but never opens the float). Since this config's `init.lua`/`lazy-lock.json` are shared across every machine in the fleet, and machines upgrade to a new Neovim version on their own schedule, naively switching to `on_jump` would silently break the auto-float-on-jump behavior on any machine still running 0.11.
+
+**Fix:** Version-gate the option with `vim.fn.has 'nvim-0.12'` so the same `init.lua` behaves correctly whichever Neovim version is currently installed:
+```lua
+jump = (vim.fn.has 'nvim-0.12' == 1) and {
+  on_jump = function(_, bufnr) vim.diagnostic.open_float { bufnr = bufnr, scope = 'cursor', focus = false } end,
+} or { float = true },
+```
+This is the general pattern for any future 0.11→0.12 (or later) deprecation surfaced by `:checkhealth` on a fleet that upgrades machine-by-machine rather than all at once: gate on `vim.fn.has 'nvim-0.12'` rather than doing a hard cutover, until every machine is confirmed upgraded.
+
 ### Resizing the terminal sometimes crashes with `picker.lua:229: attempt to index field 'preview' (a nil value)`
 
 **Symptom:** Resizing the terminal window (e.g. tmux pane resize) while the Snacks explorer sidebar is open occasionally throws:
