@@ -118,6 +118,22 @@ Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different meth
 - If diagnostics match scenario 2 (binary genuinely absent): `remote-sandbox/bin/install-deps.sh` now installs `tree-sitter` as part of the `core` preset (downloads the pinned release's `tree-sitter-linux-x64.gz` from `tree-sitter/tree-sitter` releases on GitHub). Re-run `~/bin/install-deps.sh --preset core` (or `full`) on the affected machine, or `./install.sh` from the repo root, then restart nvim.
 
 **Note on nvim-treesitter itself:** The upstream `nvim-treesitter/nvim-treesitter` repo was archived by its maintainer in April 2026 after a contentious rewrite requiring Neovim 0.12+. This repo's `shared/.config/nvim/init.lua` and `lazy-lock.json` still point at that now-archived (read-only) repo, pinned to a commit on its `main` branch (the post-rewrite API this config already uses). It still works as pinned, but will receive no further fixes/parsers from upstream. The community has organized a continuation at `neovim-treesitter/nvim-treesitter`; migrating `init.lua`'s plugin source to that fork is a separate, not-yet-done follow-up (tracked here so it isn't lost, not yet actioned).
+
+### Resizing the terminal sometimes crashes with `picker.lua:229: attempt to index field 'preview' (a nil value)`
+
+**Symptom:** Resizing the terminal window (e.g. tmux pane resize) while the Snacks explorer sidebar is open occasionally throws:
+```
+vim.schedule callback: .../snacks/picker/core/picker.lua:229: attempt to index field 'preview' (a nil value)
+stack traceback:
+        .../snacks/picker/core/picker.lua:229: in function 'init_layout'
+        .../snacks/picker/core/picker.lua:373: in function 'set_layout'
+        .../snacks/picker/core/picker.lua:280: in function <.../snacks/picker/core/picker.lua:279>
+```
+
+**Cause:** A race between two independent `VimResized` handlers on the same explorer picker instance. `shared/.config/nvim/lua/custom/plugins/picker.lua` registers a `snacks-explorer-auto-resize` autocmd that calls `picker:close()` synchronously when the terminal narrows past `filetree_auto_close_width`. `snacks.nvim`'s own picker (`lua/snacks/picker/core/picker.lua`, `attach()`) independently listens for `VimResized` on every open picker to relayout itself, and defers that relayout via `vim.schedule`. `picker:close()` does most of its teardown synchronously but *also* defers the actual field cleanup (including setting `self.preview = nil`) via `vim.schedule`. Because our autocmd is registered earlier (at `VimEnter`) than the picker's own listener (registered when the explorer opens), our `close()` call reaches its `vim.schedule` first, so our teardown callback runs *before* snacks' own relayout callback — which then dereferences the now-nil `self.preview`.
+
+**Fix:** Wrap the body of the `snacks-explorer-auto-resize` autocmd callback in an extra `vim.schedule()`. This defers the actual `close()`/`open()` call by one tick, so snacks' own relayout callback (scheduled earlier in the same `VimResized` pass) runs and completes *before* our close's teardown nils out `self.preview`. Same pattern already used by the `nvim-tree` provider's `WinLeave` auto-close handler in the same file, for the same class of race.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)

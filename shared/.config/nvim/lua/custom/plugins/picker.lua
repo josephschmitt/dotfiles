@@ -90,15 +90,20 @@ return {
           return vim.o.columns <= filetree_config.filetree_auto_close_width
         end
 
-        -- Auto-open/close when terminal is resized across the threshold
+        -- Auto-open/close when terminal is resized across the threshold.
+        -- Deferred via vim.schedule to avoid racing snacks' own per-picker
+        -- VimResized handler (which also relayouts on this same event) —
+        -- see TROUBLESHOOTING.md "Neovim (Kickstart)" for details.
         vim.api.nvim_create_autocmd("VimResized", {
           group = vim.api.nvim_create_augroup("snacks-explorer-auto-resize", { clear = true }),
           callback = function()
-            if should_auto_close() then
-              pcall(filetree_config.filetree.close)
-            else
-              pcall(filetree_config.filetree.open)
-            end
+            vim.schedule(function()
+              if should_auto_close() then
+                pcall(filetree_config.filetree.close)
+              else
+                pcall(filetree_config.filetree.open)
+              end
+            end)
           end,
         })
       end
