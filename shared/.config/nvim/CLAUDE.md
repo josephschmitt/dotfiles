@@ -78,10 +78,11 @@ LSP servers are listed in `lua/custom/lsp-servers.lua` using **lspconfig names**
 
 1. `lsp-servers.lua` — defines which servers to enable and their config
 2. `init.lua` — calls `vim.lsp.enable()` for each server
-3. `mason-auto-install` — detects enabled servers and installs them via Mason on first use
-4. `mason-tool-installer` — only for **non-LSP tools** (formatters, linters like `stylua`)
+3. `mason-auto-install.lua` — installs each server via Mason the first time its filetype is opened
 
-**IMPORTANT**: Do NOT add lspconfig names to `mason-tool-installer`'s `ensure_installed` list. Mason registry names differ from lspconfig names (e.g., `jsonls` vs `json-lsp`) and will error. Let `mason-auto-install` handle LSP servers.
+**IMPORTANT**: `mason-auto-install` does NOT auto-detect servers from `lsp-servers.lua` or `vim.lsp.enable()` calls — it only installs packages explicitly listed in its own `opts.packages`, and it needs **Mason registry names**, which often differ from lspconfig names (e.g., `jsonls` -> `json-lsp`, `rust_analyzer` -> `rust-analyzer`). Whenever you add/remove a server in `lsp-servers.lua`, add/remove its Mason package name in `lua/custom/plugins/mason-auto-install.lua` too, or it will silently never get installed (LSP will fail with "X is not executable").
+
+4. `mason-tool-installer` — only for **non-LSP tools** (formatters, linters like `stylua`). Do NOT add lspconfig names here either — same registry-name mismatch applies.
 
 ### Formatting
 Formatting uses `conform.nvim` with `lsp_format = 'fallback'`:

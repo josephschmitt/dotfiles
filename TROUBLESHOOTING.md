@@ -87,6 +87,37 @@ Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different meth
 
 **Resume:** Once nix-homebrew pins its own `brew-src` to a version ≥ 5.1.10, the explicit override in `flake.nix` (the `nix-homebrew.inputs.brew-src.url` line) can be removed.
 
+## Neovim (Kickstart)
+
+### LSP servers/formatters never auto-install ("X is not executable", "vscode-json-language-server not found")
+
+**Symptom:** Opening a file (e.g. a `.json`, `.md`, or `.rs` file) in the Kickstart config shows an LSP error like `<server> is not executable`, or the server just never attaches. `:Mason` shows only `lua-language-server` and `stylua` installed, no matter how many filetypes you've opened. Most noticeable on machines where nix-darwin doesn't happen to install the LSP as a system package (e.g. personal Macs, which lack `vscode-langservers-extracted`) — work Macs can mask this because `G5FXQQ0D00.nix`/`W2TD37NJKN.nix` install `vscode-langservers-extracted` etc. as system packages.
+
+**Cause:** `shared/.config/nvim/lua/custom/plugins/mason-auto-install.lua` had `opts = {}`. `mason-auto-install.nvim` does **not** auto-detect servers from `lua/custom/lsp-servers.lua` or `vim.lsp.enable()` calls — despite the old comment claiming otherwise, it only installs packages explicitly listed in its own `opts.packages`, using **Mason registry names** (which often differ from lspconfig names, e.g. `jsonls` -> `json-lsp`, `rust_analyzer` -> `rust-analyzer`). With an empty list, it silently never installed anything.
+
+**Fix:** List every enabled server's Mason registry name in `mason-auto-install.lua`'s `opts.packages`. Keep this list in sync with `lua/custom/lsp-servers.lua` (plus `lua_ls`, which is enabled separately in `init.lua`) whenever a server is added or removed. See `shared/.config/nvim/CLAUDE.md` LSP Server Management section for the full mapping rule.
+
+### (Work only) Aborted Mason npm install shows `Resolved node ... / Using Hermetic NodeJS ...` instead of the real error
+
+**Symptom:** A Mason npm-based install (e.g. `json-lsp`) fails and the error message is just hnvm's banner (`Resolved node X to Y`, `Using Hermetic NodeJS vX`) with no actual npm error visible.
+
+**Cause:** `hnvm` (Compass's Node version manager, installed via the `work` nix-darwin machine configs) prints a diagnostic banner on every `node`/`npm` invocation. When an install aborts, that banner is whatever ends up in the captured stderr, burying the real failure reason.
+
+**Fix:** `work/.config/shell/exports.work.sh` and `work/.config/fish/config.work.fish` set `HNVM_QUIET=true`, which silences the banner so real npm errors surface cleanly.
+
+### `[nvim-treesitter/install/<lang>] error: ... ENOENT ... (cmd): 'tree-sitter'`
+
+**Symptom:** Opening any file (e.g. a `.env`) triggers a parser install and fails with an ENOENT on the `tree-sitter` command, for one or more of the pinned parsers (`bash`, `c`, `diff`, `html`, `lua`, `luadoc`, `markdown`, `markdown_inline`, `query`, `vim`, `vimdoc`).
+
+**Cause — two distinct scenarios that produce the identical error text:**
+1. **Transient race (macOS, tree-sitter actually installed):** `vim.system`/libuv raise the same ENOENT whether the `tree-sitter` binary is missing *or* the working directory nvim-treesitter tries to spawn the process into doesn't exist. nvim-treesitter computes and deletes that cwd from a cache directory shared across all concurrent nvim instances (`~/.cache/nvim/tree-sitter-<lang>`), so with multiple nvim windows open and a parser needing (re)install, one window can delete the cwd out from under another's spawn. Diagnostic signature: intermittent, only some parsers fail, `which tree-sitter` and `vim.fn.exepath('tree-sitter')` both resolve fine, and multiple nvim processes were running concurrently.
+2. **Missing binary (remote-sandbox / Linux, tree-sitter never installed):** On a `remote-sandbox`-profile machine, `tree-sitter` was only ever provisioned via `shared/.config/nix-darwin/darwin.nix` (macOS/nix-darwin only) — `remote-sandbox/bin/install-deps.sh` had no installer for it. Diagnostic signature: **100% reproducible**, every pinned parser fails every time, `which tree-sitter` fails outright, `vim.fn.exepath('tree-sitter')` returns empty in headless nvim, `~/.local/share/nvim/site/parser/` doesn't exist at all, and there's no concurrency (a single nvim process reproduces it).
+
+**Fix:**
+- If diagnostics match scenario 1 (binary present, only intermittent failures, multiple nvim windows open): no action needed — reopen the file or restart nvim; it's benign.
+- If diagnostics match scenario 2 (binary genuinely absent): `remote-sandbox/bin/install-deps.sh` now installs `tree-sitter` as part of the `core` preset (downloads the pinned release's `tree-sitter-linux-x64.gz` from `tree-sitter/tree-sitter` releases on GitHub). Re-run `~/bin/install-deps.sh --preset core` (or `full`) on the affected machine, or `./install.sh` from the repo root, then restart nvim.
+
+**Note on nvim-treesitter itself:** The upstream `nvim-treesitter/nvim-treesitter` repo was archived by its maintainer in April 2026 after a contentious rewrite requiring Neovim 0.12+. This repo's `shared/.config/nvim/init.lua` and `lazy-lock.json` still point at that now-archived (read-only) repo, pinned to a commit on its `main` branch (the post-rewrite API this config already uses). It still works as pinned, but will receive no further fixes/parsers from upstream. The community has organized a continuation at `neovim-treesitter/nvim-treesitter`; migrating `init.lua`'s plugin source to that fork is a separate, not-yet-done follow-up (tracked here so it isn't lost, not yet actioned).
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)
