@@ -335,7 +335,9 @@ if $BOOTSTRAP; then
 fi
 
 # Pre-create directories so stow symlinks individual files, not entire directories.
-# Required when multiple stow packages contribute files to the same parent directory.
+# Required when multiple stow packages contribute files to the same parent directory,
+# and also when a stowed directory is a mix of tracked config and tool-generated state
+# (e.g. .vim: vim-plug/undo would otherwise write through a whole-dir symlink into the repo).
 info "Pre-creating directories for stow merging"
 mkdir -p "$HOME/.config/fish"
 mkdir -p "$HOME/.config/shell"
@@ -346,6 +348,7 @@ mkdir -p "$HOME/.claude"
 mkdir -p "$HOME/.config/herdr"
 mkdir -p "$HOME/.ssh"
 mkdir -p "$HOME/bin"
+mkdir -p "$HOME/.vim"
 
 if $DIRS_ONLY; then
   ok "Done (--dirs-only: skipped stow)."
