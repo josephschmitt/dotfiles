@@ -84,14 +84,14 @@
 
       knowledge-tools = pkgs.buildGoModule rec {
         pname = "knowledge-tools";
-        version = "0.7.0";
+        version = "0.10.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "josephschmitt";
           repo = "knowledge-tools";
           # CLI releases are tagged under the cli/ namespace, not bare vX.Y.Z.
           rev = "cli/v${version}";
-          hash = "sha256-p8i6EvZR535gxTfJuMcMP7HtOpUfidcTP9HprZJ15uo=";
+          hash = "sha256-XbOXYGEsSFF/LuYtI3GjJqVnU3Xodfh9vS+xNZVvjNE=";
         };
 
         # go.mod lives in the cli/ subdirectory of the monorepo.
@@ -171,7 +171,7 @@
         };
 
         # Custom pins are also exposed individually so `nix build .#<pkg>`
-        # works — used by `bin/nix-bump` to derive each vendorHash.
+        # works — used by `bin/nix_bump` to derive each vendorHash.
         inherit tsshd multica monocle knowledge-tools;
       };
     };
