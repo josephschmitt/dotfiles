@@ -12,21 +12,21 @@ $ nix flake update           # refresh nixpkgs revision in flake.lock
 $ nix profile upgrade --all  # rebuild your profile to the new lock file
 ```
 
-### Bumping the custom pins (`nix-bump`)
+### Bumping the custom pins (`nix_bump`)
 
 The nixpkgs-tracked tools move together via `nix flake update` above. The
 custom `buildGoModule` pins (`tsshd`, `monocle`, `knowledge-tools`) are pinned
 by tag and need their `version` + src `hash` + `vendorHash` bumped by hand —
-`bin/nix-bump` automates that. It edits only the pin file for the machine it
+`bin/nix_bump` automates that. It edits only the pin file for the machine it
 runs on (this flake on Linux; the matching `nix-darwin` machine file on macOS),
 then leaves you to apply the change with `nix_rebuild`.
 
 ```sh
-nix-bump                          # bump every pin to its latest tag
-nix-bump knowledge-tools          # one pin to latest
-nix-bump knowledge-tools@0.7.0    # pin an explicit version
-nix-bump --list                   # show pins and current versions
-nix-bump --dry-run                # preview without writing
+nix_bump                          # bump every pin to its latest tag
+nix_bump knowledge-tools          # one pin to latest
+nix_bump knowledge-tools@0.7.0    # pin an explicit version
+nix_bump --list                   # show pins and current versions
+nix_bump --dry-run                # preview without writing
 ```
 
 ## Various Ubuntu things

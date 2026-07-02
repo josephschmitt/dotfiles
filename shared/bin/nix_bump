@@ -131,10 +131,15 @@ prefetch_src() {
 }
 
 # Patch a field within a block range (scoped so we never touch other pins).
+# Avoids `sed -i` — GNU takes no suffix, BSD/macOS requires one; a temp file
+# rewritten in place is portable and preserves the target's perms/inode.
 patch_field() {
   local range="$1" field="$2" value="$3"
   local esc; esc=$(printf '%s' "$value" | sed -e 's/[\/&]/\\&/g')
-  sed -i "${range} s/\(${field} = \"\)[^\"]*\(\"\)/\1${esc}\2/" "$TARGET"
+  local tmp; tmp=$(mktemp)
+  sed "${range} s/\(${field} = \"\)[^\"]*\(\"\)/\1${esc}\2/" "$TARGET" >"$tmp"
+  cat "$tmp" >"$TARGET"
+  rm -f "$tmp"
 }
 
 # ---- build helpers ---------------------------------------------------------
