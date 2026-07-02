@@ -77,6 +77,7 @@ fisher update
 - **fzf** - Fuzzy finder
 - **zoxide** - Smart directory navigation
 - **fisher** - Plugin manager
+- **inshellisense** (`is`) - IDE-style inline autocomplete (optional; run `is init fish` to enable)
 
 ## Usage
 

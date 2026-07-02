@@ -204,3 +204,9 @@ for config_file in "$HOME/.zshrc.d/"*.sh; do
     . "$config_file"
   fi
 done
+
+# inshellisense autocomplete — MUST be the last command (it wraps the shell in a
+# child session; keep new startup logic above this). Setup: .config/shell/README.md
+if [[ -f "$HOME/.inshellisense/init/zsh/init.zsh" ]] && ! is_integrated_terminal; then
+  . "$HOME/.inshellisense/init/zsh/init.zsh"
+fi

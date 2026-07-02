@@ -101,6 +101,47 @@ The `shared/` profile establishes each `.d/` directory (with a `.gitkeep`). The 
 
 This complements the existing `.config/shell/` pattern (`aliases.*.sh`, `exports.*.sh`, `functions.*.sh`) for cases where profile-specific logic needs to live in the root init files rather than the shared shell config directory.
 
+## inshellisense (IDE-style autocomplete)
+
+[inshellisense](https://github.com/microsoft/inshellisense) provides fig-like,
+IDE-style inline command autocompletion for all three shells. It works by
+auto-starting a session that *wraps* the interactive shell, so the integration
+has a few non-obvious requirements that are baked into this repo:
+
+- **Must be the last command.** The source line is appended to the very end of
+  `.bashrc`, `.zshrc`, and `fish/config.fish` (after the profile `.d/` and
+  `config.*.fish` loops). inshellisense recurses into a child shell guarded by
+  the `ISTERM` env var, so anything after it in the rc file would not run in the
+  outer shell. If you add new startup logic, keep it *above* this block.
+- **Skipped in IDE/editor terminals.** The block is gated behind
+  `is_integrated_terminal`, mirroring `auto_start_tmux`, so it stays out of
+  VS Code / Neovim / Emacs / Zed terminals where a nested PTY is unwanted.
+- **No-op until provisioned.** Each shell sources
+  `~/.inshellisense/init/<shell>/init.<ext>` only if that file exists. The file
+  is created by `is init` (see below), so shells on un-provisioned machines and
+  the non-interactive CI startup-time harness are unaffected.
+
+### Installing / enabling
+
+The `is` binary is declared for macOS in
+`shared/.config/nix-darwin/darwin.nix` (`environment.systemPackages`). On
+Ubuntu / remote sandboxes install it via npm:
+
+```sh
+npm install -g @microsoft/inshellisense
+```
+
+Then generate the per-shell init files once (regenerate after upgrades):
+
+```sh
+is init                 # detects the current shell, or pass bash|zsh|fish
+```
+
+`is init` writes `~/.inshellisense/init/<shell>/init.<ext>`, which the rc files
+already source. No changes to the rc files themselves are needed — do **not**
+run `is init <shell> >> ~/.<shell>rc` (the upstream instructions), as that would
+duplicate the source line this repo already manages. Run `is doctor` to verify.
+
 ## Benefits
 
 1. **No duplication**: Shared configuration is centralized
