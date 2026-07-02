@@ -42,3 +42,9 @@ for config_file in ~/.config/fish/config.*.fish
         source $config_file
     end
 end
+
+# inshellisense autocomplete — MUST be the last command (it wraps the shell in a
+# child session; keep new startup logic above this). Setup: .config/shell/README.md
+if status is-interactive; and test -f ~/.inshellisense/init/fish/init.fish; and not is_integrated_terminal
+    source ~/.inshellisense/init/fish/init.fish
+end

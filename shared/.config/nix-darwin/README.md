@@ -41,7 +41,7 @@ This configuration manages macOS systems declaratively using Nix, providing:
 
 ### Nix Packages (System-wide)
 - **Development**: `neovim`, `gh`, `lazygit`, `ripgrep`, `fd`
-- **Shell**: `fish`, `zellij`, `tmux`, `fzf`, `zoxide`, `atuin`
+- **Shell**: `fish`, `zellij`, `tmux`, `fzf`, `zoxide`, `atuin`, `inshellisense`
 - **Tools**: `stow`, `oh-my-posh`, `volta`, `asdf-vm`
 - **AI**: `claude-code`, `codex`
 

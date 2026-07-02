@@ -66,3 +66,9 @@ for config_file in "$HOME/.bashrc.d/"*.sh; do
 done
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+
+# inshellisense autocomplete — MUST be the last command (it wraps the shell in a
+# child session; keep new startup logic above this). Setup: .config/shell/README.md
+if [ -f "$HOME/.inshellisense/init/bash/init.sh" ] && ! is_integrated_terminal; then
+  . "$HOME/.inshellisense/init/bash/init.sh"
+fi

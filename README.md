@@ -91,6 +91,7 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
   - Shared configuration modules to eliminate duplication
   - POSIX-compliant environment setup across all shells
   - macOS login shell compatibility
+  - [inshellisense](https://github.com/microsoft/inshellisense) IDE-style inline autocomplete across all three shells (skipped in editor terminals; see [shell README](shared/.config/shell/README.md#inshellisense-ide-style-autocomplete))
 - **✏️ Editors**:
   - **Neovim (Kickstart)** - Default, mapped to `nvim`/`vim` commands
   - **Neovim (AstroVim)** - Available via `astrovim` alias

@@ -42,6 +42,7 @@
     git
     gofumpt
     gum
+    inshellisense
     lazygit
     neovim
     nil
