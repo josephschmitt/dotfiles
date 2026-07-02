@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# nix-bump — bump the custom nix derivation pins for THIS machine.
+# nix_bump — bump the custom nix derivation pins for THIS machine.
 #
 # Sister to the `nix_update` / `nix_rebuild` aliases:
 #   • nix_update   → bump nixpkgs (flake update) + rebuild the profile
 #   • nix_rebuild  → rebuild the profile from the current config
-#   • nix-bump     → THIS: bump the pinned custom derivations
+#   • nix_bump     → THIS: bump the pinned custom derivations
 #                    (buildGoModule + fetchFromGitHub: tsshd, monocle,
 #                    knowledge-tools) — version + src hash + vendorHash.
 #
@@ -20,15 +20,15 @@
 # When it's done, apply the change with `nix_rebuild`.
 #
 # Usage:
-#   nix-bump                          Bump every pin to its latest tag
-#   nix-bump DEP [DEP...]             Bump the named pins. Each DEP is one of:
+#   nix_bump                          Bump every pin to its latest tag
+#   nix_bump DEP [DEP...]             Bump the named pins. Each DEP is one of:
 #                                       NAME            → bump to latest tag
 #                                       NAME@VERSION    → pin to an explicit version
-#   nix-bump --list                   List this machine's pins and versions
+#   nix_bump --list                   List this machine's pins and versions
 #
 # Examples:
-#   nix-bump knowledge-tools@0.6.0 monocle@0.48.1
-#   nix-bump tsshd knowledge-tools           # both to latest
+#   nix_bump knowledge-tools@0.6.0 monocle@0.48.1
+#   nix_bump tsshd knowledge-tools           # both to latest
 #
 # Flags:
 #   --no-build      Patch hashes but skip the per-pin verify build
@@ -40,7 +40,7 @@ set -euo pipefail
 DOTFILES="${DOTFILES_DIR:-$HOME/dotfiles}"
 FAKE_HASH="sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
-die()  { printf 'nix-bump: %s\n' "$*" >&2; exit 1; }
+die()  { printf 'nix_bump: %s\n' "$*" >&2; exit 1; }
 info() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33mwarn:\033[0m %s\n' "$*" >&2; }
 
@@ -127,7 +127,7 @@ prefetch_src() {
   local owner="$1" repo="$2" tag="$3"
   nix store prefetch-file --json --unpack \
     "https://github.com/${owner}/${repo}/archive/refs/tags/${tag}.tar.gz" 2>/dev/null \
-    | sed -En 's/.*"hash":"([^"]*)".*/\1/p'
+    | sed -En 's/.*"hash"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p'
 }
 
 # Patch a field within a block range (scoped so we never touch other pins).
