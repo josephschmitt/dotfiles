@@ -34,16 +34,16 @@
 
       tsshd = pkgs.buildGoModule rec {
         pname = "tsshd";
-        version = "0.1.6";
+        version = "0.1.8";
 
         src = pkgs.fetchFromGitHub {
           owner = "trzsz";
           repo = "tsshd";
           rev = "v${version}";
-          hash = "sha256-B5PTiz9luBxkDA9UMSkGYTcPbnXdL43rkFvbOUS5F6w=";
+          hash = "sha256-YqSSJA/jP8WRbfwC5fxFE4su01ZEPQNmiNRr96pDE1g=";
         };
 
-        vendorHash = "sha256-dW05EoAVLqmiPRRG0R4KwKsSijZuxSe15iHkyCImtZY=";
+        vendorHash = "sha256-HJWxphZuBh3gXPoEqL/EVGtwdWyW+cMSQhKyfSymKG0=";
 
         subPackages = [ "cmd/tsshd" ];
 
@@ -84,14 +84,14 @@
 
       knowledge-tools = pkgs.buildGoModule rec {
         pname = "knowledge-tools";
-        version = "0.3.0";
+        version = "0.7.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "josephschmitt";
           repo = "knowledge-tools";
           # CLI releases are tagged under the cli/ namespace, not bare vX.Y.Z.
           rev = "cli/v${version}";
-          hash = "sha256-+dviTY+gYpMOLRMoOGMxmuki4/JC17qfIqIt4/oiqEQ=";
+          hash = "sha256-p8i6EvZR535gxTfJuMcMP7HtOpUfidcTP9HprZJ15uo=";
         };
 
         # go.mod lives in the cli/ subdirectory of the monorepo.
@@ -169,6 +169,10 @@
             knowledge-tools
           ];
         };
+
+        # Custom pins are also exposed individually so `nix build .#<pkg>`
+        # works — used by `bin/nix-bump` to derive each vendorHash.
+        inherit tsshd multica monocle knowledge-tools;
       };
     };
 }
