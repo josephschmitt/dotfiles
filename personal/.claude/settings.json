@@ -56,6 +56,7 @@
       }
     ]
   },
+  "enableWorkflows": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -73,7 +74,9 @@
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
-    "vault@knowledge-tools": true
+    "vault@knowledge-tools": true,
+    "spitballing@joes-crab-shack": true,
+    "code-handoff@joes-crab-shack": true
   },
   "extraKnownMarketplaces": {
     "monocle": {
@@ -90,18 +93,18 @@
       }
     }
   },
+  "sandbox": {
+    "network": {},
+    "excludedCommands": [
+      "gh"
+    ]
+  },
   "pluginConfigs": {
     "vault@knowledge-tools": {
       "options": {
         "mcp_url": "https://knowledge.schmitt.town/mcp"
       }
     }
-  },
-  "sandbox": {
-    "network": {},
-    "excludedCommands": [
-      "gh"
-    ]
   },
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
