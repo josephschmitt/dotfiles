@@ -12,7 +12,8 @@
     "linear@claude-plugins-official": true,
     "safety-net@cc-marketplace": true,
     "security-guidance@claude-code-plugins": true,
-    "vault@knowledge-tools": true
+    "vault@knowledge-tools": true,
+    "auto-capture@knowledge-tools": true
   },
   "extraKnownMarketplaces": {
     "knowledge-tools": {
@@ -22,7 +23,7 @@
       }
     }
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "pluginConfigs": {
     "vault@knowledge-tools": {
       "options": {
