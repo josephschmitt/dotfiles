@@ -40,6 +40,72 @@ if [ -n "$CONTEXT_SIZE" ] && [ "$CONTEXT_SIZE" -gt 0 ] && [ "$CURRENT_USAGE" != 
   fi
 fi
 
+# Render a Max-plan usage bar: <label> <colored bar> <NN%> <(reset countdown)>
+# Uses literal \033 escapes; the final `echo -e` interprets them.
+render_usage_bar() {
+  local label="$1" pct="$2" resets_at="$3"
+  local width=10
+
+  # Percentages arrive as floats (e.g. 23.5); bash math is integer-only.
+  local pct_int
+  pct_int=$(printf '%.0f' "$pct")
+
+  # Filled cells, rounded to nearest, clamped to [0, width].
+  local filled=$(( (pct_int * width + 50) / 100 ))
+  [ "$filled" -gt "$width" ] && filled=$width
+  [ "$filled" -lt 0 ] && filled=0
+  local empty=$(( width - filled ))
+
+  # Threshold color, mirroring the context-window indicator above.
+  local color
+  if [ "$pct_int" -le 50 ]; then
+    color='\033[32m'
+  elif [ "$pct_int" -le 75 ]; then
+    color='\033[33m'
+  else
+    color='\033[31m'
+  fi
+
+  # Build the bar: filled (colored) + empty (dim).
+  local bar="" i
+  for (( i = 0; i < filled; i++ )); do bar="${bar}█"; done
+  local empty_bar=""
+  for (( i = 0; i < empty; i++ )); do empty_bar="${empty_bar}░"; done
+
+  # Reset countdown from epoch seconds (date +%s works on macOS & Linux).
+  local countdown=""
+  if [ -n "$resets_at" ] && [ "$resets_at" != "null" ]; then
+    local now remaining
+    now=$(date +%s)
+    remaining=$(( resets_at - now ))
+    if [ "$remaining" -gt 0 ]; then
+      local days=$(( remaining / 86400 ))
+      local hours=$(( (remaining % 86400) / 3600 ))
+      local mins=$(( (remaining % 3600) / 60 ))
+      local reset_txt
+      if [ "$days" -gt 0 ]; then
+        reset_txt="${days}d${hours}h"
+      elif [ "$hours" -gt 0 ]; then
+        reset_txt="${hours}h${mins}m"
+      else
+        reset_txt="${mins}m"
+      fi
+      countdown=" \033[90m(${reset_txt})\033[0m"
+    fi
+  fi
+
+  printf '%s %s%s\033[90m%s\033[0m %s%d%%\033[0m%s' \
+    "$label" "$color" "$bar" "$empty_bar" "$color" "$pct_int" "$countdown"
+}
+
+# Max-plan usage bar (5-hour window). The rate_limits block is only present
+# for Max/Pro subscribers after the first API response; absent => no bar.
+FIVE_H_PCT=$(echo "$input"   | jq -r '.rate_limits.five_hour.used_percentage // empty')
+FIVE_H_RESET=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
+
+USAGE_BARS=""
+[ -n "$FIVE_H_PCT" ] && USAGE_BARS="  $(render_usage_bar '⏳ 5h' "$FIVE_H_PCT" "$FIVE_H_RESET")"
+
 # Determine directory name - show relative to git root if in a subdirectory
 if [ "$IS_GIT_REPO" = true ]; then
   # We're in a git repo
@@ -111,4 +177,4 @@ fi
 
 # Output format: [Model] [percentage] 📁 directory  branch +added -deleted ⇡ahead ⇣behind
 # Use ANSI color codes: cyan for model, white for directory, green for branch
-echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS"
+echo -e "\033[36m🤖 $MODEL_DISPLAY\033[0m$CONTEXT_PERCENT \033[37m📁 $DIR_NAME\033[0m$GIT_BRANCH$GIT_DIFF_STATS$GIT_SYNC_STATUS$USAGE_BARS"
