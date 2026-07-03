@@ -1,29 +1,40 @@
 {
-  "model": "opus",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh",
-    "padding": 0
-  },
+  "agentPushNotifEnabled": true,
+  "editorMode": "vim",
+  "effortLevel": "high",
   "enabledPlugins": {
+    "auto-capture@knowledge-tools": true,
     "claude-code-setup@claude-plugins-official": true,
     "commit-commands@claude-code-plugins": true,
     "commit-commands@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
     "safety-net@cc-marketplace": true,
     "security-guidance@claude-code-plugins": true,
-    "vault@knowledge-tools": true,
-    "auto-capture@knowledge-tools": true
+    "vault@knowledge-tools": true
   },
   "extraKnownMarketplaces": {
     "knowledge-tools": {
       "source": {
-        "source": "github",
-        "repo": "josephschmitt/knowledge-tools"
+        "repo": "josephschmitt/knowledge-tools",
+        "source": "github"
       }
     }
   },
-  "effortLevel": "high",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash '/home/josephschmitt/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ]
+  },
+  "model": "opus",
   "pluginConfigs": {
     "vault@knowledge-tools": {
       "options": {
@@ -31,8 +42,11 @@
       }
     }
   },
-  "tui": "fullscreen",
-  "editorMode": "vim",
   "remoteControlAtStartup": true,
-  "agentPushNotifEnabled": true
+  "statusLine": {
+    "command": "~/.claude/statusline.sh",
+    "padding": 0,
+    "type": "command"
+  },
+  "tui": "fullscreen"
 }
