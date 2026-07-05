@@ -10,7 +10,7 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
     end
     
     # Check if tmux is available and we're not already in tmux or SSH
-    if command -q tmux; and not set -q TMUX; and not set -q SSH_CONNECTION
+    if command -q tmux; and not set -q TMUX; and not set -q SSH_CONNECTION; and not set -q HERDR
         set session_name "main"
 
         # If main session already exists, generate random name for new session

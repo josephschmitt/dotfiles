@@ -262,28 +262,6 @@ return {
     },
   },
 
-  -- Mode highlighting with tokyonight colors
-  {
-    "mvllow/modes.nvim",
-    enabled = false, -- Disabled: causes startup messages. Re-enable if you want mode highlighting
-    opts = function()
-      local colors = require("tokyonight.colors").setup { style = "night" }
-      return {
-        colors = {
-          copy = colors.orange,
-          delete = colors.red,
-          insert = colors.green,
-          visual = "#e178fa",
-        },
-        line_opacity = 0.15,
-        set_cursor = true,
-        set_cursorline = true,
-        set_number = true,
-        set_signcolumn = true,
-      }
-    end,
-  },
-
   -- Tiny inline diagnostics customization (from AstroCommunity)
   {
     "rachartier/tiny-inline-diagnostic.nvim",

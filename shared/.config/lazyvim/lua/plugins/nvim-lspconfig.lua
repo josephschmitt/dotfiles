@@ -18,7 +18,7 @@ return {
         end
         if client.name == "eslint" then
           client.server_capabilities.documentFormattingProvider = true
-        elseif client.name == "tsserver" then
+        elseif client.name == "ts_ls" then
           client.server_capabilities.documentFormattingProvider = false
         end
       end,

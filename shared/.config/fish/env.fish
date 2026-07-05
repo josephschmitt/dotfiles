@@ -1,7 +1,9 @@
 # Fish Shell Environment Configuration
 # Environment variables and PATH setup
 
-# Force English for git and other i18n-aware tools
+# Locale — LANG is the primary variable most programs check for UTF-8 support
+setenv LANG en_US.UTF-8
+setenv LC_ALL en_US.UTF-8
 setenv LANGUAGE en_US.UTF-8
 
 setenv XDG_CONFIG_HOME "$HOME/.config"

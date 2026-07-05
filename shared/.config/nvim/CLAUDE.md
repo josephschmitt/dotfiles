@@ -78,10 +78,17 @@ LSP servers are listed in `lua/custom/lsp-servers.lua` using **lspconfig names**
 
 1. `lsp-servers.lua` — defines which servers to enable and their config
 2. `init.lua` — calls `vim.lsp.enable()` for each server
-3. `mason-auto-install` — detects enabled servers and installs them via Mason on first use
-4. `mason-tool-installer` — only for **non-LSP tools** (formatters, linters like `stylua`)
+3. `mason-auto-install.lua` — installs each server via Mason the first time its filetype is opened
 
-**IMPORTANT**: Do NOT add lspconfig names to `mason-tool-installer`'s `ensure_installed` list. Mason registry names differ from lspconfig names (e.g., `jsonls` vs `json-lsp`) and will error. Let `mason-auto-install` handle LSP servers.
+**IMPORTANT**: `mason-auto-install` does NOT auto-detect servers from `lsp-servers.lua` or `vim.lsp.enable()` calls — it only installs packages explicitly listed in its own `opts.packages`, and it needs **Mason registry names**, which often differ from lspconfig names (e.g., `jsonls` -> `json-lsp`, `rust_analyzer` -> `rust-analyzer`). Whenever you add/remove a server in `lsp-servers.lua`, add/remove its Mason package name in `lua/custom/plugins/mason-auto-install.lua` too, or it will silently never get installed (LSP will fail with "X is not executable").
+
+**Debugging checklist — if the user reports an LSP server won't install / errors as "not executable" / a language has no LSP features:**
+1. Is the server in `lsp-servers.lua` (or `init.lua` for `lua_ls`)?
+2. Is its **Mason registry name** (not lspconfig name — check `:Mason` or the registry) present in `mason-auto-install.lua`'s `opts.packages`?
+3. If (1) but not (2), that's the bug — add it to `mason-auto-install.lua`.
+4. Confirm with `:Mason` after opening a matching file, or check `~/.local/state/nvim/lsp.log` for "is not executable" errors.
+
+4. `mason-tool-installer` — only for **non-LSP tools** (formatters, linters like `stylua`). Do NOT add lspconfig names here either — same registry-name mismatch applies.
 
 ### Formatting
 Formatting uses `conform.nvim` with `lsp_format = 'fallback'`:
@@ -140,7 +147,7 @@ Features ported from AstroNvim/LazyVim (each evaluated and adapted individually)
 - [x] File/buffer picker (Snacks picker, replaced Telescope)
 - [x] Buffer line / tab bar (bufferline.nvim)
 - [x] Keybinding structure (which-key groups, leader mappings)
-- [x] Git integration (gitsigns, diffview, mini.diff, lazygit)
+- [x] Git integration (gitsigns, diffview, mini.diff, lazygit, gitlinker)
 - [x] Editor enhancements (flash, multicursor, mini.move/surround/ai)
 - [x] Developer tools (claudecode, tiny-inline-diagnostic, sortjson)
 - [x] Vim options (relativenumber, nowrap, cmdheight=0, etc.)

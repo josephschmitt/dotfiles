@@ -1,6 +1,14 @@
 # Shared functions for all POSIX-compatible shells
 
 start_interactive() {
+  # Vi mode (bash only — Zsh uses zsh-vi-mode plugin, Fish uses fish_vi_key_bindings)
+  if [ -n "$BASH_VERSION" ]; then
+    set -o vi
+    bind -m vi-command '"U": redo'
+    bind -m vi-command '"gh": beginning-of-line'
+    bind -m vi-command '"gl": end-of-line'
+  fi
+
   # Prompt configuration
   if command -v oh-my-posh >/dev/null 2>&1; then
     # oh-my-posh prompt for bash
@@ -31,9 +39,23 @@ start_interactive() {
   fi
 }
 
+# cd to git repo root with a friendly greeting
+groot() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo" >&2; return 1; }
+  printf "I am Groot! \033[90m%s\033[0m\n" "$(echo "${root}" | sed "s|^${HOME}|~|")"
+  cd "$root"
+}
+
 # Change directories from ~/development
 cdd() {
   cd ~/development/"$1" || exit
+}
+
+# Project picker: launch tv pj and cd to the selected project via zoxide
+pjp() {
+  local dir
+  dir=$(tv pj) && [ -n "$dir" ] && cd "$dir"
 }
 
 # Find the given path in zoxide, or enter interactive mode
@@ -60,7 +82,7 @@ auto_start_tmux() {
   fi
 
   # Check if tmux is available and we're not already in tmux or SSH
-  if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
+  if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ] && [ -z "$HERDR" ]; then
     session_name="main"
 
     # If main session already exists, generate random name for new session
@@ -70,8 +92,22 @@ auto_start_tmux() {
 
     # Create new session and launch sesh popup
     # If tmux fails to start, fall back to regular shell
-    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'" && exit
+    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
   fi
+}
+
+# Herdr wrapper that detaches from tmux and sets HERDR env var
+herdr() {
+  if [ -n "$TMUX" ]; then
+    tmux detach-client -E "HERDR=1 command herdr $*"
+  else
+    HERDR=1 command herdr "$@"
+  fi
+}
+
+# Herdr remote attach with server-side keybindings
+herdr-remote() {
+  herdr --remote-keybindings server --remote "$@"
 }
 
 # SSH wrapper - run SSH directly (no tmux detach)

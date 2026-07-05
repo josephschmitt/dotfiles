@@ -14,5 +14,9 @@ elif tmux list-windows -F '#{window_name}' | grep -qx "$WINDOW_NAME"; then
 else
   PANE_PATH=$(tmux display-message -p '#{pane_current_path}')
   LG_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
-  tmux new-window -n "$WINDOW_NAME" -c "$PANE_PATH" "lazygit --use-config-file=$LG_CONFIG_DIR/config.yml,$LG_CONFIG_DIR/config-tab.yml"
+  LG_CONFIGS="$LG_CONFIG_DIR/config.yml,$LG_CONFIG_DIR/config-tab.yml"
+  if [ -f "$LG_CONFIG_DIR/config-work.yml" ]; then
+    LG_CONFIGS="$LG_CONFIGS,$LG_CONFIG_DIR/config-work.yml"
+  fi
+  tmux new-window -n "$WINDOW_NAME" -c "$PANE_PATH" "lazygit --use-config-file=$LG_CONFIGS"
 fi

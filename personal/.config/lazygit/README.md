@@ -66,6 +66,7 @@ Then use: `lgtheme tokyonight` or `lgtheme catppuccin`
 ├── config.yml              # Main configuration file
 ├── config-catppuccin.yml   # Catppuccin theme config
 ├── config-tokyonight.yml   # Tokyo Night theme config
+├── config-tab.yml          # Overlay for tmux lazygit tab (e.g. full-screen layout)
 ├── switch-theme.sh         # Theme switcher script
 └── README.md               # This file
 ```

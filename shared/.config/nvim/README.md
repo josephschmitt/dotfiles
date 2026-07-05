@@ -88,6 +88,7 @@ lua/custom/plugins/
 | gitsigns.nvim | Git gutter signs + hunk operations | File open |
 | mini.diff | Inline diff overlay | File open |
 | diffview.nvim | Full-screen side-by-side diff viewer | On command |
+| gitlinker.nvim | Generate GitHub permalinks for current line/selection | On keypress |
 | which-key.nvim | Keybinding popup (helix preset) | VeryLazy |
 | flash.nvim | Label-based jump motions | VeryLazy |
 | claudecode.nvim | Claude Code WebSocket integration | VeryLazy |
@@ -117,11 +118,17 @@ Leader key: **Space**
 | `<Leader>fr` | Find recent files |
 | `<Leader>ee` | Toggle file explorer |
 | `<Leader>ef` | Find file in explorer |
+| `j` / `k` | Move by display line (logical with a count, e.g. `5j`) |
+| `J` / `K` | Scroll viewport down / up (3 lines, mousewheel-style) |
+| `<Leader>J` | Join lines (was `J`) |
+| `<Leader>K` | LSP hover (was `K`) |
 | `S-h` / `S-l` | Previous / next buffer |
 | `Ctrl+1-9` | Jump to buffer by number |
 | `<Leader>gs` | Stage git hunk |
 | `<Leader>gd` | Toggle diff overlay |
 | `<Leader>gg` | Lazygit |
+| `<Leader>gy` | Yank GitHub permalink (visual = line range) |
+| `<Leader>gG` | Open GitHub permalink in browser |
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
 

@@ -14,6 +14,9 @@
 # SSH — permanent ignore: machine-specific, not worth managing via dotfiles
 \.ssh
 
+# Profile metadata — lifecycle scripts run by install.sh, never symlinked
+\.hooks
+
 # Claude — stow skills/hooks/statusline; README is docs-only, not needed at target
 ^\.claude/README\.md$
 

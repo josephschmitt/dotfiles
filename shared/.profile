@@ -34,3 +34,23 @@ fi
 if [ -f ~/.orbstack/shell/init.sh ]; then
   . ~/.orbstack/shell/init.sh 2>/dev/null || :
 fi
+
+# Source profile-specific overrides from .profile.d/
+if [ -n "$ZSH_VERSION" ]; then
+  setopt nullglob 2>/dev/null || true
+  for config_file in "$HOME/.profile.d/"*.sh; do
+    if [ -f "$config_file" ]; then
+      . "$config_file"
+    fi
+  done
+  unsetopt nullglob 2>/dev/null || true
+else
+  for config_file in "$HOME/.profile.d/"*.sh; do
+    case "$config_file" in
+      *"*"*) continue ;;
+    esac
+    if [ -f "$config_file" ]; then
+      . "$config_file"
+    fi
+  done
+fi

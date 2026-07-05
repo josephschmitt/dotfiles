@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "monocle": {
+      "args": [
+        "serve-mcp",
+        "--experimental-channels"
+      ],
+      "command": "/nix/store/b0gv7f418f1x1xhxmm3drbcv73i8axpn-monocle-0.47.0/bin/monocle"
+    },
+    "knowledge-vault": {
+      "type": "http",
+      "url": "https://knowledge.schmitt.town/mcp",
+      "oauth": {
+        "clientId": "claude-code-knowledge-vault",
+        "callbackPort": 47832
+      }
+    }
+  }
+}

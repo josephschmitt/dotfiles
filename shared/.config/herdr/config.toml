@@ -1,0 +1,95 @@
+onboarding = false
+new_cwd = "~/development"
+prompt_new_tab_name = false
+
+[session]
+resume_agents_on_restore = true
+
+[keys]
+prefix = "ctrl+s"
+
+# Pane navigation — Alt+hjkl (matches tmux-tilish / vim-tmux-navigator)
+focus_pane_left = "alt+h"
+focus_pane_down = "alt+j"
+focus_pane_up = "alt+k"
+focus_pane_right = "alt+l"
+
+# Pane cycling — Alt+`/~ (matches tmux)
+cycle_pane_next = "alt+backtick"
+cycle_pane_previous = "alt+shift+backtick"
+
+# Tab switching — Alt+1-9 (matches tmux-tilish window switching)
+switch_tab = "alt+1..9"
+
+# Tab navigation — prefix+[/]
+previous_tab = "prefix+["
+next_tab = "prefix+]"
+
+# Copy mode — prefix+v (matches tmux; default prefix+[ conflicts with previous_tab)
+copy_mode = "prefix+v"
+
+# New tab — Alt+n (matches tmux new-window)
+new_tab = "prefix+n"
+
+# Agent navigation — Alt+[/]
+previous_agent = "alt+["
+next_agent = "alt+]"
+focus_agent = "prefix+1..9"
+
+# Workspace navigation (picker disabled — default prefix+w conflicts with open_worktree)
+workspace_picker = ""
+# Rename workspace — moved from default prefix+shift+w (conflicts with new_worktree)
+rename_workspace = "prefix+shift+e"
+# open_notification_target disabled — default prefix+o freed up for pj-herdr plugin
+open_notification_target = ""
+new_workspace = "prefix+shift+n"
+previous_workspace = "alt+shift+["
+next_workspace = "alt+shift+]"
+switch_workspace = "alt+shift+1..9"
+
+# Split panes (matches tmux)
+split_horizontal = "prefix+\\"
+split_vertical = "prefix+|"
+
+# Zoom — Alt+z
+zoom = "alt+z"
+
+# Open worktree picker — prefix+w (lists existing checkouts; focuses open ones, opens closed ones)
+open_worktree = "prefix+w"
+
+# New worktree — prefix+shift+w (matches new_workspace = prefix+shift+n pattern)
+new_worktree = "prefix+shift+w"
+
+# Quick shell (closes on exit)
+[[keys.command]]
+key = "prefix+C"
+type = "pane"
+command = "bash -lc '$SHELL'"
+
+# Lazygit
+[[keys.command]]
+key = "prefix+G"
+type = "pane"
+command = "bash -lc lazygit"
+
+# pj project picker — prefix+o (pj-herdr plugin)
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "pj.open-picker"
+
+# Open existing branch as a herdr worktree (local + remote branches via fzf)
+[[keys.command]]
+key = "prefix+shift+o"
+type = "pane"
+command = """bash -lc 'branch=$(git branch -a --format "%(refname:short)" | sed "s|^origin/||" | sort -u | fzf --prompt "Open branch as worktree: " --height 40% --reverse) && [ -n "$branch" ] && herdr worktree open --branch "$branch" --focus'"""
+
+[ui]
+show_agent_labels_on_pane_borders = true
+agent_panel_scope = "all"
+
+[ui.toast]
+delivery = "terminal"
+
+[theme]
+name = "terminal"

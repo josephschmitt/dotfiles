@@ -25,7 +25,6 @@ in
   environment.systemPackages = with pkgs; [
     devbox
     direnv
-    git
     gum
     lf
     mosh
@@ -38,6 +37,7 @@ in
   homebrew = {
     brews = [
       "immich-cli"
+      "multica-ai/tap/multica"
       "osxphotos"
     ];
 
@@ -50,6 +50,7 @@ in
     ];
 
     taps = [
+      "multica-ai/tap"
     ];
 
     onActivation.cleanup = "zap";

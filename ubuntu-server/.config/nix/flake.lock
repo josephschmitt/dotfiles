@@ -1,12 +1,25 @@
 {
   "nodes": {
+    "multica-bin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782986324,
+        "narHash": "sha256-Mt2UCVktbROA8btmlLfnLB9QtDh7wfGlKiNe2xEDHgc=",
+        "type": "tarball",
+        "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1770843696,
-        "narHash": "sha256-LovWTGDwXhkfCOmbgLVA10bvsi/P8eDDpRudgk68HA8=",
+        "lastModified": 1782918843,
+        "narHash": "sha256-ETYnV9U7Sr+A45dohzZdfCZKOss4qrTkO+wgNZNvEc0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2343bbb58f99267223bc2aac4fc9ea301a155a16",
+        "rev": "e8273b29fe1390ec8d4603f2477357555291432e",
         "type": "github"
       },
       "original": {
@@ -18,6 +31,7 @@
     },
     "root": {
       "inputs": {
+        "multica-bin": "multica-bin",
         "nixpkgs": "nixpkgs"
       }
     }

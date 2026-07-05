@@ -46,7 +46,7 @@ This configuration manages macOS systems declaratively using Nix, providing:
 - **AI**: `claude-code`, `codex`
 
 ### Homebrew Integration
-- **CLI tools**: `helix`, `opencode`
+- **CLI tools**: `helix`, `opencode`, `herdr` (terminal workspace manager for AI agents — installed via brew for fast release tracking)
 - **Applications**: 1Password, Arc, ChatGPT, Claude, Ghostty, VS Code
 - **Productivity**: Raycast, Hyperkey, Leader Key
 - **Creative**: Adobe Creative Cloud
@@ -147,9 +147,23 @@ nix flake update --flake ~/dotfiles/shared/.config/nix-darwin
 Each machine has its own configuration file in `machines/` that extends the base `darwin.nix`:
 
 - **Additional packages** specific to the machine's purpose
-- **Custom dock layouts** and application preferences  
+- **Custom dock layouts** and application preferences
 - **Hardware-specific settings** (Intel vs Apple Silicon)
 - **Service configurations** (like Docker on the Mac mini)
+
+### Adding a new personal machine
+
+Personal machine configs are **auto-discovered** from `machines/*.nix`. Drop a new file named after `hostname -s` and the flake picks it up — no edits to `flake.nix` required. The easiest way is `./install.sh --bootstrap` from the repo root, which generates an empty-overrides stub for the current hostname if none exists:
+
+```nix
+{ pkgs, lib, ... }:
+{
+  # Machine-specific overrides for <hostname>.
+  nixpkgs.hostPlatform = "aarch64-darwin";  # or "x86_64-darwin"
+}
+```
+
+Work machines remain hardcoded in `flake.nix` under `workConfigs` because they gate on the private submodule being initialized.
 
 ## Fonts
 

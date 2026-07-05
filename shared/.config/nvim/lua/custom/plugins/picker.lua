@@ -83,6 +83,31 @@ return {
 
       require("snacks").setup(opts)
 
+      -- Snacks explorer auto-close behaviour (only when it's the active provider)
+      local filetree_config = require("custom.config")
+      if filetree_config.filetree_provider == "snacks" then
+        local function should_auto_close()
+          return vim.o.columns <= filetree_config.filetree_auto_close_width
+        end
+
+        -- Auto-open/close when terminal is resized across the threshold.
+        -- Deferred via vim.schedule to avoid racing snacks' own per-picker
+        -- VimResized handler (which also relayouts on this same event) —
+        -- see TROUBLESHOOTING.md "Neovim (Kickstart)" for details.
+        vim.api.nvim_create_autocmd("VimResized", {
+          group = vim.api.nvim_create_augroup("snacks-explorer-auto-resize", { clear = true }),
+          callback = function()
+            vim.schedule(function()
+              if should_auto_close() then
+                pcall(filetree_config.filetree.close)
+              else
+                pcall(filetree_config.filetree.open)
+              end
+            end)
+          end,
+        })
+      end
+
       -- LSP picker keybindings (set on LspAttach so they're buffer-local)
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("snacks-lsp-attach", { clear = true }),

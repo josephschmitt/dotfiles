@@ -4,13 +4,25 @@ Personal configuration files for development environment using [GNU Stow](https:
 
 ## Quick Start
 
-### Prerequisites
+### Fresh Machine (one-liner)
+
+On a brand-new Mac, clone this repo and run the interactive bootstrap — it installs Nix, bootstraps nix-darwin, clones TPM and installs plugins, offers to set the hostname, and runs stow at the end:
+
+```bash
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./install.sh --bootstrap
+```
+
+The bootstrap is idempotent — re-running it on a configured machine will skip completed steps. See the top-level [README.md](../README.md) for the full flow description.
+
+### Prerequisites (existing-machine install)
 
 **Required:**
-- [GNU Stow](https://www.gnu.org/software/stow/) for symlink management
+- [GNU Stow](https://www.gnu.org/software/stow/) for symlink management (installed automatically by nix-darwin)
 - Git with SSH keys configured for GitHub
 
-**Install Stow:**
+**Install Stow manually if not using nix-darwin:**
 ```bash
 # macOS
 brew install stow
@@ -49,12 +61,12 @@ git clone git@github.com:adamatan/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 
 # 2. Initialize work submodule (requires access to private work repo)
-git submodule update --init --recursive
+git submodule update --init --recursive work
 
 # 3. Apply configurations (pre-creates required directories, then runs stow)
 ./install.sh shared work
 
-# 5. Restart your shell or source configs
+# 4. Restart your shell or source configs
 exec $SHELL
 ```
 
@@ -62,11 +74,31 @@ exec $SHELL
 - Work setup requires access to the private `dotfiles-work-private` repository
 - The shell configuration has been reorganized to follow Unix best practices with shared modules
 
+#### RCA Machine Setup
+```bash
+# 1. Clone the repository
+git clone git@github.com:josephschmitt/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+# 2. Initialize rca submodule (requires access to private rca repo)
+git submodule update --init --recursive rca
+
+# 3. Apply configurations (pre-creates required directories, then runs stow)
+./install.sh shared rca
+
+# 4. Restart your shell or source configs
+exec $SHELL
+```
+
+**Notes:**
+- RCA setup requires access to the private `dotfiles-rca-private` repository
+
 ## Structure
 
 - `shared/` - Common configurations used on all machines
 - `personal/` - Personal-specific configs (personal email, etc.)
 - `work/` - Work-specific configs (private submodule with work email, company tools, etc.)
+- `rca/` - RCA-specific configs (private submodule)
 
 ## What's Included
 
@@ -116,6 +148,11 @@ This is why we create `~/.config/tmux` before running stow. The `-p` flag create
   - Custom keybindings for navigation
   - Yazi file picker integration
   - Git permalink generation
+- **Vim** (`.vimrc`) - Plain-Vim port of the Kickstart Neovim config for SSH boxes
+  - Inline tokyonight-moon palette (no plugin needed for colors)
+  - Same options/keymaps as `shared/.config/nvim/` where Vim 8+ supports them
+  - Auto-bootstraps vim-plug; minimal plugin set: vim-commentary, vim-surround, vim-repeat, vim-fugitive, fzf.vim
+  - Neovim ignores this file, so it only loads when running plain `vim`
 
 ### Terminal Multiplexer
 - **tmux** (`.config/tmux/`) - Terminal session management

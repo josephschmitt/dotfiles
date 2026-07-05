@@ -102,8 +102,27 @@ function zvm_after_init() {
   if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
     if command -v oh-my-posh >/dev/null 2>&1; then
       eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/themes/custom.omp.yaml)"
+      # OMP's cached init pins the absolute nix store path of the binary.
+      # Resolve via PATH instead so long-lived shells survive nix GC.
+      _omp_executable=oh-my-posh
     fi
   fi
+
+  # Fish-like line navigation in vi insert mode.
+  # zsh-autosuggestions auto-wraps forward-char (full accept) and
+  # forward-word (partial accept); we just bind the keys fish uses.
+  #   →  / Ctrl-F  → accept entire suggestion   |  ← / Ctrl-B  → back one char
+  #   ⌥→ / Alt-F  → accept one word              |  ⌥← / Alt-B → back one word
+  bindkey -M viins '^[[C' forward-char      # Right arrow
+  bindkey -M viins '^F' forward-char        # Ctrl-F
+  bindkey -M viins '^[f' forward-word       # Alt-F
+  bindkey -M viins '^[[1;3C' forward-word   # Alt-Right (xterm/iTerm2/Ghostty)
+  bindkey -M viins '^[^[[C' forward-word    # Alt-Right (Terminal.app)
+  bindkey -M viins '^[[D' backward-char     # Left arrow
+  bindkey -M viins '^B' backward-char       # Ctrl-B
+  bindkey -M viins '^[b' backward-word      # Alt-B
+  bindkey -M viins '^[[1;3D' backward-word  # Alt-Left (xterm/iTerm2/Ghostty)
+  bindkey -M viins '^[^[[D' backward-word   # Alt-Left (Terminal.app)
 }
 
 # Download Zinit, if it's not there yet
@@ -115,12 +134,21 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
+# Load completions before plugins so compdef is available for deferred snippets
+autoload -Uz compinit
+typeset -g ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
+if [[ -n $ZCOMPDUMP(#qN.mh+24) ]]; then
+  compinit -d "$ZCOMPDUMP"
+else
+  compinit -C -d "$ZCOMPDUMP"
+fi
+
 # Add in zsh plugins (with turbo-mode for faster startup)
 zinit ice wait lucid
 zinit light zsh-users/zsh-syntax-highlighting
 zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
-zinit ice wait lucid
+zinit ice wait lucid has"fzf"
 zinit light Aloxaf/fzf-tab
 zinit ice wait lucid
 zinit light zsh-users/zsh-completions
@@ -139,15 +167,6 @@ zinit snippet OMZP::aws
 zinit ice wait lucid
 zinit snippet OMZP::command-not-found
 
-# Load completions with daily caching
-autoload -Uz compinit
-typeset -g ZCOMPDUMP="${ZDOTDIR:-$HOME}/.zcompdump"
-if [[ -n $ZCOMPDUMP(#qN.mh+24) ]]; then
-  compinit -d "$ZCOMPDUMP"
-else
-  compinit -C -d "$ZCOMPDUMP"
-fi
-
 # Replay all cached completions
 zinit cdreplay -q
 
@@ -160,10 +179,17 @@ fi
 # Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # Case-insensitive completion
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Use LS_COLORS for completion colors
-zstyle ':completion:*' menu no # Disable completion menu since we're using fzf
+if (( $+commands[fzf] )); then
+  zstyle ':completion:*' menu no # Disable completion menu since fzf-tab handles it
+fi
 zstyle ':completion:*:*:cdd:*' tag-order 'directories' # Completions for cdd
 
 # Zsh-specific aliases  
 # ls alias is now provided by shared aliases (eza)
 
-
+# Source profile-specific overrides from .zshrc.d/
+for config_file in "$HOME/.zshrc.d/"*.sh; do
+  if [ -f "$config_file" ]; then
+    . "$config_file"
+  fi
+done

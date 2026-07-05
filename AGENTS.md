@@ -10,15 +10,17 @@ See `PLAN.md` for the current work plan: packages to add, stow decisions for eac
 - **Platforms**: macOS (primary), Ubuntu Server (secondary)
 - **Shells**: Fish (primary) → Zsh (secondary) → Bash (fallback)
 - **Editors**: Neovim (triple setup: Kickstart + LazyVim + AstroNvim) + Helix (secondary)
-- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `ubuntu-server/` (Ubuntu)
+- **Profiles**: `shared/` (all), `personal/` (macOS), `work/` (macOS), `remote-sandbox/` (remote Linux base), `rca/` (RCA overlay), `crafting/` (crafting.dev overlay), `ubuntu-server/` (Ubuntu)
 
 ### Stow Commands
 ```bash
-stow .                        # Install all
-stow shared personal          # Install specific profiles (macOS)
-stow shared ubuntu-server     # Install specific profiles (Ubuntu)
-stow -R .                     # Restow (re-link)
-stow -D .                     # Uninstall
+stow .                                 # Install all
+stow shared personal                   # Install specific profiles (macOS)
+stow shared ubuntu-server              # Install specific profiles (Ubuntu)
+stow shared remote-sandbox rca         # RCA machine
+stow shared remote-sandbox crafting    # Crafting.dev sandbox
+stow -R .                              # Restow (re-link)
+stow -D .                              # Uninstall
 ```
 
 ## Troubleshooting
@@ -36,13 +38,18 @@ When helping debug issues with tools in this repository:
 | File | Purpose | Sources |
 |------|---------|---------|
 | `.profile` | POSIX environment (PATH, exports) | - |
+| `.profile.d/*.sh` | Profile-specific `.profile` extensions | - |
 | `.config/shell/exports.sh` | Shared environment variables | - |
 | `.config/shell/aliases.sh` | Shared aliases (POSIX) | - |
 | `.config/shell/functions.sh` | Shared functions (POSIX) | - |
 | `.bash_profile` | Bash login shell | `.profile`, `.bashrc` |
 | `.bashrc` | Bash interactive | `shell/{exports,aliases,functions}.sh` |
+| `.bashrc.d/*.sh` | Profile-specific `.bashrc` extensions | - |
 | `.zshenv` | Zsh environment | `.profile` |
 | `.zshrc` | Zsh interactive | `shell/{exports,aliases,functions}.sh` |
+| `.zshrc.d/*.sh` | Profile-specific `.zshrc` extensions | - |
+| `.zprofile` | Zsh login shell | - |
+| `.zprofile.d/*.sh` | Profile-specific `.zprofile` extensions | - |
 | `fish/config.fish` | Fish (self-contained) | Fish-specific equivalents |
 
 ### Decision Tree for Configuration Changes
@@ -52,7 +59,9 @@ New configuration needed?
 ├─ Alias/Function → Is it profile-specific?
 │  ├─ YES → `{profile}/.config/shell/aliases.{profile}.sh` + Fish equivalent
 │  └─ NO → `.config/shell/aliases.sh` + Fish equivalent
-└─ Interactive feature → Shell-specific rc file only
+├─ Interactive feature → Shell-specific rc file only
+└─ Profile-specific shell init logic (not an alias/export/function)?
+   └─ `{profile}/.bashrc.d/{profile}.sh` / `.zshrc.d/` / `.profile.d/` / `.zprofile.d/`
 ```
 
 ### Multi-Shell Requirements (NON-NEGOTIABLE)
@@ -100,12 +109,45 @@ When adding new PATH entries that should beat Homebrew, ensure they follow this 
 ├── shell/aliases.{profile}.sh # Profile-specific POSIX configs
 └── fish/config.{profile}.fish # Profile-specific Fish configs
 
+{profile}/
+├── .bashrc.d/{profile}.sh     # Profile-specific .bashrc extensions
+├── .zshrc.d/{profile}.sh      # Profile-specific .zshrc extensions
+├── .profile.d/{profile}.sh    # Profile-specific .profile extensions
+└── .zprofile.d/{profile}.sh   # Profile-specific .zprofile extensions
+
 Root:
 ├── .profile, .zshrc, .bashrc  # Shell init files
+├── .profile.d/, .bashrc.d/, .zshrc.d/, .zprofile.d/  # Profile extension dirs
 └── bin/                       # Utilities
 
 ubuntu-server/.config/nix/     # Nix configs and services
 ```
+
+## Profile Hooks (`.hooks/`)
+
+Profiles can define lifecycle scripts in a `.hooks/` directory. `install.sh` runs them automatically — no profile-specific logic belongs in install.sh itself.
+
+| Hook | When | Sourced? | Use case |
+|------|------|----------|----------|
+| `.hooks/pre-stow.sh` | After submodule init, before `stow` | Yes (PATH changes propagate) | Install deps, remove conflicting files |
+| `.hooks/post-stow.sh` | After `stow` completes | No | Build caches, install plugins |
+
+**Environment variables available to hooks:**
+- `DEPS_PRESET` — value of `--deps-preset` flag (empty if not specified)
+- `DOTFILES_DIR` — absolute path to the dotfiles repo
+
+**Rules:**
+- Hooks must be executable (`chmod +x`)
+- Hooks must be excluded from stow via `.stow-local-ignore` (add `\.hooks` entry)
+- Pre-stow hooks are **sourced** (`. script`), so `export` and PATH changes persist
+- Post-stow hooks are **executed** in a subshell
+- Keep hooks idempotent — `install.sh` may be re-run
+
+**Existing hooks:**
+| Profile | Hook | Does |
+|---------|------|------|
+| `remote-sandbox` | `pre-stow` | Installs userland deps, removes conflicting default configs |
+| `shared` | `post-stow` | Rebuilds bat cache, installs/updates TPM + tmux plugins |
 
 ## Nix-Darwin (macOS System Management)
 
@@ -160,6 +202,8 @@ User requests Neovim configuration change?
 - ✅ "lazyvim" → Modify `shared/.config/lazyvim/`
 - ✅ "astrovim", "astronvim" → Modify `shared/.config/astronvim/`
 
+**Use the `AskUserQuestion` tool** when prompting for clarification — not plain text. Offer Kickstart, LazyVim, and AstroNvim as options (Kickstart first, marked "(Recommended)" since it's the default).
+
 ### Kickstart-Specific Guidelines
 When modifying Kickstart config (`shared/.config/nvim/`):
 1. **Read** `shared/.config/nvim/CLAUDE.md` first (philosophy, architecture, lazy-loading rules)
@@ -173,6 +217,26 @@ When modifying AstroNvim config (`shared/.config/astronvim/`):
 2. Follow "AstroVim way": Prefer AstroCommunity plugins over custom specs
 3. Use AstroCore/AstroLSP/AstroUI override pattern (see existing plugins)
 4. Update `shared/.config/astronvim/README.md` with new keybindings/features
+
+### Vimrc Companion (`shared/.vimrc`)
+
+A plain-Vim port of the Kickstart config lives at `shared/.vimrc` for use on SSH boxes without Neovim. Neovim ignores `~/.vimrc`, so it only loads under plain `vim`.
+
+**When adding/modifying a feature in any Neovim config, evaluate whether it's worth porting to the vimrc.**
+
+| Type of change | Action for `shared/.vimrc` |
+|---|---|
+| Vim option (e.g. `relativenumber`, `scrolloff`) | Port directly — almost always 1:1 |
+| Keybinding that uses only built-ins (`gh`/`gl`, `<C-hjkl>`, `J`/`K` scroll, `jk` escape) | Port directly |
+| Plugin-driven feature with a pure-vimscript equivalent (commentary, surround, fugitive, fzf.vim) | Port using the equivalent plugin |
+| LSP / treesitter / blink.cmp / mason / snacks / mini.* / which-key | **Skip** — no realistic plain-vim equivalent |
+| Colorscheme highlight tweak | Port to the inline tokyonight-moon palette in `shared/.vimrc` |
+
+**Workflow:**
+1. After making the Neovim change, ask: "Is this an option, a vim-builtin keybinding, or a colorscheme tweak?" If yes → port it.
+2. If it's a plugin-driven feature, check whether a pure-vimscript plugin offers the same UX (e.g. `tpope/*`, `junegunn/fzf.vim`, `Yggdroot/LeaderF`).
+3. If neither applies, **skip silently** — don't add a half-baked stub. The vimrc explicitly accepts feature gaps.
+4. Commit vimrc changes alongside the Neovim change in the same PR/branch when possible, with a `(also vimrc)` note in the commit body.
 
 ### CRITICAL: .config Symlinking Rules
 **NEVER `stow` entire `.config/` directory** - symlink individual app configs only

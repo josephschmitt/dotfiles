@@ -173,6 +173,9 @@ Main-horizontal layout with fixed 20-row bottom panes:
 - `Ctrl-s D` - Detach from current session immediately (no confirmation)
 - `Ctrl-s q` - Kill session and close terminal tab
 - `Ctrl-s N` - Create new session with random name
+- `Alt-N` - Create new session with name prompt (no prefix)
+- `Alt-{` - Switch to previous session (no prefix)
+- `Alt-}` - Switch to next session (no prefix)
 - `Ctrl-s @` - Open SSH host selector with smart tmux handling (small: 80% width, 70% height)
 - `Ctrl-s t` - Open TWM workspace manager (small: 80% width, 70% height)
 - `Ctrl-s T` - Open TWM workspace manager for existing sessions (small: 80% width, 70% height)

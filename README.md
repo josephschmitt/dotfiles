@@ -24,43 +24,43 @@ This repository contains my complete development environment setup, organized fo
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### 🆕 Fresh Machine (one command)
 
-1. **Install Nix with flakes support:**
-```bash
-sh <(curl -L https://nixos.org/nix/install)
-```
-
-2. **Install nix-darwin** (see [nix-darwin README](shared/.config/nix-darwin/README.md) for details):
-```bash
-sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/shared/.config/nix-darwin
-```
-
-### 🏠 Personal Machine
+On a brand-new Mac with nothing but a shell, clone the repo and run the interactive bootstrap:
 
 ```bash
 git clone git@github.com:adamatan/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
-
-# Apply nix-darwin configuration (installs packages, sets system preferences)
-nix_rebuild
-
-# Install user-level configuration files
-./install.sh shared personal
+./install.sh --bootstrap
 ```
 
-### 💼 Work Machine
+`--bootstrap` is idempotent and handles each step only if needed:
+
+- Generates an SSH key (and pauses for you to add it to GitHub)
+- Offers to rename the host via `scutil`
+- Installs Nix if it's missing
+- Creates an empty `shared/.config/nix-darwin/machines/<hostname>.nix` for new hosts (auto-discovered by the flake — no manual edits)
+- Bootstraps nix-darwin on first run, or calls `nix_rebuild` thereafter
+- Prompts to initialize private submodules
+- Runs profile `.hooks/pre-stow.sh` scripts (install deps, remove conflicting files)
+- Runs `stow` with profiles you pick (defaults to `shared personal` on macOS)
+- Runs profile `.hooks/post-stow.sh` scripts (TPM install, bat cache rebuild)
+
+### 🏠 Personal Machine (existing setup)
+
+```bash
+cd ~/.dotfiles
+nix_rebuild                    # Apply nix-darwin config
+./install.sh shared personal   # Symlink user-level configs
+```
+
+### 💼 Work Machine (existing setup)
 
 ```bash
 git clone git@github.com:adamatan/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 git submodule update --init --recursive
-
-# Apply nix-darwin configuration (installs packages, sets system preferences)
-# The nix_rebuild wrapper automatically detects work machines and uses work configurations
-nix_rebuild
-
-# Install user-level configuration files
+nix_rebuild                    # Auto-detects work machines via hostname
 ./install.sh shared work
 ```
 
@@ -196,10 +196,7 @@ dotfiles/
 │   └── .gitconfig   # Personal git settings
 ├── ubuntu-server/   # Ubuntu server-specific configurations
 │   └── .config/nix/ # Nix configuration for Ubuntu servers
-└── work/           # Work-specific configurations (private submodule)
-    ├── .config/nix-darwin/machines/   # Work machine configurations
-    ├── .gitconfig   # Work git settings
-    └── .compassrc   # Company-specific tools
+└── work/            # Work-specific configurations (private submodule)
 ```
 
 ## 📚 Documentation

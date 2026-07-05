@@ -1,6 +1,8 @@
 -- Custom vim options that override kickstart defaults.
 -- These run when lazy.nvim loads this file, before VimEnter.
 
+local config = require("custom.config")
+
 -- Relative line numbers for easy jump counting (kickstart only enables number)
 vim.o.relativenumber = true
 
@@ -11,7 +13,7 @@ vim.o.wrap = false
 vim.o.cmdheight = 0
 
 -- Global statusline (one at the bottom instead of per-window)
--- Prevents statusline from appearing in neo-tree and other splits
+-- Prevents statusline from appearing in the file tree and other splits
 vim.o.laststatus = 3
 
 -- RPC server: create a socket so external tools (terminal popups, git
@@ -20,12 +22,12 @@ vim.o.laststatus = 3
 local socket_path = vim.fn.stdpath("state") .. "/nvim." .. vim.fn.getpid() .. ".sock"
 pcall(vim.fn.serverstart, socket_path)
 
--- Disable netrw (replaced by neo-tree + dashboard for directory browsing)
+-- Disable netrw (replaced by file tree + dashboard for directory browsing)
 vim.g.loaded_netrwPlugin = 1
 vim.g.loaded_netrw = 1
 
 -- Directory opener: when Neovim is launched with a directory argument,
--- set the cwd, show the Snacks dashboard, and reveal neo-tree.
+-- set the cwd, show the Snacks dashboard, and reveal the file tree.
 vim.api.nvim_create_autocmd("BufEnter", {
   group = vim.api.nvim_create_augroup("custom-dir-opener", { clear = true }),
   callback = function(args)
@@ -38,7 +40,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
     -- Delete the directory buffer (no longer needed)
     vim.api.nvim_buf_delete(args.buf, { force = true })
 
-    -- Open dashboard in the current window (not as a float), then neo-tree.
+    -- Open dashboard in the current window (not as a float), then the file tree.
     -- Passing buf/win to dashboard.open() makes it render into the window
     -- like the normal VimEnter startup path does.
     vim.schedule(function()
@@ -50,10 +52,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
       end
 
       vim.schedule(function()
-        local ok_neotree = pcall(require, "neo-tree.command")
-        if ok_neotree then
-          require("neo-tree.command").execute({ action = "focus" })
-        end
+        pcall(config.filetree.focus)
       end)
     end)
   end,
@@ -79,14 +78,14 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Smart winbar: show filename only when multiple splits exist.
--- Skips floating windows (pickers, notifications, etc.) and neo-tree (has its own winbar)
+-- Skips floating windows (pickers, notifications, etc.) and file tree (has its own header)
 vim.api.nvim_create_autocmd("WinEnter", {
   group = vim.api.nvim_create_augroup("custom-winbar", { clear = true }),
   callback = function()
     if vim.api.nvim_win_get_config(0).relative ~= "" then return end
 
-    -- Skip neo-tree windows (they manage their own winbar for source tabs)
-    if vim.bo.filetype == "neo-tree" then return end
+    -- Skip file tree windows (they manage their own header)
+    if vim.bo.filetype == config.filetree.filetype then return end
 
     local wins = vim.api.nvim_tabpage_list_wins(0)
     local normal_wins = vim.tbl_filter(function(win)

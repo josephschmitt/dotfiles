@@ -15,6 +15,8 @@ on:
       - 'personal/.config/fish/**'
       - 'work/.config/shell/**'
       - 'work/.config/fish/**'
+      - 'rca/.config/shell/**'
+      - 'rca/.config/fish/**'
       - 'ubuntu-server/.config/shell/**'
       - 'ubuntu-server/.config/fish/**'
   push:
@@ -33,6 +35,8 @@ on:
       - 'personal/.config/fish/**'
       - 'work/.config/shell/**'
       - 'work/.config/fish/**'
+      - 'rca/.config/shell/**'
+      - 'rca/.config/fish/**'
       - 'ubuntu-server/.config/shell/**'
       - 'ubuntu-server/.config/fish/**'
   workflow_dispatch:

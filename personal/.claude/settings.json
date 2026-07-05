@@ -56,6 +56,7 @@
       }
     ]
   },
+  "enableWorkflows": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -72,7 +73,10 @@
     "security-guidance@claude-code-plugins": false,
     "typescript-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "monocle@monocle": true
+    "linear@claude-plugins-official": true,
+    "vault@knowledge-tools": true,
+    "spitballing@joes-crab-shack": true,
+    "code-handoff@joes-crab-shack": true
   },
   "extraKnownMarketplaces": {
     "monocle": {
@@ -81,6 +85,12 @@
         "repo": "josephschmitt/monocle"
       },
       "autoUpdate": true
+    },
+    "knowledge-tools": {
+      "source": {
+        "source": "github",
+        "repo": "josephschmitt/knowledge-tools"
+      }
     }
   },
   "sandbox": {
@@ -89,6 +99,14 @@
       "gh"
     ]
   },
-  "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true
+  "pluginConfigs": {
+    "vault@knowledge-tools": {
+      "options": {
+        "mcp_url": "https://knowledge.schmitt.town/mcp"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }
