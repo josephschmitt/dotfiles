@@ -41,6 +41,11 @@ if test "$TERM_PROGRAM" = ghostty
     set -gx TERM xterm-256color
 end
 
+# direnv hook (guarded — not every machine has direnv installed)
+if command -q direnv
+    direnv hook fish | source
+end
+
 # Auto-load additional configuration modules
 for config_file in ~/.config/fish/config.*.fish
     if test -f $config_file
