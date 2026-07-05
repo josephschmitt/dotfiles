@@ -9,3 +9,11 @@
 [user]
 	email = adamatan@users.noreply.github.com
 	name = Adam Matan
+
+# HTTPS pushes authenticate via the gh CLI's token (no GPG signing on servers).
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
