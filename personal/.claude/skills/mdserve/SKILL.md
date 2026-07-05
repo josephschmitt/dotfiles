@@ -65,6 +65,19 @@ run_in_background: true
 This gives the user a sidebar to navigate between files. Only the
 immediate directory is watched (non-recursive).
 
+## RTL languages
+
+When the markdown content is in a right-to-left language (Hebrew,
+Arabic, Farsi, etc.), pass the `--rtl` flag:
+
+```
+command: mdserve --open --rtl document.md
+run_in_background: true
+```
+
+This sets `dir="rtl"` on the content, loads appropriate fonts, and
+keeps code blocks forced LTR.
+
 ## Mermaid diagrams
 
 Use Mermaid diagrams when they improve clarity over plain text:
