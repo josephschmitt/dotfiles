@@ -47,3 +47,6 @@ keybind = cmd+shift+h=previous_tab
 keybind = cmd+shift+l=next_tab
 keybind = cmd+shift+w=close_tab
 keybind = shift+enter=text:\n
+
+# Treat Option as Alt so terminal apps (tmux, etc.) receive proper escape sequences
+macos-option-as-alt = true
