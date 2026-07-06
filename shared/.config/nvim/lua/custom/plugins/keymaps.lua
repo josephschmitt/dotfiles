@@ -43,17 +43,14 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
     map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
 
-    -- Open URL/filepath under cursor (stock Vim gx behavior, freed up here
+    -- Open URL/filepath under cursor (stock Vim gx behavior, moved here
     -- since gx is repurposed as the Transform group; see transforms.lua)
     map("n", "go", function()
       vim.ui.open(vim.fn.expand("<cfile>"))
     end, { desc = "Open URL/filepath under cursor" })
 
-    -- Remove Neovim's built-in gx mapping (opens cfile via vim.ui.open).
-    -- It's an exact match for our "gx" transform prefix (gxu/gxt/gx+/etc),
-    -- so Vim treats it as ambiguous and falls back to firing the built-in
-    -- one whenever the follow-up key doesn't land in time, erroring when
-    -- the cursor isn't on a URL/file. Open is now on "go" instead.
+    -- Delete Neovim's built-in gx (ambiguous with the gx transform prefix
+    -- above, so it fires erroneously off cursor position; see transforms.lua)
     pcall(vim.keymap.del, { "n", "x" }, "gx")
 
     -- Select all
