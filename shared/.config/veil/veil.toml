@@ -46,7 +46,7 @@ titlebar_brightness_offset = 0
 # All fields are optional; an empty [font] block has no effect.
 #
 [font]
-family = "MesloLGS Nerd Font Mono"
+family = "FiraCode Nerd Font Mono"
 size = 13.0
 force = false
 
