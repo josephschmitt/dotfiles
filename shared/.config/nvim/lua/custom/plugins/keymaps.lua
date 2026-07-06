@@ -49,6 +49,13 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.ui.open(vim.fn.expand("<cfile>"))
     end, { desc = "Open URL/filepath under cursor" })
 
+    -- Remove Neovim's built-in gx mapping (opens cfile via vim.ui.open).
+    -- It's an exact match for our "gx" transform prefix (gxu/gxt/gx+/etc),
+    -- so Vim treats it as ambiguous and falls back to firing the built-in
+    -- one whenever the follow-up key doesn't land in time, erroring when
+    -- the cursor isn't on a URL/file. Open is now on "go" instead.
+    pcall(vim.keymap.del, { "n", "x" }, "gx")
+
     -- Select all
     map("n", "gV", "ggVG", { desc = "Select all" })
 
