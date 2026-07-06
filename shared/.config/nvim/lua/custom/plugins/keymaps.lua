@@ -43,6 +43,12 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
     map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
 
+    -- Open URL/filepath under cursor (stock Vim gx behavior, freed up here
+    -- since gx is repurposed as the Transform group; see transforms.lua)
+    map("n", "go", function()
+      vim.ui.open(vim.fn.expand("<cfile>"))
+    end, { desc = "Open URL/filepath under cursor" })
+
     -- Select all
     map("n", "gV", "ggVG", { desc = "Select all" })
 

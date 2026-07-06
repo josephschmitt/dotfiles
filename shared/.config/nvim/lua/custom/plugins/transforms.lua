@@ -45,13 +45,6 @@ return {
       { "gxt", toggle_boolean, desc = "Toggle boolean" },
       { "gx+", "<C-a>", desc = "Increment number" },
       { "gx-", "<C-x>", desc = "Decrement number" },
-      {
-        "gxo",
-        function()
-          vim.ui.open(vim.fn.expand("<cfile>"))
-        end,
-        desc = "Open URL/filepath",
-      },
     },
   },
 }

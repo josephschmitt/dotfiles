@@ -131,6 +131,7 @@ Leader key: **Space**
 | `<Leader>gG` | Open GitHub permalink in browser |
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
+| `go` | Open URL/filepath under cursor |
 
 Press `<Space>` and wait for the which-key popup to see everything.
 
