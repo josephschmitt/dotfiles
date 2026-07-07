@@ -25,6 +25,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map("i", "kj", "<Esc>", { desc = "Exit insert mode" })
     map("i", "jj", "<Esc>", { desc = "Exit insert mode" })
 
+    -- Delete backwards by word (Alt+Backspace)
+    map("i", "<M-BS>", "<C-w>", { desc = "Delete word backwards" })
+
     -- macOS Cmd+V paste in all modes
     map("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
     map("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
