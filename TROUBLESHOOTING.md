@@ -170,6 +170,18 @@ The `lg` alias was the only launcher that loaded the overlay correctly, because 
 
 **Takeaway:** When there's more than one entry point into the same tool (shell alias, tmux binding, herdr binding, ...), duplicated config-building logic silently drifts. Centralize it in one script on `$PATH` and have every entry point call that.
 
+### lazygit still hangs on open even with autoFetch/fetchAll disabled and the right config file loaded
+
+**Symptom:** After the fix above (all launchers loading `config-remote-sandbox.yml`), lazygit was still slow/unresponsive opening in some monorepos (e.g. urbancompass, uc-frontend) even though auto-fetch was confirmed off — the delay was lazygit loading branch/tag/ref data, not fetching.
+
+**Cause:** Sheer git data scale, unrelated to lazygit's own config. The sandbox image pre-clones these repos with git's default wide refspec (`+refs/heads/*:refs/remotes/origin/*`) and full tags *before* dotfiles are stowed. On monorepos with a long history of feature branches and CI tags, that means tens of thousands of stale remote-tracking branches and tags baked into the local repo (uc-frontend had ~137K tags and ~18K remote branches) — lazygit (and plain `git` commands) have to enumerate all of that on every open, regardless of fetch behavior.
+
+`remote-sandbox/.gitconfig-monorepo`'s `tagOpt = --no-tags` (activated per-repo via `[includeIf]`) only prevents *future* tag fetches — it can't narrow a refspec or delete refs that already exist in a clone made before the config took effect.
+
+**Fix:** Added `shared/bin/optimize-monorepos`, a one-time fixup script run from each sandbox profile's post-stow hook (see `crafting/.hooks/post-stow.sh`) right after repos are bootstrapped. For every repo under `~/development/*/` where `.gitconfig-monorepo` is already active (sentinel: `remote.origin.tagOpt == --no-tags`), it: narrows `remote.origin.fetch` to `master` + a configurable branch-prefix glob (`MONOREPO_BRANCH_PREFIX`, default `jjs`) via `git remote set-branches`, deletes all local tags, and deletes remote-tracking branches outside that allowed set. Idempotent — a repo that's already narrowed is a fast no-op on rerun. An optional `--gc` flag runs `git gc --aggressive --prune=now` per repo afterward.
+
+**Takeaway:** A config setting that only affects *future* fetches (`tagOpt`, narrowed refspecs, etc.) can't fix data that's already on disk from before the config existed. Pre-baked sandbox images need an explicit one-time migration step, not just a config change, to bring existing clones in line.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)
