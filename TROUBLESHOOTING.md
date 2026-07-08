@@ -153,6 +153,23 @@ stack traceback:
 
 **Fix:** Wrap the body of the `snacks-explorer-auto-resize` autocmd callback in an extra `vim.schedule()`. This defers the actual `close()`/`open()` call by one tick, so snacks' own relayout callback (scheduled earlier in the same `VimResized` pass) runs and completes *before* our close's teardown nils out `self.preview`. Same pattern already used by the `nvim-tree` provider's `WinLeave` auto-close handler in the same file, for the same class of race.
 
+## lazygit
+
+### Dedicated lazygit pane/tab is slow to open on remote-sandbox/crafting boxes (auto-fetches)
+
+**Symptom:** The `lg` shell alias opens lazygit instantly (no auto-fetch), but opening lazygit via a dedicated multiplexer pane/tab (tmux `prefix+g`, or herdr `prefix+G`) is slow and shows a fetch spinner/delay on open, especially on large monorepos (e.g. the crafting box's urbancompass repo).
+
+**Cause:** Three separate launchers each hardcoded their own `--use-config-file` list (or none at all), so none of them picked up `config-remote-sandbox.yml` — the overlay that sets `autoFetch: false` / `fetchAll: false` for the `remote-sandbox` profile:
+- `shared/.config/tmux/scripts/lazygit-tab.sh` (`prefix+g` tab) only checked for `config-work.yml` (added for the `work` profile; nobody updated it when `remote-sandbox` got its own overlay).
+- `shared/.config/tmux/conf.d/50-apps.conf`'s `prefix+G` popup binding ran plain `lazygit` via `tmux-popup` — **no** `--use-config-file` at all, not even the base `config.yml`.
+- `shared/.config/herdr/config.toml`'s `prefix+G` binding ran plain `bash -lc lazygit` — same, no config file at all.
+
+The `lg` alias was the only launcher that loaded the overlay correctly, because it hardcodes `config-remote-sandbox.yml` directly (it's defined in the `remote-sandbox` profile's own alias override).
+
+**Fix:** Added `shared/bin/lazygit-launch`, a shared launcher script that builds the `--use-config-file` list (`config.yml,config-tab.yml` plus whichever of `config-work.yml`/`config-remote-sandbox.yml` exists on the current box) and `exec`s lazygit with it. All three launch sites (`lazygit-tab.sh`, the tmux popup binding, and herdr's `prefix+G` binding) now call `lazygit-launch` instead of duplicating (or omitting) the config-file logic. File-existence checks make it safe everywhere — a missing overlay just has no effect.
+
+**Takeaway:** When there's more than one entry point into the same tool (shell alias, tmux binding, herdr binding, ...), duplicated config-building logic silently drifts. Centralize it in one script on `$PATH` and have every entry point call that.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)

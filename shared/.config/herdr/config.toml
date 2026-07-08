@@ -66,11 +66,12 @@ key = "prefix+C"
 type = "pane"
 command = "bash -lc '$SHELL'"
 
-# Lazygit
+# Lazygit (uses lazygit-launch to pick up profile-specific overlays, e.g.
+# config-remote-sandbox.yml's autoFetch: false on remote-sandbox/crafting boxes)
 [[keys.command]]
 key = "prefix+G"
 type = "pane"
-command = "bash -lc lazygit"
+command = "bash -lc lazygit-launch"
 
 # pj project picker — prefix+o (pj-herdr plugin)
 [[keys.command]]

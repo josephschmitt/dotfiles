@@ -1,0 +1,22 @@
+#!/bin/sh
+# Shared lazygit launcher for dedicated lazygit panes/windows.
+#
+# Used by:
+#   - shared/.config/tmux/scripts/lazygit-tab.sh (tmux prefix+g window)
+#   - shared/.config/herdr/config.toml (herdr prefix+G pane)
+#
+# Builds the --use-config-file list from the base config plus the
+# tab/pane overlay (config-tab.yml), then layers on whichever
+# profile-specific overlay is present on this machine (e.g. config-work.yml,
+# config-remote-sandbox.yml). File-existence checks mean this is safe on
+# every profile -- a missing overlay just has no effect.
+LG_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/lazygit"
+LG_CONFIGS="$LG_CONFIG_DIR/config.yml,$LG_CONFIG_DIR/config-tab.yml"
+
+for overlay in config-work.yml config-remote-sandbox.yml; do
+  if [ -f "$LG_CONFIG_DIR/$overlay" ]; then
+    LG_CONFIGS="$LG_CONFIGS,$LG_CONFIG_DIR/$overlay"
+  fi
+done
+
+exec lazygit --use-config-file="$LG_CONFIGS" "$@"
