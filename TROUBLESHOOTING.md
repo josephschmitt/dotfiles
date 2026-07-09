@@ -153,6 +153,18 @@ stack traceback:
 
 **Fix:** Wrap the body of the `snacks-explorer-auto-resize` autocmd callback in an extra `vim.schedule()`. This defers the actual `close()`/`open()` call by one tick, so snacks' own relayout callback (scheduled earlier in the same `VimResized` pass) runs and completes *before* our close's teardown nils out `self.preview`. Same pattern already used by the `nvim-tree` provider's `WinLeave` auto-close handler in the same file, for the same class of race.
 
+### Yanking in Neovim doesn't populate the system clipboard when SSH'd into a remote-sandbox box
+
+**Symptom:** `y`/yank in Neovim over SSH into a `remote-sandbox` (or `rca`/`crafting`) box doesn't reach the local clipboard — pasting outside Neovim gets nothing. Copying via the terminal/multiplexer itself (e.g. herdr's own text selection) works fine, and it may also work in *other* SSH sessions into the same class of box.
+
+**Cause:** Two things compound:
+1. `remote-sandbox/bin/install-deps.sh` never installs a clipboard binary (`xclip`/`xsel`/`wl-copy`/`pbcopy`) — these are rootless Ubuntu boxes with no X/Wayland session, so there's nothing for Neovim's clipboard provider to shell out to.
+2. Neovim 0.10+'s built-in OSC-52 auto-detect (`autoload/provider/clipboard.vim`) only activates when `'clipboard'` is empty (`&clipboard ==# ''`). Kickstart's `init.lua` sets `vim.o.clipboard = 'unnamedplus'`, so that auto-detect path is always skipped.
+
+The only remaining path is via tmux: if Neovim sees `$TMUX` set, it shells out to `tmux set-buffer`, and `remote-sandbox/.tmux.conf`'s `set -g set-clipboard on` (+ `allow-passthrough on`) relays that up through the SSH connection as OSC-52. That's why it can appear to work in some sessions (attached to tmux) and not others (not attached, or nvim started before attaching) — the underlying gap is the same in both cases, only the tmux relay happens to paper over it.
+
+**Fix:** `shared/.config/nvim/lua/custom/plugins/options.lua` now explicitly sets `vim.g.clipboard` to the OSC-52 provider (`require('vim.ui.clipboard.osc52')`) whenever `vim.env.SSH_TTY` is set, bypassing the tool/tmux dependency entirely. Local (non-SSH) sessions are unaffected and keep using `pbcopy`/etc. This does still require the terminal on the *local* end of the SSH connection (herdr, iTerm2, etc.) to understand OSC-52 — if the fix doesn't work, check that next.
+
 ## lazygit
 
 ### Dedicated lazygit pane/tab is slow to open on remote-sandbox/crafting boxes (auto-fetches)

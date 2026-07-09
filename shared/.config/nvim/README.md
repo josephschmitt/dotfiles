@@ -28,6 +28,7 @@ Dashboard startup loads only ~5 plugins in ~50ms. The entire LSP chain (lspconfi
 - **Bufferline** hides when only one buffer is open
 - **Neo-tree** auto-opens on wide screens and closes on narrow ones
 - **mini.indentscope** uses a `draw.predicate` to skip non-file buffers — autocmd-based approaches lose the race against dashboard buffer initialization
+- **SSH clipboard** — yanks over SSH (e.g. `remote-sandbox` boxes, which have no `xclip`/`wl-copy`) use the OSC-52 provider directly, so they reach the local terminal's clipboard without needing tmux or a clipboard binary on the remote box
 
 ### Unified Keybinding Philosophy
 AstroNvim's keybinding structure was the starting point, but adapted to be more discoverable. Everything lives under `<Space>` with which-key's helix-style popup. Icons are embedded directly in group names (a workaround for `icons.mappings=false` blocking explicit icon properties).

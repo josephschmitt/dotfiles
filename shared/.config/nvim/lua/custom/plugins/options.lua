@@ -26,6 +26,26 @@ pcall(vim.fn.serverstart, socket_path)
 vim.g.loaded_netrwPlugin = 1
 vim.g.loaded_netrw = 1
 
+-- SSH clipboard: remote-sandbox boxes have no clipboard binary (xclip/wl-copy)
+-- and Neovim's built-in OSC-52 auto-detect only kicks in when 'clipboard' is
+-- empty (kickstart's init.lua sets it to unnamedplus), so it's silently
+-- skipped. Force the OSC-52 provider directly over SSH so yanks reach the
+-- local terminal's clipboard regardless of tmux/clipboard-tool availability.
+-- Local (non-SSH) sessions are untouched and keep using pbcopy/etc.
+if vim.env.SSH_TTY then
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
+
 -- Directory opener: when Neovim is launched with a directory argument,
 -- set the cwd, show the Snacks dashboard, and reveal the file tree.
 vim.api.nvim_create_autocmd("BufEnter", {
