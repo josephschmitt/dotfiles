@@ -169,6 +169,14 @@ Note: this originally keyed off `SSH_TTY` alone. `SSH_TTY` is only set by sshd w
 
 This does still require the terminal on the *local* end of the SSH connection (herdr, iTerm2, etc.) to understand OSC-52 — if the fix doesn't work, check that next.
 
+### `p`/`P` hangs forever with "Waiting for OSC 52 response from the terminal" over SSH
+
+**Symptom:** After the OSC-52 yank fix above, pasting (`p`/`P`) in Neovim over SSH into a `remote-sandbox`/`rca`/`crafting` box hangs indefinitely, with the command line showing `Waiting for OSC 52 response from the terminal. Press Ctrl-C to interrupt...`.
+
+**Cause:** The `vim.g.clipboard` override in `shared/.config/nvim/lua/custom/plugins/options.lua` originally wired up both `copy` *and* `paste` to `require('vim.ui.clipboard.osc52')`. OSC-52 copy is one-way (nvim just writes an escape sequence, no reply expected), but OSC-52 *paste* requires nvim to send a query and then block reading the terminal's reply off the same TTY. Most terminals — and definitely anything behind tmux/multiplexing — either don't implement that response leg or disable it by default (it's a security-sensitive feature, since it lets any program that can write to the TTY read the system clipboard). With no reply ever arriving, every `p`/`P` blocked forever.
+
+**Fix:** Removed the `paste` table from the `vim.g.clipboard` override entirely, leaving only `copy`. Without a custom `paste` provider, `p`/`P` fall back to normal register behavior (instant, no host-clipboard fetch) — yank-out still reaches the local clipboard via OSC-52, paste just no longer tries to pull the host clipboard back in.
+
 ## lazygit
 
 ### Dedicated lazygit pane/tab is slow to open on remote-sandbox/crafting boxes (auto-fetches)

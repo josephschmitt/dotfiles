@@ -37,16 +37,22 @@ vim.g.loaded_netrw = 1
 -- empty even for normal interactive logins. SSH_CONNECTION is set whenever
 -- there's a remote client at all, TTY or not, so check both for coverage
 -- across whatever quirks a given server/client combo has.
+--
+-- NOTE: intentionally no `paste` provider. OSC-52 paste requires the
+-- terminal to answer a query over the same TTY with the clipboard contents;
+-- most terminals (and anything behind tmux) don't implement that response
+-- leg, or block it by default for security. Wiring paste up to
+-- osc52.paste() makes every p/P send that query and then hang forever on
+-- "Waiting for OSC 52 response" since no reply ever arrives. Without a
+-- custom paste, p/P just fall back to normal register behavior (instant,
+-- no host-clipboard fetch) — copy-out still works, paste just doesn't
+-- pull from the host clipboard.
 if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
       ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
       ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-    },
-    paste = {
-      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
     },
   }
 end
