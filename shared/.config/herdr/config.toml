@@ -18,6 +18,9 @@ focus_pane_right = "alt+l"
 cycle_pane_next = "alt+backtick"
 cycle_pane_previous = "alt+shift+backtick"
 
+# Rename pane — prefix+p (default prefix+shift+p freed up for pj-herdr plugin)
+rename_pane = "prefix+p"
+
 # Tab switching — Alt+1-9 (matches tmux-tilish window switching)
 switch_tab = "alt+1..9"
 
@@ -36,11 +39,15 @@ previous_agent = "alt+["
 next_agent = "alt+]"
 focus_agent = "prefix+1..9"
 
-# Workspace navigation (picker disabled — default prefix+w conflicts with open_worktree)
+# Goto — prefix+o (jump prompt listing workspaces/spaces and agents to switch to;
+# moved from default prefix+g, which is now free)
+goto = "prefix+o"
+# Workspace picker disabled — default prefix+w conflicts with open_worktree, and
+# prefix+o is used for goto instead
 workspace_picker = ""
 # Rename workspace — moved from default prefix+shift+w (conflicts with new_worktree)
 rename_workspace = "prefix+shift+e"
-# open_notification_target disabled — default prefix+o freed up for pj-herdr plugin
+# open_notification_target disabled — no free slot
 open_notification_target = ""
 new_workspace = "prefix+shift+n"
 previous_workspace = "alt+shift+["
@@ -73,9 +80,9 @@ key = "prefix+G"
 type = "pane"
 command = "bash -lc lazygit-launch"
 
-# pj project picker — prefix+o (pj-herdr plugin)
+# pj project picker — prefix+shift+p (pj-herdr plugin; moved off prefix+o to make room for goto)
 [[keys.command]]
-key = "prefix+o"
+key = "prefix+shift+p"
 type = "plugin_action"
 command = "pj.open-picker"
 
