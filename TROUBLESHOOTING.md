@@ -163,7 +163,11 @@ stack traceback:
 
 The only remaining path is via tmux: if Neovim sees `$TMUX` set, it shells out to `tmux set-buffer`, and `remote-sandbox/.tmux.conf`'s `set -g set-clipboard on` (+ `allow-passthrough on`) relays that up through the SSH connection as OSC-52. That's why it can appear to work in some sessions (attached to tmux) and not others (not attached, or nvim started before attaching) — the underlying gap is the same in both cases, only the tmux relay happens to paper over it.
 
-**Fix:** `shared/.config/nvim/lua/custom/plugins/options.lua` now explicitly sets `vim.g.clipboard` to the OSC-52 provider (`require('vim.ui.clipboard.osc52')`) whenever `vim.env.SSH_TTY` is set, bypassing the tool/tmux dependency entirely. Local (non-SSH) sessions are unaffected and keep using `pbcopy`/etc. This does still require the terminal on the *local* end of the SSH connection (herdr, iTerm2, etc.) to understand OSC-52 — if the fix doesn't work, check that next.
+**Fix:** `shared/.config/nvim/lua/custom/plugins/options.lua` now explicitly sets `vim.g.clipboard` to the OSC-52 provider (`require('vim.ui.clipboard.osc52')`) whenever `vim.env.SSH_TTY` **or** `vim.env.SSH_CONNECTION` is set, bypassing the tool/tmux dependency entirely. Local (non-SSH) sessions are unaffected and keep using `pbcopy`/etc.
+
+Note: this originally keyed off `SSH_TTY` alone. `SSH_TTY` is only set by sshd when a pty was allocated for the session — on some boxes (e.g. this fleet's remote-sandbox machines) it comes back empty even for normal interactive logins, so the gate never fired there. `SSH_CONNECTION` is set whenever there's a remote client at all, TTY or not, and is the more reliable signal — but checking both covers whatever quirk a given server/client combo has, since it's plausible some other setup has `SSH_TTY` set without `SSH_CONNECTION` (or vice versa).
+
+This does still require the terminal on the *local* end of the SSH connection (herdr, iTerm2, etc.) to understand OSC-52 — if the fix doesn't work, check that next.
 
 ## lazygit
 

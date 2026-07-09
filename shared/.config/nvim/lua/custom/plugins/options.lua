@@ -26,13 +26,18 @@ pcall(vim.fn.serverstart, socket_path)
 vim.g.loaded_netrwPlugin = 1
 vim.g.loaded_netrw = 1
 
--- SSH clipboard: remote-sandbox boxes have no clipboard binary (xclip/wl-copy)
+-- SSH clipboard: remote boxes often have no clipboard binary (xclip/wl-copy)
 -- and Neovim's built-in OSC-52 auto-detect only kicks in when 'clipboard' is
 -- empty (kickstart's init.lua sets it to unnamedplus), so it's silently
 -- skipped. Force the OSC-52 provider directly over SSH so yanks reach the
 -- local terminal's clipboard regardless of tmux/clipboard-tool availability.
 -- Local (non-SSH) sessions are untouched and keep using pbcopy/etc.
-if vim.env.SSH_TTY then
+-- NOTE: sshd only sets SSH_TTY when a pty was allocated for the session —
+-- on some boxes (e.g. this fleet's remote-sandbox machines) it comes back
+-- empty even for normal interactive logins. SSH_CONNECTION is set whenever
+-- there's a remote client at all, TTY or not, so check both for coverage
+-- across whatever quirks a given server/client combo has.
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
