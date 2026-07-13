@@ -46,21 +46,40 @@ vim.g.loaded_netrw = 1
 -- terminal, so forcing the provider here reaches the local clipboard the
 -- same way it does over plain SSH.
 --
--- NOTE: intentionally no `paste` provider. OSC-52 paste requires the
--- terminal to answer a query over the same TTY with the clipboard contents;
--- most terminals (and anything behind tmux) don't implement that response
--- leg, or block it by default for security. Wiring paste up to
--- osc52.paste() makes every p/P send that query and then hang forever on
--- "Waiting for OSC 52 response" since no reply ever arrives. Without a
--- custom paste, p/P just fall back to normal register behavior (instant,
--- no host-clipboard fetch) — copy-out still works, paste just doesn't
--- pull from the host clipboard.
+-- NOTE: `paste` is required even though we don't want real OSC-52 paste.
+-- Neovim's clipboard validation (provider#clipboard#Executable) rejects
+-- g:clipboard outright if `copy` and `paste` aren't both present as tables —
+-- it's all-or-nothing, not "copy works, paste is just absent". Omitting
+-- `paste` doesn't disable paste alone, it invalidates the whole config, so
+-- `copy` silently stops working too and Neovim falls back to hunting for
+-- xclip/pbcopy, which don't exist on these boxes ("clipboard: No provider").
+-- Confirmed by testing: a g:clipboard with only `copy` reproducibly fails
+-- setreg('+', ...) with that exact error, while adding any `paste` table
+-- fixes it immediately.
+--
+-- We still don't want *real* OSC-52 paste: it requires the terminal to
+-- answer a query over the same TTY with the clipboard contents, and most
+-- terminals (and anything behind tmux) don't implement that response leg,
+-- or block it by default for security. Wiring paste up to osc52.paste()
+-- makes every p/P send that query and hang forever on "Waiting for OSC 52
+-- response" since no reply ever arrives. So `paste` here is a pass-through
+-- stub that just returns the local unnamed register instead of querying the
+-- terminal — it exists purely to keep g:clipboard valid so `copy` keeps
+-- working. p/P behave exactly as before (instant, no host-clipboard fetch).
 if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.HERDR_SOCKET_PATH then
+  local function local_register_paste()
+    return vim.fn.getreg('"', 1, true)
+  end
+
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
       ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
       ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = local_register_paste,
+      ["*"] = local_register_paste,
     },
   }
 end
