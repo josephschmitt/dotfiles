@@ -8,6 +8,7 @@ end
 -- Track global toggle states
 local autoformat_disabled_globally = false
 local autoformat_disabled_buffers = {}
+local center_focus_enabled = false
 
 return {
   -- Override conform to respect our autoformat toggles
@@ -188,6 +189,19 @@ return {
           end
         end,
         desc = "Toggle syntax highlighting (buffer)",
+      },
+
+      -- Center focus (pad sides, enable wrap)
+      {
+        "<Leader>tz",
+        function()
+          center_focus_enabled = not center_focus_enabled
+          vim.cmd("NoNeckPain")
+          vim.wo.wrap = center_focus_enabled
+          vim.wo.linebreak = center_focus_enabled
+          notify("Center focus", center_focus_enabled)
+        end,
+        desc = "Toggle center focus",
       },
     },
   },

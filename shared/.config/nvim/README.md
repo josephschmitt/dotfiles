@@ -70,7 +70,8 @@ lua/custom/plugins/
 ├── sortjson.lua            # JSON key sorting
 ├── tmux-navigator.lua      # Seamless Ctrl+hjkl between tmux/nvim
 ├── toggles.lua             # Toggle keybindings (format, wrap, hints, etc.)
-└── which-key.lua           # Helix-style popup with icon groups
+├── which-key.lua           # Helix-style popup with icon groups
+└── zen-center.lua          # Center buffer with padded side buffers (no-neck-pain)
 ```
 
 ## Plugins
@@ -99,6 +100,7 @@ lua/custom/plugins/
 | tiny-inline-diagnostic.nvim | Powerline-style diagnostic messages | VeryLazy |
 | multicursor.nvim | Multi-cursor editing | On keypress |
 | vim-tmux-navigator | Ctrl+hjkl across tmux and nvim splits | On keypress |
+| no-neck-pain.nvim | Center buffer with padded side buffers | On command |
 
 ## Key Bindings
 
@@ -133,6 +135,7 @@ Leader key: **Space**
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
 | `go` | Open URL/filepath under cursor |
+| `<Leader>tz` | Toggle center focus (padded sides + wrap) |
 
 Press `<Space>` and wait for the which-key popup to see everything.
 
