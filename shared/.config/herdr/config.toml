@@ -67,6 +67,9 @@ open_worktree = "prefix+w"
 # New worktree — prefix+shift+w (matches new_workspace = prefix+shift+n pattern)
 new_worktree = "prefix+shift+w"
 
+# Remove worktree — prefix+shift+d
+remove_worktree = "prefix+shift+d"
+
 # Quick shell (closes on exit)
 [[keys.command]]
 key = "prefix+C"
@@ -86,11 +89,12 @@ key = "prefix+shift+p"
 type = "plugin_action"
 command = "pj.open-picker"
 
-# Open existing branch as a herdr worktree (local + remote branches via fzf)
+# Open existing branch as a herdr worktree (tv cable channel)
 [[keys.command]]
 key = "prefix+shift+o"
 type = "pane"
-command = """bash -lc 'branch=$(git branch -a --format "%(refname:short)" | sed "s|^origin/||" | sort -u | fzf --prompt "Open branch as worktree: " --height 40% --reverse) && [ -n "$branch" ] && herdr worktree open --branch "$branch" --focus'"""
+command = "bash -lc 'tv herdr-worktree'"
+
 
 [ui]
 show_agent_labels_on_pane_borders = true

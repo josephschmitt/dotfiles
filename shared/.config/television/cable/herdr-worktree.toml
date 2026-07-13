@@ -1,0 +1,21 @@
+# Television channel for opening git branches as herdr worktrees
+# Opens existing worktree if already checked out, otherwise creates a new one
+
+[metadata]
+name = "herdr-worktree"
+description = "Open a git branch as a herdr worktree"
+requirements = ["git", "herdr"]
+
+[source]
+command = "git branch -a --format '%(refname:short)' | sed 's|^origin/||' | sort -u"
+
+[preview]
+command = "git show -p --stat --pretty=fuller --color=always '{0}'"
+
+[keybindings]
+enter = "actions:open"
+
+[actions.open]
+description = "Open branch as herdr worktree (focus existing or create new)"
+command = "command herdr worktree open --branch '{}' --focus 2>/dev/null || command herdr worktree create --branch '{}' --focus"
+mode = "execute"
