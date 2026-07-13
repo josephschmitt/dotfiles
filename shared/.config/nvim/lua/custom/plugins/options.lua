@@ -38,6 +38,14 @@ vim.g.loaded_netrw = 1
 -- there's a remote client at all, TTY or not, so check both for coverage
 -- across whatever quirks a given server/client combo has.
 --
+-- NOTE: `herdr --remote` bridges to remote sandboxes over its own transport
+-- instead of sshd, so neither SSH_TTY nor SSH_CONNECTION is set even though
+-- the session is just as remote. Herdr always sets HERDR_SOCKET_PATH (and
+-- other HERDR_* vars) in its pane environment, so check that too. Herdr
+-- v0.4.6+ passes OSC 52 sequences from child apps through to the host
+-- terminal, so forcing the provider here reaches the local clipboard the
+-- same way it does over plain SSH.
+--
 -- NOTE: intentionally no `paste` provider. OSC-52 paste requires the
 -- terminal to answer a query over the same TTY with the clipboard contents;
 -- most terminals (and anything behind tmux) don't implement that response
@@ -47,7 +55,7 @@ vim.g.loaded_netrw = 1
 -- custom paste, p/P just fall back to normal register behavior (instant,
 -- no host-clipboard fetch) — copy-out still works, paste just doesn't
 -- pull from the host clipboard.
-if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.HERDR_SOCKET_PATH then
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
