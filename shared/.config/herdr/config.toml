@@ -73,7 +73,7 @@ remove_worktree = "prefix+shift+d"
 # Quick shell (closes on exit)
 [[keys.command]]
 key = "prefix+C"
-type = "pane"
+type = "popup"
 command = "bash -lc '$SHELL'"
 description = "Quick shell"
 
@@ -81,9 +81,11 @@ description = "Quick shell"
 # config-remote-sandbox.yml's autoFetch: false on remote-sandbox/crafting boxes)
 [[keys.command]]
 key = "prefix+G"
-type = "pane"
+type = "popup"
 command = "bash -lc lazygit-launch"
 description = "Lazygit"
+width = "80%"
+height = "80%"
 
 # pj project picker — prefix+shift+p (pj-herdr plugin; moved off prefix+o to make room for goto)
 [[keys.command]]
@@ -95,9 +97,11 @@ description = "Project picker (pj)"
 # Open existing branch as a herdr worktree (tv cable channel)
 [[keys.command]]
 key = "prefix+shift+o"
-type = "pane"
+type = "popup"
 command = "bash -lc 'tv herdr-worktree'"
 description = "Open branch as worktree"
+width = "80%"
+height = "80%"
 
 # herdr-plugin-gh-pr (https://github.com/wyattjoh/herdr-plugin-gh-pr)
 # Open focused pane's branch PR in the browser — prefix+g (default goto freed;
