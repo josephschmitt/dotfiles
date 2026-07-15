@@ -93,8 +93,8 @@ key = "prefix+G"
 type = "popup"
 command = "bash -lc lazygit-launch"
 description = "Lazygit"
-width = "80%"
-height = "80%"
+width = "95%"
+height = "90%"
 
 # Yazi file manager — prefix+shift+y
 [[keys.command]]
