@@ -135,7 +135,7 @@ rows = [
 row_gap = 1
 rows = [
   ["state_icon", "workspace"],
-  ["state_text", "agent"],
+  ["state_text", "agent", "$pr"],
   ["terminal_title_stripped"]
 ]
 
