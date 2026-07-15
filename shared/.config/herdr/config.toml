@@ -70,12 +70,21 @@ new_worktree = "prefix+shift+w"
 # Remove worktree — prefix+shift+d
 remove_worktree = "prefix+shift+d"
 
-# Quick shell (closes on exit)
+# Quick shell — exits automatically after a successful command
+# (double Ctrl-c within 2s also closes the popup)
+[[keys.command]]
+key = "prefix+c"
+type = "popup"
+command = "bash -lc ~/.config/herdr/scripts/quick-shell.sh"
+description = "Quick shell"
+
+# Mini shell — persists until explicitly closed
+# (double Ctrl-c within 2s closes the popup)
 [[keys.command]]
 key = "prefix+C"
 type = "popup"
-command = "bash -lc '$SHELL'"
-description = "Quick shell"
+command = "bash -lc '~/.config/herdr/scripts/quick-shell.sh --persist'"
+description = "Mini shell"
 
 # Lazygit (uses lazygit-launch to pick up profile-specific overlays, e.g.
 # config-remote-sandbox.yml's autoFetch: false on remote-sandbox/crafting boxes)
