@@ -75,6 +75,7 @@ remove_worktree = "prefix+shift+d"
 key = "prefix+C"
 type = "pane"
 command = "bash -lc '$SHELL'"
+description = "Quick shell"
 
 # Lazygit (uses lazygit-launch to pick up profile-specific overlays, e.g.
 # config-remote-sandbox.yml's autoFetch: false on remote-sandbox/crafting boxes)
@@ -82,18 +83,37 @@ command = "bash -lc '$SHELL'"
 key = "prefix+G"
 type = "pane"
 command = "bash -lc lazygit-launch"
+description = "Lazygit"
 
 # pj project picker — prefix+shift+p (pj-herdr plugin; moved off prefix+o to make room for goto)
 [[keys.command]]
 key = "prefix+shift+p"
 type = "plugin_action"
 command = "pj.open-picker"
+description = "Project picker (pj)"
 
 # Open existing branch as a herdr worktree (tv cable channel)
 [[keys.command]]
 key = "prefix+shift+o"
 type = "pane"
 command = "bash -lc 'tv herdr-worktree'"
+description = "Open branch as worktree"
+
+# herdr-plugin-gh-pr (https://github.com/wyattjoh/herdr-plugin-gh-pr)
+# Open focused pane's branch PR in the browser — prefix+g (default goto freed;
+# goto lives at prefix+o instead)
+[[keys.command]]
+key = "prefix+g"
+type = "plugin_action"
+command = "gh-pr.open-pr"
+description = "Open PR in browser"
+
+# Manually refresh PR status for the focused pane's branch — prefix+u
+[[keys.command]]
+key = "prefix+u"
+type = "plugin_action"
+command = "gh-pr.refresh"
+description = "Refresh PR status"
 
 
 [ui]
@@ -101,7 +121,7 @@ show_agent_labels_on_pane_borders = true
 agent_panel_scope = "all"
 
 [ui.toast]
-delivery = "terminal"
+delivery = "herdr"
 
 [theme]
 name = "terminal"
