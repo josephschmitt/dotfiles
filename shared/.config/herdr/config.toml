@@ -87,6 +87,15 @@ description = "Lazygit"
 width = "80%"
 height = "80%"
 
+# Yazi file manager — prefix+shift+y
+[[keys.command]]
+key = "prefix+shift+y"
+type = "popup"
+command = "bash -lc yazi"
+description = "Yazi file manager"
+width = "80%"
+height = "80%"
+
 # pj project picker — prefix+shift+p (pj-herdr plugin; moved off prefix+o to make room for goto)
 [[keys.command]]
 key = "prefix+shift+p"
@@ -124,6 +133,7 @@ description = "Refresh PR status"
 show_agent_labels_on_pane_borders = true
 agent_panel_scope = "all"
 
+agent_panel_sort = "priority"
 [ui.sidebar.spaces]
 row_gap = 1
 rows = [
