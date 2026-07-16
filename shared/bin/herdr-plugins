@@ -153,9 +153,17 @@ read_manifest_json() {
 # Everything before the first "[[" line in the current manifest file — i.e.
 # its leading "#" comment block (and any blank lines after it). Captured
 # fresh from disk on every write so hand-edits to the header survive.
+#
+# Uses awk rather than `sed -n '1,/^\[\[/p' | sed '$d'`: GNU sed's `1,/regex/`
+# range never tests the regex against line 1 itself (a documented extension
+# to avoid a trivially-empty 1-line range), so if the manifest has NO header
+# comment and its very first line is already "[[plugins]]", that sed pattern
+# would skip past it and match the *next* "[[" line instead — capturing the
+# entire first plugin block as the "header" and duplicating it on every
+# write. awk's exit-on-match has no such off-by-one.
 manifest_header() {
     if [ -f "$manifest" ]; then
-        sed -n '1,/^\[\[/p' "$manifest" | sed '$d'
+        awk '/^\[\[/ { exit } { print }' "$manifest"
     fi
 }
 
