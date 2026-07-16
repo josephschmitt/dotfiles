@@ -63,6 +63,52 @@
 
 set -eu
 
+print_help() {
+    cat <<'EOF'
+herdr-plugins — manage herdr plugins and plugins.manifest.toml together
+
+Usage:
+  herdr-plugins [sync] [--dry-run] [--update] [--prune]
+      Reconcile herdr's installed plugins to match the manifest (the only
+      subcommand that doesn't change the manifest itself). Default when no
+      subcommand is given — this is what runs from the post-stow hook.
+        --dry-run  print what would run, change nothing
+        --update   re-apply already-installed plugins too (pulls latest for
+                   "install" entries; re-links "link" entries in case the
+                   target path's checked-out branch/worktree changed)
+        --prune    also uninstall/unlink any herdr plugin that ISN'T in the
+                   manifest (drift in the other direction). Without this
+                   flag, such plugins are only reported as a warning.
+
+  herdr-plugins install <owner>/<repo>[/subdir] [--ref REF] [--description TEXT]
+      Runs `herdr plugin install`, then adds/updates the resulting plugin's
+      entry in the manifest.
+
+  herdr-plugins link <path> [--description TEXT]
+      Runs `herdr plugin link`, then adds/updates the resulting plugin's
+      entry in the manifest.
+
+  herdr-plugins uninstall <plugin_id>
+      Runs `herdr plugin uninstall`, then removes it from the manifest.
+
+  herdr-plugins unlink <plugin_id>
+      Runs `herdr plugin unlink`, then removes it from the manifest.
+
+  herdr-plugins help | -h | --help
+      Show this help.
+
+Manifest: ~/.config/herdr/plugins.manifest.toml (see AGENTS.md in
+shared/.config/herdr/ for entry shapes and the full design notes).
+EOF
+}
+
+case "${1:-}" in
+    -h|--help|help)
+        print_help
+        exit 0
+        ;;
+esac
+
 info() { printf '\n\033[1;34m==>\033[0m %s\n' "$*"; }
 ok()   { printf '\033[0;32m✓\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!\033[0m %s\n' "$*" >&2; }
@@ -412,7 +458,7 @@ case "$subcommand" in
     unlink) cmd_unlink "$@" ;;
     *)
         err "unknown subcommand: $subcommand"
-        err "usage: herdr-plugins [sync|install|link|uninstall|unlink] ..."
+        err "usage: herdr-plugins [sync|install|link|uninstall|unlink] ... (herdr-plugins --help for details)"
         exit 1
         ;;
 esac
