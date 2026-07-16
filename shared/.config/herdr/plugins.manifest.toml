@@ -13,3 +13,8 @@ plugin_id = "gh-pr"
 description = "Labels the focused agent pane's sidebar row with its branch's GitHub PR status (prefix+g open PR, prefix+u refresh)"
 link = "~/development/herdr-plugin-gh-pr"
 note = "Personal fork (josephschmitt/herdr-plugin-gh-pr, tracking upstream wyattjoh/herdr-plugin-gh-pr) cloned to the path above. `herdr-plugins link` re-links whatever branch/worktree is currently checked out there — switch worktrees manually first if you want a specific patch set active."
+
+[[plugins]]
+plugin_id = "persiyanov.fresh-worktree"
+description = "Reset a newly created worktree to the latest origin default branch."
+install = "persiyanov/herdr-fresh-worktree"
