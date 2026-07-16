@@ -45,8 +45,8 @@ goto = "prefix+o"
 # Workspace picker disabled — default prefix+w conflicts with open_worktree, and
 # prefix+o is used for goto instead
 workspace_picker = ""
-# Rename workspace — moved from default prefix+shift+w (conflicts with new_worktree)
-rename_workspace = "prefix+shift+e"
+# Rename workspace disabled — prefix+shift+e freed for the Editor popup below
+rename_workspace = ""
 # open_notification_target disabled — no free slot
 open_notification_target = ""
 new_workspace = "prefix+shift+n"
@@ -85,6 +85,15 @@ key = "prefix+C"
 type = "popup"
 command = "bash -lc '~/.config/herdr/scripts/quick-shell.sh --persist'"
 description = "Mini shell"
+
+# Editor — $EDITOR in a popup (matches tmux's bind-key E in conf.d/50-apps.conf)
+[[keys.command]]
+key = "prefix+shift+e"
+type = "popup"
+command = "bash -lc '$EDITOR'"
+description = "Editor"
+width = 100
+height = 50
 
 # Lazygit (uses lazygit-launch to pick up profile-specific overlays, e.g.
 # config-remote-sandbox.yml's autoFetch: false on remote-sandbox/crafting boxes)
