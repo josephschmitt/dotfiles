@@ -24,7 +24,7 @@
 #   description = "<optional>"
 #
 # Usage:
-#   herdr-plugins [sync] [--dry-run] [--update] [--prune]
+#   herdr-plugins [sync] [--dry-run] [--update] [--prune | --adopt]
 #       Reconcile herdr's installed plugins to match the manifest (the only
 #       subcommand that doesn't change the manifest itself). Default when no
 #       subcommand is given — this is what runs from the post-stow hook.
@@ -35,6 +35,9 @@
 #       --prune    also uninstall/unlink any herdr plugin that ISN'T in the
 #                  manifest (drift in the other direction). Without this
 #                  flag, such plugins are only reported as a warning.
+#       --adopt    also record any herdr plugin that ISN'T in the manifest
+#                  into the manifest (the inverse of --prune). Mutually
+#                  exclusive with --prune.
 #
 #   herdr-plugins install <owner>/<repo>[/subdir] [--ref REF] [--description TEXT]
 #       Runs `herdr plugin install`, then adds/updates the resulting plugin's
@@ -68,7 +71,7 @@ print_help() {
 herdr-plugins — manage herdr plugins and plugins.manifest.toml together
 
 Usage:
-  herdr-plugins [sync] [--dry-run] [--update] [--prune]
+  herdr-plugins [sync] [--dry-run] [--update] [--prune | --adopt]
       Reconcile herdr's installed plugins to match the manifest (the only
       subcommand that doesn't change the manifest itself). Default when no
       subcommand is given — this is what runs from the post-stow hook.
@@ -79,6 +82,9 @@ Usage:
         --prune    also uninstall/unlink any herdr plugin that ISN'T in the
                    manifest (drift in the other direction). Without this
                    flag, such plugins are only reported as a warning.
+        --adopt    also record any herdr plugin that ISN'T in the manifest
+                   into the manifest (the inverse of --prune). Mutually
+                   exclusive with --prune.
 
   herdr-plugins install <owner>/<repo>[/subdir] [--ref REF] [--description TEXT]
       Runs `herdr plugin install`, then adds/updates the resulting plugin's
@@ -207,17 +213,24 @@ cmd_sync() {
     DRY_RUN=0
     UPDATE=0
     PRUNE=0
+    ADOPT=0
     for arg in "$@"; do
         case "$arg" in
             --dry-run) DRY_RUN=1 ;;
             --update) UPDATE=1 ;;
             --prune) PRUNE=1 ;;
+            --adopt) ADOPT=1 ;;
             *)
                 err "sync: unknown argument: $arg"
                 exit 1
                 ;;
         esac
     done
+
+    if [ "$PRUNE" -eq 1 ] && [ "$ADOPT" -eq 1 ]; then
+        err "sync: --prune and --adopt are mutually exclusive"
+        exit 1
+    fi
 
     installed_full=$(installed_json)
     installed_ids=$(printf '%s' "$installed_full" | jq -r '.result.plugins[].plugin_id')
@@ -298,8 +311,45 @@ cmd_sync() {
                     fi
                 fi
             done
+        elif [ "$ADOPT" -eq 1 ]; then
+            for id in $extra_ids; do
+                plugin=$(printf '%s' "$installed_full" | jq -c --arg id "$id" '.result.plugins[] | select(.plugin_id == $id)')
+                kind=$(printf '%s' "$plugin" | jq -r '.source.kind')
+                description=$(printf '%s' "$plugin" | jq -r '.description // empty')
+                if [ "$kind" = "local" ]; then
+                    plugin_root=$(printf '%s' "$plugin" | jq -r '.plugin_root')
+                    # Same $HOME -> "~" collapsing as cmd_link, so the
+                    # adopted entry stays portable across machines.
+                    stored_path="$plugin_root"
+                    case "$plugin_root" in
+                        "$HOME"/*) stored_path="~${plugin_root#"$HOME"}" ;;
+                        "$HOME") stored_path="~" ;;
+                    esac
+                    entry=$(jq -nc --arg id "$id" --arg path "$stored_path" --arg desc "$description" \
+                        '{plugin_id: $id, link: $path}
+                         + (if $desc != "" then {description: $desc} else {} end)')
+                    info "$id: not in manifest — adopting as link entry (${stored_path})"
+                    if [ "$DRY_RUN" -eq 0 ]; then
+                        upsert_entry "$id" "$entry"
+                    fi
+                else
+                    owner=$(printf '%s' "$plugin" | jq -r '.source.owner')
+                    repo=$(printf '%s' "$plugin" | jq -r '.source.repo')
+                    install_src="${owner}/${repo}"
+                    # Deliberately omit "ref": herdr only exposes resolved
+                    # commit SHAs here, and pinning to one would prevent
+                    # future --update pulls.
+                    entry=$(jq -nc --arg id "$id" --arg src "$install_src" --arg desc "$description" \
+                        '{plugin_id: $id, install: $src}
+                         + (if $desc != "" then {description: $desc} else {} end)')
+                    info "$id: not in manifest — adopting as install entry (${install_src})"
+                    if [ "$DRY_RUN" -eq 0 ]; then
+                        upsert_entry "$id" "$entry"
+                    fi
+                fi
+            done
         else
-            warn "installed but not declared in the manifest (pass --prune to remove): $(printf '%s' "$extra_ids" | tr '\n' ' ')"
+            warn "installed but not declared in the manifest (pass --prune to remove, --adopt to record in the manifest): $(printf '%s' "$extra_ids" | tr '\n' ' ')"
         fi
     fi
 
