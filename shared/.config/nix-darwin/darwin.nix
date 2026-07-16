@@ -55,6 +55,7 @@
     tmux
     tree-sitter # Required by nvim-treesitter to compile parsers
     uv
+    yq-go
     zoxide
   ];
 

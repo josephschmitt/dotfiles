@@ -3,6 +3,7 @@
 #
 # 1. Rebuilds bat theme/syntax cache
 # 2. Installs/updates TPM and tmux plugins
+# 3. Applies the herdr plugin manifest (plugins.manifest.toml)
 
 info() { printf '\n\033[1;34m==>\033[0m %s\n' "$*"; }
 ok()   { printf '\033[0;32m✓\033[0m %s\n' "$*"; }
@@ -26,4 +27,10 @@ fi
 if [ -x "$tpm_dir/bin/install_plugins" ]; then
   info "Installing/updating tmux plugins via TPM"
   "$tpm_dir/bin/install_plugins" || warn "TPM plugin install reported errors — you can retry with prefix+I inside tmux"
+fi
+
+# Apply herdr plugin manifest
+if command -v herdr >/dev/null 2>&1 && command -v herdr-plugins >/dev/null 2>&1; then
+  info "Applying herdr plugin manifest"
+  herdr-plugins || warn "herdr plugin sync reported errors — rerun manually: herdr-plugins"
 fi

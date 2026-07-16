@@ -1,0 +1,418 @@
+#!/bin/sh
+# Manages herdr plugins AND shared/.config/herdr/plugins.manifest.toml (the
+# tracked, declarative plugin manifest) together, so the manifest never drifts
+# from what's actually installed. Named plugins.manifest.toml (not
+# plugins.json) so stow can symlink it into ~/.config/herdr/ without a
+# filename collision with herdr's own generated plugins.json there. TOML
+# (not JSON) so the manifest can carry real "#" comments instead of a fake
+# "//" key hack.
+#
+# Lives in shared/bin/ (symlinked to ~/bin, which is on PATH) as
+# `herdr-plugins` rather than under .config/herdr/ — it's a command you
+# run, not config.
+#
+# Manifest entry shapes (TOML array of tables):
+#   [[plugins]]
+#   plugin_id = "..."
+#   install = "<owner>/<repo>[/subdir]"
+#   ref = "<optional>"
+#   description = "<optional>"
+#
+#   [[plugins]]
+#   plugin_id = "..."
+#   link = "<path, ~ allowed>"
+#   description = "<optional>"
+#
+# Usage:
+#   herdr-plugins [sync] [--dry-run] [--update] [--prune]
+#       Reconcile herdr's installed plugins to match the manifest (the only
+#       subcommand that doesn't change the manifest itself). Default when no
+#       subcommand is given — this is what runs from the post-stow hook.
+#       --dry-run  print what would run, change nothing
+#       --update   re-apply already-installed plugins too (pulls latest for
+#                  "install" entries; re-links "link" entries in case the
+#                  target path's checked-out branch/worktree changed)
+#       --prune    also uninstall/unlink any herdr plugin that ISN'T in the
+#                  manifest (drift in the other direction). Without this
+#                  flag, such plugins are only reported as a warning.
+#
+#   herdr-plugins install <owner>/<repo>[/subdir] [--ref REF] [--description TEXT]
+#       Runs `herdr plugin install`, then adds/updates the resulting plugin's
+#       entry in the manifest. One step instead of installing by hand and
+#       remembering to edit plugins.manifest.toml separately.
+#
+#   herdr-plugins link <path> [--description TEXT]
+#       Runs `herdr plugin link`, then adds/updates the resulting plugin's
+#       entry in the manifest.
+#
+#   herdr-plugins uninstall <plugin_id>
+#       Runs `herdr plugin uninstall`, then removes it from the manifest.
+#
+#   herdr-plugins unlink <plugin_id>
+#       Runs `herdr plugin unlink`, then removes it from the manifest.
+#
+# In every case, herdr's CLI is the actual source of truth for what ran;
+# the manifest is updated to match its result rather than assumed up front,
+# so a failed install/link never leaves a stale manifest entry behind.
+#
+# Internally the manifest is edited by round-tripping through JSON (TOML ->
+# JSON via yq, edit with jq, JSON -> TOML via yq) since jq has no native TOML
+# support. That round-trip can't preserve comments, so any leading "#"
+# comment block at the top of the file is captured before the edit and
+# reattached after — see manifest_header()/write_manifest_json().
+
+set -eu
+
+info() { printf '\n\033[1;34m==>\033[0m %s\n' "$*"; }
+ok()   { printf '\033[0;32m✓\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m!\033[0m %s\n' "$*" >&2; }
+err()  { printf '\033[0;31m✗\033[0m %s\n' "$*" >&2; }
+
+manifest="$HOME/.config/herdr/plugins.manifest.toml"
+
+require_deps() {
+    if ! command -v herdr >/dev/null 2>&1; then
+        err "herdr not found on PATH"
+        exit 1
+    fi
+    if ! command -v jq >/dev/null 2>&1; then
+        err "jq not found on PATH (required to parse/edit plugins.manifest.toml)"
+        exit 1
+    fi
+    if ! command -v yq >/dev/null 2>&1; then
+        err "yq not found on PATH (required to parse/edit plugins.manifest.toml — needs mikefarah/yq, the Go one with TOML support, not the Python jq-wrapper of the same name)"
+        exit 1
+    fi
+    if [ ! -f "$manifest" ]; then
+        err "manifest not found: $manifest"
+        exit 1
+    fi
+}
+
+installed_json() {
+    herdr plugin list --json
+}
+
+# Reads the manifest as JSON (via yq) so jq can operate on it.
+read_manifest_json() {
+    yq -p toml -o json "$manifest"
+}
+
+# Everything before the first "[[" line in the current manifest file — i.e.
+# its leading "#" comment block (and any blank lines after it). Captured
+# fresh from disk on every write so hand-edits to the header survive.
+manifest_header() {
+    if [ -f "$manifest" ]; then
+        sed -n '1,/^\[\[/p' "$manifest" | sed '$d'
+    fi
+}
+
+# Writes $1 (a full manifest JSON object, e.g. {"plugins": [...]}) back to
+# the manifest as TOML, reattaching whatever header comment was already
+# there. Atomic (temp file + mv).
+write_manifest_json() {
+    new_json="$1"
+    header=$(manifest_header)
+    body=$(printf '%s' "$new_json" | yq -p json -o toml -)
+    tmp=$(mktemp)
+    if [ -n "$header" ]; then
+        printf '%s\n\n%s\n' "$header" "$body" >"$tmp"
+    else
+        printf '%s\n' "$body" >"$tmp"
+    fi
+    mv "$tmp" "$manifest"
+}
+
+# Shallow-merges $2 (a JSON object of fields to set) onto any existing
+# manifest entry for plugin_id $1 — so hand-added fields (e.g. a "note") on
+# an existing entry survive, and only the fields we're told to set change.
+# Adds a new entry if $1 isn't present yet.
+upsert_entry() {
+    plugin_id="$1"
+    new_fields="$2"
+    new_json=$(read_manifest_json | jq --arg id "$plugin_id" --argjson newf "$new_fields" '
+        (.plugins | map(select(.plugin_id == $id)) | first) as $existing
+        | .plugins = ((.plugins | map(select(.plugin_id != $id))) + [(($existing // {}) + $newf)])
+        ')
+    write_manifest_json "$new_json"
+}
+
+remove_entry() {
+    plugin_id="$1"
+    new_json=$(read_manifest_json | jq --arg id "$plugin_id" \
+        '.plugins |= map(select(.plugin_id != $id))')
+    write_manifest_json "$new_json"
+}
+
+cmd_sync() {
+    DRY_RUN=0
+    UPDATE=0
+    PRUNE=0
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) DRY_RUN=1 ;;
+            --update) UPDATE=1 ;;
+            --prune) PRUNE=1 ;;
+            *)
+                err "sync: unknown argument: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
+    installed_full=$(installed_json)
+    installed_ids=$(printf '%s' "$installed_full" | jq -r '.result.plugins[].plugin_id')
+    is_installed() { printf '%s\n' "$installed_ids" | grep -qx "$1"; }
+
+    manifest_json=$(read_manifest_json)
+    status=0
+    count=$(printf '%s' "$manifest_json" | jq '.plugins | length')
+    i=0
+    while [ "$i" -lt "$count" ]; do
+        entry=$(printf '%s' "$manifest_json" | jq -c ".plugins[$i]")
+        plugin_id=$(printf '%s' "$entry" | jq -r '.plugin_id')
+        install_src=$(printf '%s' "$entry" | jq -r '.install // empty')
+        link_path=$(printf '%s' "$entry" | jq -r '.link // empty')
+        ref=$(printf '%s' "$entry" | jq -r '.ref // empty')
+        i=$((i + 1))
+
+        if is_installed "$plugin_id" && [ "$UPDATE" -eq 0 ]; then
+            ok "$plugin_id already installed (use --update to refresh)"
+            continue
+        fi
+
+        if [ -n "$install_src" ]; then
+            cmd="herdr plugin install ${install_src}"
+            [ -n "$ref" ] && cmd="$cmd --ref ${ref}"
+            cmd="$cmd --yes"
+            info "$plugin_id: ${cmd}"
+            if [ "$DRY_RUN" -eq 0 ]; then
+                if ! eval "$cmd"; then
+                    err "$plugin_id: install failed"
+                    status=1
+                fi
+            fi
+        elif [ -n "$link_path" ]; then
+            expanded_path=$(eval echo "$link_path")
+            if [ ! -d "$expanded_path" ]; then
+                warn "$plugin_id: link target does not exist, skipping: $expanded_path"
+                status=1
+                continue
+            fi
+            info "$plugin_id: herdr plugin link ${expanded_path}"
+            if [ "$DRY_RUN" -eq 0 ]; then
+                if ! herdr plugin link "$expanded_path"; then
+                    err "$plugin_id: link failed"
+                    status=1
+                fi
+            fi
+        else
+            warn "$plugin_id: manifest entry has neither \"install\" nor \"link\", skipping"
+            status=1
+        fi
+    done
+
+    # Drift check: plugins herdr has installed that aren't declared in the
+    # manifest at all. Reported by default; removed only with --prune.
+    manifest_ids=$(printf '%s' "$manifest_json" | jq -r '.plugins[].plugin_id')
+    installed_sorted=$(mktemp)
+    manifest_sorted=$(mktemp)
+    printf '%s\n' "$installed_ids" | sort >"$installed_sorted"
+    printf '%s\n' "$manifest_ids" | sort >"$manifest_sorted"
+    extra_ids=$(comm -23 "$installed_sorted" "$manifest_sorted")
+    rm -f "$installed_sorted" "$manifest_sorted"
+    if [ -n "$extra_ids" ]; then
+        if [ "$PRUNE" -eq 1 ]; then
+            for id in $extra_ids; do
+                kind=$(printf '%s' "$installed_full" | jq -r --arg id "$id" '.result.plugins[] | select(.plugin_id == $id) | .source.kind')
+                if [ "$kind" = "local" ]; then
+                    info "$id: not in manifest — herdr plugin unlink ${id}"
+                    if [ "$DRY_RUN" -eq 0 ] && ! herdr plugin unlink "$id"; then
+                        err "$id: unlink failed"
+                        status=1
+                    fi
+                else
+                    info "$id: not in manifest — herdr plugin uninstall ${id}"
+                    if [ "$DRY_RUN" -eq 0 ] && ! herdr plugin uninstall "$id"; then
+                        err "$id: uninstall failed"
+                        status=1
+                    fi
+                fi
+            done
+        else
+            warn "installed but not declared in the manifest (pass --prune to remove): $(printf '%s' "$extra_ids" | tr '\n' ' ')"
+        fi
+    fi
+
+    exit "$status"
+}
+
+cmd_install() {
+    src=""
+    ref=""
+    description=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --ref) ref="$2"; shift 2 ;;
+            --description) description="$2"; shift 2 ;;
+            *)
+                if [ -n "$src" ]; then
+                    err "install: unexpected argument: $1"
+                    exit 1
+                fi
+                src="$1"
+                shift
+                ;;
+        esac
+    done
+    if [ -z "$src" ]; then
+        err "usage: herdr-plugins install <owner>/<repo>[/subdir] [--ref REF] [--description TEXT]"
+        exit 1
+    fi
+    owner=${src%%/*}
+    rest=${src#*/}
+    repo=${rest%%/*}
+
+    cmd="herdr plugin install ${src}"
+    [ -n "$ref" ] && cmd="$cmd --ref ${ref}"
+    cmd="$cmd --yes"
+    info "$cmd"
+    if ! eval "$cmd"; then
+        err "install failed"
+        exit 1
+    fi
+
+    found=$(installed_json | jq -c --arg owner "$owner" --arg repo "$repo" \
+        '[.result.plugins[] | select(.source.kind=="github" and .source.owner==$owner and .source.repo==$repo)] | first // empty')
+    if [ -z "$found" ]; then
+        err "installed, but couldn't find a matching plugin in \`herdr plugin list --json\` for ${owner}/${repo} — add the manifest entry by hand"
+        exit 1
+    fi
+    plugin_id=$(printf '%s' "$found" | jq -r '.plugin_id')
+    # If there's no manifest entry for this plugin yet, default the
+    # description to herdr's own plugin description so a first-time install
+    # isn't left undocumented. If an entry already exists, never touch
+    # description unless --description was explicitly passed — it may carry
+    # hand-written annotations (e.g. a keybinding note) that herdr's own
+    # description doesn't know about.
+    if [ -z "$description" ] && ! read_manifest_json | jq -e --arg id "$plugin_id" '.plugins[] | select(.plugin_id == $id)' >/dev/null; then
+        description=$(printf '%s' "$found" | jq -r '.description // empty')
+    fi
+
+    entry=$(jq -nc --arg id "$plugin_id" --arg src "$src" --arg ref "$ref" --arg desc "$description" \
+        '{plugin_id: $id, install: $src}
+         + (if $ref != "" then {ref: $ref} else {} end)
+         + (if $desc != "" then {description: $desc} else {} end)')
+    upsert_entry "$plugin_id" "$entry"
+    ok "installed and recorded \"$plugin_id\" in plugins.manifest.toml"
+    info "Don't forget: [[keys.command]] bindings in config.toml and a row in AGENTS.md, if applicable."
+}
+
+cmd_link() {
+    path=""
+    description=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --description) description="$2"; shift 2 ;;
+            *)
+                if [ -n "$path" ]; then
+                    err "link: unexpected argument: $1"
+                    exit 1
+                fi
+                path="$1"
+                shift
+                ;;
+        esac
+    done
+    if [ -z "$path" ]; then
+        err "usage: herdr-plugins link <path> [--description TEXT]"
+        exit 1
+    fi
+    expanded_path=$(eval echo "$path")
+    if [ ! -d "$expanded_path" ]; then
+        err "link target does not exist: $expanded_path"
+        exit 1
+    fi
+
+    info "herdr plugin link ${expanded_path}"
+    if ! herdr plugin link "$expanded_path"; then
+        err "link failed"
+        exit 1
+    fi
+
+    real_path=$(cd "$expanded_path" && pwd)
+    found=$(installed_json | jq -c --arg path "$real_path" \
+        '[.result.plugins[] | select(.source.kind=="local" and (.plugin_root == $path or ((.manifest_path // "") | startswith($path))))] | first // empty')
+    if [ -z "$found" ]; then
+        err "linked, but couldn't find a matching plugin in \`herdr plugin list --json\` for ${expanded_path} — add the manifest entry by hand"
+        exit 1
+    fi
+    plugin_id=$(printf '%s' "$found" | jq -r '.plugin_id')
+    # Same rule as cmd_install: only default description from herdr's own
+    # plugin metadata when there's no existing manifest entry to preserve.
+    if [ -z "$description" ] && ! read_manifest_json | jq -e --arg id "$plugin_id" '.plugins[] | select(.plugin_id == $id)' >/dev/null; then
+        description=$(printf '%s' "$found" | jq -r '.description // empty')
+    fi
+
+    # The invoking shell already expanded any leading "~" in $path before we
+    # ever saw it. Re-collapse $HOME back to "~" for storage so the manifest
+    # stays portable across machines instead of hardcoding this one's home dir.
+    stored_path="$path"
+    case "$real_path" in
+        "$HOME"/*) stored_path="~${real_path#"$HOME"}" ;;
+        "$HOME") stored_path="~" ;;
+    esac
+
+    entry=$(jq -nc --arg id "$plugin_id" --arg path "$stored_path" --arg desc "$description" \
+        '{plugin_id: $id, link: $path}
+         + (if $desc != "" then {description: $desc} else {} end)')
+    upsert_entry "$plugin_id" "$entry"
+    ok "linked and recorded \"$plugin_id\" in plugins.manifest.toml"
+    info "Don't forget: [[keys.command]] bindings in config.toml and a row in AGENTS.md, if applicable."
+}
+
+cmd_uninstall() {
+    plugin_id="${1:-}"
+    if [ -z "$plugin_id" ]; then
+        err "usage: herdr-plugins uninstall <plugin_id>"
+        exit 1
+    fi
+    if ! herdr plugin uninstall "$plugin_id"; then
+        warn "\`herdr plugin uninstall $plugin_id\` failed — removing it from the manifest anyway"
+    fi
+    remove_entry "$plugin_id"
+    ok "uninstalled and removed \"$plugin_id\" from plugins.manifest.toml"
+    info "Don't forget to remove its table row and any bindings in AGENTS.md/config.toml."
+}
+
+cmd_unlink() {
+    plugin_id="${1:-}"
+    if [ -z "$plugin_id" ]; then
+        err "usage: herdr-plugins unlink <plugin_id>"
+        exit 1
+    fi
+    if ! herdr plugin unlink "$plugin_id"; then
+        warn "\`herdr plugin unlink $plugin_id\` failed — removing it from the manifest anyway"
+    fi
+    remove_entry "$plugin_id"
+    ok "unlinked and removed \"$plugin_id\" from plugins.manifest.toml"
+    info "Don't forget to remove its table row and any bindings in AGENTS.md/config.toml."
+}
+
+require_deps
+
+subcommand="${1:-sync}"
+[ $# -gt 0 ] && shift
+
+case "$subcommand" in
+    sync) cmd_sync "$@" ;;
+    install) cmd_install "$@" ;;
+    link) cmd_link "$@" ;;
+    uninstall) cmd_uninstall "$@" ;;
+    unlink) cmd_unlink "$@" ;;
+    *)
+        err "unknown subcommand: $subcommand"
+        err "usage: herdr-plugins [sync|install|link|uninstall|unlink] ..."
+        exit 1
+        ;;
+esac
