@@ -144,6 +144,8 @@ Profiles can define lifecycle scripts in a `.hooks/` directory. `install.sh` run
 |---------|------|------|
 | `remote-sandbox` | `pre-stow` | Installs userland deps, removes conflicting default configs |
 | `shared` | `post-stow` | Rebuilds bat cache, installs/updates TPM + tmux plugins |
+| `crafting` | `post-stow` | Runs `bootstrap_sandbox`, then `optimize-monorepos` |
+| `work` | `post-stow` | Runs `optimize-monorepos` (narrows monorepo fetch refspecs, prunes stale tags/branches) |
 
 ## Nix-Darwin (macOS System Management)
 
