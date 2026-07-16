@@ -156,17 +156,30 @@ manifest_header() {
 # Writes $1 (a full manifest JSON object, e.g. {"plugins": [...]}) back to
 # the manifest as TOML, reattaching whatever header comment was already
 # there. Atomic (temp file + mv).
+#
+# $manifest is normally a symlink (stow links it into ~/.config/herdr/ from
+# the dotfiles repo). `mv tmp $manifest` would rename() onto the symlink
+# itself, replacing it with a plain file and silently severing the link to
+# the repo — every write after that point would vanish from `git status`.
+# Resolve to the real path first so the mv lands on the file the symlink
+# points to instead, leaving the symlink itself untouched. The temp file is
+# created in the same directory as that real path so the final mv is a
+# same-filesystem rename (atomic), not a cross-device copy.
 write_manifest_json() {
     new_json="$1"
     header=$(manifest_header)
     body=$(printf '%s' "$new_json" | yq -p json -o toml -)
-    tmp=$(mktemp)
+    target="$manifest"
+    if [ -L "$manifest" ]; then
+        target=$(readlink -f "$manifest")
+    fi
+    tmp=$(mktemp "$(dirname "$target")/.plugins.manifest.toml.XXXXXX")
     if [ -n "$header" ]; then
         printf '%s\n\n%s\n' "$header" "$body" >"$tmp"
     else
         printf '%s\n' "$body" >"$tmp"
     fi
-    mv "$tmp" "$manifest"
+    mv "$tmp" "$target"
 }
 
 # Shallow-merges $2 (a JSON object of fields to set) onto any existing
