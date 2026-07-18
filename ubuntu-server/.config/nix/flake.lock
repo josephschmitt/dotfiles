@@ -1,10 +1,10 @@
 {
   "nodes": {
-    "multica-bin": {
+    "multica-bin-amd64": {
       "flake": false,
       "locked": {
-        "lastModified": 1782986324,
-        "narHash": "sha256-Mt2UCVktbROA8btmlLfnLB9QtDh7wfGlKiNe2xEDHgc=",
+        "lastModified": 1783160657,
+        "narHash": "sha256-7oWrNGx+yfS/CExWpj5BOQ3DrrN17xbvWZjSeFWytrw=",
         "type": "tarball",
         "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz"
       },
@@ -13,13 +13,26 @@
         "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz"
       }
     },
+    "multica-bin-arm64": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783160698,
+        "narHash": "sha256-y6HR6OYnUKa6ut1kDloZ8BWi+6yOlP42bpNJRGs53gI=",
+        "type": "tarball",
+        "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_arm64.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_arm64.tar.gz"
+      }
+    },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1782918843,
-        "narHash": "sha256-ETYnV9U7Sr+A45dohzZdfCZKOss4qrTkO+wgNZNvEc0=",
+        "lastModified": 1782978903,
+        "narHash": "sha256-bG1LAS3YehMzp4RSXw99o3yMEO/Ktb0Tx29RCtEU0Tk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e8273b29fe1390ec8d4603f2477357555291432e",
+        "rev": "d33369954a67ae3322177dc9a3d564092912120c",
         "type": "github"
       },
       "original": {
@@ -31,7 +44,8 @@
     },
     "root": {
       "inputs": {
-        "multica-bin": "multica-bin",
+        "multica-bin-amd64": "multica-bin-amd64",
+        "multica-bin-arm64": "multica-bin-arm64",
         "nixpkgs": "nixpkgs"
       }
     }

@@ -12,6 +12,12 @@ $ nix flake update           # refresh nixpkgs revision in flake.lock
 $ nix profile upgrade --all  # rebuild your profile to the new lock file
 ```
 
+The flake builds for both `x86_64-linux` and `aarch64-linux`, so the same
+package set works on the x86_64 server and on an arm64 host (e.g. a Raspberry
+Pi) with no edits — `nix profile upgrade` resolves the running machine's arch
+automatically. The `multica` prebuilt binary is pinned per-arch and selected to
+match.
+
 ### Bumping the custom pins (`nix_bump`)
 
 The nixpkgs-tracked tools move together via `nix flake update` above. The

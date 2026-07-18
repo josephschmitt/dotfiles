@@ -30,6 +30,19 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 ~/.config/tmux/plugins/tpm/bin/install_plugins
 ```
 
+### Wrong profile's files active (Mac config on a server, or vice-versa)
+
+**Symptom:** A machine behaves as if it belongs to the wrong profile — e.g. an Ubuntu/Pi server has GPG commit signing forced on (`gpg failed to sign the data`), commits show the wrong email, or `~/.config/nix/flake.nix` is a macOS (`aarch64-darwin`) flake that can't build on Linux. `readlink ~/.gitconfig` points into `personal/` on a server (or `ubuntu-server/` on a Mac).
+
+**Cause:** Profiles (`personal`, `work`, `ubuntu-server`, …) are **mutually exclusive** — a machine stows exactly one identity profile plus `shared`. If two are stowed on the same host, every file they both ship (`.gitconfig`, `.config/nix/flake.nix`, `.config/nix/nix.conf`, …) collides on the same `$HOME` target. Stow gives it to whichever profile it linked first and silently skips the rest, so the wrong profile can win. Fish makes this easy to miss: `config.fish` sources `~/.config/fish/config.*.fish` by glob, so a stray `config.personal.fish` loads with no profile gate.
+
+**Fix:** Stow only the intended profiles for the host (servers: `stow shared ubuntu-server`; never add `personal`). Confirm no foreign links remain:
+```bash
+find ~ -type l -lname '*dotfiles/personal/*'   # on a server, should print nothing
+readlink ~/.gitconfig                          # should resolve into the host's own profile
+```
+Anything genuinely universal that lived in a single profile (e.g. the `direnv` hook) belongs in `shared/`, guarded so it no-ops where the tool is absent (`if command -q direnv; …; end`).
+
 ## tmux
 
 ### Status bar shows plain default (no hostname/git/time info)
