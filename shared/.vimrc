@@ -289,6 +289,9 @@ inoremap jk <Esc>
 inoremap kj <Esc>
 inoremap jj <Esc>
 
+" Delete backwards by word (Alt+Backspace)
+inoremap <M-BS> <C-w>
+
 " Comment with <C-c> (uses vim-commentary)
 nmap <C-c> gcc
 xmap <C-c> gc

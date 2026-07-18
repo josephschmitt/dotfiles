@@ -47,6 +47,15 @@ groot() {
   cd "$root"
 }
 
+# Like groot, but from a worktree jumps to the main repo's root, not the worktree's
+grooot() {
+  local common_dir root
+  common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || { echo "Not in a git repo" >&2; return 1; }
+  root=$(dirname "$common_dir")
+  printf "I am Grooot! \033[90m%s\033[0m\n" "$(echo "${root}" | sed "s|^${HOME}|~|")"
+  cd "$root"
+}
+
 # Change directories from ~/development
 cdd() {
   cd ~/development/"$1" || exit

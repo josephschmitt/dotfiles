@@ -25,6 +25,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map("i", "kj", "<Esc>", { desc = "Exit insert mode" })
     map("i", "jj", "<Esc>", { desc = "Exit insert mode" })
 
+    -- Delete backwards by word (Alt+Backspace)
+    map("i", "<M-BS>", "<C-w>", { desc = "Delete word backwards" })
+
     -- macOS Cmd+V paste in all modes
     map("", "<D-v>", "+p<CR>", { noremap = true, silent = true })
     map("!", "<D-v>", "<C-R>+", { noremap = true, silent = true })
@@ -42,6 +45,16 @@ vim.api.nvim_create_autocmd("VimEnter", {
     -- Go to beginning/end of line (Helix-style)
     map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
     map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
+
+    -- Open URL/filepath under cursor (stock Vim gx behavior, moved here
+    -- since gx is repurposed as the Transform group; see transforms.lua)
+    map("n", "go", function()
+      vim.ui.open(vim.fn.expand("<cfile>"))
+    end, { desc = "Open URL/filepath under cursor" })
+
+    -- Delete Neovim's built-in gx (ambiguous with the gx transform prefix
+    -- above, so it fires erroneously off cursor position; see transforms.lua)
+    pcall(vim.keymap.del, { "n", "x" }, "gx")
 
     -- Select all
     map("n", "gV", "ggVG", { desc = "Select all" })

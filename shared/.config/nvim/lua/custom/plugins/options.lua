@@ -26,6 +26,64 @@ pcall(vim.fn.serverstart, socket_path)
 vim.g.loaded_netrwPlugin = 1
 vim.g.loaded_netrw = 1
 
+-- SSH clipboard: remote boxes often have no clipboard binary (xclip/wl-copy)
+-- and Neovim's built-in OSC-52 auto-detect only kicks in when 'clipboard' is
+-- empty (kickstart's init.lua sets it to unnamedplus), so it's silently
+-- skipped. Force the OSC-52 provider directly over SSH so yanks reach the
+-- local terminal's clipboard regardless of tmux/clipboard-tool availability.
+-- Local (non-SSH) sessions are untouched and keep using pbcopy/etc.
+-- NOTE: sshd only sets SSH_TTY when a pty was allocated for the session —
+-- on some boxes (e.g. this fleet's remote-sandbox machines) it comes back
+-- empty even for normal interactive logins. SSH_CONNECTION is set whenever
+-- there's a remote client at all, TTY or not, so check both for coverage
+-- across whatever quirks a given server/client combo has.
+--
+-- NOTE: `herdr --remote` bridges to remote sandboxes over its own transport
+-- instead of sshd, so neither SSH_TTY nor SSH_CONNECTION is set even though
+-- the session is just as remote. Herdr always sets HERDR_SOCKET_PATH (and
+-- other HERDR_* vars) in its pane environment, so check that too. Herdr
+-- v0.4.6+ passes OSC 52 sequences from child apps through to the host
+-- terminal, so forcing the provider here reaches the local clipboard the
+-- same way it does over plain SSH.
+--
+-- NOTE: `paste` is required even though we don't want real OSC-52 paste.
+-- Neovim's clipboard validation (provider#clipboard#Executable) rejects
+-- g:clipboard outright if `copy` and `paste` aren't both present as tables —
+-- it's all-or-nothing, not "copy works, paste is just absent". Omitting
+-- `paste` doesn't disable paste alone, it invalidates the whole config, so
+-- `copy` silently stops working too and Neovim falls back to hunting for
+-- xclip/pbcopy, which don't exist on these boxes ("clipboard: No provider").
+-- Confirmed by testing: a g:clipboard with only `copy` reproducibly fails
+-- setreg('+', ...) with that exact error, while adding any `paste` table
+-- fixes it immediately.
+--
+-- We still don't want *real* OSC-52 paste: it requires the terminal to
+-- answer a query over the same TTY with the clipboard contents, and most
+-- terminals (and anything behind tmux) don't implement that response leg,
+-- or block it by default for security. Wiring paste up to osc52.paste()
+-- makes every p/P send that query and hang forever on "Waiting for OSC 52
+-- response" since no reply ever arrives. So `paste` here is a pass-through
+-- stub that just returns the local unnamed register instead of querying the
+-- terminal — it exists purely to keep g:clipboard valid so `copy` keeps
+-- working. p/P behave exactly as before (instant, no host-clipboard fetch).
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.HERDR_SOCKET_PATH then
+  local function local_register_paste()
+    return vim.fn.getreg('"', 1, true)
+  end
+
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = local_register_paste,
+      ["*"] = local_register_paste,
+    },
+  }
+end
+
 -- Directory opener: when Neovim is launched with a directory argument,
 -- set the cwd, show the Snacks dashboard, and reveal the file tree.
 vim.api.nvim_create_autocmd("BufEnter", {

@@ -168,6 +168,59 @@ stack traceback:
 
 **Fix:** Wrap the body of the `snacks-explorer-auto-resize` autocmd callback in an extra `vim.schedule()`. This defers the actual `close()`/`open()` call by one tick, so snacks' own relayout callback (scheduled earlier in the same `VimResized` pass) runs and completes *before* our close's teardown nils out `self.preview`. Same pattern already used by the `nvim-tree` provider's `WinLeave` auto-close handler in the same file, for the same class of race.
 
+### Yanking in Neovim doesn't populate the system clipboard when SSH'd into a remote-sandbox box
+
+**Symptom:** `y`/yank in Neovim over SSH into a `remote-sandbox` (or `rca`/`crafting`) box doesn't reach the local clipboard — pasting outside Neovim gets nothing. Copying via the terminal/multiplexer itself (e.g. herdr's own text selection) works fine, and it may also work in *other* SSH sessions into the same class of box.
+
+**Cause:** Two things compound:
+1. `remote-sandbox/bin/install-deps.sh` never installs a clipboard binary (`xclip`/`xsel`/`wl-copy`/`pbcopy`) — these are rootless Ubuntu boxes with no X/Wayland session, so there's nothing for Neovim's clipboard provider to shell out to.
+2. Neovim 0.10+'s built-in OSC-52 auto-detect (`autoload/provider/clipboard.vim`) only activates when `'clipboard'` is empty (`&clipboard ==# ''`). Kickstart's `init.lua` sets `vim.o.clipboard = 'unnamedplus'`, so that auto-detect path is always skipped.
+
+The only remaining path is via tmux: if Neovim sees `$TMUX` set, it shells out to `tmux set-buffer`, and `remote-sandbox/.tmux.conf`'s `set -g set-clipboard on` (+ `allow-passthrough on`) relays that up through the SSH connection as OSC-52. That's why it can appear to work in some sessions (attached to tmux) and not others (not attached, or nvim started before attaching) — the underlying gap is the same in both cases, only the tmux relay happens to paper over it.
+
+**Fix:** `shared/.config/nvim/lua/custom/plugins/options.lua` now explicitly sets `vim.g.clipboard` to the OSC-52 provider (`require('vim.ui.clipboard.osc52')`) whenever `vim.env.SSH_TTY` **or** `vim.env.SSH_CONNECTION` is set, bypassing the tool/tmux dependency entirely. Local (non-SSH) sessions are unaffected and keep using `pbcopy`/etc.
+
+Note: this originally keyed off `SSH_TTY` alone. `SSH_TTY` is only set by sshd when a pty was allocated for the session — on some boxes (e.g. this fleet's remote-sandbox machines) it comes back empty even for normal interactive logins, so the gate never fired there. `SSH_CONNECTION` is set whenever there's a remote client at all, TTY or not, and is the more reliable signal — but checking both covers whatever quirk a given server/client combo has, since it's plausible some other setup has `SSH_TTY` set without `SSH_CONNECTION` (or vice versa).
+
+This does still require the terminal on the *local* end of the SSH connection (herdr, iTerm2, etc.) to understand OSC-52 — if the fix doesn't work, check that next.
+
+### `p`/`P` hangs forever with "Waiting for OSC 52 response from the terminal" over SSH
+
+**Symptom:** After the OSC-52 yank fix above, pasting (`p`/`P`) in Neovim over SSH into a `remote-sandbox`/`rca`/`crafting` box hangs indefinitely, with the command line showing `Waiting for OSC 52 response from the terminal. Press Ctrl-C to interrupt...`.
+
+**Cause:** The `vim.g.clipboard` override in `shared/.config/nvim/lua/custom/plugins/options.lua` originally wired up both `copy` *and* `paste` to `require('vim.ui.clipboard.osc52')`. OSC-52 copy is one-way (nvim just writes an escape sequence, no reply expected), but OSC-52 *paste* requires nvim to send a query and then block reading the terminal's reply off the same TTY. Most terminals — and definitely anything behind tmux/multiplexing — either don't implement that response leg or disable it by default (it's a security-sensitive feature, since it lets any program that can write to the TTY read the system clipboard). With no reply ever arriving, every `p`/`P` blocked forever.
+
+**Fix:** Removed the `paste` table from the `vim.g.clipboard` override entirely, leaving only `copy`. Without a custom `paste` provider, `p`/`P` fall back to normal register behavior (instant, no host-clipboard fetch) — yank-out still reaches the local clipboard via OSC-52, paste just no longer tries to pull the host clipboard back in.
+
+## lazygit
+
+### Dedicated lazygit pane/tab is slow to open on remote-sandbox/crafting boxes (auto-fetches)
+
+**Symptom:** The `lg` shell alias opens lazygit instantly (no auto-fetch), but opening lazygit via a dedicated multiplexer pane/tab (tmux `prefix+g`, or herdr `prefix+G`) is slow and shows a fetch spinner/delay on open, especially on large monorepos (e.g. the crafting box's urbancompass repo).
+
+**Cause:** Three separate launchers each hardcoded their own `--use-config-file` list (or none at all), so none of them picked up `config-remote-sandbox.yml` — the overlay that sets `autoFetch: false` / `fetchAll: false` for the `remote-sandbox` profile:
+- `shared/.config/tmux/scripts/lazygit-tab.sh` (`prefix+g` tab) only checked for `config-work.yml` (added for the `work` profile; nobody updated it when `remote-sandbox` got its own overlay).
+- `shared/.config/tmux/conf.d/50-apps.conf`'s `prefix+G` popup binding ran plain `lazygit` via `tmux-popup` — **no** `--use-config-file` at all, not even the base `config.yml`.
+- `shared/.config/herdr/config.toml`'s `prefix+G` binding ran plain `bash -lc lazygit` — same, no config file at all.
+
+The `lg` alias was the only launcher that loaded the overlay correctly, because it hardcodes `config-remote-sandbox.yml` directly (it's defined in the `remote-sandbox` profile's own alias override).
+
+**Fix:** Added `shared/bin/lazygit-launch`, a shared launcher script that builds the `--use-config-file` list (`config.yml,config-tab.yml` plus whichever of `config-work.yml`/`config-remote-sandbox.yml` exists on the current box) and `exec`s lazygit with it. All three launch sites (`lazygit-tab.sh`, the tmux popup binding, and herdr's `prefix+G` binding) now call `lazygit-launch` instead of duplicating (or omitting) the config-file logic. File-existence checks make it safe everywhere — a missing overlay just has no effect.
+
+**Takeaway:** When there's more than one entry point into the same tool (shell alias, tmux binding, herdr binding, ...), duplicated config-building logic silently drifts. Centralize it in one script on `$PATH` and have every entry point call that.
+
+### lazygit still hangs on open even with autoFetch/fetchAll disabled and the right config file loaded
+
+**Symptom:** After the fix above (all launchers loading `config-remote-sandbox.yml`), lazygit was still slow/unresponsive opening in some monorepos (e.g. urbancompass, uc-frontend) even though auto-fetch was confirmed off — the delay was lazygit loading branch/tag/ref data, not fetching.
+
+**Cause:** Sheer git data scale, unrelated to lazygit's own config. The sandbox image pre-clones these repos with git's default wide refspec (`+refs/heads/*:refs/remotes/origin/*`) and full tags *before* dotfiles are stowed. On monorepos with a long history of feature branches and CI tags, that means tens of thousands of stale remote-tracking branches and tags baked into the local repo (uc-frontend had ~137K tags and ~18K remote branches) — lazygit (and plain `git` commands) have to enumerate all of that on every open, regardless of fetch behavior.
+
+`remote-sandbox/.gitconfig-monorepo`'s `tagOpt = --no-tags` (activated per-repo via `[includeIf]`) only prevents *future* tag fetches — it can't narrow a refspec or delete refs that already exist in a clone made before the config took effect.
+
+**Fix:** Added `shared/bin/optimize-monorepos`, a one-time fixup script run from each sandbox profile's post-stow hook (see `crafting/.hooks/post-stow.sh`) right after repos are bootstrapped. For every repo under `~/development/*/` where `.gitconfig-monorepo` is already active (sentinel: `remote.origin.tagOpt == --no-tags`), it: narrows `remote.origin.fetch` to `master` + a configurable branch-prefix glob (`MONOREPO_BRANCH_PREFIX`, default `jjs`) via `git remote set-branches`, deletes all local tags, and deletes remote-tracking branches outside that allowed set. Idempotent — a repo that's already narrowed is a fast no-op on rerun. An optional `--gc` flag runs `git gc --aggressive --prune=now` per repo afterward.
+
+**Takeaway:** A config setting that only affects *future* fetches (`tagOpt`, narrowed refspecs, etc.) can't fix data that's already on disk from before the config existed. Pre-baked sandbox images need an explicit one-time migration step, not just a config change, to bring existing clones in line.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)

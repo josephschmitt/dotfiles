@@ -28,6 +28,7 @@ Dashboard startup loads only ~5 plugins in ~50ms. The entire LSP chain (lspconfi
 - **Bufferline** hides when only one buffer is open
 - **Neo-tree** auto-opens on wide screens and closes on narrow ones
 - **mini.indentscope** uses a `draw.predicate` to skip non-file buffers — autocmd-based approaches lose the race against dashboard buffer initialization
+- **SSH clipboard** — yanks over SSH (e.g. `remote-sandbox` boxes, which have no `xclip`/`wl-copy`) use the OSC-52 provider directly, so they reach the local terminal's clipboard without needing tmux or a clipboard binary on the remote box
 
 ### Unified Keybinding Philosophy
 AstroNvim's keybinding structure was the starting point, but adapted to be more discoverable. Everything lives under `<Space>` with which-key's helix-style popup. Icons are embedded directly in group names (a workaround for `icons.mappings=false` blocking explicit icon properties).
@@ -69,7 +70,8 @@ lua/custom/plugins/
 ├── sortjson.lua            # JSON key sorting
 ├── tmux-navigator.lua      # Seamless Ctrl+hjkl between tmux/nvim
 ├── toggles.lua             # Toggle keybindings (format, wrap, hints, etc.)
-└── which-key.lua           # Helix-style popup with icon groups
+├── which-key.lua           # Helix-style popup with icon groups
+└── zen-center.lua          # Center buffer with padded side buffers (no-neck-pain)
 ```
 
 ## Plugins
@@ -98,6 +100,7 @@ lua/custom/plugins/
 | tiny-inline-diagnostic.nvim | Powerline-style diagnostic messages | VeryLazy |
 | multicursor.nvim | Multi-cursor editing | On keypress |
 | vim-tmux-navigator | Ctrl+hjkl across tmux and nvim splits | On keypress |
+| no-neck-pain.nvim | Center buffer with padded side buffers | On command |
 
 ## Key Bindings
 
@@ -131,6 +134,8 @@ Leader key: **Space**
 | `<Leader>gG` | Open GitHub permalink in browser |
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
+| `go` | Open URL/filepath under cursor |
+| `<Leader>tz` | Toggle center focus (padded sides + wrap) |
 
 Press `<Space>` and wait for the which-key popup to see everything.
 

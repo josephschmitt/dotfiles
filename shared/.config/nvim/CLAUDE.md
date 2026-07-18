@@ -51,7 +51,8 @@ shared/.config/nvim/
         ├── sortjson.lua            # JSON key sorting
         ├── tmux-navigator.lua      # Ctrl+hjkl tmux/nvim navigation
         ├── toggles.lua             # Toggle keybindings (wrap, inlay hints, format-on-save)
-        └── which-key.lua           # Keybinding popup groups
+        ├── which-key.lua           # Keybinding popup groups
+        └── zen-center.lua          # Center buffer with padded side buffers (no-neck-pain)
 ```
 
 ### How Custom Plugins Work
@@ -96,6 +97,9 @@ Formatting uses `conform.nvim` with `lsp_format = 'fallback'`:
 - Otherwise → falls back to LSP formatting (if the attached server supports it)
 - Manual format: `grf` (under the `gr` LSP group)
 - Format-on-save is enabled by default, toggled via `<Leader>tf` (buffer) / `<Leader>tF` (global)
+
+### Center Focus
+`<Leader>tz` toggles a centered-buffer focus mode via `no-neck-pain.nvim`: pads both sides of the window with empty buffers (width 100, matching the color column) and enables `wrap`/`linebreak`. Toggling off restores `nowrap` and removes the padding. Lazy-loads on first use of the `:NoNeckPain` command.
 
 ### Keybinding Prefixes
 LSP and editing bindings use Neovim's native `g` prefixes (not `<Leader>`):

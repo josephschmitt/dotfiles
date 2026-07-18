@@ -28,8 +28,6 @@
   system.primaryUser = "adam";
 
   environment.systemPackages = with pkgs; [
-    asdf-vm
-    atuin
     bat
     bun
     csvq
@@ -42,11 +40,11 @@
     git
     gofumpt
     gum
+    jq
     lazygit
     neovim
     nil
     nixpkgs-fmt
-    nushell
     oh-my-posh
     prettierd
     ripgrep
@@ -57,7 +55,7 @@
     tmux
     tree-sitter # Required by nvim-treesitter to compile parsers
     uv
-    zellij
+    yq-go
     zoxide
   ];
 

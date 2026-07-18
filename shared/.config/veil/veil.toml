@@ -10,7 +10,7 @@
 # letter_spacing = 1.0
 
 # Enable font ligatures (e.g. -> becomes →  in supported fonts).
-# ligatures = true
+ligatures = true
 
 # Path to the nvim binary. Veil uses multi-layer automatic detection
 # (cached path, login shell PATH, common Homebrew locations) which
@@ -33,7 +33,7 @@ titlebar_brightness_offset = 0
 
 # Check for new Veil releases on GitHub at startup.
 # Disable if you prefer not to make network requests.
-# update_check = true
+update_check = true
 
 
 # Font. See https://github.com/0x1b2c/Veil/blob/master/FONT.md for full
@@ -46,7 +46,7 @@ titlebar_brightness_offset = 0
 # All fields are optional; an empty [font] block has no effect.
 #
 [font]
-family = "FiraCode Nerd Font Mono"
+family = "MesloLGS Nerd Font Mono"
 size = 13.0
 force = false
 

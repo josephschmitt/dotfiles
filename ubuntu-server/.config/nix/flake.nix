@@ -159,7 +159,7 @@
             tmux
             uv
             volta
-            yq
+            yq-go
             zellij
             zoxide
             zsh
