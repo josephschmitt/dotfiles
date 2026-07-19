@@ -92,6 +92,21 @@ Then start tmux normally.
 - tmux issue: https://github.com/tmux/tmux/issues/4329
 - yazi issue: https://github.com/sxyazi/yazi/issues/2308
 
+### Old keybindings still active on a long-running server (config reload doesn't help)
+
+**Symptom:** A machine with an up-to-date config (e.g., a headless Pi whose tmux server has been running for weeks) still responds to old keybindings that were removed from the config — even after `tmux source-file ~/.config/tmux/tmux.conf`. Seen with the old `Ctrl+[`/`Ctrl+]` window-navigation keys lingering after they were changed to `Alt+[`/`Alt+]`.
+
+**Cause:** `unbind-key -a` (the first line of `tmux.reset.conf`) only clears the **prefix** key table. Root-table bindings (`bind -n ...`) from a previously loaded config stay in the running server's memory across reloads. Machines that restart their tmux server regularly never notice; long-running servers accumulate stale root bindings.
+
+**Fix:** Remove the stale root binding explicitly on the live server (sessions are unaffected):
+```bash
+tmux unbind -n 'C-['
+tmux unbind -n 'C-]'
+```
+Or restart the tmux server entirely (kills sessions): `tmux kill-server`.
+
+**Note:** Don't "fix" this by adding `unbind-key -a -T root` to `tmux.reset.conf` — that would also wipe tmux's built-in root-table mouse bindings (status-bar wheel scrolling, pane selection by click, etc.).
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`
