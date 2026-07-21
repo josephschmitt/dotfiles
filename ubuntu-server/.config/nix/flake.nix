@@ -4,13 +4,16 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   # multica ships as a prebuilt binary per arch — pin one input per system and
-  # pick the right tarball below. (Both are updated together by `flake update`.)
+  # pick the right tarball below. Pin a FIXED release tag (not latest/download):
+  # a moving URL re-fetches new bytes on every multica release while flake.lock
+  # still holds the old narHash, so the lock self-stales and `nix profile
+  # install` fails with a narHash mismatch. Bump deliberately via `nix_bump`.
   inputs.multica-bin-amd64 = {
-    url = "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_amd64.tar.gz";
+    url = "https://github.com/multica-ai/multica/releases/download/v0.4.7/multica_linux_amd64.tar.gz";
     flake = false;
   };
   inputs.multica-bin-arm64 = {
-    url = "https://github.com/multica-ai/multica/releases/latest/download/multica_linux_arm64.tar.gz";
+    url = "https://github.com/multica-ai/multica/releases/download/v0.4.7/multica_linux_arm64.tar.gz";
     flake = false;
   };
 
@@ -32,7 +35,7 @@
 
           multica = pkgs.stdenv.mkDerivation {
             pname = "multica";
-            version = "latest";
+            version = "0.4.7";
             src = multica-bin;
             nativeBuildInputs = [ pkgs.autoPatchelfHook ];
             buildInputs = [ pkgs.stdenv.cc.cc.lib ];
