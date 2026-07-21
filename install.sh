@@ -304,6 +304,42 @@ has_profile() {
   return 1
 }
 
+# Distro skeleton files that ship as plain files on a fresh host. GNU stow
+# aborts ALL operations on any conflict, so a single leftover ~/.bashrc stops
+# every package from linking — and an unattended caller wrapping the run in
+# `|| true` never sees it. Move these aside before stowing so a first run can
+# proceed. Only a plain (non-symlink) file that a selected profile actually
+# provides is touched — we never displace a file the repo won't replace.
+DEFAULT_CONFLICTS=".bashrc .bash_profile .bash_logout .profile .zshrc .zshenv .zprofile"
+
+backup_conflicting_defaults() {
+  local backup_dir="$HOME/.dotfiles-pre-stow-backup"
+  local moved=false
+  for f in $DEFAULT_CONFLICTS; do
+    local target="$HOME/$f"
+    # Only a plain file (present, not a symlink) can conflict with stow.
+    { [ -e "$target" ] && [ ! -L "$target" ]; } || continue
+    # Skip unless a selected profile actually stows this file.
+    local provided=false
+    for p in "${PROFILES[@]}"; do
+      if [ -e "$DOTFILES_DIR/$p/$f" ]; then
+        provided=true
+        break
+      fi
+    done
+    $provided || continue
+    if ! $moved; then
+      mkdir -p "$backup_dir"
+      moved=true
+    fi
+    warn "Backing up distro-default ~/$f -> ${backup_dir}/$f"
+    mv "$target" "$backup_dir/$f"
+  done
+  if $moved; then
+    ok "Backed up conflicting defaults to $backup_dir"
+  fi
+}
+
 run_bootstrap() {
   info "Bootstrap mode — setting up a fresh machine"
   if ! $IS_DARWIN; then
@@ -384,9 +420,17 @@ for p in "${PROFILES[@]}"; do
   fi
 done
 
+# Clear distro-default files that would otherwise abort the whole stow run.
+backup_conflicting_defaults
+
 info "Stowing profiles: ${PROFILES[*]}"
 cd "$DOTFILES_DIR"
-stow -v --target="$HOME" "${PROFILES[@]}"
+if ! stow -v --target="$HOME" "${PROFILES[@]}"; then
+  warn "stow FAILED — no profiles were linked (stow aborts all packages on any conflict)."
+  warn "The conflicting files above are not distro defaults we back up automatically."
+  warn "Move them aside (or into the repo) and re-run: ./install.sh ${PROFILES[*]}"
+  exit 1
+fi
 
 # Run profile post-stow hooks
 for p in "${PROFILES[@]}"; do

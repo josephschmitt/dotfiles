@@ -30,6 +30,29 @@ git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 ~/.config/tmux/plugins/tpm/bin/install_plugins
 ```
 
+### `install.sh` links nothing on a fresh host ("All operations aborted")
+
+**Symptom:** On a brand-new machine, `./install.sh shared ubuntu-server` prints `WARNING! stowing shared would cause conflicts ... All operations aborted.` and *no* profile is linked — not even packages that had no conflict. An automated caller wrapping the run in `./install.sh ... || true` swallows the error and boots with none of the dotfiles stowed.
+
+**Cause:** A fresh host ships plain-file `~/.bashrc`, `~/.profile`, `~/.zshrc` (distro skeletons). GNU stow treats each as a conflict and aborts *all* packages on any single conflict — it is all-or-nothing per run.
+
+**Fix:** `install.sh` now backs up these well-known defaults to `~/.dotfiles-pre-stow-backup/` before stowing (only plain files a selected profile actually provides — pre-existing symlinks are left alone). If stow still fails on some *other* conflict, the script exits non-zero with a loud message instead of continuing silently. To resolve a leftover conflict by hand:
+```bash
+mkdir -p ~/.dotfiles-pre-stow-backup
+for f in .bashrc .profile .zshrc; do
+  [ -e "$HOME/$f" ] && [ ! -L "$HOME/$f" ] && mv "$HOME/$f" ~/.dotfiles-pre-stow-backup/
+done
+cd ~/dotfiles && ./install.sh shared ubuntu-server
+```
+
+### `nix profile install` fails with "mismatch in field 'narHash'" for multica
+
+**Symptom:** On the Ubuntu server, `nix profile install ~/dotfiles/ubuntu-server/.config/nix#default` fails with `error: mismatch in field 'narHash' of input 'multica-bin-arm64'` even though the checkout is clean.
+
+**Cause:** The `multica` inputs used to point at a moving `releases/latest/download/...` URL. Every multica release changed the bytes behind that URL while `flake.lock` still held the old `narHash`, so the lock self-staled.
+
+**Fix:** `ubuntu-server/.config/nix/flake.nix` now pins a fixed release tag (e.g. `releases/download/v0.4.7/...`), so the lock is stable. Bump deliberately with `nix flake update multica-bin-amd64 multica-bin-arm64` (or `bin/nix_bump`) after editing the tag, then commit the refreshed `flake.lock`.
+
 ### Wrong profile's files active (Mac config on a server, or vice-versa)
 
 **Symptom:** A machine behaves as if it belongs to the wrong profile — e.g. an Ubuntu/Pi server has GPG commit signing forced on (`gpg failed to sign the data`), commits show the wrong email, or `~/.config/nix/flake.nix` is a macOS (`aarch64-darwin`) flake that can't build on Linux. `readlink ~/.gitconfig` points into `personal/` on a server (or `ubuntu-server/` on a Mac).
