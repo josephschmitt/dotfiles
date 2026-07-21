@@ -49,14 +49,22 @@
 #       entry in the manifest.
 #
 #   herdr-plugins uninstall <plugin_id>
-#       Runs `herdr plugin uninstall`, then removes it from the manifest.
+#       Runs `herdr plugin uninstall`, then removes it from the manifest. If
+#       herdr doesn't have the id installed at all, just removes the stale
+#       manifest entry (if any) without calling herdr.
 #
 #   herdr-plugins unlink <plugin_id>
-#       Runs `herdr plugin unlink`, then removes it from the manifest.
+#       Runs `herdr plugin unlink`, then removes it from the manifest. If
+#       herdr doesn't have the id linked at all, just removes the stale
+#       manifest entry (if any) without calling herdr.
 #
-# In every case, herdr's CLI is the actual source of truth for what ran;
-# the manifest is updated to match its result rather than assumed up front,
-# so a failed install/link never leaves a stale manifest entry behind.
+# In every case, herdr's CLI is the actual source of truth for what ran; the
+# manifest is only updated once herdr confirms the removal actually happened
+# (checked via `herdr plugin list --json` beforehand, and via the `removed`
+# field of unlink's JSON output afterward — `herdr plugin unlink` exits 0
+# even for an id it doesn't recognize, so the exit code alone can't be
+# trusted). Any other failure (e.g. an invalid plugin id) aborts without
+# touching the manifest, rather than assuming the manifest edit is safe.
 #
 # Internally the manifest is edited by round-tripping through JSON (TOML ->
 # JSON via yq, edit with jq, JSON -> TOML via yq) since jq has no native TOML
@@ -96,9 +104,13 @@ Usage:
 
   herdr-plugins uninstall <plugin_id>
       Runs `herdr plugin uninstall`, then removes it from the manifest.
+      If herdr doesn't have the id installed, just removes the stale
+      manifest entry (if any).
 
   herdr-plugins unlink <plugin_id>
       Runs `herdr plugin unlink`, then removes it from the manifest.
+      If herdr doesn't have the id linked, just removes the stale
+      manifest entry (if any).
 
   herdr-plugins help | -h | --help
       Show this help.
@@ -488,14 +500,26 @@ cmd_link() {
     info "Don't forget: [[keys.command]] bindings in config.toml and a row in AGENTS.md, if applicable."
 }
 
+# True if $1 is a plugin_id herdr currently has installed/linked.
+is_herdr_installed() {
+    installed_json | jq -e --arg id "$1" '.result.plugins[] | select(.plugin_id == $id)' >/dev/null
+}
+
 cmd_uninstall() {
     plugin_id="${1:-}"
     if [ -z "$plugin_id" ]; then
         err "usage: herdr-plugins uninstall <plugin_id>"
         exit 1
     fi
+    if ! is_herdr_installed "$plugin_id"; then
+        warn "\"$plugin_id\" isn't installed in herdr — removing stale manifest entry, if any"
+        remove_entry "$plugin_id"
+        ok "removed \"$plugin_id\" from plugins.manifest.toml"
+        exit 0
+    fi
     if ! herdr plugin uninstall "$plugin_id"; then
-        warn "\`herdr plugin uninstall $plugin_id\` failed — removing it from the manifest anyway"
+        err "\`herdr plugin uninstall $plugin_id\` failed — manifest left unchanged"
+        exit 1
     fi
     remove_entry "$plugin_id"
     ok "uninstalled and removed \"$plugin_id\" from plugins.manifest.toml"
@@ -508,8 +532,23 @@ cmd_unlink() {
         err "usage: herdr-plugins unlink <plugin_id>"
         exit 1
     fi
-    if ! herdr plugin unlink "$plugin_id"; then
-        warn "\`herdr plugin unlink $plugin_id\` failed — removing it from the manifest anyway"
+    if ! is_herdr_installed "$plugin_id"; then
+        warn "\"$plugin_id\" isn't linked in herdr — removing stale manifest entry, if any"
+        remove_entry "$plugin_id"
+        ok "removed \"$plugin_id\" from plugins.manifest.toml"
+        exit 0
+    fi
+    # `herdr plugin unlink` exits 0 even for an id it doesn't recognize,
+    # reporting the outcome via JSON `removed` instead of the exit code — so
+    # check that field rather than trusting the exit status alone.
+    if ! out=$(herdr plugin unlink "$plugin_id"); then
+        err "\`herdr plugin unlink $plugin_id\` failed — manifest left unchanged"
+        exit 1
+    fi
+    removed=$(printf '%s' "$out" | jq -r '.result.removed // false')
+    if [ "$removed" != "true" ]; then
+        err "\`herdr plugin unlink $plugin_id\` reported removed=false — manifest left unchanged"
+        exit 1
     fi
     remove_entry "$plugin_id"
     ok "unlinked and removed \"$plugin_id\" from plugins.manifest.toml"
