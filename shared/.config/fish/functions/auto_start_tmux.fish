@@ -1,4 +1,9 @@
 function auto_start_tmux -d "Auto-start tmux if available and not already inside tmux"
+    # Disabled by default since migrating to herdr.dev. Opt in with ENABLE_AUTO_TMUX=1.
+    if not set -q ENABLE_AUTO_TMUX
+        return
+    end
+
     # Skip if SKIP_AUTO_TMUX is set (for performance testing)
     if set -q SKIP_AUTO_TMUX
         return
@@ -24,9 +29,8 @@ function auto_start_tmux -d "Auto-start tmux if available and not already inside
             set start_dir "$HOME"
         end
 
-        # Create new session and launch sesh popup
-        # If tmux fails to start, fall back to regular shell
-        tmux new-session -s $session_name -c $start_dir \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
+        # Create new session. If tmux fails to start, fall back to regular shell
+        tmux new-session -s $session_name -c $start_dir
     end
 end
 

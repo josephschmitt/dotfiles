@@ -85,6 +85,9 @@ is_integrated_terminal() {
 
 # Auto-start tmux if available and not already inside tmux
 auto_start_tmux() {
+  # Disabled by default since migrating to herdr.dev. Opt in with ENABLE_AUTO_TMUX=1.
+  [ -n "$ENABLE_AUTO_TMUX" ] || return
+
   # Skip in IDE/editor integrated terminals
   if is_integrated_terminal; then
     return
@@ -99,9 +102,8 @@ auto_start_tmux() {
       session_name="$(random-session-name)"
     fi
 
-    # Create new session and launch sesh popup
-    # If tmux fails to start, fall back to regular shell
-    tmux new-session -s "$session_name" \; run-shell "$TMUX_CONFIG_DIR/scripts/sesh-or-stay.sh '$session_name'"
+    # Create new session. If tmux fails to start, fall back to regular shell
+    tmux new-session -s "$session_name"
   fi
 }
 

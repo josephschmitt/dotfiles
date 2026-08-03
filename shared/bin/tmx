@@ -21,7 +21,7 @@ OPTIONS:
 
 EXAMPLES:
   tmx                          # Attach to last session
-  tmx --new                    # Create new session with sesh picker
+  tmx --new                    # Create a new session with a random name
   tmx ~/development/myproject  # Create session from directory name
 
 EOF
@@ -80,8 +80,8 @@ new_session_mode() {
     fi
   fi
 
-  # Create new session and launch sesh popup
-  tmux new-session -s "$session_name" -c "$start_dir" \; run-shell "${TMUX_CONFIG_DIR}/scripts/sesh-or-stay.sh '$session_name'"
+  # Create new session
+  tmux new-session -s "$session_name" -c "$start_dir"
 }
 
 # DIRECTORY MODE - create/switch to session based on directory basename
