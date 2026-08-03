@@ -20,6 +20,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map({ "n", "v" }, "J", "2<C-e>", { desc = "Scroll down (2 lines)" })
     map({ "n", "v" }, "K", "2<C-y>", { desc = "Scroll up (2 lines)" })
 
+    -- PageDown/PageUp mirror J/K viewport scroll (2 lines per press).
+    map({ "n", "v" }, "<PageDown>", "2<C-e>", { desc = "Scroll down (2 lines)" })
+    map({ "n", "v" }, "<PageUp>", "2<C-y>", { desc = "Scroll up (2 lines)" })
+
     -- Exit insert mode shortcuts
     map("i", "jk", "<Esc>", { desc = "Exit insert mode" })
     map("i", "kj", "<Esc>", { desc = "Exit insert mode" })

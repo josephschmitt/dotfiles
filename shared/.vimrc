@@ -284,6 +284,12 @@ nnoremap K 2<C-y>
 xnoremap J 2<C-e>
 xnoremap K 2<C-y>
 
+" PageDown/PageUp mirror J/K viewport scroll
+nnoremap <PageDown> 2<C-e>
+nnoremap <PageUp> 2<C-y>
+xnoremap <PageDown> 2<C-e>
+xnoremap <PageUp> 2<C-y>
+
 " Insert-mode escape shortcuts
 inoremap jk <Esc>
 inoremap kj <Esc>
