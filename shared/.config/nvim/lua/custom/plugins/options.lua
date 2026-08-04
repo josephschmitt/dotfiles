@@ -3,6 +3,43 @@
 
 local config = require("custom.config")
 
+-- GUI-launched Neovim (e.g. Veil, or Terminal.app opened from Finder) inherits
+-- only the minimal launchd PATH — it does not source shell rc files — so tools
+-- installed under ~/go/bin, ~/.local/bin, /opt/homebrew/bin, etc. are missing
+-- from vim.env.PATH. Mason tools are unaffected (invoked by absolute path), but
+-- anything nvim shells out to by bare name fails: e.g. Snacks lazygit calls
+-- vim.fn.system({ "lazygit" }) and errors "'lazygit' is not executable".
+-- Prepend the known user bin dirs (mirrors PATH setup in shell/exports.sh) when
+-- they exist and aren't already present. Idempotent; no-op in a normal terminal
+-- launch where they're already on PATH.
+if vim.fn.has("mac") == 1 then
+  local home = vim.env.HOME
+  local extra = {
+    home .. "/.local/bin",
+    home .. "/go/bin",
+    home .. "/bin",
+    home .. "/.cargo/bin",
+    home .. "/.bun/bin",
+    "/opt/homebrew/bin",
+    "/opt/homebrew/sbin",
+    home .. "/Library/pnpm",
+    home .. "/.nix-profile/bin",
+    "/nix/var/nix/profiles/default/bin",
+    "/run/current-system/sw/bin",
+  }
+  local sep = ":"
+  local current = sep .. (vim.env.PATH or "") .. sep
+  local prefix = {}
+  for _, dir in ipairs(extra) do
+    if vim.fn.isdirectory(dir) == 1 and not current:find(sep .. dir .. sep, 1, true) then
+      table.insert(prefix, dir)
+    end
+  end
+  if #prefix > 0 then
+    vim.env.PATH = table.concat(prefix, sep) .. sep .. vim.env.PATH
+  end
+end
+
 -- Relative line numbers for easy jump counting (kickstart only enables number)
 vim.o.relativenumber = true
 
