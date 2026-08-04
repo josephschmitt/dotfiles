@@ -65,7 +65,6 @@
     enable = true;
     brews = [
       "herdr"
-      "josephschmitt/tap/monocle"
       "josephschmitt/tap/pj"
       "raine/workmux/workmux"
       "scooter"
@@ -78,6 +77,7 @@
       "fantastical"
       "ghostty"
       "hyperkey"
+      "josephschmitt/tap/monocle"
       "leader-key"
       "notion"
       "raycast"
