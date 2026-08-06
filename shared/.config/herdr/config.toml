@@ -1,6 +1,7 @@
 onboarding = false
+
+[terminal]
 new_cwd = "~/development"
-prompt_new_tab_name = false
 
 [session]
 resume_agents_on_restore = true
@@ -149,7 +150,7 @@ description = "Refresh PR status"
 
 [ui]
 show_agent_labels_on_pane_borders = true
-agent_panel_scope = "all"
+prompt_new_tab_name = false
 
 agent_panel_sort = "priority"
 [ui.sidebar.spaces]
