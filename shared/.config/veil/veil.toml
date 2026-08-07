@@ -46,7 +46,8 @@ update_check = true
 # All fields are optional; an empty [font] block has no effect.
 #
 [font]
-family = "MesloLGS Nerd Font Mono"
+# family = "MesloLGS Nerd Font Mono"
+family = "FiraCode Nerd Font Mono"
 size = 13.0
 force = false
 
