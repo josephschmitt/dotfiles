@@ -1,0 +1,82 @@
+#!/usr/bin/swift
+
+// ddpm-monitor-watcher — Launch DDPM when Dell U3224KB connects
+//
+// Event-driven monitor watcher using CGDisplayRegisterReconfigurationCallback.
+// Zero polling — macOS notifies us instantly when displays connect/disconnect.
+// Managed as a launchd agent via nix-darwin.
+
+import CoreGraphics
+import Foundation
+
+let monitorName = "DELL U3224KB"
+let ddpmApp = "/Applications/DDPM/DDPM.app"
+let settleTime: UInt32 = 30
+
+// Serial queue for thread-safe access to dellWasConnected — the CG callback
+// fires on an internal CoreGraphics thread, so all state changes go through here.
+let queue = DispatchQueue(label: "ddpm-monitor-watcher")
+var dellWasConnected = false // only accessed on `queue`
+
+func isDellConnected() -> Bool {
+    let pipe = Pipe()
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: "/usr/sbin/ioreg")
+    process.arguments = ["-l"]
+    process.standardOutput = pipe
+    process.standardError = FileHandle.nullDevice
+    try? process.run()
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+    process.waitUntilExit()
+    let output = String(data: data, encoding: .utf8) ?? ""
+    return output.contains(monitorName)
+}
+
+func launchDDPM() {
+    log("Dell monitor connected — launching DDPM")
+    Process.launchedProcess(launchPath: "/usr/bin/open", arguments: [ddpmApp])
+    sleep(settleTime)
+    Process.launchedProcess(launchPath: "/usr/bin/osascript", arguments: ["-e", "quit app \"DDPM\""])
+    log("DDPM closed after \(settleTime)s")
+}
+
+func log(_ message: String) {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    print("\(formatter.string(from: Date())): \(message)")
+    fflush(stdout)
+}
+
+// Check on startup — if Dell is already connected (e.g. login with monitor plugged in),
+// launch DDPM immediately
+queue.sync {
+    if isDellConnected() {
+        launchDDPM()
+        dellWasConnected = true
+    }
+}
+
+// Register for display change events (fires instantly on connect/disconnect)
+let callback: CGDisplayReconfigurationCallBack = { (displayID, flags, _) in
+    // Only act on completed reconfigurations, not the "begin" phase
+    guard !flags.contains(.beginConfigurationFlag) else { return }
+
+    queue.async {
+        if flags.contains(.addFlag) {
+            if !dellWasConnected && isDellConnected() {
+                dellWasConnected = true
+                launchDDPM()
+            }
+        } else if flags.contains(.removeFlag) {
+            if dellWasConnected && !isDellConnected() {
+                log("Dell monitor disconnected")
+                dellWasConnected = false
+            }
+        }
+    }
+}
+
+CGDisplayRegisterReconfigurationCallback(callback, nil)
+log("Watching for Dell monitor connections...")
+
+RunLoop.current.run()

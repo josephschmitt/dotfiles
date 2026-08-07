@@ -126,6 +126,20 @@
     pkgs.nerd-fonts.fira-code
   ];
 
+  # Launch DDPM when Dell U3224KB monitor connects to re-apply webcam settings
+  launchd.user.agents.ddpm-monitor-watcher = {
+    serviceConfig = {
+      ProgramArguments = [
+        "/usr/bin/swift"
+        "/Users/josephschmitt/bin/ddpm-monitor-watcher"
+      ];
+      RunAtLoad = true;
+      KeepAlive = true;
+      StandardOutPath = "/tmp/ddpm-monitor-watcher.log";
+      StandardErrorPath = "/tmp/ddpm-monitor-watcher.err";
+    };
+  };
+
   # Necessary for using flakes on this system.
   nix.settings.experimental-features = "nix-command flakes";
 
