@@ -16,7 +16,7 @@ ligatures = true
 # (cached path, login shell PATH, common Homebrew locations) which
 # works in the vast majority of cases. Only set this if automatic
 # detection resolves to a binary you don't want.
-# nvim_path = ""
+nvim_path = "/run/current-system/sw/bin/nvim"
 
 # Default NVIM_APPNAME for new windows. Leave empty to use "nvim".
 # nvim_appname = ""
