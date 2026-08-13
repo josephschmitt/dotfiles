@@ -427,6 +427,31 @@ augroup CustomFiletypes
 augroup END
 
 " =============================================================================
+" Create missing parent directories on save (custom/options.lua parity)
+" Writing to a path whose directory doesn't exist normally fails with E212.
+" Prompt instead; declining leaves the write to fail exactly as before.
+" FileWritePre covers `:w some/other/path`, which doesn't fire BufWritePre.
+" =============================================================================
+function! s:MkdirOnSave(target) abort
+  " Skip plugin-owned pseudo-paths (fugitive://, scp://, ...)
+  if a:target =~# '^\w\w\+://' | return | endif
+
+  let l:dir = fnamemodify(expand(a:target), ':p:h')
+  if empty(l:dir) || isdirectory(l:dir) | return | endif
+
+  if confirm("Directory does not exist:\n" . l:dir . "\n\nCreate it?", "&Yes\n&No", 1, 'Question') != 1
+    return
+  endif
+
+  call mkdir(l:dir, 'p')
+endfunction
+
+augroup CustomMkdirOnSave
+  autocmd!
+  autocmd BufWritePre,FileWritePre * call s:MkdirOnSave(expand('<afile>'))
+augroup END
+
+" =============================================================================
 " Highlight on yank (kickstart parity, vim 8+)
 " Briefly highlights the yanked range with IncSearch.
 " =============================================================================

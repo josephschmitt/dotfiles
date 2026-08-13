@@ -153,6 +153,34 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end,
 })
 
+-- Create missing parent directories on save.
+-- Writing to a path whose directory doesn't exist normally fails with E212
+-- ("Can't open file for writing"), forcing a trip out to the shell to mkdir.
+-- Prompt instead. Declining just returns, so the write fails exactly as it
+-- does today — no silent directory creation without consent.
+--
+-- FileWritePre is included alongside BufWritePre because `:w some/other/path`
+-- (writing the buffer to a different file) fires FileWritePre, not BufWritePre.
+-- `<afile>` (args.match) is the target path in both cases.
+vim.api.nvim_create_autocmd({ "BufWritePre", "FileWritePre" }, {
+  group = vim.api.nvim_create_augroup("custom-mkdir-on-save", { clear = true }),
+  callback = function(args)
+    -- Skip plugin-owned pseudo-paths (oil://, fugitive://, scp://, ...)
+    if args.match:match("^%w%w+://") then return end
+
+    local dir = vim.fn.fnamemodify(vim.fn.expand(args.match), ":p:h")
+    if dir == "" or vim.fn.isdirectory(dir) == 1 then return end
+
+    local choice = vim.fn.confirm("Directory does not exist:\n" .. dir .. "\n\nCreate it?", "&Yes\n&No", 1, "Question")
+    if choice ~= 1 then return end
+
+    local ok, err = pcall(vim.fn.mkdir, dir, "p")
+    if not ok then
+      vim.notify("Failed to create " .. dir .. ": " .. tostring(err), vim.log.levels.ERROR)
+    end
+  end,
+})
+
 -- Markdown: show all syntax characters (disable concealing)
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("custom-markdown", { clear = true }),
