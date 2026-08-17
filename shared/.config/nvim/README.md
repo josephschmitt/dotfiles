@@ -135,6 +135,9 @@ Leader key: **Space**
 | `<Leader>gG` | Open GitHub permalink in browser |
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
+| `gxu` / `gxU` / `gx~` | Lowercase / uppercase / toggle case of word |
+| `gxt` | Toggle pair at or after cursor (`true`/`false`, `&&`/`\|\|`, `==`/`!=`) |
+| `gx+` / `gx-` | Increment / decrement number |
 | `go` | Open URL/filepath under cursor |
 | `<Leader>tz` | Toggle center focus (padded sides + wrap) |
 

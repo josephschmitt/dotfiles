@@ -51,6 +51,7 @@ shared/.config/nvim/
         ├── sortjson.lua            # JSON key sorting
         ├── tmux-navigator.lua      # Ctrl+hjkl tmux/nvim navigation
         ├── toggles.lua             # Toggle keybindings (wrap, inlay hints, format-on-save)
+        ├── transforms.lua          # gx group: case ops, word/symbol pair toggle, increment
         ├── which-key.lua           # Keybinding popup groups
         └── zen-center.lua          # Center buffer with padded side buffers (no-neck-pain)
 ```
@@ -109,8 +110,33 @@ LSP and editing bindings use Neovim's native `g` prefixes (not `<Leader>`):
 | `gr` | LSP | `grn` rename, `gra` code action, `grr` references, `grd` definition, `grf` format |
 | `gs` | Surround | `gsa` add, `gsd` delete, `gsr` replace |
 | `gc` | Comment | `gcc` line, `gc` selection |
+| `gx` | Transform | `gxu`/`gxU`/`gx~` case, `gxt` toggle pair, `gx+`/`gx-` increment |
 
 These are registered as which-key groups with icons in `which-key.lua`.
+
+Because `gx` is a prefix here, Neovim's built-in `gx` (open URL under cursor) is
+deleted in `keymaps.lua` and re-bound to `go`.
+
+### Pair Toggling (`gxt`)
+
+`transforms.lua` implements `gxt` by hand rather than pulling in a plugin
+(`dial.nvim`, `add-subtract-ex.nvim`). It scans the current line for the earliest
+word or symbol pair at or after the cursor — matching `<C-a>`'s reach-forward
+behavior — and splices the replacement in with `nvim_buf_set_text`.
+
+Three details are load-bearing; preserve them if you touch this file:
+
+1. **`nvim_buf_set_text`, not `ciw`** — `ciw` clobbers the unnamed register and
+   leaves a stray insert on the undo stack.
+2. **`operatorfunc` + `g@l`** — this is what makes `.` re-toggle instead of
+   replaying the raw edit. Requires the global `_G.__transform_toggle_pair`.
+3. **Word tables stay lowercase** — casing is derived (`match_case`), so `TRUE`
+   and `True` work without extra entries.
+
+Keep the pair tables short. Matching reaches forward from the cursor, so every
+added entry is another chance to grab something unintended. `1`/`0` is
+deliberately excluded (that's `gx+`/`gx-`'s job), as is a bare `+`/`-` symbol
+pair (it collides with signed numbers).
 
 ## Performance: Lazy-Loading Guidelines
 
