@@ -1,7 +1,12 @@
 onboarding = false
 
 [terminal]
-new_cwd = "~/development"
+# "follow" (herdr's default) makes new panes and tabs inherit the focused
+# pane's directory — the pre-0.8.0 / tmux behavior. new_cwd is a single global
+# policy covering panes, tabs AND spaces with no per-context override, so the
+# ~/development default for new spaces is applied by the wrapped new_workspace
+# binding below instead (an explicit --cwd outranks new_cwd).
+new_cwd = "follow"
 
 [session]
 resume_agents_on_restore = true
@@ -50,7 +55,10 @@ workspace_picker = ""
 rename_workspace = ""
 # open_notification_target disabled — no free slot
 open_notification_target = ""
-new_workspace = "prefix+shift+n"
+# new_workspace disabled as a native binding — replaced by the [[keys.command]]
+# wrapper below (prefix+shift+n) that passes --cwd ~/development, since
+# [terminal] new_cwd is now "follow" for the sake of panes/tabs
+new_workspace = ""
 previous_workspace = "alt+shift+["
 next_workspace = "alt+shift+]"
 switch_workspace = "alt+shift+1..9"
@@ -70,6 +78,18 @@ new_worktree = "prefix+shift+w"
 
 # Remove worktree — prefix+shift+d
 remove_worktree = "prefix+shift+d"
+
+# New space — prefix+shift+n, wrapped to force ~/development.
+#
+# [terminal] new_cwd is "follow" so that splits and new tabs inherit the
+# focused pane (herdr 0.8.0 collapsed panes/tabs/spaces under one global
+# policy). New *spaces* should still start in ~/development, so this wrapper
+# passes an explicit --cwd, which outranks new_cwd. See TROUBLESHOOTING.md.
+[[keys.command]]
+key = "prefix+shift+n"
+type = "shell"
+command = "bash -lc 'herdr workspace create --focus --cwd ~/development'"
+description = "New space"
 
 # Quick shell — exits automatically after a successful command
 # (double Ctrl-c within 2s also closes the popup)

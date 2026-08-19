@@ -64,6 +64,22 @@ Then start tmux normally.
 - tmux issue: https://github.com/tmux/tmux/issues/4329
 - yazi issue: https://github.com/sxyazi/yazi/issues/2308
 
+## herdr
+
+### After upgrading to 0.8.0, splits and new tabs open in `~/development` instead of the current directory
+
+**Symptom:** `prefix+\`, `prefix+|`, and `prefix+n` open the new pane/tab in `~/development` rather than the focused pane's directory.
+
+**Cause:** herdr 0.8.0 added `[terminal] new_cwd`, documented as *"CWD policy for new panes, tabs, and workspaces"* — a single global policy covering all three contexts, with no per-context override. Setting it to `~/development` to get the desired behavior for new *spaces* necessarily drags splits and new tabs along with it.
+
+**Fix:** Invert the defaulting. `new_cwd = "follow"` (herdr's own default) restores native inherit for panes and tabs; the `new_workspace` native binding is blanked (`new_workspace = ""`) and replaced by a `[[keys.command]]` on the same key running:
+```
+bash -lc 'herdr workspace create --focus --cwd ~/development'
+```
+An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/development`. Worktree, pj-picker, and tv bindings are unaffected — they already supply their own concrete path.
+
+**Takeaway:** When an upstream tool collapses several contexts under one global setting, check `<tool> <subcommand> --help` for a per-invocation flag that outranks it before contorting the config — and prefer wrapping the *rarer* action so the common path stays native. Also: blank a replaced native binding (`key_name = ""`) rather than deleting the line, or herdr's upstream default silently returns.
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`

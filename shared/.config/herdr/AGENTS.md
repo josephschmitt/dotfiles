@@ -36,8 +36,27 @@ This config customizes bindings heavily. The guiding principles:
 - **Agent/workspace navigation uses `alt+[/]` and `alt+shift+[/]`** — bracket pattern for sequential cycling
 - **Splits use `prefix+\` and `prefix+|`** — matches tmux visual split conventions
 - **Frequently-used actions skip the prefix** (`alt+z` for zoom, `` alt+` `` for pane cycling) — speed over consistency
+- **Replaced natives are blanked, never deleted** — set `key_name = ""` (e.g. `workspace_picker`, `rename_workspace`, `open_notification_target`, `new_workspace`) with a comment saying why. Deleting the line restores herdr's upstream default for that action, which in this config can silently collide with an existing binding (`prefix+v` is `copy_mode`, `prefix+c` is the Quick shell popup).
 
 When adding new bindings, follow these patterns: use `alt+<key>` for high-frequency actions, `prefix+<key>` for everything else. Document the binding's purpose with a TOML comment.
+
+## CWD Policy for New Panes / Tabs / Spaces
+
+`[terminal] new_cwd` (herdr 0.8.0+) is a **single global policy** governing new
+panes, tabs *and* workspaces/spaces alike — there is no per-context override.
+
+This config deliberately sets `new_cwd = "follow"` (herdr's default) so splits
+(`prefix+\`, `prefix+|`) and new tabs (`prefix+n`) inherit the focused pane's
+directory — the pre-0.8.0 / tmux behavior. New **spaces** should still start in
+`~/development`, so `new_workspace` is blanked and replaced by a
+`[[keys.command]]` on `prefix+shift+n` that runs
+`herdr workspace create --focus --cwd ~/development`; an explicit `--cwd`
+outranks `new_cwd`.
+
+**Do not "simplify" this back to a global `new_cwd = "~/development"`.** That
+reintroduces the bug it was written to fix: every split and new tab lands in
+`~/development` instead of where you were working. See the `## herdr` section
+in the repo-root `TROUBLESHOOTING.md`.
 
 ## Custom Command Bindings
 
