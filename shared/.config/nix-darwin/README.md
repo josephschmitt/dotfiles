@@ -51,6 +51,12 @@ This configuration manages macOS systems declaratively using Nix, providing:
 - **Productivity**: Raycast, Hyperkey, Leader Key
 - **Creative**: Adobe Creative Cloud
 
+**Trust store**: Homebrew 6.x gates non-official taps behind `brew trust`, and locates that
+store via `$XDG_CONFIG_HOME`. Activation runs `brew bundle` under `sudo`, which strips that
+variable, so `darwin.nix` sets `HOMEBREW_XDG_CONFIG_HOME` in `/etc/homebrew/brew.env` to keep
+interactive and activation runs pointed at the same `trust.json`. Without it, everything you
+trusted by hand reads as untrusted during `nix_rebuild`.
+
 ## System Defaults
 
 ### Dock Configuration

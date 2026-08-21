@@ -103,6 +103,64 @@ Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different meth
 
 **Resume:** Once nix-homebrew pins its own `brew-src` to a version ≥ 5.1.10, the explicit override in `flake.nix` (the `nix-homebrew.inputs.brew-src.url` line) can be removed.
 
+### Non-official taps read as untrusted during `nix_rebuild` even after `brew trust`
+
+**Symptom:** You run `brew trust --formula user/tap/thing` (or `--cask`/`--tap`) interactively,
+`brew` confirms it, and `brew install` works fine from your shell. But `nix_rebuild` still treats
+every third-party tap as untrusted — formulae/casks from them are skipped or refused during the
+Homebrew bundle step, as if you had never trusted anything.
+
+**Cause:** Homebrew 6.x stores trust in `$HOMEBREW_USER_CONFIG_HOME/trust.json`, and
+`bin/brew` derives that directory like this:
+
+```sh
+if   [[ -n "${XDG_CONFIG_HOME-}" ]];        then HOMEBREW_USER_CONFIG_HOME="${XDG_CONFIG_HOME}/homebrew"
+elif [[ -n "${HOMEBREW_XDG_CONFIG_HOME-}" ]]; then HOMEBREW_USER_CONFIG_HOME="${HOMEBREW_XDG_CONFIG_HOME}/homebrew"
+else                                             HOMEBREW_USER_CONFIG_HOME="${HOME}/.homebrew"
+fi
+```
+
+Our shells export `XDG_CONFIG_HOME=~/.config`, so interactive `brew trust` writes
+`~/.config/homebrew/trust.json`. But the nix-darwin homebrew module invokes the bundle as:
+
+```
+sudo --preserve-env=PATH --user=<user> --set-home env brew bundle ...
+```
+
+`sudo` env-resets everything except `PATH`, so `XDG_CONFIG_HOME` is gone by the time `brew` runs.
+Activation therefore falls through to `~/.homebrew/trust.json` — a *different*, usually stale
+store. Two divergent trust files, and the one activation reads never gets your `brew trust` writes.
+
+Confirm the split:
+```bash
+brew ruby -e 'require "trust"; puts Homebrew::Trust.trust_file'
+env -u XDG_CONFIG_HOME brew ruby -e 'require "trust"; puts Homebrew::Trust.trust_file'
+```
+Two different paths means you have this bug.
+
+**Fix:** Pin both contexts to the same store via `/etc/homebrew/brew.env`, which `bin/brew` reads
+itself *before* computing `HOMEBREW_USER_CONFIG_HOME` — so it survives sudo's env reset. In
+`darwin.nix`:
+
+```nix
+environment.etc."homebrew/brew.env".text = ''
+  HOMEBREW_XDG_CONFIG_HOME=/Users/${config.system.primaryUser}/.config
+'';
+```
+
+`HOMEBREW_USER_CONFIG_HOME` itself **cannot** be set this way — `bin/brew` explicitly refuses to
+let env files override the vars it exports (`BIN_BREW_EXPORTED_VARS`). `HOMEBREW_XDG_CONFIG_HOME`
+is the supported fallback and is not on that list.
+
+Activation writes `/etc` long before the Homebrew bundle step, so a single `nix_rebuild` is
+self-healing. Verify afterwards:
+```bash
+env -u XDG_CONFIG_HOME brew ruby -e 'require "trust"; puts Homebrew::Trust.trust_file'
+```
+It should print `~/.config/homebrew/trust.json`.
+
+Once confirmed, the stale `~/.homebrew/` store is dead weight and can be removed.
+
 ## Neovim (Kickstart)
 
 ### LSP servers/formatters never auto-install ("X is not executable", "vscode-json-language-server not found")

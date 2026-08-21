@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ config, pkgs, ... }: {
   nixpkgs.config.allowUnfree = true;
 
   # Override packages with build issues
@@ -60,6 +60,21 @@
   ];
 
   environment.shells = [ pkgs.fish ];
+
+  # Homebrew resolves its user config dir (and therefore the `brew trust` store)
+  # from $XDG_CONFIG_HOME. The nix-darwin homebrew module runs `brew bundle` via
+  # `sudo --preserve-env=PATH`, which strips XDG_CONFIG_HOME, so activation falls
+  # back to ~/.homebrew/trust.json while interactive `brew trust` writes to
+  # ~/.config/homebrew/trust.json. The two stores diverge and every non-official
+  # tap reads as untrusted during activation.
+  #
+  # /etc/homebrew/brew.env is read by bin/brew itself (before it computes
+  # HOMEBREW_USER_CONFIG_HOME), so it survives sudo's env_reset.
+  # HOMEBREW_XDG_CONFIG_HOME is the documented fallback used when XDG_CONFIG_HOME
+  # is unset, which pins both contexts to the same trust store.
+  environment.etc."homebrew/brew.env".text = ''
+    HOMEBREW_XDG_CONFIG_HOME=/Users/${config.system.primaryUser}/.config
+  '';
 
   homebrew = {
     enable = true;
