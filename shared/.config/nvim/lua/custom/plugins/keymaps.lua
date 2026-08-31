@@ -1,6 +1,6 @@
 -- Core keybindings ported from AstroNvim/LazyVim.
 -- These are non-leader convenience mappings that improve daily editing flow.
--- Uses VimEnter to ensure they load after plugins (e.g. Comment.nvim for gcc/gc).
+-- Uses VimEnter to ensure they load after plugins (e.g. celeste_comment for gcc/gc).
 vim.api.nvim_create_autocmd("VimEnter", {
   group = vim.api.nvim_create_augroup("custom-keymaps", { clear = true }),
   callback = function()

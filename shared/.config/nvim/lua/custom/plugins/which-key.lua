@@ -64,6 +64,7 @@ return {
         { "g%", hidden = true }, -- Reverse matchit cycling (niche, use g[/g] instead)
         { "gt", hidden = true }, -- Use <Leader><Tab>] instead
         { "gT", hidden = true }, -- Use <Leader><Tab>[ instead
+        { "gb", group = "󰅺 Block Comment" },
         { "gc", group = "󰅺 Comment" },
         { "gr", group = "󰒕 LSP" },
         { "gra", desc = "Code Action" },
