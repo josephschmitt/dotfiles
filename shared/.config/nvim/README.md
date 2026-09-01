@@ -102,7 +102,7 @@ lua/custom/plugins/
 | multicursor.nvim | Multi-cursor editing | On keypress |
 | vim-tmux-navigator | Ctrl+hjkl across tmux and nvim splits | On keypress |
 | no-neck-pain.nvim | Center buffer with padded side buffers | On command |
-| celeste_comment.nvim | Line/block commenting (Neovim 0.12+) | On keypress |
+| celeste_comment.nvim | Line/block commenting | On keypress |
 
 ## Key Bindings
 

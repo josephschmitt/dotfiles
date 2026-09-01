@@ -7,15 +7,12 @@
 --   * Tree-sitter-aware comment strings — correct markers inside JSX/TSX, Vue, etc.
 --   * VSCode-style indent handling for buffers that mix tabs and spaces
 --
--- Requires Neovim 0.12+, so it's version-gated: on 0.11 the `cond` is false, the
--- plugin never loads, and the built-in `gc`/`gcc` mappings stay in place.
--- Pinned to `~0.3.0` (patch updates only) — upstream ships breaking changes in
--- MINOR bumps.
+-- Requires Neovim 0.12+. Unpinned on purpose — upstream ships breaking changes in
+-- MINOR bumps, and we'd rather ride the latest and fix breaks than sit on an old
+-- release. `lazy-lock.json` still holds it steady between `:Lazy update` runs.
 return {
   {
     "celeste3z/celeste_comment.nvim",
-    version = "~0.3.0",
-    cond = vim.fn.has("nvim-0.12") == 1,
     -- Loaded on first use. `o` mode covers the textobjects (e.g. `dgc` deletes a
     -- comment block); `<C-c>` in keymaps.lua feeds `gcc`, which trips this too.
     keys = {
