@@ -13,6 +13,7 @@
 return {
   {
     "celeste3z/celeste_comment.nvim",
+    cond = vim.fn.has("nvim-0.12") == 1,
     -- Loaded on first use. `o` mode covers the textobjects (e.g. `dgc` deletes a
     -- comment block); `<C-c>` in keymaps.lua feeds `gcc`, which trips this too.
     keys = {
