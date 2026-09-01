@@ -33,6 +33,7 @@ shared/.config/nvim/
         ├── bufferline.lua          # Tab bar with ordinal numbering
         ├── cmdline.lua             # Command-line completion sources
         ├── colorscheme.lua         # Tokyonight moon style override
+        ├── comment.lua             # celeste_comment (line/block commenting)
         ├── dashboard.lua           # Snacks dashboard keys
         ├── diagnostics.lua         # Inline diagnostic styling
         ├── filetree.lua            # Neo-tree file explorer
@@ -108,7 +109,8 @@ LSP and editing bindings use Neovim's native `g` prefixes (not `<Leader>`):
 |--------|-------|----------|
 | `gr` | LSP | `grn` rename, `gra` code action, `grr` references, `grd` definition, `grf` format |
 | `gs` | Surround | `gsa` add, `gsd` delete, `gsr` replace |
-| `gc` | Comment | `gcc` line, `gc` selection |
+| `gc` | Comment | `gcc` line, `gc` selection, `gco`/`gcO`/`gcA` new comment below/above/eol |
+| `gb` | Block comment | `gbc` line, `gb` selection |
 
 These are registered as which-key groups with icons in `which-key.lua`.
 
@@ -125,7 +127,7 @@ Dashboard startup should load minimal plugins (~5). Every plugin must justify lo
 | **Completion** | `event = { "InsertEnter", "CmdlineEnter" }` | blink.cmp, LuaSnip |
 | **Non-critical UI** | `event = "VeryLazy"` | which-key, claudecode, flash, diagnostics |
 | **Multi-buffer UI** | `event = "BufAdd"` | bufferline |
-| **On-demand tools** | `cmd` or `keys` triggers | neo-tree, diffview, sortjson, pj |
+| **On-demand tools** | `cmd` or `keys` triggers | neo-tree, diffview, sortjson, pj, celeste_comment |
 
 ### Rules for new plugins
 1. **Always add a lazy-loading trigger** — never leave a plugin without `event`, `cmd`, `keys`, or `ft`
@@ -161,3 +163,4 @@ Features ported from AstroNvim/LazyVim (each evaluated and adapted individually)
 - [x] Auto-install LSP servers (mason-auto-install)
 - [x] LSP formatting via conform.nvim (`grf`, format-on-save)
 - [x] LSP server config (lua/custom/lsp-servers.lua)
+- [x] Line/block commenting (celeste_comment.nvim, replaces built-in `vim._comment`)

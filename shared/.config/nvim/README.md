@@ -102,6 +102,7 @@ lua/custom/plugins/
 | multicursor.nvim | Multi-cursor editing | On keypress |
 | vim-tmux-navigator | Ctrl+hjkl across tmux and nvim splits | On keypress |
 | no-neck-pain.nvim | Center buffer with padded side buffers | On command |
+| celeste_comment.nvim | Line/block commenting | On keypress |
 
 ## Key Bindings
 
@@ -135,6 +136,10 @@ Leader key: **Space**
 | `<Leader>gG` | Open GitHub permalink in browser |
 | `<Leader>ac` | Launch Claude in tmux split |
 | `gsa` / `gsd` / `gsr` | Surround add / delete / replace |
+| `gcc` / `gc` | Toggle line comment (line / motion or selection) |
+| `gbc` / `gb` | Toggle block comment (line / motion or selection) |
+| `gco` / `gcO` / `gcA` | New comment below / above / at end of line |
+| `Ctrl+C` | Toggle comment (line in normal, selection in visual) |
 | `go` | Open URL/filepath under cursor |
 | `<Leader>tz` | Toggle center focus (padded sides + wrap) |
 
