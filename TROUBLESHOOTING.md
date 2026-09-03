@@ -280,6 +280,24 @@ The `lg` alias was the only launcher that loaded the overlay correctly, because 
 
 **Takeaway:** A config setting that only affects *future* fetches (`tagOpt`, narrowed refspecs, etc.) can't fix data that's already on disk from before the config existed. Pre-baked sandbox images need an explicit one-time migration step, not just a config change, to bring existing clones in line.
 
+## git
+
+### Every `git pull` fails with `fatal: couldn't find remote ref refs/heads/<branch>` after a tracked branch is merged/deleted (even on master)
+
+**Symptom:** In a narrowed monorepo, after `git track <branch>` and that branch is later merged and deleted on the remote, *all* subsequent `git pull`/`git fetch` fail — including on `master` — with `fatal: couldn't find remote ref refs/heads/<branch>`.
+
+**Cause:** `git track` (in `*/.gitconfig-monorepo`) adds a branch-specific refspec to `remote.origin.fetch` via `git remote set-branches --add`, e.g. `+refs/heads/jjs/foo:refs/remotes/origin/jjs/foo`. A plain fetch honors *every* configured refspec, and a non-wildcard refspec for a ref that no longer exists remotely is a hard error that aborts the whole fetch. `fetch.prune`/`git remote prune` don't help — they remove stale remote-tracking refs, not the configured refspec line that's demanding the (now-missing) fetch.
+
+**Fix:** Centralized all the refspec plumbing in `shared/bin/git-monorepo-track` (on `$PATH` via `~/bin`) rather than as embedded shell duplicated across each `.gitconfig-monorepo`. Each profile's `.gitconfig-monorepo` `[alias]` block wires four thin aliases to it (scoped to monorepos via `[includeIf]`, so `git pl` etc. don't shadow anything in normal repos — a `git-track` script on `$PATH` *would* have, which is why the script is neutrally named and invoked through aliases):
+- `git track <branch> [remote]` — adds the branch-specific refspec, fetches, and switches to the branch (unchanged behavior; logic just moved into the script).
+- `git untrack <branch> [remote]` — companion to `track`; surgically removes that branch's refspec via `git config --unset remote.<remote>.fetch <regex>`. Idempotent.
+- `git prune-tracks [remote]` — walks every non-wildcard `remote.<remote>.fetch` refspec (skipping `master`), checks each with `git ls-remote --heads`, and drops any whose remote branch is gone.
+- `git pl [remote] [branch]` — self-healing pull: runs `prune-tracks` then `git pull`, so a merged-and-deleted tracked branch can never wedge a pull. Use it instead of plain `git pull` in these monorepos.
+
+**Takeaways:**
+- A non-wildcard fetch refspec is a *hard requirement*, not a filter — if you add per-branch refspecs, you need a matching removal path (manual `untrack`, or automatic pruning before fetch) for when those branches disappear. Wildcard namespace refspecs (`+refs/heads/jjs/*:...`) tolerate individual deletions and are an alternative model if per-branch tracking proves too fiddly.
+- Non-trivial git-alias logic belongs in a script on `$PATH`, not as escaped shell inside a gitconfig — same reasoning as the `lazygit-launch` extraction above. But name it so it *won't* be auto-discovered as a `git-<name>` subcommand (which would shadow a same-named alias globally, outside the `[includeIf]` scope); invoke it through the scoped alias instead.
+
 ## television
 
 ### tv opens `files` channel instead of the requested channel (e.g. `sesh`, `pj`)

@@ -1,0 +1,112 @@
+#!/bin/sh
+# Per-branch fetch-refspec management for narrowed monorepos.
+#
+# In monorepos, shared/bin/optimize-monorepos narrows remote.origin.fetch to
+# master + a branch-prefix glob (see MONOREPO_BRANCH_PREFIX). To work with a
+# branch outside that namespace (e.g. a coworker's branch), `track` adds a
+# branch-specific refspec so it gets fetched.
+#
+# The catch: a non-wildcard fetch refspec is a HARD requirement, not a filter.
+# Once such a branch is merged and deleted on the remote, every `git fetch` /
+# `git pull` -- even on master -- aborts with:
+#     fatal: couldn't find remote ref refs/heads/<branch>
+# `fetch.prune` / `git remote prune` don't help: they drop stale
+# remote-tracking refs, not the configured refspec line demanding the fetch.
+#
+# This script centralizes the add + removal paths so the fragile refspec
+# plumbing lives in one place instead of being duplicated as embedded shell
+# across each profile's .gitconfig-monorepo. The monorepo [alias] block wires
+# `git track` / `git untrack` / `git prune-tracks` / `git pl` to it (scoped to
+# monorepos via [includeIf]).
+#
+# Subcommands (run from inside the repo):
+#   track <branch> [remote]   add refspec for <branch>, fetch it, switch to it
+#   untrack <branch> [remote] remove <branch>'s refspec (idempotent)
+#   prune-tracks [remote]     drop refspecs whose remote branch is gone
+#   pl [remote] [branch...]   prune-tracks, then git pull (self-healing pull)
+#
+# remote defaults to origin. master and wildcard (`*`) refspecs are never
+# touched by untrack/prune-tracks.
+
+set -eu
+
+usage() {
+  cat <<'EOF'
+git-monorepo-track: per-branch fetch-refspec management for narrowed monorepos.
+
+Subcommands (run from inside the repo; remote defaults to origin):
+  track <branch> [remote]    add refspec for <branch>, fetch it, switch to it
+  untrack <branch> [remote]  remove <branch>'s refspec (idempotent)
+  prune-tracks [remote]      drop refspecs whose remote branch is gone
+  pl [remote] [branch...]    prune-tracks, then git pull (self-healing pull)
+
+Normally invoked via the git aliases: git track / git untrack /
+git prune-tracks / git pl (defined in .gitconfig-monorepo).
+EOF
+}
+
+# Remove the fetch refspec whose source ref is refs/heads/<branch> (or a bare
+# <branch> as written by `git remote set-branches --add`). --unset returns 5
+# when nothing matches, which is fine here -- swallow it.
+untrack_branch() {
+  _remote="$1"
+  _branch="$2"
+  git config --unset "remote.$_remote.fetch" "^\+*refs/heads/$_branch:" 2>/dev/null || true
+  git config --unset "remote.$_remote.fetch" "^$_branch\$" 2>/dev/null || true
+}
+
+cmd_track() {
+  [ $# -ge 1 ] || { echo "track: missing <branch>" >&2; exit 2; }
+  branch="$1"
+  remote="${2:-origin}"
+  if ! git config --get-all "remote.$remote.fetch" | grep -qF "$branch"; then
+    git remote set-branches --add "$remote" "$branch"
+  fi
+  git fetch "$remote" "$branch" && git switch -c "$branch" "$remote/$branch"
+}
+
+cmd_untrack() {
+  [ $# -ge 1 ] || { echo "untrack: missing <branch>" >&2; exit 2; }
+  untrack_branch "${2:-origin}" "$1"
+}
+
+# Walk every non-wildcard fetch refspec; drop any whose remote branch no longer
+# exists. Skips master and wildcard specs.
+cmd_prune_tracks() {
+  remote="${1:-origin}"
+  git config --get-all "remote.$remote.fetch" | while IFS= read -r spec; do
+    case "$spec" in
+      *'*'*) continue ;;              # leave wildcard namespace refspecs alone
+    esac
+    src="${spec#+}"                   # strip leading '+'
+    src="${src%%:*}"                  # keep left (source) side
+    br="${src#refs/heads/}"
+    [ -z "$br" ] && continue
+    [ "$br" = master ] && continue
+    if [ -z "$(git ls-remote --heads "$remote" "$br" 2>/dev/null)" ]; then
+      echo "untracking gone branch: $br"
+      untrack_branch "$remote" "$br"
+    fi
+  done
+  true
+}
+
+# Self-healing pull: prune stale refspecs first so a merged-and-deleted tracked
+# branch can't wedge the pull, then pull. Extra args pass through to git pull.
+cmd_pl() {
+  remote="${1:-origin}"
+  cmd_prune_tracks "$remote" >/dev/null
+  git pull "$@"
+}
+
+[ $# -ge 1 ] || { usage >&2; exit 2; }
+sub="$1"
+shift
+case "$sub" in
+  track)         cmd_track "$@" ;;
+  untrack)       cmd_untrack "$@" ;;
+  prune-tracks)  cmd_prune_tracks "$@" ;;
+  pl)            cmd_pl "$@" ;;
+  -h|--help)     usage ;;
+  *)             echo "unknown subcommand: $sub" >&2; usage >&2; exit 2 ;;
+esac
