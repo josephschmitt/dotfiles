@@ -15,6 +15,11 @@
 # Detect the actual editor to use
 ACTUAL_EDITOR="${VISUAL:-${EDITOR:-nvim}}"
 
+# Popup-aware RPC detection is opt-in; set ENABLE_POPUP_EDITOR=1 to enable it
+if [ -z "$ENABLE_POPUP_EDITOR" ]; then
+    exec "$ACTUAL_EDITOR" "$@"
+fi
+
 # Check for --no-rpc flag
 SKIP_RPC=0
 if [ "$1" = "--no-rpc" ]; then
