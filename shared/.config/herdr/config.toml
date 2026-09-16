@@ -184,7 +184,7 @@ rows = [
 row_gap = 1
 rows = [
   ["state_icon", "workspace", "tab", "pane"],
-  [{ token = "$repo", fg = "#bb9af7" }, { token = "$branch", fg = "#7dcfff" }, "$pr"],
+  [{ token = "$repo", fg = "#bb9af7" }, { token = "$branch", fg = "#7dcfff" }, { token = "$pr", fg = "#9ece6a" }],
   ["terminal_title_stripped"]
 ]
 
