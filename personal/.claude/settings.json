@@ -14,43 +14,21 @@
             "command": "~/.claude/hooks/tmux-notify.sh"
           }
         ]
-      },
-      {
-        "matcher": "permission_prompt|elicitation_dialog",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "workmux set-window-status waiting"
-          }
-        ]
       }
     ],
-    "PostToolUse": [
+    "SessionStart": [
       {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "workmux set-window-status working"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
+            "command": "bash '/Users/josephschmitt/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          },
           {
             "type": "command",
-            "command": "workmux set-window-status done"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "workmux set-window-status working"
+            "command": "bash ~/.config/herdr/scripts/report-repo.sh",
+            "timeout": 5
           }
         ]
       }
