@@ -102,8 +102,7 @@ herdr-plugins sync --prune    # also remove installed plugins NOT in the manifes
 
 `install`/`link` look up the actual `plugin_id` herdr assigned (never assume one) and
 upsert it into the manifest, merging onto any existing entry rather than replacing it
-wholesale — hand-added fields (like `gh-pr`'s `note` below) and a hand-written
-`description` survive a re-run. `uninstall`/`unlink` remove the matching entry. Since
+wholesale — hand-added fields and a hand-written `description` survive a re-run. `uninstall`/`unlink` remove the matching entry. Since
 `install`/`link` run the real herdr command first and only touch the manifest on
 success, a failed install/link never leaves a stale entry behind.
 
@@ -125,7 +124,7 @@ Current plugins:
 | Plugin ID | Purpose | Notes |
 |-----------|---------|-------|
 | `pj` | Fuzzy-find `pj` projects and open them as herdr workspaces (`prefix+shift+p`) | Installed from GitHub (`josephschmitt/pj-herdr`) |
-| `gh-pr` | Labels the focused agent pane's sidebar row with its branch's GitHub PR status; powers `prefix+g` (open PR) and `prefix+u` (refresh) | Linked from a local clone at `~/development/herdr-plugin-gh-pr` — **your own fork** (`josephschmitt/herdr-plugin-gh-pr`, tracking `upstream: wyattjoh/herdr-plugin-gh-pr`). `herdr-plugins link` re-links whatever branch/worktree is currently checked out there; switch worktrees manually first if you want a specific patch set active. That repo is its own git checkout with its own history — nothing to vendor into dotfiles. |
+| `gh-pr` | Labels the focused agent pane's sidebar row with its branch's GitHub PR status; powers `prefix+g` (open PR) and `prefix+u` (refresh) | Installed from GitHub (`wyattjoh/herdr-plugin-gh-pr`) |
 
 When adding a new plugin:
 1. `herdr-plugins install ...` or `herdr-plugins link ...` — this installs/links
