@@ -173,9 +173,9 @@ show_agent_labels_on_pane_borders = true
 prompt_new_tab_name = false
 
 # Wider than herdr's defaults (26/18/36) — default was too narrow on startup
-sidebar_width = 32
+sidebar_width = 40
 sidebar_min_width = 24
-sidebar_max_width = 48
+sidebar_max_width = 55
 
 agent_panel_sort = "priority"
 [ui.sidebar.spaces]
