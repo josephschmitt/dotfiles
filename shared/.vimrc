@@ -306,6 +306,10 @@ xmap <C-c> gc
 nnoremap < <<
 nnoremap > >>
 
+" Indent / unindent in visual mode, reselecting so it's repeatable
+xnoremap < <gv
+xnoremap > >gv
+
 " Helix-style line ends
 nnoremap gh 0
 nnoremap gl $

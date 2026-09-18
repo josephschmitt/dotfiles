@@ -46,6 +46,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
     map("n", "<", "<<", { desc = "Unindent line" })
     map("n", ">", ">>", { desc = "Indent line" })
 
+    -- Indent/unindent in visual mode, reselecting so it's repeatable with . or another </>
+    map("v", "<", "<gv", { desc = "Unindent selection" })
+    map("v", ">", ">gv", { desc = "Indent selection" })
+
     -- Go to beginning/end of line (Helix-style)
     map({ "n", "v" }, "gh", "0", { desc = "Go to beginning of line" })
     map({ "n", "v" }, "gl", "$", { desc = "Go to end of line" })
