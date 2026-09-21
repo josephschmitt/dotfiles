@@ -38,6 +38,8 @@ shared/.config/nvim/
         ├── diagnostics.lua         # Inline diagnostic styling
         ├── filetree.lua            # Neo-tree file explorer
         ├── flash.lua               # Flash jump motions
+        ├── format-on-paste.lua     # Auto-format pasted text (p/P) via conform
+        ├── formatter-auto-install.lua # Ensures conform's non-LSP formatters are installed
         ├── git.lua                 # Gitsigns, mini.diff, diffview, lazygit
         ├── indent-blankline.lua    # Static indent guides
         ├── keymaps.lua             # Global keybindings
@@ -98,6 +100,18 @@ Formatting uses `conform.nvim` with `lsp_format = 'fallback'`:
 - Otherwise → falls back to LSP formatting (if the attached server supports it)
 - Manual format: `grf` (under the `gr` LSP group)
 - Format-on-save is enabled by default, toggled via `<Leader>tf` (buffer) / `<Leader>tF` (global)
+
+### Formatter Auto-Install
+`formatter-auto-install.lua` ensures the non-LSP formatters conform.nvim's `formatters_by_ft` expects (`stylua`, `gofumpt`, `prettierd`) are installed via Mason. Without it, filetypes like JSON/JS/CSS/etc. that list `prettierd`/`prettier` in `formatters_by_ft` fail to format (with no clear error) if neither binary happens to be installed yet.
+
+`mason-auto-install.lua` only covers LSP servers. `init.lua` wires up `mason-tool-installer.nvim` for non-LSP tools, but calls its `.setup()` directly inside `config` with an empty `ensure_installed` — not via lazy.nvim `opts` — so a normal `opts` override in a custom plugin file can't merge into it. Worse, `mason-tool-installer`'s own `plugin/` script runs its install check on `VimEnter`, so **the override must load eagerly** (no `event`/`cmd`/`keys` trigger) and call `.setup()` again before `VimEnter` fires — a lazy-loaded override would run after the install check already happened for that session, and its packages wouldn't be picked up until the next full restart.
+
+### Format on Paste
+`format-on-paste.lua` remaps `p`/`P` (normal and visual mode, any register, any count) to paste normally, then run `conform.format()` scoped to the range between the `'[`/`']` marks Neovim sets after any put. conform has no native "format on paste" option, so this is hand-rolled.
+
+Two gotchas discovered while building this:
+- **Range must not be zero-width.** `conform`'s `range` uses (1,0)-indexed `{row, col}` for `start`/`end`. Setting `end`'s column to `0` produces a zero-width range for formatters with `range_args` (e.g. stylua uses byte offsets computed from row+col) — the formatter silently no-ops. The `end` column must be the length of the last affected line.
+- **Visual-mode paste must exit visual mode first.** Remapping `v_p` to call `vim.cmd("normal! gvp")` directly from inside the mapping callback leaves Neovim stuck in visual mode (the paste never applies) because the callback still fires mid-dispatch of the original visual command. Prefixing with `<Esc>` (`gv` then re-select) before pasting avoids the reentrancy issue.
 
 ### Center Focus
 `<Leader>tz` toggles a centered-buffer focus mode via `no-neck-pain.nvim`: pads both sides of the window with empty buffers (width 100, matching the color column) and enables `wrap`/`linebreak`. Toggling off restores `nowrap` and removes the padding. Lazy-loads on first use of the `:NoNeckPain` command.
@@ -161,6 +175,6 @@ Features ported from AstroNvim/LazyVim (each evaluated and adapted individually)
 - [x] Indent guides (indent-blankline + mini.indentscope)
 - [x] Session persistence (persistence.nvim)
 - [x] Auto-install LSP servers (mason-auto-install)
-- [x] LSP formatting via conform.nvim (`grf`, format-on-save)
+- [x] LSP formatting via conform.nvim (`grf`, format-on-save, format-on-paste)
 - [x] LSP server config (lua/custom/lsp-servers.lua)
 - [x] Line/block commenting (celeste_comment.nvim, replaces built-in `vim._comment`)

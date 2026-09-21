@@ -30,6 +30,7 @@ Dashboard startup loads only ~5 plugins in ~50ms. The entire LSP chain (lspconfi
 - **mini.indentscope** uses a `draw.predicate` to skip non-file buffers — autocmd-based approaches lose the race against dashboard buffer initialization
 - **Missing directories on save** — `:w path/to/new/file` prompts to create the missing parent directories instead of failing with `E212`. Answering "No" lets the write fail as it normally would, so nothing is created behind your back (also ported to `shared/.vimrc`)
 - **SSH clipboard** — yanks over SSH (e.g. `remote-sandbox` boxes, which have no `xclip`/`wl-copy`) use the OSC-52 provider directly, so they reach the local terminal's clipboard without needing tmux or a clipboard binary on the remote box
+- **Format on paste** — `p`/`P` (normal and visual, any register, any count) run conform.nvim on just the pasted lines afterward, so pasted code picks up local indentation/style automatically
 
 ### Unified Keybinding Philosophy
 AstroNvim's keybinding structure was the starting point, but adapted to be more discoverable. Everything lives under `<Space>` with which-key's helix-style popup. Icons are embedded directly in group names (a workaround for `icons.mappings=false` blocking explicit icon properties).
@@ -57,6 +58,8 @@ lua/custom/plugins/
 ├── diagnostics.lua         # Powerline-style inline diagnostics
 ├── filetree.lua            # Neo-tree with auto-open/close
 ├── flash.lua               # Label-based jump motions
+├── format-on-paste.lua     # Auto-format pasted text (p/P)
+├── formatter-auto-install.lua # Auto-installs conform's non-LSP formatters
 ├── git.lua                 # Gitsigns, mini.diff, diffview, lazygit
 ├── indent-blankline.lua    # Static indent guides (all levels)
 ├── keymaps.lua             # Core keybindings (jk escape, etc.)
@@ -96,7 +99,7 @@ lua/custom/plugins/
 | flash.nvim | Label-based jump motions | VeryLazy |
 | claudecode.nvim | Claude Code WebSocket integration | VeryLazy |
 | persistence.nvim | Session save/restore per directory | File open |
-| conform.nvim | Format on save | File save |
+| conform.nvim | Format on save + format on paste | File save / first paste |
 | indent-blankline.nvim | Static indent guides at every level | File open |
 | tiny-inline-diagnostic.nvim | Powerline-style diagnostic messages | VeryLazy |
 | multicursor.nvim | Multi-cursor editing | On keypress |
