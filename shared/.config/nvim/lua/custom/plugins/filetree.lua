@@ -67,12 +67,15 @@ return {
     keys = {
       {
         "<Leader>ee",
-        function() config.filetree.toggle() end,
+        function()
+          local p = Snacks.picker.get({ source = "explorer" })[1]
+          if p then p:close() else config.filetree.reveal() end
+        end,
         desc = "Toggle Explorer (current file)",
       },
       {
         "<Leader>eE",
-        function() Snacks.picker.explorer({ cwd = vim.uv.cwd() }) end,
+        function() config.filetree.open_cwd() end,
         desc = "Toggle Explorer (cwd)",
       },
       {
@@ -90,7 +93,7 @@ return {
               pcall(config.filetree.close)
             end
           else
-            pcall(config.filetree.focus)
+            pcall(config.filetree.restore)
           end
         end,
         desc = "Toggle explorer focus",

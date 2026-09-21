@@ -24,6 +24,13 @@ local function wipe_bufs_matching(predicate)
   end
 end
 
+-- snacks' explorer picker has no hide/restore API: p:close() fully tears down
+-- the picker (finder, matcher, layout, etc.), so reopening always creates a
+-- fresh one at the default root. To make <Leader>o's reopen restore whichever
+-- state (revealed file, or cwd root) was most recently open, we track it here.
+---@type {mode: "reveal"|"cwd", file: string?}?
+local last_explorer_state = nil
+
 local adapters = {
   ["snacks"] = {
     -- The explorer is a snacks picker in sidebar layout. The list window has
@@ -44,6 +51,28 @@ local adapters = {
     focus = function()
       local p = Snacks.picker.get({ source = "explorer" })[1]
       if p then p:focus("list") else Snacks.picker.explorer() end
+    end,
+    reveal = function()
+      last_explorer_state = { mode = "reveal", file = vim.api.nvim_buf_get_name(0) }
+      Snacks.explorer.reveal()
+    end,
+    -- Open at process cwd (used by <Leader>eE), tracked for <Leader>o restore.
+    open_cwd = function()
+      last_explorer_state = { mode = "cwd" }
+      Snacks.picker.explorer({ cwd = vim.uv.cwd() })
+    end,
+    -- Reopen restoring whichever state (reveal or cwd) was most recently open.
+    restore = function()
+      local p = Snacks.picker.get({ source = "explorer" })[1]
+      if p then
+        p:focus("list")
+      elseif last_explorer_state and last_explorer_state.mode == "reveal" and last_explorer_state.file ~= "" then
+        Snacks.explorer.reveal({ file = last_explorer_state.file })
+      elseif last_explorer_state and last_explorer_state.mode == "cwd" then
+        Snacks.picker.explorer({ cwd = vim.uv.cwd() })
+      else
+        Snacks.picker.explorer()
+      end
     end,
     reload = function()
       local p = Snacks.picker.get({ source = "explorer" })[1]
