@@ -34,3 +34,26 @@ profile's `.gitconfig-monorepo` (scoped to monorepos via `[includeIf]`).
 namespace gets fetched; `untrack` / `prune-tracks` remove such refspecs so a
 merged-and-deleted branch can't wedge every `git pull` with `fatal: couldn't
 find remote ref ...`; `pl` is a self-healing pull (prune then pull).
+
+### git-default-branch
+Prints the repo's default branch name (`origin/HEAD`, falling back to a local
+`main` or `master`). Exposed as `git default-branch`; used by the `br`/`plr`
+aliases and by `lazygit-check-main-branch` / `workmux-merge.sh` instead of
+hardcoding `master`.
+
+### git-smart-branch
+Creates a new branch from a base (defaulting to `origin/$(git
+default-branch)`) or switches to an existing one. Exposed as the `br` alias.
+
+### git-replace-branch
+Switches to a new branch via `git smart-branch`, then force-deletes the old
+branch (only on a successful switch). Exposed as the `brd` alias.
+
+### git-clean-branches
+Fetches, prunes remote-tracking refs, and deletes local branches whose
+upstream is gone. Supports `--dry-run` to preview before deleting. Exposed as
+the `cl` alias.
+
+### git-worktree-sibling
+Adds or removes a git worktree as a sibling directory (`../<repo>-<branch>`).
+Exposed as the `wta` (add) / `wtr` (remove) aliases.

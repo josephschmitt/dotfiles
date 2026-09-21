@@ -1,0 +1,24 @@
+#!/bin/sh
+# Create a new branch from a base, or switch to an existing one.
+#
+# Usage: git smart-branch <branch> [base]
+#
+# base defaults to origin/<default-branch>. If <branch> already exists
+# locally, just switch to it (base is ignored in that case).
+
+set -eu
+
+usage() {
+  echo "usage: git smart-branch <branch> [base]" >&2
+}
+
+[ $# -ge 1 ] || { usage; exit 2; }
+
+branch="$1"
+base="${2:-origin/$(git default-branch)}"
+
+if git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null; then
+  git checkout "$branch"
+else
+  git checkout -b "$branch" "$base" --no-track
+fi

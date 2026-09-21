@@ -5,17 +5,7 @@
 
 CURRENT_BRANCH="$1"
 
-# Try to get the default branch from origin/HEAD
-DEFAULT_BRANCH=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's|^origin/||')
-
-# If origin/HEAD is not set, fall back to common names
-if [ -z "$DEFAULT_BRANCH" ]; then
-  if git show-ref --verify --quiet refs/heads/main; then
-    DEFAULT_BRANCH="main"
-  elif git show-ref --verify --quiet refs/heads/master; then
-    DEFAULT_BRANCH="master"
-  fi
-fi
+DEFAULT_BRANCH=$(git default-branch)
 
 # Show menu if we're on the default branch
 if [ "$CURRENT_BRANCH" = "$DEFAULT_BRANCH" ]; then

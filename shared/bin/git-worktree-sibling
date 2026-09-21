@@ -1,0 +1,55 @@
+#!/bin/sh
+# Add or remove a git worktree as a sibling directory of the repo, named
+# "<repo>-<branch>" (slashes in the branch name become dashes).
+#
+# Usage:
+#   git worktree-sibling add <branch>
+#   git worktree-sibling remove <branch>
+
+set -eu
+
+usage() {
+  cat <<'EOF'
+git-worktree-sibling: manage worktrees as sibling directories.
+
+Usage:
+  git worktree-sibling add <branch>     create worktree at ../<repo>-<branch>
+  git worktree-sibling remove <branch>  remove worktree at ../<repo>-<branch>
+EOF
+}
+
+sibling_dir() {
+  root=$(git rev-parse --show-toplevel)
+  repo=$(basename "$root")
+  branch=$(printf '%s' "$1" | tr '/' '-')
+  echo "$(dirname "$root")/$repo-$branch"
+}
+
+cmd_add() {
+  [ $# -ge 1 ] || { echo "add: missing <branch>" >&2; usage >&2; exit 2; }
+  branch="$1"
+  dir=$(sibling_dir "$branch")
+
+  if git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null; then
+    git worktree add "$dir" "$branch"
+  else
+    git worktree add "$dir" -b "$branch"
+  fi
+  echo "worktree created at: $dir"
+}
+
+cmd_remove() {
+  [ $# -ge 1 ] || { echo "remove: missing <branch>" >&2; usage >&2; exit 2; }
+  dir=$(sibling_dir "$1")
+  git worktree remove "$dir"
+}
+
+[ $# -ge 1 ] || { usage >&2; exit 2; }
+sub="$1"
+shift
+case "$sub" in
+  add)        cmd_add "$@" ;;
+  remove)     cmd_remove "$@" ;;
+  -h|--help)  usage ;;
+  *)          echo "unknown subcommand: $sub" >&2; usage >&2; exit 2 ;;
+esac

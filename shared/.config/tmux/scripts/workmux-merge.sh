@@ -11,7 +11,7 @@ if [ -f "$CONFIG" ]; then
 fi
 
 # Step 1: Pick target branch (optional, defaults to main branch)
-DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || true)
+DEFAULT_BRANCH=$(git default-branch 2>/dev/null || true)
 BRANCHES=$(git branch --format='%(refname:short)' 2>/dev/null)
 TARGET=$(printf '%s\n' "$BRANCHES" | gum filter --header "Merge into branch" --placeholder "default branch" --no-strict --value "$DEFAULT_BRANCH") || exit 0
 

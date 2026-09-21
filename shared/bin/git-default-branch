@@ -1,0 +1,23 @@
+#!/bin/sh
+# Print the default branch name for the current repo.
+#
+# Detection order:
+#   1. refs/remotes/origin/HEAD (fast local read, set by `git remote set-head`
+#      or a `git clone`)
+#   2. a local refs/heads/main
+#   3. a local refs/heads/master
+#   4. "main" (ultimate fallback, e.g. no commits/remote yet)
+
+set -eu
+
+default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|^refs/remotes/origin/||') || true
+
+if [ -z "$default_branch" ]; then
+  if git show-ref --verify --quiet refs/heads/main; then
+    default_branch="main"
+  elif git show-ref --verify --quiet refs/heads/master; then
+    default_branch="master"
+  fi
+fi
+
+echo "${default_branch:-main}"

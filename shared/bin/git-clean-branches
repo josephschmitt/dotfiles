@@ -1,0 +1,43 @@
+#!/bin/sh
+# Fetch, prune remote-tracking refs, and delete local branches whose
+# upstream is gone.
+#
+# Usage: git clean-branches [--dry-run] [remote]
+
+set -eu
+
+usage() {
+  echo "usage: git clean-branches [--dry-run] [remote]" >&2
+}
+
+dry_run=false
+if [ "${1:-}" = "--dry-run" ]; then
+  dry_run=true
+  shift
+fi
+
+remote="${1:-origin}"
+
+git fetch "$remote"
+git remote prune "$remote"
+
+# `git branch -vv` marks a local branch "[origin/foo: gone]" once its
+# upstream has been deleted on the remote. Collect just those branch names.
+gone_branches=$(git branch -vv | grep "$remote/.*: gone]" | awk '{print $1}')
+
+if [ -z "$gone_branches" ]; then
+  echo "no branches to clean up"
+  exit 0
+fi
+
+if [ "$dry_run" = true ]; then
+  echo "would delete:"
+  printf '%s\n' "$gone_branches"
+  exit 0
+fi
+
+echo "$gone_branches" | xargs git branch -D
+git prune
+
+echo "deleted:"
+printf '%s\n' "$gone_branches"

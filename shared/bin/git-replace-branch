@@ -1,0 +1,21 @@
+#!/bin/sh
+# Switch to a new branch and force-delete the old one.
+#
+# Usage: git replace-branch <branch> [base]
+#
+# Delegates the create-or-switch to `git smart-branch`. The old branch is
+# only deleted if that checkout succeeds.
+
+set -eu
+
+usage() {
+  echo "usage: git replace-branch <branch> [base]" >&2
+}
+
+[ $# -ge 1 ] || { usage; exit 2; }
+
+old_branch=$(git rev-parse --abbrev-ref HEAD)
+
+git smart-branch "$@"
+
+git branch -D "$old_branch"
