@@ -103,9 +103,26 @@ vim.g.loaded_netrw = 1
 -- stub that just returns the local unnamed register instead of querying the
 -- terminal — it exists purely to keep g:clipboard valid so `copy` keeps
 -- working. p/P behave exactly as before (instant, no host-clipboard fetch).
+--
+-- NOTE: regtype (linewise/charwise/blockwise) must be preserved or `yy` + `p`
+-- pastes charwise at the cursor instead of on the next line. Neovim's
+-- clipboard.vim doesn't take a regtype back from `paste` — its only way to
+-- recover regtype on paste is a cache populated by the last `copy` call
+-- (s:selections[reg].data), which it returns instead of the fresh paste
+-- result when the two are list-identical (`==#`). `copy` receives lines with
+-- a trailing "" element for linewise/blockwise yanks (Vim's own register
+-- list convention marking a trailing newline), but plain `getreg(reg, 1,
+-- true)` never includes that element — so the fresh paste value never
+-- matches the cache, the cache hit never fires, and every paste falls back
+-- to being treated as charwise. Re-append the same trailing "" here so the
+-- shapes match and the cache (with correct regtype) is used.
 if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.HERDR_SOCKET_PATH then
   local function local_register_paste()
-    return vim.fn.getreg('"', 1, true)
+    local lines = vim.fn.getreg('"', 1, true)
+    if vim.fn.getregtype('"'):sub(1, 1) ~= "v" then
+      table.insert(lines, "")
+    end
+    return lines
   end
 
   vim.g.clipboard = {
