@@ -31,25 +31,35 @@ end
 ---@type {mode: "reveal"|"cwd", file: string?}?
 local last_explorer_state = nil
 
+-- Snacks.picker.get() only returns pickers whose window exists on the current tab,
+-- so an explorer that was just created but hasn't rendered yet (async finder still
+-- running) is invisible to it. Include not-yet-shown pickers so callers racing at
+-- startup (dir opener + VimResized auto-open) reuse it instead of opening a second one.
+local function get_explorer()
+  for _, p in ipairs(Snacks.picker.get({ source = "explorer", tab = false })) do
+    if not p.shown or p:on_current_tab() then return p end
+  end
+end
+
 local adapters = {
   ["snacks"] = {
     -- The explorer is a snacks picker in sidebar layout. The list window has
     -- filetype "snacks_picker_list" — that's what bufferline/mini see.
     filetype = "snacks_picker_list",
     open = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then p:show() else Snacks.picker.explorer() end
     end,
     close = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then p:close() end
     end,
     toggle = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then p:close() else Snacks.picker.explorer() end
     end,
     focus = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then p:focus("list") else Snacks.picker.explorer() end
     end,
     reveal = function()
@@ -63,7 +73,7 @@ local adapters = {
     end,
     -- Reopen restoring whichever state (reveal or cwd) was most recently open.
     restore = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then
         p:focus("list")
       elseif last_explorer_state and last_explorer_state.mode == "reveal" and last_explorer_state.file ~= "" then
@@ -75,7 +85,7 @@ local adapters = {
       end
     end,
     reload = function()
-      local p = Snacks.picker.get({ source = "explorer" })[1]
+      local p = get_explorer()
       if p then p:refresh() end
     end,
     wipe_buffers = function()

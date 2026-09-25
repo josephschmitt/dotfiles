@@ -227,6 +227,14 @@ stack traceback:
 
 **Fix:** Wrap the body of the `snacks-explorer-auto-resize` autocmd callback in an extra `vim.schedule()`. This defers the actual `close()`/`open()` call by one tick, so snacks' own relayout callback (scheduled earlier in the same `VimResized` pass) runs and completes *before* our close's teardown nils out `self.preview`. Same pattern already used by the `nvim-tree` provider's `WinLeave` auto-close handler in the same file, for the same class of race.
 
+### `nvim <dir>` opens two Snacks explorer sidebars (wide herdr panes only)
+
+**Symptom:** `nvim path/to/dir` in a wide (> 150 cols) herdr pane opens two explorer sidebars side by side next to the dashboard. Narrow/tall panes and local terminals are fine.
+
+**Cause:** A startup race between two callers that each open an explorer. The `custom-dir-opener` autocmd (`lua/custom/plugins/options.lua`) replaces the directory buffer with `config.filetree.focus()`, and the `snacks-explorer-auto-resize` `VimResized` handler (`lua/custom/plugins/picker.lua`) calls `config.filetree.open()` when `columns > filetree_auto_close_width`. herdr reports the final pane size to nvim a moment after startup, so `VimResized` fires while the first explorer is still starting up. Both adapter functions check for an existing explorer with `Snacks.picker.get({ source = "explorer" })`, but by default that only returns pickers where `picker:on_current_tab()` is true, which requires the layout window to exist. A newly created explorer has no window until its async finder returns and calls `show()`. So the first explorer is invisible during that gap, and the second caller creates another one.
+
+**Fix:** The snacks adapter in `lua/custom/config.lua` uses a `get_explorer()` helper that calls `Snacks.picker.get({ source = "explorer", tab = false })` and also accepts pickers that haven't been shown yet (`not p.shown or p:on_current_tab()`). The racing caller then reuses the pending explorer (`open()` just calls `p:show()` early) instead of creating a duplicate. Explorers on other tabs are still ignored. To check: `:lua print(#Snacks.picker.get({ source = "explorer", tab = false }))` should print `1`.
+
 ### Yanking in Neovim doesn't populate the system clipboard when SSH'd into a remote-sandbox box
 
 **Symptom:** `y`/yank in Neovim over SSH into a `remote-sandbox` (or `rca`/`crafting`) box doesn't reach the local clipboard — pasting outside Neovim gets nothing. Copying via the terminal/multiplexer itself (e.g. herdr's own text selection) works fine, and it may also work in *other* SSH sessions into the same class of box.
