@@ -2,7 +2,7 @@
 
 A bespoke [Neovim](https://neovim.io/) configuration built from scratch on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim).
 
-![IMG_0586](https://github.com/user-attachments/assets/c60822c1-5e65-44c4-8f06-22be623d3fec)
+![JoeVim dashboard with the Snacks explorer sidebar](../../../docs/nvim-screenshot.png)
 
 ## Why Build From Scratch?
 
