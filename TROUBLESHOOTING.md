@@ -103,6 +103,25 @@ Note: Homebrew 5.0.12 has the same class of bug in `api/cask.rb` (different meth
 
 **Resume:** Once nix-homebrew pins its own `brew-src` to a version ≥ 5.1.10, the explicit override in `flake.nix` (the `nix-homebrew.inputs.brew-src.url` line) can be removed.
 
+**Resolved:** nix-homebrew now pins `brew-src` 7.0.4 itself, so the override was removed (see next entry for why leaving it in broke brew).
+
+### Every `brew` command crashes with `key not found: "HOMEBREW_ORIGINAL_BREW_FILE"`
+
+**Symptom:** After `nix flake update` + `nix_rebuild`, `brew --version` works but anything that runs Ruby (`brew info`, `brew upgrade`, `brew ruby`) fails:
+```
+.../startup/config.rb:36:in 'fetch': key not found: "HOMEBREW_ORIGINAL_BREW_FILE" (KeyError)
+```
+
+**Cause:** nix-homebrew ships its own launcher (`modules/brew.tail.sh`, a copy of upstream `bin/brew`) that must match the `brew-src` it is paired with. The old `nix-homebrew.inputs.brew-src.url = "github:Homebrew/brew/5.1.10"` override in `flake.nix` forced a brew source that didn't match the newer launcher, so the launcher never exported `HOMEBREW_ORIGINAL_BREW_FILE`. Note the store path name (`brew-7.0.4-patched`) and `brew --version` come from nix-homebrew's *own* lockfile, not from the override, so they showed 7.0.4 while the actual source was 5.1.10.
+
+**Fix:** Don't override `brew-src` in `flake.nix`; let nix-homebrew pick the version its launcher was written for:
+```bash
+cd shared/.config/nix-darwin && nix flake update nix-homebrew && nix_rebuild
+```
+If a brew regression forces a pin again, check that the tag is close to the one in nix-homebrew's own `flake.nix`, and re-verify with `brew info jq`.
+
+Also: macOS 27 needs a Homebrew new enough to know the release, or bottle lookup uses tag `arm64_dunno` and every formula reports "no bottle available". Check with `brew ruby -e 'puts Utils::Bottles.tag'`.
+
 ### Non-official taps read as untrusted during `nix_rebuild` even after `brew trust`
 
 **Symptom:** You run `brew trust --formula user/tap/thing` (or `--cask`/`--tap`) interactively,
