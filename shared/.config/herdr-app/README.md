@@ -38,6 +38,7 @@ Why `alt`: matches tmux-tilish / vim-tmux-navigator. Needs `option_as_alt` (Sett
 | `1..9` | Focus agent N (agents list order) |
 | `c` / `C` | Quick shell / mini shell (the latter persists; `hide` keeps it, reopen with `C`) |
 | `E` / `G` / `Y` | `$EDITOR` / `lazygit-launch` / `yazi` popups |
+| `_` | Hide the open popup if it persists (mini shell, Lazygit). Any other popup is closed like `✕`, which kills its program |
 | `g` | Open the branch's PR (`gh pr view --web`) |
 | `b` / `s` / `?` | Toggle sidebar / settings / keybinds |
 
@@ -62,7 +63,7 @@ Gotchas:
 How it works:
 - The popup takes keyboard focus (`handle.focus()`) and reads `on_key_down`. Only typed characters (`key_char`) count; bare modifiers/arrows are ignored, `Esc`/`ctrl+s`/`ctrl+c` close.
 - Plain actions call `run("<command>", args)` — the same commands `keys.json` binds (`herdr-app commands`). They close the popup first so focus is back in the terminal.
-- Popup programs (`late: true` items) run `hc run --bg --json --no-parent --no-notify [--rm] [--on <machine>] [--cwd <folder>] -- bash -lc <cmd>`, where the folder is the focused pane's live `cwd` (from `panes()`, since `focused().cwd` is only set for layout blocks). On a remote space the folder is left out unless the pane reports one, so `hc` starts in that machine's home; the Mac's home is never sent to a remote. Then `openOverlay` a modal layout: a 30px title-bar block (this same mod, via `props.bar`) over a `{ terminal: "<addr>" }` block. The overlay closes itself when the program exits; `✕` runs `terminal.kill`. The persistent mini shell skips `--rm`, remembers its address in `shared("leader.Mini shell")` and says `hide` instead of `✕`.
+- Popup programs (`late: true` items) run `hc run --bg --json --no-parent --no-notify [--rm] [--on <machine>] [--cwd <folder>] -- bash -lc <cmd>`, where the folder is the focused pane's live `cwd` (from `panes()`, since `focused().cwd` is only set for layout blocks). On a remote space the folder is left out unless the pane reports one, so `hc` starts in that machine's home; the Mac's home is never sent to a remote. Then `openOverlay` a modal layout: a 30px title-bar block (this same mod, via `props.bar`) over a `{ terminal: "<addr>" }` block. The overlay closes itself when the program exits; `✕` runs `terminal.kill`. The persistent popups skip `--rm`, remember their address in `shared("leader.<title>")` and say `hide` instead of `✕`: the mini shell (`C`) and Lazygit (`G`). Hiding keeps the program running; pressing the same key reattaches to it.
 - Popup items finish their async work (spawning the terminal) while the leader is alive, then close it and open the overlay back to back. No `pane.focus`: the overlay's terminal takes the keys itself, and since Herdr 0.1.12 `pane.focus {terminal}` only finds layout blocks and panes, so it fails with "no such pane" for a popup terminal.
 
 Editing it: the app hot-reloads on save (a broken save keeps the old version and reports in `herdr-app status`). After every change:
@@ -185,6 +186,7 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 | `cmd+` shortcuts, `ctrl+1..9` space select, `f2` rename | none | app defaults in `keys.json` | Native macOS app keymap; harmless extras |
 | `[ui]` sidebar rows/widths, `[session]`, `[terminal] new_cwd`, toasts | configured | n/a | Layouts own the sidebar, core keeps terminals alive, new tabs and splits already follow the focused terminal's folder |
 | Popup size | per-command `width`/`height` | per-item `width`/`height` in `leader/main.js` | Kept close, not identical |
+| Hide popup | none: no TUI command hides or closes a popup | leader `_`: hides a persistent popup (mini shell, Lazygit); closes others like `✕` | Gap on the TUI side. Add the TUI key here once herdr has a popup-hide command |
 
 ### Open items
 

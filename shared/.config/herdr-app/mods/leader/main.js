@@ -52,7 +52,7 @@ async function popup({ title, cmd, width = 0.8, height = 0.8, persist = false })
   // opened under a still-open leader loses the keyboard to the pane beneath
   // when the leader goes. (Still in the same tick, so the view can open it.)
   closeLeader();
-  openOverlay({
+  const overlay = openOverlay({
     kind: "dialog",
     modal: true,
     width,
@@ -65,6 +65,7 @@ async function popup({ title, cmd, width = 0.8, height = 0.8, persist = false })
       ],
     },
   });
+  setShared("leader.top", { title, persist, terminal, overlay });
 }
 
 // Set by the open leader: closes it (once).
@@ -86,6 +87,18 @@ const worktrees = (mode) => {
     return dialog("open", { width: 560, height: 480 });
   }
   openOverlay({ mod: "wt-picker", kind: "popup", at: "top", offset: 40, width: 640, height: mode === "remove" ? 0.5 : 0.8, props: { mode } });
+};
+
+// Hides the open popup. A persistent one (mini shell, Lazygit) keeps running and
+// comes back on its key. Any other one has no way back once closed, so it falls
+// back to closing like ✕: its program is killed.
+const hidePopup = () => {
+  const top = /** @type {{ title: string, persist: boolean, terminal: string, overlay: string } | undefined} */ (shared("leader.top"));
+  if (!top || !terminals().some((t) => t.address === top.terminal && t.state === "live")) {
+    return notify({ title: "No popup open", level: "info" });
+  }
+  if (!top.persist) run("terminal.kill", { terminal: top.terminal });
+  closeOverlay(top.overlay);
 };
 
 const DIRS = { h: "left", j: "down", k: "up", l: "right" };
@@ -118,8 +131,9 @@ const ITEMS = [
   { group: "Popups", keys: ["c"], show: "c", label: "Quick shell", late: true, act: () => popup({ title: "Quick shell", cmd: "~/.config/herdr/scripts/quick-shell.sh", width: 0.6, height: 0.6 }) },
   { group: "Popups", keys: ["C"], show: "C", label: "Mini shell (persists)", late: true, act: () => popup({ title: "Mini shell", cmd: "~/.config/herdr/scripts/quick-shell.sh --persist", width: 0.6, height: 0.6, persist: true }) },
   { group: "Popups", keys: ["E"], show: "E", label: "Editor", late: true, act: () => popup({ title: "Editor", cmd: "$EDITOR", width: 0.8, height: 0.8 }) },
-  { group: "Popups", keys: ["G"], show: "G", label: "Lazygit", late: true, act: () => popup({ title: "Lazygit", cmd: "lazygit-launch", width: 0.9, height: 0.9 }) },
+  { group: "Popups", keys: ["G"], show: "G", label: "Lazygit", late: true, act: () => popup({ title: "Lazygit", cmd: "lazygit-launch", width: 0.9, height: 0.9, persist: true }) },
   { group: "Popups", keys: ["Y"], show: "Y", label: "Yazi", late: true, act: () => popup({ title: "Yazi", cmd: "yazi", width: 0.8, height: 0.8 }) },
+  { group: "Popups", keys: ["_"], show: "_", label: "Hide popup (mini shell, Lazygit)", act: hidePopup },
 
   {
     group: "Other", keys: ["g"], show: "g", label: "Open PR in browser", late: true,
