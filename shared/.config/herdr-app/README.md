@@ -2,7 +2,7 @@ Configuration for [Herdr app](https://herdr.dev/) — the desktop (GUI) successo
 
 ## What's tracked
 
-Only `keys.json` and `mods/leader/` are symlinked from this repo (via GNU Stow). The rest of `~/.config/herdr-app` is written by the app (`settings.json`, `view.json`, `layouts/`, `mods/`, ...) and stays local — `settings.json` holds zoom, which changes constantly. Don't `stow` the whole directory's contents blindly: if `keys.json` is deleted while the app runs, it rewrites it within a second, so remove and re-stow in a single command.
+Only `keys.json`, `mods/leader/` and `mods/pj-picker/` are symlinked from this repo (via GNU Stow). The rest of `~/.config/herdr-app` is written by the app (`settings.json`, `view.json`, `layouts/`, `mods/`, ...) and stays local — `settings.json` holds zoom, which changes constantly. Don't `stow` the whole directory's contents blindly: if `keys.json` is deleted while the app runs, it rewrites it within a second, so remove and re-stow in a single command.
 
 ## Keybindings (`keys.json`)
 
@@ -33,7 +33,7 @@ Why `alt`: matches tmux-tilish / vim-tmux-navigator. Needs `option_as_alt` (Sett
 | `n`, `[`, `]`, `T`, `X` | New, previous, next, rename, close tab |
 | `N` | New space in `~/development` |
 | `o` | Go to… (picker) |
-| `P` | Project picker (`pj` + `fzf` in a popup, then `herdr-app do space.new`) |
+| `P` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
 | `w` / `W` / `D` | Open / new / remove worktree (the app's `worktree` mod dialogs) |
 | `1..9` | Focus agent N (agents list order) |
 | `c` / `C` | Quick shell / mini shell (the latter persists; `hide` keeps it, reopen with `C`) |
@@ -74,6 +74,33 @@ herdr-app do overlay.close
 ```
 
 Reinstalling on a new machine: `stow shared` links the mod and `keys.json`. There is no hook for this; if the app already created `keys.json`, delete it and stow in one command (see above).
+
+## pj project picker (`mods/pj-picker/`)
+
+A native-looking project picker styled like the app's "Go to…" window (`cmd+p`, leader `o`). Go to… is the shipped `picker` mod with hard-coded rows (spaces, tabs, agents) and no source/provider API, so this is a sibling mod that lists `pj` projects instead. The shipped `picker` is untouched and keeps getting app updates.
+
+Opened by leader `P` (`run("mod.open", { name: "pj-picker" })`). Type to filter (case-insensitive substring over name, path and marker).
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Focus the project's open space, else create one (`space.new` with the folder and name) |
+| `ctrl+n` | Always create a new space, even if one is open |
+| `↑` / `↓` | Move (wraps) |
+| `Esc` | Close |
+
+- **Open space match:** a space on this computer (`machine` null) whose `folder` equals the project path (trailing `/` ignored). Matching rows show a dot in the space's color.
+- **Data source:** `pj --json --sort alpha`, so it honors `~/.config/pj/config.yaml` (search paths, markers, excludes). `pj` only runs locally, so projects on remote machines (Crafting sandbox) aren't listed; new spaces are pinned to this computer (`machine: ""`).
+- **Why a mod:** the only extension route in the app is a mod, which can `exec(...)`. The layout (header, filter field, fixed-height scroll strip, key handling) is copied from the shipped `picker` mod.
+- A direct shortcut is one line in `keys.json`, e.g. `"cmd-shift-o": "mod.open:pj-picker"`.
+
+Same setup and editing notes as the leader mod (stowed directory symlink, hot-reload, `.gitignore` hides the generated `gpui-kit.d.ts` / `jsconfig.json`):
+
+```sh
+herdr-app check ~/.config/herdr-app/mods/pj-picker   # loads and renders once
+herdr-app do mod.open --name pj-picker               # open the picker
+herdr-app shot /tmp/pj.png                           # then look at it
+herdr-app do overlay.close
+```
 
 ### Not ported from the TUI config
 
