@@ -70,10 +70,11 @@ const dialog = (action, size) => {
   openOverlay({ mod: "worktree", kind: "dialog", ...size, props: { space: h.space, folder: h.cwd, action } });
 };
 
-// Worktree pickers (mods/wt-picker, like the TUI's prefix+w / W / D popups).
+// Worktree pickers (mods/wt-picker, like the TUI's prefix+w / W / B / D popups).
 // They run ~/bin/herdr-wt on this Mac. "all" lists this Mac's worktrees, so it
-// opens from any space; "pick" / "remove" work on the focused space's repo, so
-// remote spaces get the shipped worktree mod's dialog for the same action.
+// opens from any space; "pick" / "branch" / "remove" work on the focused space's
+// repo, so remote spaces get the shipped worktree mod's dialog for the closest
+// action ("branch" gets the same "open" dialog as "pick": it has no branch list).
 const worktrees = (mode) => {
   if (mode !== "all" && here().machine) {
     if (mode === "remove") return dialog("remove", { width: 440, height: 260 });
@@ -104,6 +105,7 @@ const ITEMS = [
   { group: "Spaces", keys: ["O"], show: "O", label: "Project picker (pj)", act: () => run("mod.open", { name: "pj-picker" }) },
   { group: "Spaces", keys: ["w"], show: "w", label: "All worktrees", act: () => worktrees("all") },
   { group: "Spaces", keys: ["W"], show: "W", label: "Worktree picker (this repo)", act: () => worktrees("pick") },
+  { group: "Spaces", keys: ["B"], show: "B", label: "Branch picker (worktree from branch)", act: () => worktrees("branch") },
   { group: "Spaces", keys: ["D"], show: "D", label: "Remove worktree", act: () => worktrees("remove") },
 
   { group: "Agents", keys: "123456789".split(""), show: "1-9", label: "Focus agent", act: (k) => { const a = agents()[Number(k) - 1]; if (a) run("agent.focus", { terminal: a.address }); } },

@@ -6,6 +6,10 @@
 #                                  pane's repo are listed below
 #   wt-picker.sh --all             switch to any managed worktree, all repos
 #                                  (prefix+w); works from any pane
+#   wt-picker.sh --branch          check out an existing branch of the focused
+#                                  pane's repo as a worktree (prefix+shift+b):
+#                                  lists the local and origin branches that
+#                                  have no worktree yet
 #   wt-picker.sh --remove-current  remove the worktree the focused pane is in
 #                                  (prefix+shift+d)
 #
@@ -15,6 +19,10 @@
 # delete the highlighted worktree (asks first). ctrl-j/ctrl-k move, Esc closes.
 # --all: Enter switches to / opens the highlighted worktree, ctrl-d deletes it;
 # no create (there's no repo to create in).
+# --branch: Enter checks the highlighted branch out into a worktree (remote-only
+# branches get a tracking branch) and opens its workspace; no create, no delete.
+# Tab cycles the list all / local / remote (remote = origin-only branches).
+# Refs are whatever is already local (no fetch).
 #
 # The work is done by herdr-wt (shared/bin), which uses Worktrunk (`wt`) for
 # the checkouts and hooks.
@@ -25,8 +33,9 @@ mode=pick
 case "${1:-}" in
   --remove-current) mode=remove ;;
   --all) mode=all ;;
+  --branch) mode=branch ;;
   "") ;;
-  *) printf 'usage: %s [--all | --remove-current]\n' "$0" >&2; exit 2 ;;
+  *) printf 'usage: %s [--all | --branch | --remove-current]\n' "$0" >&2; exit 2 ;;
 esac
 
 pause() {
@@ -147,6 +156,59 @@ fi
 
 # The repo's name (its main checkout's folder), shown in the prompt.
 repo=$(basename "$(herdr-wt checkouts | sed -n '1p' | cut -f2)")
+
+# --branch: branches (local, and origin's) that have no worktree yet.
+if [ "${mode}" = branch ]; then
+  list=$(herdr-wt branches) || { pause "Failed. Press any key to close"; exit 1; }
+  if [ -z "${list}" ]; then
+    printf '\n\033[33mNo branches without a worktree in %s.\033[0m\n' "${repo}"
+    pause
+    exit 0
+  fi
+  # Tab cycles the scope all -> local -> remote and re-opens fzf with the typed
+  # query kept. "local": has a local branch (local or both); "remote": origin
+  # only, i.e. the rows tagged "remote".
+  scope=all
+  query=""
+  while :; do
+    # branch<TAB>display: bold branch, yellow "remote" for origin-only ones, dim
+    # age and subject; columns aligned. fzf shows and matches the display only.
+    out=$(printf '%s\n' "${list}" | awk -F '\t' -v scope="${scope}" '
+      scope == "local" && $2 == "remote" { next }
+      scope == "remote" && $2 != "remote" { next }
+      {
+        n++; b[n] = $1; k[n] = $2; d[n] = $3; s[n] = $4
+        if (length($1) > bw) bw = length($1)
+        if (length($3) > dw) dw = length($3)
+      }
+      END {
+        for (i = 1; i <= n; i++)
+          printf "%s\t\033[1m%s\033[0m \033[33m%-6s\033[0m \033[2m%s  %s\033[0m\n", b[i],
+            sprintf("%-" bw "s", b[i]), (k[i] == "remote" ? "remote" : ""),
+            sprintf("%-" dw "s", d[i]), s[i]
+      }' | fzf --ansi --layout=reverse --height=100% --border=none \
+      --delimiter='\t' --with-nth=2 --print-query --query="${query}" --expect=tab \
+      --prompt="${scope} branch (${repo}) ❯ " \
+      --header="Enter check out in a worktree · Tab all/local/remote · Esc" --header-first)
+    rc=$?
+    # 0: selection, 1: no match (Tab still reports), 130: Esc / ctrl-c.
+    [ "${rc}" -le 1 ] || exit 0
+    query=$(printf '%s\n' "${out}" | sed -n '1p')
+    key=$(printf '%s\n' "${out}" | sed -n '2p')
+    if [ "${key}" = tab ]; then
+      case "${scope}" in
+        all) scope=local ;;
+        local) scope=remote ;;
+        *) scope=all ;;
+      esac
+      continue
+    fi
+    sel=$(printf '%s\n' "${out}" | sed -n '3p')
+    [ -n "${sel}" ] || exit 0
+    run open "$(printf '%s' "${sel}" | cut -f1)"
+    exit 0
+  done
+fi
 
 WT_HEADER="Enter open (or create typed name) · ctrl-n create typed name · ctrl-d delete · Esc"
 # WT_MSG: result of the last ctrl-d, shown above the hints. Both are read by

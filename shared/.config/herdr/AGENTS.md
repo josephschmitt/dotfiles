@@ -66,7 +66,7 @@ in the repo-root `TROUBLESHOOTING.md`.
 
 The config includes `[[keys.command]]` entries for launching tools in temporary panes. When adding new ones, read `config.toml` for the existing commands and follow the same pattern.
 
-## Worktree Pickers (`prefix+w` / `prefix+shift+w` / `prefix+shift+d`)
+## Worktree Pickers (`prefix+w` / `prefix+shift+w` / `prefix+shift+b` / `prefix+shift+d`)
 
 Herdr's native worktree actions are blanked (`open_worktree`, `new_worktree`,
 `remove_worktree` = `""`) and replaced by popups running
@@ -78,9 +78,14 @@ Herdr's native worktree actions are blanked (`open_worktree`, `new_worktree`,
 - `prefix+shift+w` → no flag: fzf find-or-create in the focused pane's repo
   (Enter focuses/opens/creates, `ctrl-n` force-creates the typed name, `ctrl-d`
   offers to delete the highlighted worktree).
+- `prefix+shift+b` → `--branch`: the focused pane's repo's local and `origin/`
+  branches that have no worktree yet (`herdr-wt branches`, newest first, no
+  fetch). Enter checks the branch out into a worktree and opens its workspace;
+  `Tab` cycles all / local / remote (origin-only). No create, no delete.
 - `prefix+shift+d` → `--remove-current`.
 
-There's deliberately no separate "new worktree" key: the repo picker creates.
+There's deliberately no separate "new worktree" key: the repo picker creates a
+new branch, the branch picker checks out an existing one.
 `prefix+t` is unbound (it used to alias the picker).
 
 The layers, so a fix goes in the right one:

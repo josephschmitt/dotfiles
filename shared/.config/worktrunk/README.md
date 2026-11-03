@@ -2,7 +2,7 @@
 
 Configuration for [Worktrunk](https://worktrunk.dev) (`wt`) - git worktree management with lifecycle hooks.
 
-Here it is the worktree engine behind the Herdr worktree picker (TUI `prefix+shift+w` find-or-create in this repo / `prefix+w` all worktrees / `prefix+shift+d` remove; Mac app leader `W` / `w` / `D`). `shared/bin/herdr-wt` calls `wt switch` / `wt remove` and does the Herdr side itself (focusing, opening, closing workspaces). `wt` works standalone too.
+Here it is the worktree engine behind the Herdr worktree picker (TUI `prefix+shift+w` find-or-create in this repo / `prefix+w` all worktrees / `prefix+shift+b` existing branch -> worktree / `prefix+shift+d` remove; Mac app leader `W` / `w` / `B` / `D`). `shared/bin/herdr-wt` calls `wt switch` / `wt remove` and does the Herdr side itself (focusing, opening, closing workspaces). `wt` works standalone too.
 
 Installed by Homebrew via nix-darwin (`"worktrunk"` in `shared/.config/nix-darwin/darwin.nix`, applied with `nix_rebuild`). `stow shared` links this directory to `~/.config/worktrunk/`.
 

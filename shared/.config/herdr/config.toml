@@ -77,7 +77,7 @@ zoom = "alt+z"
 # shared/bin/herdr-wt; [[keys.command]] entries below). They add setup hooks,
 # a match list while typing, a cross-repo list, and delete from the list.
 # There's no separate "new worktree" key: the repo picker's Enter / ctrl-n
-# already create.
+# already create. prefix+shift+b is the branch picker (existing branch -> worktree).
 open_worktree = ""
 new_worktree = ""
 remove_worktree = ""
@@ -170,6 +170,19 @@ key = "prefix+shift+w"
 type = "popup"
 command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
 description = "Worktree picker (this repo)"
+width = "80%"
+height = "60%"
+
+# Branch picker (scripts/wt-picker.sh --branch) — the focused pane's repo's
+# local and origin branches that have no worktree yet, newest first. Enter checks
+# the branch out as a worktree (remote-only ones get a tracking branch, Worktrunk
+# hooks run) and opens its workspace. Refs are whatever is already local (no
+# fetch). Same keys in the Herdr Mac app (leader B, mods/wt-picker mode "branch").
+[[keys.command]]
+key = "prefix+shift+b"
+type = "popup"
+command = "bash -lc '~/.config/herdr/scripts/wt-picker.sh --branch'"
+description = "Branch picker (worktree from branch)"
 width = "80%"
 height = "60%"
 

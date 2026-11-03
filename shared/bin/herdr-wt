@@ -15,6 +15,9 @@
 #                                 ~/.herdr/worktrees), all repos: repo, branch,
 #                                 path, main checkout
 #   herdr-wt checkouts            TSV per checkout: branch, path, main (1/0)
+#   herdr-wt branches             TSV per branch with no checkout (local refs
+#                                 only, newest first): branch, kind (local /
+#                                 remote / both), relative date, subject
 #   herdr-wt current              path of the checkout containing $PWD
 #   herdr-wt dirty <target>       `git status --short` of that checkout (empty: clean)
 #   herdr-wt create <name>        find-or-create the checkout, print its path
@@ -41,7 +44,7 @@ die() {
 }
 
 usage() {
-  sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,33p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -157,6 +160,40 @@ cmd_create() {
   path=$(printf '%s' "${json}" | jq -r '.path // empty')
   [ -n "${path}" ] || die "wt switch didn't report a path"
   printf '%s\n' "${path}"
+}
+
+# Branches that could get a worktree: local and origin/* refs minus those
+# already checked out anywhere (git allows a branch in one checkout only; this
+# also drops the default branch, which the main checkout holds). Local refs
+# only, no fetch: that's seconds on the big monorepos. A branch that is both
+# local and on origin shows once (date and subject of the newer tip).
+# TSV: branch<TAB>kind<TAB>relative date<TAB>subject, newest first.
+cmd_branches() {
+  taken=$(checkouts | cut -f1 | paste -s -d '\t' -)
+  git -C "${MAIN}" for-each-ref --sort=-committerdate \
+    --format='%(refname)%09%(committerdate:relative)%09%(contents:subject)' \
+    refs/heads refs/remotes/origin | awk -F '\t' -v taken="${taken}" '
+    BEGIN {
+      n = split(taken, t, "\t")
+      for (i = 1; i <= n; i++) if (t[i] != "") skip[t[i]] = 1
+    }
+    {
+      if (index($1, "refs/heads/") == 1) { name = substr($1, 12); kind = "local" }
+      else { name = substr($1, 21); kind = "remote" }
+      if (name == "HEAD" || name in skip) next
+      if (name in seen) { if (seen[name] != kind) seen[name] = "both"; next }
+      order[++count] = name
+      seen[name] = kind
+      date[name] = $2
+      subject[name] = $3
+    }
+    END {
+      for (i = 1; i <= count; i++) {
+        name = order[i]
+        printf "%s\t%s\t%s\t%s\n", name, seen[name], date[name], subject[name]
+      }
+    }
+  '
 }
 
 cmd_dirty() {
@@ -305,6 +342,7 @@ esac
 repo_init
 case "${sub}" in
   checkouts) checkouts ;;
+  branches) cmd_branches ;;
   current) current_checkout ;;
   dirty) cmd_dirty "$@" ;;
   create) cmd_create "$@" ;;

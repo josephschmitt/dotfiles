@@ -9,8 +9,13 @@
 //     typed name even when something matches.
 //   "all" (leader w): every managed worktree (~/.herdr/worktrees/<repo>/<name>)
 //     across all repos. Enter focuses its open space or opens one. No create.
+//   "branch" (leader B): the focused space's repo's local and origin branches
+//     that have no worktree yet, newest first. Enter checks the branch out into a
+//     worktree (remote-only ones get a tracking branch) and opens a space for it.
+//     Tab cycles the list all / local / remote (remote = origin-only branches).
+//     No create, no delete. Refs are whatever is already local (no fetch).
 //   "remove" (leader D): remove the focused space's worktree.
-// In both lists ctrl+d offers to remove the highlighted worktree (asks first;
+// In the "pick" and "all" lists ctrl+d offers to remove the highlighted worktree (asks first;
 // forced if it has changes). ctrl+j/k move, Esc leaves.
 //
 // The git/worktree work is done by ~/bin/herdr-wt (Herdr-independent
@@ -70,7 +75,12 @@ export default class WtPicker extends View {
     this.confirm = null; // { c, changes } while asking to remove c
     this.message = "";
     this.all = this.mode === "all";
-    this.input = InputState.new({ placeholder: this.all ? "Switch to a worktree…" : "Go to or create a worktree…" });
+    this.branch = this.mode === "branch";
+    this.scope = "all"; // branch mode, Tab cycles: all -> local -> remote (origin-only)
+    this.co = null; // branch mode: the repo's checkouts, to match a new worktree to its space
+    this.input = InputState.new({
+      placeholder: this.all ? "Switch to a worktree…" : this.branch ? "Check out a branch…" : "Go to or create a worktree…",
+    });
     this.input.on("change", (_e, cx) => { this.filter = this.input.value(); this.at = 0; this.scroll = 0; cx.notify(); });
     this.input.on("submit", (_e, cx) => this.enter(cx));
     this.handle = cx.focus_handle();
@@ -127,8 +137,29 @@ export default class WtPicker extends View {
     });
   }
 
+  // Branches with no worktree (herdr-wt branches), plus the repo's checkouts.
+  async loadBranches() {
+    const r = await wt(["branches"], this.cwd);
+    if (!r.ok) {
+      this.list = [];
+      this.error = /not in a git repository/.test(r.err) ? `Not in a git repository: ${this.cwd}` : lastLine(r.err) || "herdr-wt branches failed";
+      return;
+    }
+    const c = await wt(["checkouts"], this.cwd);
+    this.co = (c.ok ? c.out : "").split("\n").filter(Boolean).map((line) => {
+      const [branch, path, main] = line.split("\t");
+      return { branch, path, main: main === "1" };
+    });
+    this.repo = (this.co[0]?.path ?? "").split("/").filter(Boolean).pop() ?? "";
+    this.list = r.out.split("\n").filter(Boolean).map((line) => {
+      const [branch, kind, date, subject = ""] = line.split("\t");
+      return { branch, kind, date, subject, name: branch, hay: `${branch} ${subject}`.toLowerCase() };
+    });
+  }
+
   async load() {
     if (this.all) return this.loadAll();
+    if (this.branch) return this.loadBranches();
     const r = await wt(["checkouts"], this.cwd);
     if (!r.ok) {
       this.list = [];
@@ -158,8 +189,10 @@ export default class WtPicker extends View {
   rows() {
     const q = this.filter.trim();
     const f = q.toLowerCase();
-    const hits = (this.list ?? []).filter((c) => !f || c.hay.includes(f));
-    if (this.all || !q || this.list === null || hits.length) return hits;
+    // Branch scope: "local" = has a local branch (local or both), "remote" = origin only.
+    const inScope = (c) => !this.branch || this.scope === "all" || (this.scope === "remote") === (c.kind === "remote");
+    const hits = (this.list ?? []).filter((c) => inScope(c) && (!f || c.hay.includes(f)));
+    if (this.all || this.branch || !q || this.list === null || hits.length) return hits;
     return [{ create: true, name: q }];
   }
 
@@ -171,12 +204,13 @@ export default class WtPicker extends View {
   }
 
   go(r, cx) {
-    if (r.create) return this.create(r.name, cx);
+    // Branch rows have no checkout yet: `herdr-wt create` makes (or finds) one.
+    if (r.create || this.branch) return this.create(r.create ? r.name : r.branch, cx);
     this.open(r.path);
   }
 
   open(path) {
-    const s = spaceOf(norm(path), this.list ?? []);
+    const s = spaceOf(norm(path), (this.branch ? this.co : this.list) ?? []);
     this.close();
     if (s) run("space.select", { id: s.id });
     // Unnamed, so the space follows the checkout folder and nests under the repo.
@@ -185,7 +219,7 @@ export default class WtPicker extends View {
 
   create(name, cx) {
     if (this.all || !name || this.busy) return;
-    this.busy = `Creating ${name}… (fetch, checkout, hooks)`;
+    this.busy = this.branch ? `Checking out ${name}… (checkout, hooks)` : `Creating ${name}… (fetch, checkout, hooks)`;
     this.error = "";
     cx.notify();
     cx.spawn(async (cx) => {
@@ -288,6 +322,13 @@ export default class WtPicker extends View {
           .child(div().w(18).flex_none().text_size(15).text_color(t.accent).child("+"))
           .child(div().flex_shrink(1).min_w(0).truncate().text_color(t.foreground).child(`Create worktree ${r.name}`))
           .child(h_flex().flex_1().justify_end().child(tag("from origin/<default>", t.dim)));
+      if (this.branch)
+        return base
+          .child(div().w(18).flex_none().text_size(13).text_color(t.dim).child("⎇"))
+          .child(div().flex_shrink(1).min_w(0).truncate().font_semibold().text_color(t.foreground).child(r.name))
+          .when(r.kind === "remote", (el) => el.child(tag("remote", t.ansi3 ?? t.dim)))
+          .child(h_flex().flex_1().min_w(0).justify_end().child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(r.subject)))
+          .child(tag(r.date, t.dim));
       const open = spaceOf(norm(r.path), this.list ?? []);
       return base
         .child(div().w(18).flex_none().text_size(13).text_color(t.dim).child(r.main ? "◆" : "⑂"))
@@ -317,8 +358,8 @@ export default class WtPicker extends View {
         .child(div().pt(6).text_size(11.5).text_color(t.dim).child(changes ? "Enter discard and remove · Esc cancel" : "Enter remove · Esc cancel"));
     };
 
-    const hints = removing ? "Enter remove · Esc" : this.all ? "Enter go · ctrl+d delete · Esc" : "Enter go · ctrl+n create · ctrl+d delete · Esc";
-    const title = removing ? "Remove worktree" : this.all ? "All worktrees" : "Worktrees";
+    const hints = removing ? "Enter remove · Esc" : this.branch ? `Enter check out · Tab ${this.scope} · Esc` : this.all ? "Enter go · ctrl+d delete · Esc" : "Enter go · ctrl+n create · ctrl+d delete · Esc";
+    const title = removing ? "Remove worktree" : this.branch ? "Branches" : this.all ? "All worktrees" : "Worktrees";
 
     return v_flex()
       .id("wt-picker")
@@ -346,12 +387,19 @@ export default class WtPicker extends View {
         else if (this.confirm) return;
         else if ((k === "down" || (k === "j" && ctrl)) && n) this.at = (this.at + 1) % n;
         else if ((k === "up" || (k === "k" && ctrl)) && n) this.at = (this.at + n - 1) % n;
-        else if (k === "n" && ctrl) this.create(this.filter.trim(), cx);
+        else if (k === "tab" && this.branch) {
+          this.scope = { all: "local", local: "remote", remote: "all" }[this.scope];
+          this.at = 0;
+          this.scroll = 0;
+        } else if (k === "n" && ctrl) { if (!this.branch) this.create(this.filter.trim(), cx); }
         else if (k === "d" && ctrl) {
-          this.error = "";
-          this.message = "";
-          if (!sel || sel.create) this.error = "ctrl+d: highlight a worktree to delete it";
-          else cx.spawn(async (cx) => { await this.ask(sel); cx.notify(); });
+          // (Branch mode lists branches, not worktrees: nothing to delete.)
+          if (!this.branch) {
+            this.error = "";
+            this.message = "";
+            if (!sel || sel.create) this.error = "ctrl+d: highlight a worktree to delete it";
+            else cx.spawn(async (cx) => { await this.ask(sel); cx.notify(); });
+          }
         } else return;
         cx.stop_propagation();
         cx.notify();
@@ -393,7 +441,9 @@ export default class WtPicker extends View {
               }))
             .when(this.list === null, (el) => el.child(line("Loading worktrees…")))
             .when(this.list !== null && n === 0 && !this.error, (el) =>
-              el.child(line(this.all ? (this.filter.trim() ? "No matching worktree" : "No worktrees in ~/.herdr/worktrees") : "Type a branch name to create a worktree")))
+              el.child(line(this.branch
+                ? (this.filter.trim() ? "No matching branch" : this.scope === "all" ? "No branches without a worktree" : `No ${this.scope} branches without a worktree`)
+                : this.all ? (this.filter.trim() ? "No matching worktree" : "No worktrees in ~/.herdr/worktrees") : "Type a branch name to create a worktree")))
             .children(rows.map((r, i) => (visible(i) ? placeAt(row(r, i), i) : null)).filter(Boolean)),
         ))
       .when(removing && !this.busy && !this.confirm && !this.error, (el) => el.child(line("Checking…")));
