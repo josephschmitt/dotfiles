@@ -111,22 +111,23 @@ Git worktree pickers, the app side of the TUI's `prefix+w` / `prefix+shift+w` / 
 
 | Leader | Mode | Does |
 |--------|------|------|
-| `w` | `all` | Every managed worktree (`~/.herdr/worktrees/<repo>/<name>`) across all repos, the repo as a dim tag before the branch. Enter switches to or opens it, `ctrl+d` removes it. No create. Works from any space, even a remote one or one outside a repo. Main checkouts aren't listed (the pj picker covers those) |
+| `w` | `all` | Every managed worktree (`~/.herdr/worktrees/<repo>/<name>`) across all repos, the repo as a dim tag before the branch. Enter switches to or opens it, `ctrl+d` removes it, `ctrl+g` merges it. No create. Works from any space, even a remote one or one outside a repo. Main checkouts aren't listed (the pj picker covers those) |
 | `W` | `pick` (default) | Find-or-create in the focused space's repo: type a name, the matching checkouts are listed below (case-insensitive substring over branch and path). The title names the repo (`Worktrees (dotfiles)`), as the TUI's prompt does (`worktree (dotfiles) ❯`). There's no separate "new worktree" key: Enter on an unmatched name, or `ctrl+n`, creates |
 | `B` | `branch` | Existing branch -> worktree: the focused space's repo's local and `origin/` branches that have no worktree yet, newest first (`herdr-wt branches`; remote-only ones are tagged, the commit subject and age are dim). Type to filter on branch and subject; `Tab` cycles the list all / local / remote (remote = origin-only, the tagged rows; local includes branches that are on both). Enter checks the branch out into a worktree (a remote-only branch gets a tracking branch, Worktrunk hooks run) and opens a space for it. No create, no delete. The refs are whatever is already local: nothing is fetched, so `git fetch` first for a branch someone just pushed |
 | `D` | `remove` | Skips the list and goes straight to the remove confirmation for the focused space's checkout |
 
-Keys in the lists (`branch` mode only has `Enter`, `Tab`, the arrows and `Esc`; `ctrl+n` / `ctrl+d` do nothing there):
+Keys in the lists (`branch` mode only has `Enter`, `Tab`, the arrows and `Esc`; `ctrl+n` / `ctrl+d` / `ctrl+g` do nothing there):
 
 | Key | Action |
 |-----|--------|
 | `Enter` | Focus the checkout's open space, else open one (`space.new`, unnamed so it nests under the repo). Repo mode, nothing matching: a "Create worktree `<name>`" row creates it and opens it |
 | `ctrl+n` | Repo mode: create the typed name even when something matches (e.g. `foo` while `foo-bar` exists). Does nothing in `all` mode |
 | `ctrl+d` | Offer to remove the highlighted worktree: asks first, lists uncommitted changes and forces if there are any; refuses the main checkout. Its space is closed after the checkout is gone |
+| `ctrl+g` | Offer to merge the highlighted worktree into the default branch with [`wt merge`](https://worktrunk.dev/merge/): asks first and lists uncommitted changes (they're committed with the merge). Worktrunk squashes the branch's commits, rebases onto the target, fast-forwards it, runs the merge hooks, then removes the worktree and branch; the space is closed once the checkout is gone. Refuses the main checkout and a detached HEAD. On failure (conflict, failing `pre-merge` hook) the output's tail is shown and the worktree and space are kept; after a conflict the rebase is waiting in the worktree |
 | `↑` / `↓`, `ctrl+k` / `ctrl+j` | Move (wraps) |
-| `Esc` | Close (cancels a remove confirmation first) |
+| `Esc` | Close (cancels a remove / merge confirmation first) |
 
-- **Engine:** everything git-side is `~/bin/herdr-wt` (its Herdr-independent subcommands `managed`, `checkouts`, `branches`, `current`, `dirty`, `create`, `delete`; in `all` mode `dirty` / `delete` run in the worktree's main checkout, since they resolve against the repo of their cwd), which uses [Worktrunk](https://worktrunk.dev) — so new worktrees land in `~/.herdr/worktrees/<repo>/<branch>`, branch from a freshly fetched `origin/<default>`, and run the hooks in `~/.config/worktrunk/config.toml` (see `shared/.config/worktrunk/README.md`). The mod only does the space side (`space.select` / `space.new` / `space.close`).
+- **Engine:** everything git-side is `~/bin/herdr-wt` (its Herdr-independent subcommands `managed`, `checkouts`, `branches`, `current`, `dirty`, `create`, `delete`, `default-branch`, `merge`; in `all` mode `dirty` / `delete` / `default-branch` / `merge` run in the worktree's main checkout, since they resolve against the repo of their cwd), which uses [Worktrunk](https://worktrunk.dev) — so new worktrees land in `~/.herdr/worktrees/<repo>/<branch>`, branch from a freshly fetched `origin/<default>`, and run the hooks in `~/.config/worktrunk/config.toml` (see `shared/.config/worktrunk/README.md`). The mod only does the space side (`space.select` / `space.new` / `space.close`).
 - **Open space match:** like the shipped `worktree` mod, a local space whose first terminal is inside the checkout (and not inside a deeper one). The dot after the name is in that space's color.
 - **Local only:** `herdr-wt` runs on this computer. Leader `w` lists this computer's worktrees from any space; `W`, `B` and `D` fall back to the shipped `worktree` mod on remote spaces.
 - `herdr-wt` is called by absolute path and appends the usual tool dirs to `PATH` itself, so it works when the app was launched from Finder.
@@ -162,8 +163,8 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 | Focus agent N | `prefix+1..9` | native `focus_agent` | leader |
 | Go to… (spaces, agents) | `prefix+o` | native `goto` | leader `o` runs the shipped `picker` mod |
 | New space in `~/development` | `prefix+shift+n` | `[[keys.command]]` wrapper | leader `N` |
-| All worktrees, every repo (switch/open, `ctrl+d` delete) | `prefix+w` | popup running `scripts/wt-picker.sh --all` (native `workspace_picker` / `open_worktree` blanked) | leader `w`: `wt-picker` `{mode: "all"}` |
-| Worktree picker for this repo (find-or-create, `ctrl+n` create, `ctrl+d` delete) | `prefix+shift+w` | popup running `scripts/wt-picker.sh` (native `rename_workspace` / `new_worktree` blanked) | leader `W`: `wt-picker` |
+| All worktrees, every repo (switch/open, `ctrl+d` delete, `ctrl+g` merge) | `prefix+w` | popup running `scripts/wt-picker.sh --all` (native `workspace_picker` / `open_worktree` blanked) | leader `w`: `wt-picker` `{mode: "all"}` |
+| Worktree picker for this repo (find-or-create, `ctrl+n` create, `ctrl+d` delete, `ctrl+g` merge) | `prefix+shift+w` | popup running `scripts/wt-picker.sh` (native `rename_workspace` / `new_worktree` blanked) | leader `W`: `wt-picker` |
 | Branch picker: existing branch -> worktree (`Enter`), `Tab` cycles all / local / remote | `prefix+shift+b` | popup running `scripts/wt-picker.sh --branch` | leader `B`: `wt-picker` `{mode: "branch"}` |
 | Remove the focused worktree | `prefix+shift+d` | `wt-picker.sh --remove-current` popup (native `remove_worktree` blanked) | leader `D`: `wt-picker` `{mode: "remove"}` |
 | Quick shell / mini shell | `prefix+c` / `prefix+shift+c` | popup running `quick-shell.sh` | leader popup running the same script |
@@ -176,7 +177,7 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 | Item | TUI | App | Why / status |
 |------|-----|-----|--------------|
 | Worktree picker on a remote space | works if `herdr-wt`, `wt` and `git` are on that box | leader `w` still lists this computer's worktrees; `W`/`B`/`D` fall back to the shipped `worktree` mod's dialogs (no hooks; `B` gets the same "open" dialog as `W`, which has no branch list) | `wt-picker` runs `herdr-wt` on this computer only |
-| Worktree picker UI | fzf (type, then `ctrl-n` / `ctrl-d`) | native list | Same keys and behavior; the TUI shows the dirty-files list and confirms in the terminal |
+| Worktree picker UI | fzf (type, then `ctrl-n` / `ctrl-d` / `ctrl-g`) | native list | Same keys and behavior; the TUI shows the dirty-files list and confirms in the terminal; a merge streams `wt merge`'s output live (the app shows its last lines on failure) |
 | Cycle panes | `alt+backtick` / `alt+shift+backtick` | none | App has no cycle-pane command (only directional `pane.go`) |
 | Rename pane | `prefix+p` | none | App has no rename-pane command |
 | Refresh PR status | `prefix+u` | none | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |

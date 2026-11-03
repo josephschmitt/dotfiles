@@ -74,10 +74,14 @@ Herdr's native worktree actions are blanked (`open_worktree`, `new_worktree`,
 
 - `prefix+w` → `--all`: every managed worktree (`~/.herdr/worktrees/<repo>/<name>`)
   across all repos, from any pane (repo or not). Enter switches to / opens it,
-  `ctrl-d` offers to delete it. No create.
+  `ctrl-d` offers to delete it, `ctrl-g` to merge it (`wt merge`). No create.
 - `prefix+shift+w` → no flag: fzf find-or-create in the focused pane's repo
   (Enter focuses/opens/creates, `ctrl-n` force-creates the typed name, `ctrl-d`
-  offers to delete the highlighted worktree).
+  offers to delete the highlighted worktree, `ctrl-g` to merge it into the
+  default branch: `herdr-wt merge-close` runs `wt merge --yes` in the checkout,
+  which squashes, rebases, fast-forwards, removes the worktree and branch, then
+  the workspace is closed; confirmation lists uncommitted changes, which are
+  committed with the merge).
 - `prefix+shift+b` → `--branch`: the focused pane's repo's local and `origin/`
   branches that have no worktree yet (`herdr-wt branches`, newest first, no
   fetch). Enter checks the branch out into a worktree and opens its workspace;

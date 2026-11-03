@@ -16,9 +16,10 @@
 # Keys (fzf), find-or-create: Enter opens the highlighted worktree (focus its
 # workspace, or open one), or creates the typed name when nothing matches.
 # ctrl-n creates the typed name even if something matches. ctrl-d offers to
-# delete the highlighted worktree (asks first). ctrl-j/ctrl-k move, Esc closes.
-# --all: Enter switches to / opens the highlighted worktree, ctrl-d deletes it;
-# no create (there's no repo to create in).
+# delete the highlighted worktree (asks first). ctrl-g merges it into the
+# default branch (`wt merge`, asks first). ctrl-j/ctrl-k move, Esc closes.
+# --all: Enter switches to / opens the highlighted worktree, ctrl-d deletes it,
+# ctrl-g merges it; no create (there's no repo to create in).
 # --branch: Enter checks the highlighted branch out into a worktree (remote-only
 # branches get a tracking branch) and opens its workspace; no create, no delete.
 # Tab cycles the list all / local / remote (remote = origin-only branches).
@@ -104,15 +105,51 @@ remove_flow() {
   fi
 }
 
+# Ask, then merge a worktree (by path) into the default branch and remove it,
+# closing its workspace. wt squashes its commits (and any uncommitted changes),
+# rebases onto the target, fast-forwards it and runs the merge hooks. Returns 1
+# if cancelled, refused or failed (a conflict leaves the rebase to resolve in the
+# worktree).
+merge_flow() {
+  reason=""
+  info=$(checkout_info "$1")
+  branch=$(printf '%s' "${info}" | cut -f1)
+  if [ "$(printf '%s' "${info}" | cut -f3)" = 1 ]; then
+    reason="main checkout, not a worktree"
+    printf '\033[33m%s is the %s.\033[0m\n' "$1" "${reason}"
+    return 1
+  fi
+  if [ -z "${branch}" ]; then
+    reason="detached HEAD, no branch"
+    printf '\033[33m%s has no branch (detached HEAD).\033[0m\n' "$1"
+    return 1
+  fi
+  target=$(herdr-wt default-branch)
+  printf '\033[1mMerge %s into %s\033[0m\n\033[2m%s\033[0m\n' "${branch}" "${target}" "$1"
+  printf 'Squashes its commits, rebases onto %s and fast-forwards it, runs the merge\n' "${target}"
+  printf 'hooks, then removes the worktree and branch and closes its workspace.\n\n'
+  changes=$(herdr-wt dirty "$1")
+  if [ -n "${changes}" ]; then
+    printf '\033[33mUncommitted changes (committed with the merge):\033[0m\n%s\n\n' "${changes}"
+  fi
+  confirm "Merge?" || return 1
+  printf '\n'
+  if ! herdr-wt merge-close "$1"; then
+    reason="failed"
+    pause "Failed. Press any key to continue"
+    return 1
+  fi
+}
+
 # --all: every managed worktree, from any pane (repo or not).
 if [ "${mode}" = all ]; then
-  WT_HEADER="Enter switch/open · ctrl-d delete · Esc"
+  WT_HEADER="Enter switch/open · ctrl-d delete · ctrl-g merge · Esc"
   WT_MSG=""
   export WT_HEADER WT_MSG
   while :; do
     # shellcheck disable=SC2016 # $WT_* expand in fzf's shell, not here
     out=$(herdr-wt all | fzf --ansi --layout=reverse --height=100% --border=none \
-      --delimiter='\t' --with-nth=4 --expect=ctrl-d \
+      --delimiter='\t' --with-nth=4 --expect=ctrl-d,ctrl-g \
       --prompt='worktree ❯ ' --header="${WT_HEADER}" --header-first \
       --with-shell='sh -c' \
       --bind 'result:transform-header:[ -n "$WT_MSG" ] && printf "%s\n" "$WT_MSG"; printf "%s" "$WT_HEADER"')
@@ -125,6 +162,19 @@ if [ "${mode}" = all ]; then
     WT_MSG=""
     if [ -z "${path}" ]; then
       [ "${key}" = ctrl-d ] && WT_MSG="ctrl-d: highlight a worktree to delete it"
+      [ "${key}" = ctrl-g ] && WT_MSG="ctrl-g: highlight a worktree to merge it"
+      continue
+    fi
+    if [ "${key}" = ctrl-g ]; then
+      clear
+      # Like ctrl-d: merge_flow resolves against the repo of $PWD, so run it
+      # from the worktree's main checkout.
+      res=$(cd "${main}" && { merge_flow "${path}" >/dev/tty 2>&1 && echo ok || printf '%s\n' "${reason}"; })
+      if [ "${res}" = ok ]; then
+        WT_MSG="Merged ${path}"
+      else
+        WT_MSG="Not merged${res:+ (${res})}: ${path}"
+      fi
       continue
     fi
     if [ "${key}" = ctrl-d ]; then
@@ -210,16 +260,20 @@ if [ "${mode}" = branch ]; then
   done
 fi
 
-WT_HEADER="Enter open (or create typed name) · ctrl-n create typed name · ctrl-d delete · Esc"
+WT_HEADER="Enter open (or create typed name) · ctrl-n create typed name · ctrl-d delete · ctrl-g merge · Esc"
 # WT_MSG: result of the last ctrl-d, shown above the hints. Both are read by
 # the transform-header bind (which redraws the header on every result change).
 WT_MSG=""
 export WT_HEADER WT_MSG
 
+main_path=$(herdr-wt checkouts | sed -n '1p' | cut -f2)
+
 while :; do
+  # Merging or removing the worktree this popup was opened in deletes our cwd.
+  [ -d "${PWD}" ] || cd "${main_path}" || exit 1
   # shellcheck disable=SC2016 # $FZF_* / $WT_* expand in fzf's shell, not here
   out=$(herdr-wt list | fzf --ansi --layout=reverse --height=100% --border=none \
-    --delimiter='\t' --with-nth=4 --print-query --expect=ctrl-n,ctrl-d \
+    --delimiter='\t' --with-nth=4 --print-query --expect=ctrl-n,ctrl-d,ctrl-g \
     --prompt="worktree (${repo}) ❯ " --header="${WT_HEADER}" --header-first \
     --with-shell='sh -c' \
     --bind 'result:transform-header:if [ "$FZF_MATCH_COUNT" -eq 0 ] && [ -n "$FZF_QUERY" ]; then printf "No match · Enter creates %s\n" "$FZF_QUERY"; fi; [ -n "$WT_MSG" ] && printf "%s\n" "$WT_MSG"; printf "%s" "$WT_HEADER"')
@@ -248,6 +302,23 @@ while :; do
         WT_MSG="Removed ${path}"
       else
         WT_MSG="Not removed${reason:+ (${reason})}: ${path}"
+      fi
+      continue
+      ;;
+    ctrl-g)
+      if [ -z "${path}" ]; then
+        WT_MSG="ctrl-g: highlight a worktree to merge it"
+        continue
+      fi
+      if [ "$(checkout_info "${path}" | cut -f3)" = 1 ]; then
+        WT_MSG="Can't merge ${path}: it's the main checkout, not a worktree"
+        continue
+      fi
+      clear
+      if merge_flow "${path}"; then
+        WT_MSG="Merged ${path}"
+      else
+        WT_MSG="Not merged${reason:+ (${reason})}: ${path}"
       fi
       continue
       ;;

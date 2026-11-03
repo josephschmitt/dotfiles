@@ -148,7 +148,8 @@ description = "Project picker (pj)"
 
 # All worktrees (scripts/wt-picker.sh --all) — every managed worktree
 # (~/.herdr/worktrees/<repo>/<name>) across all repos, from any pane. Enter
-# focuses its open workspace or opens one; ctrl-d offers to delete it. No
+# focuses its open workspace or opens one; ctrl-d offers to delete it, ctrl-g to
+# merge it into the default branch (`wt merge`). No
 # create (use prefix+shift+w in the repo). Main checkouts: the pj picker.
 [[keys.command]]
 key = "prefix+w"
@@ -163,7 +164,9 @@ height = "60%"
 # one, opens a closed one, or creates the typed name when nothing matches (from
 # a freshly fetched origin/<default>, running the Worktrunk hooks in
 # ~/.config/worktrunk/config.toml). ctrl-n creates the typed name even if
-# something matches; ctrl-d offers to delete the highlighted worktree.
+# something matches; ctrl-d offers to delete the highlighted worktree; ctrl-g
+# offers to merge it into the default branch (`wt merge`: squash, rebase,
+# fast-forward, remove worktree and branch, close its workspace).
 # Same keys in the Herdr Mac app (leader w / W / D, mods/wt-picker).
 [[keys.command]]
 key = "prefix+shift+w"

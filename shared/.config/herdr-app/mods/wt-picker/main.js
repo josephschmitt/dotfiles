@@ -16,7 +16,8 @@
 //     No create, no delete. Refs are whatever is already local (no fetch).
 //   "remove" (leader D): remove the focused space's worktree.
 // In the "pick" and "all" lists ctrl+d offers to remove the highlighted worktree (asks first;
-// forced if it has changes). ctrl+j/k move, Esc leaves.
+// forced if it has changes), and ctrl+g to merge it into the default branch
+// (`wt merge`: squash, rebase, fast-forward, remove; asks first). ctrl+j/k move, Esc leaves.
 //
 // The git/worktree work is done by ~/bin/herdr-wt (Herdr-independent
 // subcommands), which uses Worktrunk (`wt`) so creating runs the hooks in
@@ -59,6 +60,15 @@ async function wt(args, cwd) {
 }
 
 const lastLine = (s) => s.split("\n").filter(Boolean).pop() ?? "";
+
+// What went wrong in a multi-line error (a failed merge): its "✗" line, if the
+// tail doesn't already include it, then the last few lines.
+function tail(s, n = 4) {
+  const lines = s.split("\n").filter((l) => l.trim());
+  const end = lines.slice(-n);
+  const fail = [...lines].reverse().find((l) => l.startsWith("✗"));
+  return (fail && !end.includes(fail) ? [fail, ...end] : end).join("\n");
+}
 
 export default class WtPicker extends View {
   init(_props, cx) {
@@ -198,7 +208,7 @@ export default class WtPicker extends View {
 
   enter(cx) {
     if (this.busy) return;
-    if (this.confirm) return this.remove(cx);
+    if (this.confirm) return this.confirm.merge ? this.merge(cx) : this.remove(cx);
     const sel = this.rows()[this.at];
     if (sel) this.go(sel, cx);
   }
@@ -243,6 +253,47 @@ export default class WtPicker extends View {
     }
     const d = await wt(["dirty", c.path], this.cwdFor(c));
     this.confirm = { c, changes: d.ok ? d.out : "" };
+  }
+
+  // Confirm merging c into the default branch (`merge` on the confirm marks it).
+  async askMerge(c) {
+    this.message = "";
+    if (c.main) {
+      this.error = `${c.displayPath} is the main checkout, not a worktree`;
+      return;
+    }
+    if (!c.branch) {
+      this.error = `${c.displayPath} has no branch (detached HEAD)`;
+      return;
+    }
+    const cwd = this.cwdFor(c);
+    const [d, t] = await Promise.all([wt(["dirty", c.path], cwd), wt(["default-branch"], cwd)]);
+    this.confirm = { c, changes: d.ok ? d.out : "", merge: t.ok && t.out ? t.out : "the default branch" };
+  }
+
+  merge(cx) {
+    const { c, merge: target } = this.confirm;
+    this.confirm = null;
+    this.busy = `Merging ${c.name} into ${target}… (squash, rebase, hooks)`;
+    cx.notify();
+    cx.spawn(async (cx) => {
+      const r = await wt(["merge", c.path], this.cwdFor(c));
+      this.busy = "";
+      if (!r.ok) {
+        // A conflict leaves the rebase in progress in the worktree.
+        this.error = tail(r.err) || "Couldn't merge the worktree";
+        return cx.notify();
+      }
+      // The merge removes the worktree and branch; if it kept them, so do we
+      // (the space stays). Checkout gone first, then its space.
+      const s = spaceOf(norm(c.path), this.list ?? []);
+      if (!this.all && inside(this.cwd, c.path)) this.cwd = this.list.find((x) => x.main)?.path ?? home();
+      await this.load();
+      if (s && !(this.list ?? []).some((x) => x.path === c.path)) run("space.close", { id: s.id, confirmed: true });
+      this.message = lastLine(r.out) || `Merged ${c.name} into ${target}`;
+      this.at = 0;
+      cx.notify();
+    });
   }
 
   remove(cx) {
@@ -344,7 +395,19 @@ export default class WtPicker extends View {
 
     // Remove confirmation (replaces the list).
     const confirmView = () => {
-      const { c, changes } = this.confirm;
+      const { c, changes, merge } = this.confirm;
+      if (merge)
+        return v_flex()
+          .gap(8)
+          .px(14)
+          .child(div().text_size(14).font_semibold().text_color(t.foreground).child(`Merge ${c.name} into ${merge}?`))
+          .child(div().text_size(11).text_color(t.dim).child(c.displayPath))
+          .child(div().text_color(t.foreground).child(`Squashes its commits, rebases onto ${merge} and fast-forwards it, runs the merge hooks, then removes the worktree and branch and closes its space.`))
+          .when(changes, (el) =>
+            el
+              .child(div().pt(4).font_semibold().text_color(t.ansi3 ?? t.foreground).child("Uncommitted changes (committed with the merge):"))
+              .child(div().font_family(settings().font ?? "Menlo").text_size(11.5).text_color(t.foreground).child(changes.split("\n").slice(0, 12).join("\n"))))
+          .child(div().pt(6).text_size(11.5).text_color(t.dim).child("Enter merge · Esc cancel"));
       return v_flex()
         .gap(8)
         .px(14)
@@ -358,7 +421,7 @@ export default class WtPicker extends View {
         .child(div().pt(6).text_size(11.5).text_color(t.dim).child(changes ? "Enter discard and remove · Esc cancel" : "Enter remove · Esc cancel"));
     };
 
-    const hints = removing ? "Enter remove · Esc" : this.branch ? `Enter check out · Tab ${this.scope} · Esc` : this.all ? "Enter go · ctrl+d delete · Esc" : "Enter go · ctrl+n create · ctrl+d delete · Esc";
+    const hints = removing ? "Enter remove · Esc" : this.branch ? `Enter check out · Tab ${this.scope} · Esc` : this.all ? "Enter go · ctrl+d delete · ctrl+g merge · Esc" : "Enter go · ctrl+n create · ctrl+d delete · ctrl+g merge · Esc";
     const title = removing ? "Remove worktree" : this.branch ? "Branches" : this.all ? "All worktrees" : "Worktrees";
 
     return v_flex()
@@ -399,6 +462,13 @@ export default class WtPicker extends View {
             this.message = "";
             if (!sel || sel.create) this.error = "ctrl+d: highlight a worktree to delete it";
             else cx.spawn(async (cx) => { await this.ask(sel); cx.notify(); });
+          }
+        } else if (k === "g" && ctrl) {
+          if (!this.branch && !removing) {
+            this.error = "";
+            this.message = "";
+            if (!sel || sel.create) this.error = "ctrl+g: highlight a worktree to merge it";
+            else cx.spawn(async (cx) => { await this.askMerge(sel); cx.notify(); });
           }
         } else return;
         cx.stop_propagation();

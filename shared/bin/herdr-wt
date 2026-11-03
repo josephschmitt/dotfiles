@@ -22,12 +22,18 @@
 #   herdr-wt dirty <target>       `git status --short` of that checkout (empty: clean)
 #   herdr-wt create <name>        find-or-create the checkout, print its path
 #   herdr-wt delete <target> [-f] remove the checkout with `wt remove`
+#   herdr-wt default-branch       the branch `merge` merges into
+#   herdr-wt merge <target>       `wt merge` the checkout's branch into the default
+#                                 branch (squash, rebase, fast-forward, hooks;
+#                                 uncommitted changes are committed with it), then
+#                                 remove the worktree and branch. Progress on stderr
 #
 # Herdr TUI (talk to the running herdr server):
 #   herdr-wt list                 TSV for fzf: branch, path, workspace id, display
 #   herdr-wt all                  TSV for fzf, all repos: path, main, workspace id, display
 #   herdr-wt open <name>          focus its workspace, else open it, else create it
 #   herdr-wt remove <target> [-f] close its workspace, then delete
+#   herdr-wt merge-close <target> merge, then close its workspace (if the checkout is gone)
 #
 # Exit codes: 0 ok, 1 error, 3 checkout is dirty (pass -f to remove anyway).
 
@@ -44,7 +50,7 @@ die() {
 }
 
 usage() {
-  sed -n '2,33p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,40p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -236,6 +242,36 @@ cmd_delete() {
   esac
 }
 
+# merge <target>: `wt merge` from inside the checkout (it merges the current
+# branch). wt removes the worktree and branch in the background; wait for the
+# folder to go so callers see the final state. wt's progress goes to stderr, the
+# one-line result to stdout. A conflict, failed pre-merge hook, etc. exits non-zero.
+cmd_merge() {
+  [ $# -ge 1 ] || die "merge: missing target"
+  target=$1
+  hit=$(resolve "${target}")
+  [ -n "${hit}" ] || die "no worktree for '${target}'"
+  branch=$(printf '%s' "${hit}" | cut -f1)
+  path=$(printf '%s' "${hit}" | cut -f2)
+  is_main=$(printf '%s' "${hit}" | cut -f3)
+  [ "${is_main}" = 0 ] || die "${path} is the repository's main checkout, not a worktree"
+  [ -n "${branch}" ] || die "${path} has no branch (detached HEAD): nothing to merge"
+
+  cd "${path}"
+  json=$(wt merge --yes --format json)
+  into=$(printf '%s' "${json}" | jq -r '.target // empty')
+  if [ "$(printf '%s' "${json}" | jq -r '.removed // false')" = true ]; then
+    n=0
+    while [ -e "${path}" ] && [ "${n}" -lt 50 ]; do
+      sleep 0.2
+      n=$((n + 1))
+    done
+    printf 'Merged %s into %s (worktree removed)\n' "${branch}" "${into:-$(default_branch)}"
+  else
+    printf 'Merged %s into %s (worktree kept)\n' "${branch}" "${into:-$(default_branch)}"
+  fi
+}
+
 # ---- Herdr TUI -------------------------------------------------------------
 
 # JSON of `herdr worktree list` for this repo, "" if herdr isn't reachable.
@@ -329,6 +365,20 @@ cmd_remove() {
   fi
 }
 
+# merge-close <target>: merge, then close the checkout's workspace. Only once
+# the checkout is gone, so a merge that kept the worktree keeps its workspace.
+cmd_merge_close() {
+  [ $# -ge 1 ] || die "merge-close: missing target"
+  hit=$(resolve "$1")
+  [ -n "${hit}" ] || die "no worktree for '$1'"
+  path=$(printf '%s' "${hit}" | cut -f2)
+  ws=$(workspace_for "${path}")
+  (cmd_merge "${path}")
+  if [ -n "${ws}" ] && [ ! -e "${path}" ]; then
+    command herdr workspace close "${ws}" >/dev/null
+  fi
+}
+
 # ---- main ------------------------------------------------------------------
 
 [ $# -ge 1 ] || usage 1
@@ -347,6 +397,9 @@ case "${sub}" in
   dirty) cmd_dirty "$@" ;;
   create) cmd_create "$@" ;;
   delete) cmd_delete "$@" ;;
+  default-branch) default_branch ;;
+  merge) cmd_merge "$@" ;;
+  merge-close) cmd_merge_close "$@" ;;
   list) cmd_list ;;
   open) cmd_open "$@" ;;
   remove) cmd_remove "$@" ;;
