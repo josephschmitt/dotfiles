@@ -33,7 +33,7 @@ Why `alt`: matches tmux-tilish / vim-tmux-navigator. Needs `option_as_alt` (Sett
 | `n`, `[`, `]`, `T`, `X` | New, previous, next, rename, close tab |
 | `N` | New space in `~/development` |
 | `o` | Go to… (picker) |
-| `O` / `P` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
+| `O` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
 | `w` / `W` / `D` | Open / new / remove worktree (the app's `worktree` mod dialogs) |
 | `1..9` | Focus agent N (agents list order) |
 | `c` / `C` | Quick shell / mini shell (the latter persists; `hide` keeps it, reopen with `C`) |
@@ -79,7 +79,7 @@ Reinstalling on a new machine: `stow shared` links the mod and `keys.json`. Ther
 
 A native-looking project picker styled like the app's "Go to…" window (`cmd+p`, leader `o`). Go to… is the shipped `picker` mod with hard-coded rows (spaces, tabs, agents) and no source/provider API, so this is a sibling mod that lists `pj` projects instead. The shipped `picker` is untouched and keeps getting app updates.
 
-Opened by leader `O` or `P` (`run("mod.open", { name: "pj-picker" })`; `O` pairs with `o` = Go to…, `P` is the older key). The TUI's `prefix+shift+o` (`tv herdr-worktree`) was never ported, so `O` was free. Type to filter (case-insensitive substring over name, path and marker).
+Opened by leader `O` (`run("mod.open", { name: "pj-picker" })`), the same keys as the TUI's `prefix+shift+o` and a pair with `o` = Go to…. Type to filter (case-insensitive substring over name, path and marker).
 
 | Key | Action |
 |-----|--------|
@@ -130,14 +130,14 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 | Open / new / remove worktree | `prefix+w` / `prefix+shift+w` / `prefix+shift+d` | native | leader (`worktree` mod dialogs) |
 | Quick shell / mini shell | `prefix+c` / `prefix+shift+c` | popup running `quick-shell.sh` | leader popup running the same script |
 | Editor / lazygit / yazi | `prefix+shift+e` / `prefix+shift+g` / `prefix+shift+y` | popups | leader popups |
-| Project picker (`pj`) | `prefix+shift+p` | `pj` plugin (`pj-herdr`) | leader `P` opens `pj-picker`; Enter focuses an open space, else creates one |
+| Project picker (`pj`) | `prefix+shift+o` | `pj` plugin (`pj-herdr`) | leader `O` opens `pj-picker`; Enter focuses an open space, else creates one |
 | Open branch's PR | `prefix+g` | `gh-pr` plugin | leader `g` runs `gh pr view --web` |
 
 ### Differences (intentional or unavoidable)
 
 | Item | TUI | App | Why / status |
 |------|-----|-----|--------------|
-| `prefix+shift+o` | `tv herdr-worktree` (open a branch as a worktree) | **`pj-picker`** (also on `P`) | **Conflict: same keys, different action.** The app's `O` was bound to the project picker on request. Resolve by moving one side so the keys agree (see Open items) |
+| Open branch as worktree (`tv herdr-worktree`) | `prefix+shift+b` | none | Uses the TUI's `herdr worktree` CLI; use leader `w`/`W` in the app. Was `prefix+shift+o` until that went to the pj picker, so keep `B` free in the app for this if it's ever ported |
 | Cycle panes | `alt+backtick` / `alt+shift+backtick` | none | App has no cycle-pane command (only directional `pane.go`) |
 | Rename pane | `prefix+p` | none | App has no rename-pane command |
 | Refresh PR status | `prefix+u` | none | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |
@@ -150,7 +150,7 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 
 ### Open items
 
-- **`prefix+shift+o`.** Pick one: (a) app `O` goes back to worktree-style behavior or is unbound, `P` stays the only `pj` key (keys match the TUI); or (b) TUI `prefix+shift+o` also becomes `pj.open-picker` and the worktree picker moves elsewhere. Until then the two disagree on `O`.
+None.
 
 ### Keeping them in sync
 

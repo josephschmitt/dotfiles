@@ -24,7 +24,7 @@ focus_pane_right = "alt+l"
 cycle_pane_next = "alt+backtick"
 cycle_pane_previous = "alt+shift+backtick"
 
-# Rename pane — prefix+p (default prefix+shift+p freed up for pj-herdr plugin)
+# Rename pane — prefix+p (default prefix+shift+p is left unbound)
 rename_pane = "prefix+p"
 
 # Tab switching — Alt+1-9 (matches tmux-tilish window switching)
@@ -135,16 +135,18 @@ description = "Yazi file manager"
 width = "80%"
 height = "80%"
 
-# pj project picker — prefix+shift+p (pj-herdr plugin; moved off prefix+o to make room for goto)
+# pj project picker — prefix+shift+o (pj-herdr plugin). Matches the Herdr Mac app,
+# where leader O opens its pj-picker mod (see shared/.config/herdr-app/README.md, "TUI ↔ app parity")
 [[keys.command]]
-key = "prefix+shift+p"
+key = "prefix+shift+o"
 type = "plugin_action"
 command = "pj.open-picker"
 description = "Project picker (pj)"
 
-# Open existing branch as a herdr worktree (tv cable channel)
+# Open existing branch as a herdr worktree (tv cable channel) — prefix+shift+b ("branch").
+# Moved off prefix+shift+o, which is now the pj picker. TUI-only: the app has no equivalent
 [[keys.command]]
-key = "prefix+shift+o"
+key = "prefix+shift+b"
 type = "popup"
 command = "bash -lc 'tv herdr-worktree'"
 description = "Open branch as worktree"

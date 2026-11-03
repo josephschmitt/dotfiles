@@ -5,7 +5,7 @@
 
 [[plugins]]
 plugin_id = "pj"
-description = "Project jumper — fuzzy-find pj projects and open them as herdr workspaces (prefix+shift+p)"
+description = "Project jumper — fuzzy-find pj projects and open them as herdr workspaces (prefix+shift+o)"
 install = "josephschmitt/pj-herdr"
 [[plugins]]
 plugin_id = "persiyanov.fresh-worktree"

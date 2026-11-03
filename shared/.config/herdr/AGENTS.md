@@ -127,7 +127,7 @@ Current plugins:
 
 | Plugin ID | Purpose | Notes |
 |-----------|---------|-------|
-| `pj` | Fuzzy-find `pj` projects and open them as herdr workspaces (`prefix+shift+p`) | Installed from GitHub (`josephschmitt/pj-herdr`) |
+| `pj` | Fuzzy-find `pj` projects and open them as herdr workspaces (`prefix+shift+o`) | Installed from GitHub (`josephschmitt/pj-herdr`) |
 | `gh-pr` | Labels the focused agent pane's sidebar row with its branch's GitHub PR status; powers `prefix+g` (open PR) and `prefix+u` (refresh) | Installed from GitHub (`wyattjoh/herdr-plugin-gh-pr`) |
 
 When adding a new plugin:

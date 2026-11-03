@@ -3,7 +3,7 @@
 //
 // Type to filter, ↑/↓ and Enter to go, ctrl+n to always make a new space, Esc
 // to leave. Enter focuses the project's open space (same folder, this
-// computer), else creates one. Opened by leader `P` (mods/leader).
+// computer), else creates one. Opened by leader `O` (mods/leader).
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
