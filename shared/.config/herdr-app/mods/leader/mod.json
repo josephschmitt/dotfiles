@@ -1,1 +1,1 @@
-{ "place": "none", "title": "Leader", "overlay": { "kind": "popup", "at": "bottom", "width": 740, "height": 380 } }
+{ "place": "none", "title": "Leader", "overlay": { "kind": "popup", "frame": "none", "at": "bottom", "width": 1, "height": 1 } }

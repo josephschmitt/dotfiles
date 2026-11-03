@@ -54,7 +54,7 @@ Gotchas:
 | Piece | Where | Role |
 |-------|-------|------|
 | `mods/leader/main.js` | this repo, stowed to `~/.config/herdr-app/mods/leader` | The whole mod: `ITEMS` key table, the which-key popup, the popup-terminal runner, and the title bar for those popups |
-| `mods/leader/mod.json` | same | `{"place": "none", "overlay": {"kind": "popup", "at": "bottom", ...}}`: not docked anywhere, opens as a bottom popup via `mod.open` |
+| `mods/leader/mod.json` | same | `{"place": "none", "overlay": {"kind": "popup", "frame": "none", "at": "bottom", "width": 1, "height": 1}}`: not docked anywhere; `mod.open` shows it as a frameless popup covering the window, and `render()` draws the 740x380 card at the bottom center itself (a popup's own position follows the mouse pointer, so the mod can't rely on it). A press beside the card closes it. After editing `mod.json`, write it in place (`cat x > mod.json`, not an editor's atomic replace) or the app's watcher may miss it |
 | `"ctrl-s": "mod.open:leader"` | `keys.json` (`global`) | Opens the popup. `mod.open` toggles, so `ctrl+s` again closes it |
 | `.gitignore` | this directory | Hides `gpui-kit.d.ts` / `jsconfig.json`, which the app writes into every mod folder (visible here because the mod dir is a symlink) |
 

@@ -197,14 +197,25 @@ export default class Leader extends View {
               .child(div().truncate().text_color(t.foreground).child(i.label)),
           ),
         );
+    // The overlay covers the whole window with no frame (mod.json): popups only
+    // know "at the pointer" or an exact {x, y}, and the mod can't read the window
+    // size, so the card is placed here instead, at the bottom center. A press
+    // beside the card closes it, like a click outside a popup.
     return v_flex()
       .id("leader").track_focus(this.handle).on_key_down((e, cx) => this.key(e, cx))
-      .size_full().min_h(0).p(18).gap(14).bg(t.popover).text_size(12)
+      .on_mouse_down("left", () => this.close())
+      .size_full().min_h(0).items_center().justify_end().p(16)
       .child(
-        h_flex().items_center()
-          .child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child("Leader"))
-          .child(div().text_size(11).text_color(t.dim).child("press a key · Esc to cancel")),
-      )
-      .child(h_flex().gap(28).items_start().children(COLUMNS.map((names) => v_flex().flex_1().min_w(0).gap(12).children(names.map(group)))));
+        v_flex()
+          .id("leader-card").on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+          .w(740).max_w_full().h(380).max_h_full().min_h(0).p(18).gap(14)
+          .bg(t.popover).border_1().border_color(t.border).rounded(12).shadow_lg().text_size(12)
+          .child(
+            h_flex().items_center()
+              .child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child("Leader"))
+              .child(div().text_size(11).text_color(t.dim).child("press a key · Esc to cancel")),
+          )
+          .child(h_flex().gap(28).items_start().children(COLUMNS.map((names) => v_flex().flex_1().min_w(0).gap(12).children(names.map(group))))),
+      );
   }
 }
