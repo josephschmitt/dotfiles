@@ -118,7 +118,7 @@ const ITEMS = [
   { group: "Popups", keys: ["c"], show: "c", label: "Quick shell", late: true, act: () => popup({ title: "Quick shell", cmd: "~/.config/herdr/scripts/quick-shell.sh", width: 0.6, height: 0.6 }) },
   { group: "Popups", keys: ["C"], show: "C", label: "Mini shell (persists)", late: true, act: () => popup({ title: "Mini shell", cmd: "~/.config/herdr/scripts/quick-shell.sh --persist", width: 0.6, height: 0.6, persist: true }) },
   { group: "Popups", keys: ["E"], show: "E", label: "Editor", late: true, act: () => popup({ title: "Editor", cmd: "$EDITOR", width: 0.8, height: 0.8 }) },
-  { group: "Popups", keys: ["G"], show: "G", label: "Lazygit", late: true, act: () => popup({ title: "Lazygit", cmd: "lazygit-launch", width: 0.95, height: 0.9 }) },
+  { group: "Popups", keys: ["G"], show: "G", label: "Lazygit", late: true, act: () => popup({ title: "Lazygit", cmd: "lazygit-launch", width: 0.9, height: 0.9 }) },
   { group: "Popups", keys: ["Y"], show: "Y", label: "Yazi", late: true, act: () => popup({ title: "Yazi", cmd: "yazi", width: 0.8, height: 0.8 }) },
 
   {
