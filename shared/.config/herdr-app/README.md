@@ -47,6 +47,7 @@ Gotchas:
 - `ctrl+s` is no longer passed to programs (same as with the TUI prefix).
 - A mod can't open overlays from async work after its own popup has closed, so async items (`late: true`) run first and the leader closes afterwards. Terminal popups call `closeLeader()` themselves *right before* `openOverlay` (same tick, so it still works): a popup opened under a still-open leader loses the keyboard to the pane beneath when the leader closes.
 - The mod folder is a symlink into this repo, and the app writes `gpui-kit.d.ts` and `jsconfig.json` into it; `.gitignore` here hides them.
+- `quick-shell.sh` binds Ctrl-c itself for the double-tap close: fish 4 reads Ctrl-c as a key at the prompt (no SIGINT), and oh-my-posh binds it too, so the bind is made at the first `fish_prompt`.
 - `quick-shell.sh` still tries `herdr notification show` for its "press Ctrl-c again" hint, which talks to the TUI server, so it only appears if that is running.
 
 ### How the mod is set up
@@ -62,7 +63,7 @@ How it works:
 - The popup takes keyboard focus (`handle.focus()`) and reads `on_key_down`. Only typed characters (`key_char`) count; bare modifiers/arrows are ignored, `Esc`/`ctrl+s`/`ctrl+c` close.
 - Plain actions call `run("<command>", args)` — the same commands `keys.json` binds (`herdr-app commands`). They close the popup first so focus is back in the terminal.
 - Popup programs (`late: true` items) run `hc run --bg --json --no-parent --no-notify [--rm] -- bash -lc <cmd>` in the focused pane's folder (or `--on <machine>`), then `openOverlay` a modal layout: a 30px title-bar block (this same mod, via `props.bar`) over a `{ terminal: "<addr>" }` block. The overlay closes itself when the program exits; `✕` runs `terminal.kill`. The persistent mini shell skips `--rm`, remembers its address in `shared("leader.Mini shell")` and says `hide` instead of `✕`.
-- Popup items finish their async work (spawning the terminal) while the leader is alive, then close it and open the overlay back to back, then `pane.focus` the popup's terminal so it takes keystrokes.
+- Popup items finish their async work (spawning the terminal) while the leader is alive, then close it and open the overlay back to back. No `pane.focus`: the overlay's terminal takes the keys itself, and since Herdr 0.1.12 `pane.focus {terminal}` only finds layout blocks and panes, so it fails with "no such pane" for a popup terminal.
 
 Editing it: the app hot-reloads on save (a broken save keeps the old version and reports in `herdr-app status`). After every change:
 

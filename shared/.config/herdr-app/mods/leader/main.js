@@ -58,8 +58,6 @@ async function popup({ title, cmd, width = 0.8, height = 0.8, persist = false })
       ],
     },
   });
-  // Make sure the popup's terminal, not the pane beneath, types.
-  run("pane.focus", { terminal });
 }
 
 // Set by the open leader: closes it (once).

@@ -17,7 +17,9 @@ if command -v fish >/dev/null 2>&1; then
         # Track Ctrl-c presses for double-tap exit
         set -g __quick_shell_last_sigint 0
 
-        # Handle Ctrl-c (SIGINT)
+        # Handle Ctrl-c (SIGINT). Fish 4 reads Ctrl-c as a key at the prompt (no
+        # signal is raised), so the same handler is also bound to the key; the
+        # signal handler still covers Ctrl-c while a command runs.
         function __handle_sigint --on-signal SIGINT
             set -l now (date +%s)
             set -l time_diff (math \$now - \$__quick_shell_last_sigint)
@@ -31,6 +33,18 @@ if command -v fish >/dev/null 2>&1; then
                 herdr notification show 'Quick Shell' --body 'Press Ctrl-c again to close popup' >/dev/null 2>&1
                 commandline -f repaint
             end
+        end
+
+        function __handle_ctrl_c_key
+            __handle_sigint
+            commandline -f cancel-commandline repaint
+        end
+        # Bound at the first prompt, after config.fish: oh-my-posh binds ctrl-c
+        # itself (insert/visual mode) and would win over a bind made here.
+        function __bind_ctrl_c --on-event fish_prompt
+            bind -M insert \\cc __handle_ctrl_c_key
+            bind -M default \\cc __handle_ctrl_c_key
+            functions -e __bind_ctrl_c
         end
 
         # Hook that runs after each command
