@@ -80,6 +80,32 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Takeaway:** When an upstream tool collapses several contexts under one global setting, check `<tool> <subcommand> --help` for a per-invocation flag that outranks it before contorting the config — and prefer wrapping the *rarer* action so the common path stays native. Also: blank a replaced native binding (`key_name = ""`) rather than deleting the line, or herdr's upstream default silently returns.
 
+### Herdr mac app can't reach the Crafting sandbox: `Connection closed by UNKNOWN port 65535`
+
+**Symptom:** In the app's "Add a machine" dialog, a Crafting sandbox ssh entry shows `cannot reach <host>: Connection closed by UNKNOWN port 65535`, even though `herdr-remote` in the TUI works via the `*.sandbox` wrapper host.
+
+**Cause:** Two independent problems, both visible by running `ssh -o BatchMode=yes <host> true` by hand:
+1. An entry that runs `cs ssh-proxy <name>.sandbox.<domain>:443` directly fails with `Fatal: 404` — the real proxy host is `<workspace>--<sandbox-id>-...`, which only `cs-ssh-proxy-wrapper` computes.
+2. The app is launched from Finder, so ssh gets a minimal `PATH` (`/usr/bin:/bin:...`). `ProxyCommand sh -c 'cs-ssh-proxy-wrapper %h'` fails with `command not found`, and the wrapper itself needs `cs` and `jq`, which are also not on that `PATH`. The app also only lists *non-wildcard* `Host` entries, so the `Host *.sandbox` pattern never appears.
+
+**Fix:** In the work profile's `.ssh/config`, an explicit `Host joe-crafting` block sets only `HostName joe.sandbox`, and the alias is also listed on the `Host *.sandbox joe-crafting` block that carries the `ProxyCommand` (absolute path `/Users/<you>/bin/cs-ssh-proxy-wrapper %h`). `work/bin/cs-ssh-proxy-wrapper` also prepends `~/.crafting/sandbox/cli/current/bin`, `/opt/homebrew/bin`, etc. to `PATH`.
+
+**Verify:** `env -i HOME=$HOME PATH=/usr/bin:/bin /usr/bin/ssh -o BatchMode=yes joe-crafting echo ok` — the `env -i` reproduces the GUI app's environment.
+
+**Takeaway:** When a GUI app's ssh fails but the terminal's works, reproduce with `env -i` and a minimal `PATH` before suspecting the app. Use absolute paths in `ProxyCommand`.
+
+#### Follow-up: `` Error: `herdr.hc`: hc took longer than 30 s and was stopped ``
+
+**Symptom:** After the `PATH` fix, ssh connects but the app's Add dialog shows the `hc` (health check) timeout.
+
+**Cause:** Every ssh connection ran the wrapper, which called `cs sandbox list` (also `cs sandbox show`) — a 10-15 s API round trip. Herdr opens several connections during add/health check, so the total passes its 30 s budget. A terminal `ssh` hides this because you only wait ~17 s once.
+
+**Fix:** `cs-ssh-proxy-wrapper` caches `<id> <default-workspace>` per sandbox name in `~/.cache/cs-ssh-proxy/<name>` and goes straight to `cs ssh-proxy` on a hit (~1-2 s per connection). If the cached route fails within 10 s (stale id after the sandbox was recreated, or it's suspended) the cache entry is dropped and the slow resolve + resume path runs. Delete the file to force a re-resolve.
+
+**Takeaway:** `Host` patterns match the name typed on the command line, not a `HostName` rewritten by another block. An alias that sets `HostName` inherits a wildcard block's options only if the alias is also listed on that block's `Host` line. Check with `ssh -G <alias>`.
+
+**Takeaway:** Time the ssh connection itself (`time ssh host true`) — a ProxyCommand that does network work on every connect is invisible interactively but breaks clients with short timeouts.
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`
