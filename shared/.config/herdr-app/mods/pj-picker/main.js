@@ -141,9 +141,10 @@ export default class PjPicker extends View {
         .when(on, (el) => el.bg(t.hover))
         .hover((s) => s.bg(t.hover))
         .on_click(() => this.go(r, false))
-        .child(open ? div().size(8).flex_none().rounded(4).bg(dotColor(open)) : div().size(8).flex_none())
         .child(div().w(18).flex_none().font_family(iconFont).text_size(15).text_color(iconColor(t, r.color)).child(r.icon ?? ""))
         .child(div().flex_shrink(1).min_w(0).truncate().font_semibold().text_color(t.foreground).child(r.name))
+        // Open space: a dot in its color right after the name (no reserved slot on other rows).
+        .when(open, (el) => el.child(div().size(7).flex_none().rounded(4).bg(dotColor(open))))
         .child(h_flex().flex_1().min_w(0).justify_end().child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(r.displayPath)))
         .when(r.markerLabel, (el) => el.child(div().flex_none().text_size(10.5).text_color(t.dim).child(r.markerLabel)));
     };

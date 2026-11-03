@@ -88,7 +88,7 @@ Opened by leader `O` or `P` (`run("mod.open", { name: "pj-picker" })`; `O` pairs
 | `↑` / `↓` | Move (wraps) |
 | `Esc` | Close |
 
-- **Open space match:** a space on this computer (`machine` null) whose `folder` equals the project path (trailing `/` ignored). Matching rows show a dot in the space's color.
+- **Open space match:** a space on this computer (`machine` null) whose `folder` equals the project path (trailing `/` ignored). Matching rows show a dot in the space's color right after the name.
 - **Icons:** each row shows `pj`'s marker icon (`pj --icons`, `%i`) and color (`%c`). The icons are Nerd Font glyphs, drawn in the app's terminal font (`settings().font`, a Nerd Font here); `pj`'s color names map onto the theme's `ansi0..15`.
 - **Data source:** `pj --icons --format '%P\t%n\t%l\t%i\t%c' --sort alpha` (one tab-separated line per project), so it honors `~/.config/pj/config.yaml` (search paths, markers, excludes). `pj` only runs locally, so projects on remote machines (Crafting sandbox) aren't listed; new spaces are pinned to this computer (`machine: ""`).
 - **Why a mod:** the only extension route in the app is a mod, which can `exec(...)`. The layout (header, filter field, fixed-height scroll strip, key handling) is copied from the shipped `picker` mod.
