@@ -1,0 +1,271 @@
+#!/bin/sh
+# herdr-wt — find-or-create / remove git worktrees and their Herdr workspaces.
+#
+# Worktrunk (`wt`, https://worktrunk.dev) creates and removes the checkouts and
+# runs the hooks in ~/.config/worktrunk/config.toml; this script does the Herdr
+# side. Used by the TUI picker (~/.config/herdr/scripts/wt-picker.sh) and, for
+# the Herdr-independent subcommands, by the Mac app's wt-picker mod.
+#
+# Every subcommand works on the repo of the current directory (any checkout of
+# it). Targets are a branch name or a worktree path.
+#
+# Herdr-independent (git + wt only):
+#   herdr-wt checkouts            TSV per checkout: branch, path, main (1/0)
+#   herdr-wt current              path of the checkout containing $PWD
+#   herdr-wt dirty <target>       `git status --short` of that checkout (empty: clean)
+#   herdr-wt create <name>        find-or-create the checkout, print its path
+#   herdr-wt delete <target> [-f] remove the checkout with `wt remove`
+#
+# Herdr TUI (talk to the running herdr server):
+#   herdr-wt list                 TSV for fzf: branch, path, workspace id, display
+#   herdr-wt open <name>          focus its workspace, else open it, else create it
+#   herdr-wt remove <target> [-f] close its workspace, then delete
+#
+# Exit codes: 0 ok, 1 error, 3 checkout is dirty (pass -f to remove anyway).
+
+set -eu
+
+# GUI apps (the Herdr Mac app) may start with a minimal PATH: append the usual
+# tool dirs as a fallback (appended, so an existing PATH keeps its order).
+PATH="${PATH}:${HOME}/bin:${HOME}/.local/bin:/opt/homebrew/bin:/run/current-system/sw/bin:${HOME}/.nix-profile/bin:/usr/local/bin"
+export PATH
+
+die() {
+  printf 'herdr-wt: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
+
+# ---- repo ------------------------------------------------------------------
+
+# Main checkout of the repo at $PWD (the worktree list's first entry).
+main_checkout() {
+  git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p'
+}
+
+repo_init() {
+  MAIN=$(main_checkout)
+  [ -n "${MAIN}" ] || die "not in a git repository: ${PWD}"
+}
+
+# TSV: branch<TAB>path<TAB>main(1/0). Detached checkouts get an empty branch;
+# bare and prunable entries are skipped.
+checkouts() {
+  git -C "${MAIN}" worktree list --porcelain | awk '
+    function flush() {
+      if (path != "" && !skip) printf "%s\t%s\t%d\n", branch, path, (n++ == 0)
+      path = ""; branch = ""; skip = 0
+    }
+    /^worktree / { flush(); path = substr($0, 10); next }
+    /^branch /   { branch = substr($0, 8); sub(/^refs\/heads\//, "", branch); next }
+    /^bare$/ || /^prunable/ { skip = 1; next }
+    END { flush() }
+  '
+}
+
+# Resolve a target to "branch<TAB>path<TAB>main". A branch name wins over a
+# directory of the same name (as in wt); paths may be ~/..., relative, or
+# symlinked (/tmp vs /private/tmp).
+resolve() {
+  target=$1
+  list=$(checkouts)
+  hit=$(printf '%s\n' "${list}" | awk -F '\t' -v t="${target}" '$1 == t { print; exit }')
+  if [ -z "${hit}" ]; then
+    case "${target}" in
+      "~"/*) target="${HOME}/${target#"~/"}" ;;
+    esac
+    if [ -d "${target}" ]; then
+      abs=$(cd "${target}" && pwd)
+      phys=$(cd "${target}" && pwd -P)
+      hit=$(printf '%s\n' "${list}" | awk -F '\t' -v a="${abs}" -v p="${phys}" '$2 == a || $2 == p { print; exit }')
+    fi
+  fi
+  printf '%s' "${hit}"
+}
+
+current_checkout() {
+  git rev-parse --show-toplevel 2>/dev/null || true
+}
+
+default_branch() {
+  b=$(git -C "${MAIN}" symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null | sed 's|^refs/remotes/origin/||') || true
+  if [ -z "${b}" ]; then
+    if git -C "${MAIN}" show-ref --verify --quiet refs/heads/main; then
+      b=main
+    elif git -C "${MAIN}" show-ref --verify --quiet refs/heads/master; then
+      b=master
+    fi
+  fi
+  printf '%s\n' "${b:-main}"
+}
+
+# ---- git + wt --------------------------------------------------------------
+
+cmd_create() {
+  [ $# -ge 1 ] || die "create: missing name"
+  name=$1
+  hit=$(resolve "${name}")
+  if [ -n "${hit}" ]; then
+    printf '%s\n' "${hit}" | cut -f2
+    return
+  fi
+  git check-ref-format --branch "${name}" >/dev/null 2>&1 || die "not a valid branch name: '${name}'"
+
+  cd "${MAIN}"
+  if git show-ref --verify --quiet "refs/heads/${name}" || git show-ref --verify --quiet "refs/remotes/origin/${name}"; then
+    # Existing branch (local, or remote -> wt makes a tracking branch).
+    printf 'Checking out %s…\n' "${name}" >&2
+    json=$(wt switch --no-cd --yes --format json "${name}")
+  else
+    # New branch from a fresh default branch (what the fresh-worktree plugin
+    # did for workmux). Offline: fall back to the local default branch.
+    default=$(default_branch)
+    base=${default}
+    printf 'Fetching origin/%s…\n' "${default}" >&2
+    if git fetch --quiet origin "${default}" 2>/dev/null; then
+      base="origin/${default}"
+    else
+      printf 'Fetch failed; branching from local %s\n' "${default}" >&2
+    fi
+    printf 'Creating %s from %s…\n' "${name}" "${base}" >&2
+    json=$(wt switch --create --no-cd --yes --base "${base}" --format json "${name}")
+  fi
+  path=$(printf '%s' "${json}" | jq -r '.path // empty')
+  [ -n "${path}" ] || die "wt switch didn't report a path"
+  printf '%s\n' "${path}"
+}
+
+cmd_dirty() {
+  [ $# -ge 1 ] || die "dirty: missing target"
+  hit=$(resolve "$1")
+  [ -n "${hit}" ] || die "no worktree for '$1'"
+  git -C "$(printf '%s' "${hit}" | cut -f2)" --no-optional-locks status --short
+}
+
+# delete <target> [-f]: remove the checkout (no Herdr involvement).
+cmd_delete() {
+  [ $# -ge 1 ] || die "delete: missing target"
+  target=$1
+  force=${2:-}
+  hit=$(resolve "${target}")
+  [ -n "${hit}" ] || die "no worktree for '${target}'"
+  branch=$(printf '%s' "${hit}" | cut -f1)
+  path=$(printf '%s' "${hit}" | cut -f2)
+  is_main=$(printf '%s' "${hit}" | cut -f3)
+  [ "${is_main}" = 0 ] || die "${path} is the repository's main checkout, not a worktree"
+
+  if [ "${force}" != "-f" ] && [ -n "$(git -C "${path}" --no-optional-locks status --porcelain)" ]; then
+    printf '%s has uncommitted changes:\n' "${path}" >&2
+    git -C "${path}" --no-optional-locks status --short >&2
+    exit 3
+  fi
+
+  # Out of the checkout first: it may be our cwd.
+  cd "${MAIN}"
+  set -- remove --yes --foreground --format json
+  [ "${force}" = "-f" ] && set -- "$@" --force
+  json=$(wt "$@" -- "${branch:-${path}}")
+  outcome=$(printf '%s' "${json}" | jq -r '.[0].branch_outcome // empty')
+  # shellcheck disable=SC2016 # literal backticks in a message
+  case "${outcome}" in
+    deleted) printf 'Removed %s (branch %s deleted)\n' "${path}" "${branch}" ;;
+    "") printf 'Removed %s\n' "${path}" ;;
+    retained_unmerged) printf 'Removed %s (branch %s kept: unmerged; `wt remove -D` deletes it)\n' "${path}" "${branch}" ;;
+    *) printf 'Removed %s (branch %s kept: %s)\n' "${path}" "${branch}" "${outcome}" ;;
+  esac
+}
+
+# ---- Herdr TUI -------------------------------------------------------------
+
+# JSON of `herdr worktree list` for this repo, "" if herdr isn't reachable.
+herdr_worktrees() {
+  command herdr worktree list --cwd "${MAIN}" 2>/dev/null || true
+}
+
+# Workspace id showing a checkout path ("" if none).
+workspace_for() {
+  herdr_worktrees | jq -r --arg p "$1" '.result.worktrees[]? | select(.path == $p) | .open_workspace_id // empty' | head -n1
+}
+
+cmd_list() {
+  here=$(current_checkout)
+  hw=$(herdr_worktrees)
+  [ -n "${hw}" ] || hw='{}'
+  # Open workspaces by path, from herdr; everything else from git.
+  # Display: "● branch   ~/path  main here" (● = open in Herdr), columns aligned.
+  checkouts | jq -R -s -r --argjson hw "${hw}" --arg here "${here}" --arg home "${HOME}" '
+    ($hw.result.worktrees // [] | map({(.path): (.open_workspace_id // "")}) | add // {}) as $open
+    | [split("\n")[] | select(length > 0) | split("\t")
+       | {branch: .[0], path: .[1], main: .[2], name: (if .[0] == "" then "(detached)" else .[0] end)}]
+    | (map(.name | length) | max // 0) as $w
+    | .[]
+    | ($open[.path] // "") as $ws
+    | (.path | if startswith($home + "/") then "~" + ltrimstr($home) else . end) as $short
+    | ([ (if $ws != "" then "\u001b[32m●\u001b[0m" else " " end),
+        ("\u001b[1m" + .name + "\u001b[0m" + (" " * ($w - (.name | length) + 1))),
+        ("\u001b[2m" + $short + "\u001b[0m"),
+        (if .main == "1" then "\u001b[33mmain\u001b[0m" else empty end),
+        (if .path == $here then "\u001b[36mhere\u001b[0m" else empty end)
+      ] | join(" ")) as $display
+    | [.branch, .path, $ws, $display] | join("\t")
+  '
+}
+
+# Open a checkout path as a workspace and focus it.
+open_path() {
+  ws=$(workspace_for "$1")
+  if [ -n "${ws}" ]; then
+    command herdr workspace focus "${ws}" >/dev/null
+  else
+    command herdr worktree open --cwd "${MAIN}" --path "$1" --focus >/dev/null
+  fi
+}
+
+cmd_open() {
+  [ $# -ge 1 ] || die "open: missing name"
+  path=$(cmd_create "$1")
+  open_path "${path}"
+}
+
+cmd_remove() {
+  [ $# -ge 1 ] || die "remove: missing target"
+  target=$1
+  force=${2:-}
+  hit=$(resolve "${target}")
+  [ -n "${hit}" ] || die "no worktree for '${target}'"
+  path=$(printf '%s' "${hit}" | cut -f2)
+  ws=$(workspace_for "${path}")
+  # Delete (main-checkout and dirty checks included), then close the
+  # workspace. In this order because the caller may be a popup over that very
+  # workspace: if closing it ends the caller, the checkout is already gone
+  # rather than left behind. (macOS lets a folder go while shells sit in it.)
+  (cmd_delete "${path}" "${force}")
+  if [ -n "${ws}" ]; then
+    command herdr workspace close "${ws}" >/dev/null
+  fi
+}
+
+# ---- main ------------------------------------------------------------------
+
+[ $# -ge 1 ] || usage 1
+sub=$1
+shift
+case "${sub}" in
+  -h | --help | help) usage 0 ;;
+esac
+repo_init
+case "${sub}" in
+  checkouts) checkouts ;;
+  current) current_checkout ;;
+  dirty) cmd_dirty "$@" ;;
+  create) cmd_create "$@" ;;
+  delete) cmd_delete "$@" ;;
+  list) cmd_list ;;
+  open) cmd_open "$@" ;;
+  remove) cmd_remove "$@" ;;
+  *) usage 1 ;;
+esac

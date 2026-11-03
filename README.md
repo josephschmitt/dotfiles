@@ -106,7 +106,7 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
 - **📦 Package Management**: Nix packages + Homebrew integration
 - **🌐 Languages**: Node.js, Rust, Python, Go configurations
 - **🔨 Package Managers**: pnpm, bun, cargo, asdf, volta
-- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, and more
+- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, [Worktrunk](https://worktrunk.dev) (git worktrees + hooks behind the Herdr worktree picker), and more
 
 ### ⚡ Productivity Features
 

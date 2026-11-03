@@ -84,6 +84,7 @@
       "raine/workmux/workmux"
       "scooter"
       "television"
+      "worktrunk" # `wt`: worktree engine + hooks behind the Herdr worktree picker
     ];
     casks = [
       "1password"

@@ -1,0 +1,42 @@
+# Worktrunk user config (https://worktrunk.dev) — see README.md here.
+#
+# Worktrunk is the worktree engine behind the Herdr worktree picker
+# (shared/bin/herdr-wt): it creates and removes checkouts and runs the hooks
+# below. Herdr has no worktree hooks of its own.
+
+# Same place Herdr's own worktree commands use ([worktrees] directory default),
+# so checkouts made by either tool live side by side and Herdr groups them.
+worktree-path = "~/.herdr/worktrees/{{ repo }}/{{ branch | sanitize }}"
+
+# ---- hooks ---------------------------------------------------------------
+# pre-*  hooks block and a failure aborts the operation.
+# post-* hooks run in the background (output in .git/wt/logs/).
+# A table runs its commands concurrently.
+
+# Before the new worktree is handed over (blocking, so the Herdr space opens
+# with these in place).
+[pre-start]
+# workmux's `files.symlink: [node_modules]`: share the primary checkout's
+# node_modules instead of reinstalling. Only when the source exists.
+node-modules = "if [ -d '{{ primary_worktree_path }}/node_modules' ] && [ ! -e '{{ worktree_path }}/node_modules' ]; then ln -s '{{ primary_worktree_path }}/node_modules' '{{ worktree_path }}/node_modules'; fi"
+
+# After creation, in the background.
+[post-start]
+# Copy gitignored files (.env, ...) from the primary checkout, but only the
+# ones a repo opts into with a .worktreeinclude file (no-op without one), so
+# build output and caches aren't copied by accident.
+copy-ignored = "wt step copy-ignored --require-include"
+
+# [pre-remove] — blocking, runs before a worktree is removed; a failure keeps
+# it. Nothing by default. Example:
+# [pre-remove]
+# stop-dev-server = "pkill -f '{{ worktree_path }}' || true"
+
+# ---- per-project hooks ---------------------------------------------------
+# Keyed by <host>/<owner>/<repo> (`wt config show` prints it as Identifier).
+# Hooks here are added after the global ones above.
+
+# Work repos (was workmux's post_create in work/.config/workmux/config.yaml).
+# Guarded so it's a no-op where the `compass` CLI isn't installed.
+[projects."github.com/UrbanCompass/*"]
+post-start = "if command -v compass >/dev/null 2>&1; then compass repo init; fi"

@@ -70,14 +70,13 @@ split_vertical = "prefix+|"
 # Zoom — Alt+z
 zoom = "alt+z"
 
-# Open worktree picker — prefix+w (lists existing checkouts; focuses open ones, opens closed ones)
-open_worktree = "prefix+w"
-
-# New worktree — prefix+shift+w (matches new_workspace = prefix+shift+n pattern)
-new_worktree = "prefix+shift+w"
-
-# Remove worktree — prefix+shift+d
-remove_worktree = "prefix+shift+d"
+# Native worktree actions disabled — prefix+w / prefix+shift+w / prefix+shift+d
+# run the find-or-create worktree picker instead (scripts/wt-picker.sh, built
+# on Worktrunk + shared/bin/herdr-wt; [[keys.command]] entries below). It adds
+# setup hooks, a match list while typing, and delete from the list.
+open_worktree = ""
+new_worktree = ""
+remove_worktree = ""
 
 # New space — prefix+shift+n, wrapped to force ~/development.
 #
@@ -143,15 +142,49 @@ type = "plugin_action"
 command = "pj.open-picker"
 description = "Project picker (pj)"
 
-# Open existing branch as a herdr worktree (tv cable channel) — prefix+t ("tree").
-# Moved off prefix+shift+o, which is now the pj picker. TUI-only: the app has no equivalent
+# Worktree picker (scripts/wt-picker.sh) — type a name; matching worktrees of
+# the focused pane's repo are listed below. Enter focuses an open one, opens a
+# closed one, or creates the typed name when nothing matches (from a freshly
+# fetched origin/<default>, running the Worktrunk hooks in
+# ~/.config/worktrunk/config.toml). ctrl-n creates the typed name even if
+# something matches; ctrl-d deletes the highlighted worktree.
+# prefix+t ("tree") is an alias kept from the tv branch picker it replaced.
+# Same keys in the Herdr Mac app (leader w / W / D / t, mods/wt-picker).
+[[keys.command]]
+key = "prefix+w"
+type = "popup"
+command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
+description = "Worktree picker"
+width = "80%"
+height = "60%"
+
 [[keys.command]]
 key = "prefix+t"
 type = "popup"
-command = "bash -lc 'tv herdr-worktree'"
-description = "Open branch as worktree"
+command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
+description = "Worktree picker"
 width = "80%"
-height = "80%"
+height = "60%"
+
+# New worktree — same picker, but Enter always uses the typed name
+[[keys.command]]
+key = "prefix+shift+w"
+type = "popup"
+command = "bash -lc '~/.config/herdr/scripts/wt-picker.sh --new'"
+description = "New worktree"
+width = "80%"
+height = "60%"
+
+# Remove the focused pane's worktree — confirm (forced if dirty), delete the
+# checkout with `wt remove` (branch too if merged), close its workspace.
+# Refuses the main checkout.
+[[keys.command]]
+key = "prefix+shift+d"
+type = "popup"
+command = "bash -lc '~/.config/herdr/scripts/wt-picker.sh --remove-current'"
+description = "Remove worktree"
+width = "70%"
+height = "40%"
 
 # herdr-plugin-gh-pr (https://github.com/wyattjoh/herdr-plugin-gh-pr)
 # Open focused pane's branch PR in the browser — prefix+g (default goto freed;

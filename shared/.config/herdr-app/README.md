@@ -2,7 +2,7 @@ Configuration for [Herdr app](https://herdr.dev/) — the desktop (GUI) successo
 
 ## What's tracked
 
-Only `keys.json`, `mods/leader/` and `mods/pj-picker/` are symlinked from this repo (via GNU Stow). The rest of `~/.config/herdr-app` is written by the app (`settings.json`, `view.json`, `layouts/`, `mods/`, ...) and stays local — `settings.json` holds zoom, which changes constantly. Don't `stow` the whole directory's contents blindly: if `keys.json` is deleted while the app runs, it rewrites it within a second, so remove and re-stow in a single command.
+Only `keys.json`, `mods/leader/`, `mods/pj-picker/` and `mods/wt-picker/` are symlinked from this repo (via GNU Stow). The rest of `~/.config/herdr-app` is written by the app (`settings.json`, `view.json`, `layouts/`, `mods/`, ...) and stays local — `settings.json` holds zoom, which changes constantly. Don't `stow` the whole directory's contents blindly: if `keys.json` is deleted while the app runs, it rewrites it within a second, so remove and re-stow in a single command.
 
 ## Keybindings (`keys.json`)
 
@@ -34,7 +34,7 @@ Why `alt`: matches tmux-tilish / vim-tmux-navigator. Needs `option_as_alt` (Sett
 | `N` | New space in `~/development` |
 | `o` | Go to… (picker) |
 | `O` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
-| `w` / `W` / `D` | Open / new / remove worktree (the app's `worktree` mod dialogs) |
+| `w` (or `t`) / `W` / `D` | Worktree picker / new worktree / remove this worktree (`wt-picker`; see [Worktree picker](#worktree-picker-modswt-picker)). On a remote space they open the shipped `worktree` mod's dialogs instead |
 | `1..9` | Focus agent N (agents list order) |
 | `c` / `C` | Quick shell / mini shell (the latter persists; `hide` keeps it, reopen with `C`) |
 | `E` / `G` / `Y` | `$EDITOR` / `lazygit-launch` / `yazi` popups |
@@ -103,6 +103,34 @@ herdr-app shot /tmp/pj.png                           # then look at it
 herdr-app do overlay.close
 ```
 
+## Worktree picker (`mods/wt-picker/`)
+
+Find-or-create for git worktrees, the app side of the TUI's `prefix+w` popup (`shared/.config/herdr/scripts/wt-picker.sh`), in the same look as the pj picker. Leader `w` (alias `t`) opens it, `W` opens it in "new" mode, `D` opens it on the focused space's worktree to remove it.
+
+Type a name: the checkouts of the focused space's repo that match (case-insensitive substring over branch and path) are listed below.
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Focus the checkout's open space, else open one (`space.new`, unnamed so it nests under the repo). With nothing matching, a "Create worktree `<name>`" row creates it and opens it |
+| `ctrl+n` | Create the typed name even when something matches (e.g. `foo` while `foo-bar` exists) |
+| `ctrl+d` | Remove the highlighted worktree: asks first, lists uncommitted changes and forces if there are any; refuses the main checkout. Its space is closed after the checkout is gone |
+| `↑` / `↓`, `ctrl+k` / `ctrl+j` | Move (wraps) |
+| `Esc` | Close (cancels a remove confirmation first) |
+
+Props: `{ mode: "new" }` puts the Create row first, so Enter always uses the typed name (leader `W`); `{ mode: "remove" }` skips the list and goes straight to the remove confirmation for the focused space's checkout (leader `D`).
+
+- **Engine:** everything git-side is `~/bin/herdr-wt` (its Herdr-independent subcommands `checkouts`, `current`, `dirty`, `create`, `delete`), which uses [Worktrunk](https://worktrunk.dev) — so new worktrees land in `~/.herdr/worktrees/<repo>/<branch>`, branch from a freshly fetched `origin/<default>`, and run the hooks in `~/.config/worktrunk/config.toml` (see `shared/.config/worktrunk/README.md`). The mod only does the space side (`space.select` / `space.new` / `space.close`).
+- **Open space match:** like the shipped `worktree` mod, a local space whose first terminal is inside the checkout (and not inside a deeper one). The dot after the name is in that space's color.
+- **Local only:** `herdr-wt` runs on this computer. The leader keys fall back to the shipped `worktree` mod on remote spaces.
+- `herdr-wt` is called by absolute path and appends the usual tool dirs to `PATH` itself, so it works when the app was launched from Finder.
+
+```sh
+herdr-app check ~/.config/herdr-app/mods/wt-picker
+herdr-app do mod.open --name wt-picker               # pick mode (props need the leader)
+herdr-app shot /tmp/wt.png
+herdr-app do overlay.close
+```
+
 ## TUI ↔ app parity
 
 Goal: switch between the Herdr TUI (`shared/.config/herdr/config.toml`) and the Herdr Mac app without relearning keys. **Same action, same keys, wherever the app allows it.** They can't be identical (the app has no native leader key, no plugins, a different popup mechanism), so every difference is listed here on purpose. This table is the single place to check; update it in the same commit as any keybinding or feature change on either side.
@@ -127,7 +155,9 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 | Focus agent N | `prefix+1..9` | native `focus_agent` | leader |
 | Go to… (spaces, agents) | `prefix+o` | native `goto` | leader `o` runs the shipped `picker` mod |
 | New space in `~/development` | `prefix+shift+n` | `[[keys.command]]` wrapper | leader `N` |
-| Open / new / remove worktree | `prefix+w` / `prefix+shift+w` / `prefix+shift+d` | native | leader (`worktree` mod dialogs) |
+| Worktree picker (find-or-create, `ctrl+n` create, `ctrl+d` delete) | `prefix+w`, alias `prefix+t` | popup running `scripts/wt-picker.sh` (native `open_worktree` blanked) | leader `w` / `t` open `wt-picker` |
+| New worktree | `prefix+shift+w` | `wt-picker.sh --new` popup (native `new_worktree` blanked) | leader `W`: `wt-picker` `{mode: "new"}` |
+| Remove the focused worktree | `prefix+shift+d` | `wt-picker.sh --remove-current` popup (native `remove_worktree` blanked) | leader `D`: `wt-picker` `{mode: "remove"}` |
 | Quick shell / mini shell | `prefix+c` / `prefix+shift+c` | popup running `quick-shell.sh` | leader popup running the same script |
 | Editor / lazygit / yazi | `prefix+shift+e` / `prefix+shift+g` / `prefix+shift+y` | popups | leader popups |
 | Project picker (`pj`) | `prefix+shift+o` | `pj` plugin (`pj-herdr`) | leader `O` opens `pj-picker`; Enter focuses an open space, else creates one |
@@ -137,7 +167,8 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 
 | Item | TUI | App | Why / status |
 |------|-----|-----|--------------|
-| Open branch as worktree (`tv herdr-worktree`) | `prefix+t` | none | The `tv` channel calls the TUI's `herdr worktree` CLI; use leader `w`/`W` in the app. Was `prefix+shift+o` until that went to the pj picker, so keep `t` free in the leader for this if it's ever ported |
+| Worktree picker on a remote space | works if `herdr-wt`, `wt` and `git` are on that box | leader `w`/`W`/`D` fall back to the shipped `worktree` mod's dialogs (no hooks) | `wt-picker` runs `herdr-wt` on this computer only |
+| Worktree picker UI | fzf (type, then `ctrl-n` / `ctrl-d`) | native list | Same keys and behavior; the TUI shows the dirty-files list and confirms in the terminal |
 | Cycle panes | `alt+backtick` / `alt+shift+backtick` | none | App has no cycle-pane command (only directional `pane.go`) |
 | Rename pane | `prefix+p` | none | App has no rename-pane command |
 | Refresh PR status | `prefix+u` | none | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |
