@@ -85,7 +85,7 @@ Opened by leader `O` or `P` (`run("mod.open", { name: "pj-picker" })`; `O` pairs
 |-----|--------|
 | `Enter` | Focus the project's open space, else create one (`space.new` with the folder and name) |
 | `ctrl+n` | Always create a new space, even if one is open |
-| `↑` / `↓` | Move (wraps) |
+| `↑` / `↓`, `ctrl+k` / `ctrl+j` | Move (wraps) |
 | `Esc` | Close |
 
 - **Open space match:** a space on this computer (`machine` null) whose `folder` equals the project path (trailing `/` ignored). Matching rows show a dot in the space's color right after the name.

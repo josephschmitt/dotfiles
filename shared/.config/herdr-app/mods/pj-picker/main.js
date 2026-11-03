@@ -163,8 +163,9 @@ export default class PjPicker extends View {
       .on_key_down((e, cx) => {
         const k = e.key;
         if (k === "escape") return this.close();
-        if (k === "down" && n) this.at = (this.at + 1) % n;
-        else if (k === "up" && n) this.at = (this.at + n - 1) % n;
+        const ctrl = e.modifiers.control;
+        if ((k === "down" || (k === "j" && ctrl)) && n) this.at = (this.at + 1) % n;
+        else if ((k === "up" || (k === "k" && ctrl)) && n) this.at = (this.at + n - 1) % n;
         else if (k === "n" && e.modifiers.control) this.go(sel, true);
         else return;
         cx.stop_propagation();
