@@ -70,14 +70,14 @@ const dialog = (action, size) => {
   openOverlay({ mod: "worktree", kind: "dialog", ...size, props: { space: h.space, folder: h.cwd, action } });
 };
 
-// Worktree picker (mods/wt-picker, like the TUI's prefix+w / W / D popups).
-// It's local-only (runs ~/bin/herdr-wt here), so remote spaces get the
-// shipped worktree mod's dialog for the same action instead.
+// Worktree pickers (mods/wt-picker, like the TUI's prefix+w / W / D popups).
+// They run ~/bin/herdr-wt on this Mac. "all" lists this Mac's worktrees, so it
+// opens from any space; "pick" / "remove" work on the focused space's repo, so
+// remote spaces get the shipped worktree mod's dialog for the same action.
 const worktrees = (mode) => {
-  if (here().machine) {
-    const action = { pick: "open", new: "new", remove: "remove" }[mode];
-    const size = { pick: { width: 560, height: 480 }, new: { width: 460, height: 280 }, remove: { width: 440, height: 260 } }[mode];
-    return dialog(action, size);
+  if (mode !== "all" && here().machine) {
+    if (mode === "remove") return dialog("remove", { width: 440, height: 260 });
+    return dialog("open", { width: 560, height: 480 });
   }
   openOverlay({ mod: "wt-picker", kind: "popup", at: "top", offset: 40, width: 640, height: mode === "remove" ? 0.5 : 0.8, props: { mode } });
 };
@@ -102,8 +102,8 @@ const ITEMS = [
   { group: "Spaces", keys: ["N"], show: "N", label: "New space (~/development)", act: () => run("space.new", { folder: `${home()}/development` }) },
   { group: "Spaces", keys: ["o"], show: "o", label: "Go to…", act: () => run("mod.open", { name: "picker" }) },
   { group: "Spaces", keys: ["O"], show: "O", label: "Project picker (pj)", act: () => run("mod.open", { name: "pj-picker" }) },
-  { group: "Spaces", keys: ["w", "t"], show: "w t", label: "Worktree picker", act: () => worktrees("pick") },
-  { group: "Spaces", keys: ["W"], show: "W", label: "New worktree", act: () => worktrees("new") },
+  { group: "Spaces", keys: ["w"], show: "w", label: "All worktrees", act: () => worktrees("all") },
+  { group: "Spaces", keys: ["W"], show: "W", label: "Worktree picker (this repo)", act: () => worktrees("pick") },
   { group: "Spaces", keys: ["D"], show: "D", label: "Remove worktree", act: () => worktrees("remove") },
 
   { group: "Agents", keys: "123456789".split(""), show: "1-9", label: "Focus agent", act: (k) => { const a = agents()[Number(k) - 1]; if (a) run("agent.focus", { terminal: a.address }); } },

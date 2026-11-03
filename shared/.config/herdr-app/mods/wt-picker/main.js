@@ -1,19 +1,22 @@
-// Worktree picker: the Mac app side of the TUI's prefix+w popup
+// Worktree pickers: the Mac app side of the TUI's prefix+w / W / D popups
 // (shared/.config/herdr/scripts/wt-picker.sh). Same look as mods/pj-picker.
 //
-// Type a name: the checkouts of the focused space's repo that match are listed.
-// Enter focuses a checkout's open space, opens a space for it, or (no match)
-// creates the typed name as a new worktree and opens it. ctrl+n creates the
-// typed name even when something matches; ctrl+d removes the highlighted
-// worktree (asks first; forced if it has changes). ctrl+j/k move, Esc leaves.
-//
-// props: { mode: "new" }    Enter always uses the typed name (leader W)
-//        { mode: "remove" } remove the focused space's worktree (leader D)
+// props.mode:
+//   "pick" (default, leader W): find-or-create in the focused space's repo.
+//     Type a name: the checkouts of that repo that match are listed. Enter
+//     focuses a checkout's open space, opens a space for it, or (no match)
+//     creates the typed name as a new worktree and opens it. ctrl+n creates the
+//     typed name even when something matches.
+//   "all" (leader w): every managed worktree (~/.herdr/worktrees/<repo>/<name>)
+//     across all repos. Enter focuses its open space or opens one. No create.
+//   "remove" (leader D): remove the focused space's worktree.
+// In both lists ctrl+d offers to remove the highlighted worktree (asks first;
+// forced if it has changes). ctrl+j/k move, Esc leaves.
 //
 // The git/worktree work is done by ~/bin/herdr-wt (Herdr-independent
 // subcommands), which uses Worktrunk (`wt`) so creating runs the hooks in
-// ~/.config/worktrunk/config.toml. Local spaces only: leader w/W/D fall back to
-// the shipped `worktree` mod on remote ones.
+// ~/.config/worktrunk/config.toml. Local only: on remote spaces leader W/D fall
+// back to the shipped `worktree` mod; leader w always lists this Mac's worktrees.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
@@ -66,7 +69,8 @@ export default class WtPicker extends View {
     this.error = "";
     this.confirm = null; // { c, changes } while asking to remove c
     this.message = "";
-    this.input = InputState.new({ placeholder: this.mode === "new" ? "New worktree: branch name…" : "Go to or create a worktree…" });
+    this.all = this.mode === "all";
+    this.input = InputState.new({ placeholder: this.all ? "Switch to a worktree…" : "Go to or create a worktree…" });
     this.input.on("change", (_e, cx) => { this.filter = this.input.value(); this.at = 0; this.scroll = 0; cx.notify(); });
     this.input.on("submit", (_e, cx) => this.enter(cx));
     this.handle = cx.focus_handle();
@@ -92,7 +96,39 @@ export default class WtPicker extends View {
     closeOverlay(props().overlay);
   }
 
+  // herdr-wt resolves targets against the repo of its cwd: in all mode that's
+  // the worktree's own repo, not the focused space's.
+  cwdFor(c) {
+    return c.mainPath ?? this.cwd;
+  }
+
+  async loadAll() {
+    const r = await wt(["managed"], home());
+    if (!r.ok) {
+      this.list = [];
+      this.error = lastLine(r.err) || "herdr-wt managed failed";
+      return;
+    }
+    const h = norm(home());
+    const cwd = norm(this.cwd);
+    this.list = r.out.split("\n").filter(Boolean).map((line) => {
+      const [repo, branch, path, mainPath] = line.split("\t");
+      return {
+        repo,
+        branch,
+        path,
+        mainPath,
+        main: false,
+        here: inside(cwd, path),
+        name: branch || "(detached)",
+        displayPath: path.startsWith(`${h}/`) ? `~${path.slice(h.length)}` : path,
+        hay: `${repo} ${branch} ${path}`.toLowerCase(),
+      };
+    });
+  }
+
   async load() {
+    if (this.all) return this.loadAll();
     const r = await wt(["checkouts"], this.cwd);
     if (!r.ok) {
       this.list = [];
@@ -101,6 +137,9 @@ export default class WtPicker extends View {
     }
     const h = norm(home());
     const here = (await wt(["current"], this.cwd)).out;
+    // The repo's name (its main checkout's folder), shown in the title.
+    const mainPath = r.out.split("\n")[0]?.split("\t")[1] ?? "";
+    this.repo = mainPath.split("/").filter(Boolean).pop() ?? "";
     this.list = r.out.split("\n").filter(Boolean).map((line) => {
       const [branch, path, main] = line.split("\t");
       return {
@@ -115,16 +154,13 @@ export default class WtPicker extends View {
     });
   }
 
-  // Matching checkouts, plus a "Create <query>" row: first in new mode,
-  // alone when nothing matches.
+  // Matching checkouts, or a lone "Create <query>" row when nothing matches.
   rows() {
     const q = this.filter.trim();
     const f = q.toLowerCase();
     const hits = (this.list ?? []).filter((c) => !f || c.hay.includes(f));
-    if (!q || this.list === null) return hits;
-    const create = { create: true, name: q };
-    if (this.mode === "new") return [create, ...hits.filter((c) => c.branch !== q)];
-    return hits.length ? hits : [create];
+    if (this.all || !q || this.list === null || hits.length) return hits;
+    return [{ create: true, name: q }];
   }
 
   enter(cx) {
@@ -148,7 +184,7 @@ export default class WtPicker extends View {
   }
 
   create(name, cx) {
-    if (!name || this.busy) return;
+    if (this.all || !name || this.busy) return;
     this.busy = `Creating ${name}… (fetch, checkout, hooks)`;
     this.error = "";
     cx.notify();
@@ -171,7 +207,7 @@ export default class WtPicker extends View {
       this.error = `${c.displayPath} is the main checkout, not a worktree`;
       return;
     }
-    const d = await wt(["dirty", c.path], this.cwd);
+    const d = await wt(["dirty", c.path], this.cwdFor(c));
     this.confirm = { c, changes: d.ok ? d.out : "" };
   }
 
@@ -181,7 +217,7 @@ export default class WtPicker extends View {
     this.busy = `Removing ${c.name}…`;
     cx.notify();
     cx.spawn(async (cx) => {
-      const r = await wt(["delete", c.path, ...(changes ? ["-f"] : [])], this.cwd);
+      const r = await wt(["delete", c.path, ...(changes ? ["-f"] : [])], this.cwdFor(c));
       this.busy = "";
       if (!r.ok) {
         this.error = lastLine(r.err) || "Couldn't remove the worktree";
@@ -196,7 +232,7 @@ export default class WtPicker extends View {
         return this.close();
       }
       this.message = msg;
-      if (this.cwd === c.path || inside(this.cwd, c.path)) this.cwd = this.list.find((x) => x.main)?.path ?? home();
+      if (!this.all && inside(this.cwd, c.path)) this.cwd = this.list.find((x) => x.main)?.path ?? home();
       await this.load();
       this.at = 0;
       cx.notify();
@@ -255,6 +291,7 @@ export default class WtPicker extends View {
       const open = spaceOf(norm(r.path), this.list ?? []);
       return base
         .child(div().w(18).flex_none().text_size(13).text_color(t.dim).child(r.main ? "◆" : "⑂"))
+        .when(r.repo, (el) => el.child(tag(r.repo, t.dim)))
         .child(div().flex_shrink(1).min_w(0).truncate().font_semibold().text_color(t.foreground).child(r.name))
         .when(open, (el) => el.child(div().size(7).flex_none().rounded(4).bg(dotColor(open))))
         .child(h_flex().flex_1().min_w(0).justify_end().child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(r.displayPath)))
@@ -280,8 +317,8 @@ export default class WtPicker extends View {
         .child(div().pt(6).text_size(11.5).text_color(t.dim).child(changes ? "Enter discard and remove · Esc cancel" : "Enter remove · Esc cancel"));
     };
 
-    const hints = this.mode === "new" ? "Enter create · Esc" : removing ? "Enter remove · Esc" : "Enter go · ctrl+n create · ctrl+d delete · Esc";
-    const title = this.mode === "new" ? "New worktree" : removing ? "Remove worktree" : "Worktrees";
+    const hints = removing ? "Enter remove · Esc" : this.all ? "Enter go · ctrl+d delete · Esc" : "Enter go · ctrl+n create · ctrl+d delete · Esc";
+    const title = removing ? "Remove worktree" : this.all ? "All worktrees" : "Worktrees";
 
     return v_flex()
       .id("wt-picker")
@@ -310,14 +347,22 @@ export default class WtPicker extends View {
         else if ((k === "down" || (k === "j" && ctrl)) && n) this.at = (this.at + 1) % n;
         else if ((k === "up" || (k === "k" && ctrl)) && n) this.at = (this.at + n - 1) % n;
         else if (k === "n" && ctrl) this.create(this.filter.trim(), cx);
-        else if (k === "d" && ctrl && sel && !sel.create) {
+        else if (k === "d" && ctrl) {
           this.error = "";
-          cx.spawn(async (cx) => { await this.ask(sel); cx.notify(); });
+          this.message = "";
+          if (!sel || sel.create) this.error = "ctrl+d: highlight a worktree to delete it";
+          else cx.spawn(async (cx) => { await this.ask(sel); cx.notify(); });
         } else return;
         cx.stop_propagation();
         cx.notify();
       })
-      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child(title)).child(div().text_size(11).text_color(t.dim).child(hints)))
+      .child(
+        h_flex().items_center().gap(8)
+          .child(div().flex_none().text_size(15).font_semibold().text_color(t.foreground).child(title))
+          .when(this.repo && !this.all, (el) => el.child(div().min_w(0).truncate().text_size(15).text_color(t.dim).child(`(${this.repo})`)))
+          .child(div().flex_1())
+          .child(div().flex_none().text_size(11).text_color(t.dim).child(hints)),
+      )
       .when(!removing, (el) =>
         el.child(
           h_flex().h(36).flex_none().px(10).gap(8).items_center().rounded(9).border_1().border_color(t.accent).bg(t.background)
@@ -347,7 +392,8 @@ export default class WtPicker extends View {
                 cx.notify();
               }))
             .when(this.list === null, (el) => el.child(line("Loading worktrees…")))
-            .when(this.list !== null && n === 0 && !this.error, (el) => el.child(line("Type a branch name to create a worktree")))
+            .when(this.list !== null && n === 0 && !this.error, (el) =>
+              el.child(line(this.all ? (this.filter.trim() ? "No matching worktree" : "No worktrees in ~/.herdr/worktrees") : "Type a branch name to create a worktree")))
             .children(rows.map((r, i) => (visible(i) ? placeAt(row(r, i), i) : null)).filter(Boolean)),
         ))
       .when(removing && !this.busy && !this.confirm && !this.error, (el) => el.child(line("Checking…")));

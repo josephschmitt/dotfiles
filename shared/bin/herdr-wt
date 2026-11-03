@@ -6,10 +6,14 @@
 # side. Used by the TUI picker (~/.config/herdr/scripts/wt-picker.sh) and, for
 # the Herdr-independent subcommands, by the Mac app's wt-picker mod.
 #
-# Every subcommand works on the repo of the current directory (any checkout of
-# it). Targets are a branch name or a worktree path.
+# Most subcommands work on the repo of the current directory (any checkout of
+# it). Targets are a branch name or a worktree path. `managed` and `all` list
+# the worktrees of every repo, from any directory.
 #
 # Herdr-independent (git + wt only):
+#   herdr-wt managed              TSV per worktree under $HERDR_WT_ROOT (default
+#                                 ~/.herdr/worktrees), all repos: repo, branch,
+#                                 path, main checkout
 #   herdr-wt checkouts            TSV per checkout: branch, path, main (1/0)
 #   herdr-wt current              path of the checkout containing $PWD
 #   herdr-wt dirty <target>       `git status --short` of that checkout (empty: clean)
@@ -18,6 +22,7 @@
 #
 # Herdr TUI (talk to the running herdr server):
 #   herdr-wt list                 TSV for fzf: branch, path, workspace id, display
+#   herdr-wt all                  TSV for fzf, all repos: path, main, workspace id, display
 #   herdr-wt open <name>          focus its workspace, else open it, else create it
 #   herdr-wt remove <target> [-f] close its workspace, then delete
 #
@@ -36,7 +41,7 @@ die() {
 }
 
 usage() {
-  sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -101,6 +106,21 @@ default_branch() {
     fi
   fi
   printf '%s\n' "${b:-main}"
+}
+
+# ---- all repos -------------------------------------------------------------
+
+# TSV: repo<TAB>branch<TAB>path<TAB>main, one row per linked checkout under the
+# worktree root (where Worktrunk and Herdr put them), sorted by repo, branch.
+# Directories that aren't checkouts (no .git file) are skipped.
+cmd_managed() {
+  root=${HERDR_WT_ROOT:-${HOME}/.herdr/worktrees}
+  for p in "${root}"/*/*; do
+    [ -f "${p}/.git" ] || continue
+    common=$(git -C "${p}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || continue
+    branch=$(git -C "${p}" branch --show-current 2>/dev/null) || branch=""
+    printf '%s\t%s\t%s\t%s\n' "$(basename "$(dirname "${p}")")" "${branch}" "${p}" "$(dirname "${common}")"
+  done | sort -t "$(printf '\t')" -k1,1 -k2,2
 }
 
 # ---- git + wt --------------------------------------------------------------
@@ -215,6 +235,29 @@ cmd_list() {
   '
 }
 
+# All managed worktrees (cmd_managed) for fzf, with the open workspace from one
+# `herdr workspace list`. Display: "● repo  branch  ~/path", columns aligned.
+cmd_all() {
+  wl=$(command herdr workspace list 2>/dev/null || true)
+  [ -n "${wl}" ] || wl='{}'
+  cmd_managed | jq -R -s -r --argjson wl "${wl}" --arg home "${HOME}" '
+    ($wl.result.workspaces // [] | map(select(.worktree.checkout_path != null) | {(.worktree.checkout_path): .workspace_id}) | add // {}) as $open
+    | [split("\n")[] | select(length > 0) | split("\t")
+       | {repo: .[0], branch: .[1], path: .[2], main: .[3], name: (if .[1] == "" then "(detached)" else .[1] end)}]
+    | (map(.repo | length) | max // 0) as $rw
+    | (map(.name | length) | max // 0) as $w
+    | .[]
+    | ($open[.path] // "") as $ws
+    | (.path | if startswith($home + "/") then "~" + ltrimstr($home) else . end) as $short
+    | ([ (if $ws != "" then "\u001b[32m●\u001b[0m" else " " end),
+        ("\u001b[35m" + .repo + "\u001b[0m" + (" " * ($rw - (.repo | length) + 1))),
+        ("\u001b[1m" + .name + "\u001b[0m" + (" " * ($w - (.name | length) + 1))),
+        ("\u001b[2m" + $short + "\u001b[0m")
+      ] | join(" ")) as $display
+    | [.path, .main, $ws, $display] | join("\t")
+  '
+}
+
 # Open a checkout path as a workspace and focus it.
 open_path() {
   ws=$(workspace_for "$1")
@@ -256,6 +299,8 @@ sub=$1
 shift
 case "${sub}" in
   -h | --help | help) usage 0 ;;
+  managed) cmd_managed; exit ;;
+  all) cmd_all; exit ;;
 esac
 repo_init
 case "${sub}" in

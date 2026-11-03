@@ -51,7 +51,8 @@ goto = "prefix+o"
 # Workspace picker disabled — default prefix+w conflicts with open_worktree, and
 # prefix+o is used for goto instead
 workspace_picker = ""
-# Rename workspace disabled — prefix+shift+e freed for the Editor popup below
+# Rename workspace disabled — its default prefix+shift+w is the repo worktree
+# picker below (prefix+shift+e is the Editor popup)
 rename_workspace = ""
 # open_notification_target disabled — no free slot
 open_notification_target = ""
@@ -70,10 +71,13 @@ split_vertical = "prefix+|"
 # Zoom — Alt+z
 zoom = "alt+z"
 
-# Native worktree actions disabled — prefix+w / prefix+shift+w / prefix+shift+d
-# run the find-or-create worktree picker instead (scripts/wt-picker.sh, built
-# on Worktrunk + shared/bin/herdr-wt; [[keys.command]] entries below). It adds
-# setup hooks, a match list while typing, and delete from the list.
+# Native worktree actions disabled — prefix+w (all worktrees), prefix+shift+w
+# (find-or-create in this repo) and prefix+shift+d (remove) run the worktree
+# pickers instead (scripts/wt-picker.sh, built on Worktrunk +
+# shared/bin/herdr-wt; [[keys.command]] entries below). They add setup hooks,
+# a match list while typing, a cross-repo list, and delete from the list.
+# There's no separate "new worktree" key: the repo picker's Enter / ctrl-n
+# already create.
 open_worktree = ""
 new_worktree = ""
 remove_worktree = ""
@@ -142,36 +146,30 @@ type = "plugin_action"
 command = "pj.open-picker"
 description = "Project picker (pj)"
 
-# Worktree picker (scripts/wt-picker.sh) — type a name; matching worktrees of
-# the focused pane's repo are listed below. Enter focuses an open one, opens a
-# closed one, or creates the typed name when nothing matches (from a freshly
-# fetched origin/<default>, running the Worktrunk hooks in
-# ~/.config/worktrunk/config.toml). ctrl-n creates the typed name even if
-# something matches; ctrl-d deletes the highlighted worktree.
-# prefix+t ("tree") is an alias kept from the tv branch picker it replaced.
-# Same keys in the Herdr Mac app (leader w / W / D / t, mods/wt-picker).
+# All worktrees (scripts/wt-picker.sh --all) — every managed worktree
+# (~/.herdr/worktrees/<repo>/<name>) across all repos, from any pane. Enter
+# focuses its open workspace or opens one; ctrl-d offers to delete it. No
+# create (use prefix+shift+w in the repo). Main checkouts: the pj picker.
 [[keys.command]]
 key = "prefix+w"
 type = "popup"
-command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
-description = "Worktree picker"
+command = "bash -lc '~/.config/herdr/scripts/wt-picker.sh --all'"
+description = "All worktrees"
 width = "80%"
 height = "60%"
 
-[[keys.command]]
-key = "prefix+t"
-type = "popup"
-command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
-description = "Worktree picker"
-width = "80%"
-height = "60%"
-
-# New worktree — same picker, but Enter always uses the typed name
+# Worktree picker for this repo (scripts/wt-picker.sh) — type a name; matching
+# worktrees of the focused pane's repo are listed below. Enter focuses an open
+# one, opens a closed one, or creates the typed name when nothing matches (from
+# a freshly fetched origin/<default>, running the Worktrunk hooks in
+# ~/.config/worktrunk/config.toml). ctrl-n creates the typed name even if
+# something matches; ctrl-d offers to delete the highlighted worktree.
+# Same keys in the Herdr Mac app (leader w / W / D, mods/wt-picker).
 [[keys.command]]
 key = "prefix+shift+w"
 type = "popup"
-command = "bash -lc '~/.config/herdr/scripts/wt-picker.sh --new'"
-description = "New worktree"
+command = "bash -lc ~/.config/herdr/scripts/wt-picker.sh"
+description = "Worktree picker (this repo)"
 width = "80%"
 height = "60%"
 

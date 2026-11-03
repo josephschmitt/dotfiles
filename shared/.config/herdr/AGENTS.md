@@ -66,20 +66,29 @@ in the repo-root `TROUBLESHOOTING.md`.
 
 The config includes `[[keys.command]]` entries for launching tools in temporary panes. When adding new ones, read `config.toml` for the existing commands and follow the same pattern.
 
-## Worktree Picker (`prefix+w` / `prefix+shift+w` / `prefix+shift+d`, alias `prefix+t`)
+## Worktree Pickers (`prefix+w` / `prefix+shift+w` / `prefix+shift+d`)
 
 Herdr's native worktree actions are blanked (`open_worktree`, `new_worktree`,
 `remove_worktree` = `""`) and replaced by popups running
-`scripts/wt-picker.sh`: an fzf find-or-create list (Enter focuses/opens/creates,
-`ctrl-n` force-creates the typed name, `ctrl-d` deletes), `--new` mode, and
-`--remove-current`.
+`scripts/wt-picker.sh`:
+
+- `prefix+w` → `--all`: every managed worktree (`~/.herdr/worktrees/<repo>/<name>`)
+  across all repos, from any pane (repo or not). Enter switches to / opens it,
+  `ctrl-d` offers to delete it. No create.
+- `prefix+shift+w` → no flag: fzf find-or-create in the focused pane's repo
+  (Enter focuses/opens/creates, `ctrl-n` force-creates the typed name, `ctrl-d`
+  offers to delete the highlighted worktree).
+- `prefix+shift+d` → `--remove-current`.
+
+There's deliberately no separate "new worktree" key: the repo picker creates.
+`prefix+t` is unbound (it used to alias the picker).
 
 The layers, so a fix goes in the right one:
 
 | Layer | File | Does |
 |-------|------|------|
 | UI | `scripts/wt-picker.sh` | fzf popup, confirmations |
-| Glue | `shared/bin/herdr-wt` | resolve names/paths, find the workspace for a checkout, `herdr workspace focus` / `herdr worktree open --cwd <main> --path <p> --focus` / `herdr workspace close` |
+| Glue | `shared/bin/herdr-wt` | resolve names/paths, find the workspace for a checkout, `herdr workspace focus` / `herdr worktree open --cwd <main> --path <p> --focus` / `herdr workspace close`; `managed` / `all` list every repo's worktrees (git, plus one `herdr workspace list` for the open dots) |
 | Engine + hooks | [Worktrunk](https://worktrunk.dev) (`wt`), `shared/.config/worktrunk/config.toml` | create/remove checkouts in `~/.herdr/worktrees/<repo>/<branch>`, run setup hooks (`node_modules` symlink, `compass repo init` on work repos) |
 
 - Herdr has no worktree hooks of its own; put per-worktree setup in Worktrunk's
@@ -88,7 +97,10 @@ The layers, so a fix goes in the right one:
   checkout errors with `linked_worktree_source`), and opens a parent workspace
   for the main checkout if none is open, so the worktree groups under it.
 - Listing uses `git worktree list` + `herdr worktree list`, not `wt list`
-  (seconds on the big monorepos).
+  (seconds on the big monorepos). The all-repos list globs
+  `~/.herdr/worktrees/*/*` and skips folders without a valid `.git` file.
+- Opening/removing from the all-repos list `cd`s into the worktree (or its main
+  checkout) first, since `herdr-wt open/remove` resolve against the cwd's repo.
 - The Mac app's `mods/wt-picker` uses the same `herdr-wt` (its Herdr-independent
   subcommands) on the same keys; keep them in step (parity table).
 - Replaced the old `tv herdr-worktree` cable channel on `prefix+t`.

@@ -1,15 +1,20 @@
 #!/bin/sh
-# Herdr worktree picker (runs in a popup; see config.toml prefix+w / W / D).
+# Herdr worktree pickers (run in popups; see config.toml prefix+w / W / D).
 #
-#   wt-picker.sh                   find-or-create: type a name, matching
-#                                  worktrees of this repo are listed below
-#   wt-picker.sh --new             same list, but Enter always uses what you typed
+#   wt-picker.sh                   find-or-create in this repo (prefix+shift+w):
+#                                  type a name, matching worktrees of the focused
+#                                  pane's repo are listed below
+#   wt-picker.sh --all             switch to any managed worktree, all repos
+#                                  (prefix+w); works from any pane
 #   wt-picker.sh --remove-current  remove the worktree the focused pane is in
+#                                  (prefix+shift+d)
 #
-# Keys (fzf): Enter opens the highlighted worktree (focus its workspace, or
-# open one), or creates the typed name when nothing matches. ctrl-n creates
-# the typed name even if something matches. ctrl-d removes the highlighted
-# worktree. ctrl-j/ctrl-k move, Esc closes.
+# Keys (fzf), find-or-create: Enter opens the highlighted worktree (focus its
+# workspace, or open one), or creates the typed name when nothing matches.
+# ctrl-n creates the typed name even if something matches. ctrl-d offers to
+# delete the highlighted worktree (asks first). ctrl-j/ctrl-k move, Esc closes.
+# --all: Enter switches to / opens the highlighted worktree, ctrl-d deletes it;
+# no create (there's no repo to create in).
 #
 # The work is done by herdr-wt (shared/bin), which uses Worktrunk (`wt`) for
 # the checkouts and hooks.
@@ -18,10 +23,10 @@ set -u
 
 mode=pick
 case "${1:-}" in
-  --new) mode=new ;;
   --remove-current) mode=remove ;;
+  --all) mode=all ;;
   "") ;;
-  *) printf 'usage: %s [--new | --remove-current]\n' "$0" >&2; exit 2 ;;
+  *) printf 'usage: %s [--all | --remove-current]\n' "$0" >&2; exit 2 ;;
 esac
 
 pause() {
@@ -90,6 +95,47 @@ remove_flow() {
   fi
 }
 
+# --all: every managed worktree, from any pane (repo or not).
+if [ "${mode}" = all ]; then
+  WT_HEADER="Enter switch/open · ctrl-d delete · Esc"
+  WT_MSG=""
+  export WT_HEADER WT_MSG
+  while :; do
+    # shellcheck disable=SC2016 # $WT_* expand in fzf's shell, not here
+    out=$(herdr-wt all | fzf --ansi --layout=reverse --height=100% --border=none \
+      --delimiter='\t' --with-nth=4 --expect=ctrl-d \
+      --prompt='worktree ❯ ' --header="${WT_HEADER}" --header-first \
+      --with-shell='sh -c' \
+      --bind 'result:transform-header:[ -n "$WT_MSG" ] && printf "%s\n" "$WT_MSG"; printf "%s" "$WT_HEADER"')
+    rc=$?
+    [ "${rc}" -le 1 ] || exit 0
+    key=$(printf '%s\n' "${out}" | sed -n 1p)
+    sel=$(printf '%s\n' "${out}" | sed -n 2p)
+    path=$(printf '%s' "${sel}" | cut -f1)
+    main=$(printf '%s' "${sel}" | cut -f2)
+    WT_MSG=""
+    if [ -z "${path}" ]; then
+      [ "${key}" = ctrl-d ] && WT_MSG="ctrl-d: highlight a worktree to delete it"
+      continue
+    fi
+    if [ "${key}" = ctrl-d ]; then
+      clear
+      # remove_flow and herdr-wt resolve against the repo of $PWD; the
+      # subshell keeps our cwd. Its $reason comes back as the last line.
+      res=$(cd "${main}" && { remove_flow "${path}" >/dev/tty 2>&1 && echo ok || printf '%s\n' "${reason}"; })
+      if [ "${res}" = ok ]; then
+        WT_MSG="Removed ${path}"
+      else
+        WT_MSG="Not removed${res:+ (${res})}: ${path}"
+      fi
+      continue
+    fi
+    cd "${path}" || fail "Can't enter ${path}"
+    run open "${path}"
+    exit 0
+  done
+fi
+
 here=$(herdr-wt current 2>/dev/null)
 [ -n "${here}" ] || fail "Not in a git repository: ${PWD}"
 
@@ -99,11 +145,10 @@ if [ "${mode}" = remove ]; then
   exit 0
 fi
 
-if [ "${mode}" = new ]; then
-  WT_HEADER="New worktree: type a branch name · Enter creates it (or opens it if it exists) · Esc"
-else
-  WT_HEADER="Enter open · ctrl-n create typed name · ctrl-d delete · Esc"
-fi
+# The repo's name (its main checkout's folder), shown in the prompt.
+repo=$(basename "$(herdr-wt checkouts | sed -n '1p' | cut -f2)")
+
+WT_HEADER="Enter open (or create typed name) · ctrl-n create typed name · ctrl-d delete · Esc"
 # WT_MSG: result of the last ctrl-d, shown above the hints. Both are read by
 # the transform-header bind (which redraws the header on every result change).
 WT_MSG=""
@@ -113,7 +158,7 @@ while :; do
   # shellcheck disable=SC2016 # $FZF_* / $WT_* expand in fzf's shell, not here
   out=$(herdr-wt list | fzf --ansi --layout=reverse --height=100% --border=none \
     --delimiter='\t' --with-nth=4 --print-query --expect=ctrl-n,ctrl-d \
-    --prompt='worktree ❯ ' --header="${WT_HEADER}" --header-first \
+    --prompt="worktree (${repo}) ❯ " --header="${WT_HEADER}" --header-first \
     --with-shell='sh -c' \
     --bind 'result:transform-header:if [ "$FZF_MATCH_COUNT" -eq 0 ] && [ -n "$FZF_QUERY" ]; then printf "No match · Enter creates %s\n" "$FZF_QUERY"; fi; [ -n "$WT_MSG" ] && printf "%s\n" "$WT_MSG"; printf "%s" "$WT_HEADER"')
   rc=$?
@@ -126,7 +171,16 @@ while :; do
 
   case "${key}" in
     ctrl-d)
-      [ -n "${path}" ] || continue
+      # Refusals go in the header (WT_MSG), where they stay visible; the
+      # confirmation screen is only for something that can be deleted.
+      if [ -z "${path}" ]; then
+        WT_MSG="ctrl-d: highlight a worktree to delete it"
+        continue
+      fi
+      if [ "$(checkout_info "${path}" | cut -f3)" = 1 ]; then
+        WT_MSG="Can't delete ${path}: it's the main checkout, not a worktree"
+        continue
+      fi
       clear
       if remove_flow "${path}"; then
         WT_MSG="Removed ${path}"
@@ -136,13 +190,7 @@ while :; do
       continue
       ;;
     ctrl-n) target=${query} ;;
-    *)
-      if [ "${mode}" = new ] && [ -n "${query}" ]; then
-        target=${query}
-      else
-        target=${path:-${query}}
-      fi
-      ;;
+    *) target=${path:-${query}} ;;
   esac
   [ -n "${target}" ] || continue
   run open "${target}"

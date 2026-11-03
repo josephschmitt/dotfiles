@@ -57,12 +57,15 @@ the `cl` alias.
 ### git-worktree-sibling
 Adds or removes a git worktree as a sibling directory (`../<repo>-<branch>`).
 Exposed as the `wta` (add) / `wtr` (remove) aliases.
+
 ### herdr-wt
 Find-or-create / remove git worktrees and their Herdr workspaces, on top of
 [Worktrunk](https://worktrunk.dev) (`wt`, which creates/removes the checkouts
 and runs the hooks in `~/.config/worktrunk/config.toml`). Backs the Herdr
-worktree picker: the TUI popup (`~/.config/herdr/scripts/wt-picker.sh`,
-`prefix+w`) uses all of it, the Mac app's `wt-picker` mod uses the
-Herdr-independent subcommands (`checkouts`, `current`, `dirty`, `create`,
-`delete`). New branches start from a freshly fetched `origin/<default>`.
-Works from any checkout of a repo; `herdr-wt --help` for the subcommands.
+worktree pickers: the TUI popups (`~/.config/herdr/scripts/wt-picker.sh`,
+`prefix+w` / `prefix+shift+w` / `prefix+shift+d`) use all of it, the Mac
+app's `wt-picker` mod uses the Herdr-independent subcommands (`managed`,
+`checkouts`, `current`, `dirty`, `create`, `delete`). New branches start from
+a freshly fetched `origin/<default>`. Most subcommands work from any checkout
+of a repo; `managed` / `all` list the worktrees under `~/.herdr/worktrees` for
+every repo, from anywhere. `herdr-wt --help` for the subcommands.
