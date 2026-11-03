@@ -81,10 +81,9 @@
     brews = [
       "herdr"
       "josephschmitt/tap/pj"
-      "raine/workmux/workmux"
       "scooter"
       "television"
-      "worktrunk" # `wt`: worktree engine + hooks behind the Herdr worktree picker
+      "worktrunk"
     ];
     casks = [
       "1password"
@@ -105,7 +104,6 @@
     taps = [
       "0x1b2c/veil"
       "josephschmitt/tap"
-      "raine/workmux"
     ];
 
     onActivation.autoUpdate = true;
