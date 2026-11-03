@@ -143,10 +143,10 @@ type = "plugin_action"
 command = "pj.open-picker"
 description = "Project picker (pj)"
 
-# Open existing branch as a herdr worktree (tv cable channel) — prefix+shift+b ("branch").
+# Open existing branch as a herdr worktree (tv cable channel) — prefix+t ("tree").
 # Moved off prefix+shift+o, which is now the pj picker. TUI-only: the app has no equivalent
 [[keys.command]]
-key = "prefix+shift+b"
+key = "prefix+t"
 type = "popup"
 command = "bash -lc 'tv herdr-worktree'"
 description = "Open branch as worktree"

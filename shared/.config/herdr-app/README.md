@@ -137,7 +137,7 @@ Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[ke
 
 | Item | TUI | App | Why / status |
 |------|-----|-----|--------------|
-| Open branch as worktree (`tv herdr-worktree`) | `prefix+shift+b` | none | Uses the TUI's `herdr worktree` CLI; use leader `w`/`W` in the app. Was `prefix+shift+o` until that went to the pj picker, so keep `B` free in the app for this if it's ever ported |
+| Open branch as worktree (`tv herdr-worktree`) | `prefix+t` | none | The `tv` channel calls the TUI's `herdr worktree` CLI; use leader `w`/`W` in the app. Was `prefix+shift+o` until that went to the pj picker, so keep `t` free in the leader for this if it's ever ported |
 | Cycle panes | `alt+backtick` / `alt+shift+backtick` | none | App has no cycle-pane command (only directional `pane.go`) |
 | Rename pane | `prefix+p` | none | App has no rename-pane command |
 | Refresh PR status | `prefix+u` | none | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |
