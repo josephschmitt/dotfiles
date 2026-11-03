@@ -13,14 +13,20 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { agents, closeOverlay, focused, hc, home, notify, exec, openOverlay, props, run, setShared, shared, spaces, terminals, theme } from "herdr";
+import { agents, closeOverlay, focused, hc, home, notify, exec, openOverlay, panes, props, run, setShared, shared, spaces, terminals, theme } from "herdr";
 
 // ---- actions -------------------------------------------------------------
 
+// The focused pane's live folder (focused().cwd is only set for a layout terminal
+// block). A remote space's folder is a path on that machine, so the Mac's home is
+// only the fallback for local spaces; remote ones leave cwd empty and hc uses that
+// machine's home.
 const here = () => {
   const f = focused();
   const space = spaces().find((s) => s.id === f?.space);
-  return { space: f?.space, cwd: f?.cwd || space?.folder || home(), machine: space?.machine ?? null };
+  const pane = panes().find((p) => p.pane === f?.pane);
+  const machine = space?.machine ?? null;
+  return { space: f?.space, cwd: f?.cwd || pane?.cwd || space?.folder || (machine ? null : home()), machine };
 };
 
 // A program in a popup over the window: a hidden hc terminal shown in a modal
@@ -34,7 +40,8 @@ async function popup({ title, cmd, width = 0.8, height = 0.8, persist = false })
   if (!terminal) {
     const r = await hc([
       "run", "--bg", "--json", "--no-parent", "--no-notify", ...(persist ? [] : ["--rm"]),
-      ...(machine ? ["--on", machine] : ["--cwd", cwd]),
+      ...(machine ? ["--on", machine] : []),
+      ...(cwd ? ["--cwd", cwd] : []),
       "--", "bash", "-lc", cmd,
     ]);
     if (r.code !== 0) return notify({ title: `${title} failed to start`, body: (r.stderr || r.stdout).trim(), level: "error" });
