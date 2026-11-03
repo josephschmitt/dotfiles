@@ -90,6 +90,7 @@ const ITEMS = [
   { group: "Spaces", keys: ["N"], show: "N", label: "New space (~/development)", act: () => run("space.new", { folder: `${home()}/development` }) },
   { group: "Spaces", keys: ["o"], show: "o", label: "Go to…", act: () => run("mod.open", { name: "picker" }) },
   { group: "Spaces", keys: ["P"], show: "P", label: "Project picker (pj)", act: () => run("mod.open", { name: "pj-picker" }) },
+  { group: "Spaces", keys: ["O"], show: "O", label: "Project picker (pj)", act: () => run("mod.open", { name: "pj-picker" }) },
   { group: "Spaces", keys: ["w"], show: "w", label: "Open worktree", act: () => dialog("open", { width: 560, height: 480 }) },
   { group: "Spaces", keys: ["W"], show: "W", label: "New worktree", act: () => dialog("new", { width: 460, height: 280 }) },
   { group: "Spaces", keys: ["D"], show: "D", label: "Remove worktree", act: () => dialog("remove", { width: 440, height: 260 }) },

@@ -33,7 +33,7 @@ Why `alt`: matches tmux-tilish / vim-tmux-navigator. Needs `option_as_alt` (Sett
 | `n`, `[`, `]`, `T`, `X` | New, previous, next, rename, close tab |
 | `N` | New space in `~/development` |
 | `o` | Go to… (picker) |
-| `P` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
+| `O` / `P` | Project picker (`pj`; focuses the project's existing space or creates one; see [pj project picker](#pj-project-picker-modspj-picker)) |
 | `w` / `W` / `D` | Open / new / remove worktree (the app's `worktree` mod dialogs) |
 | `1..9` | Focus agent N (agents list order) |
 | `c` / `C` | Quick shell / mini shell (the latter persists; `hide` keeps it, reopen with `C`) |
@@ -79,7 +79,7 @@ Reinstalling on a new machine: `stow shared` links the mod and `keys.json`. Ther
 
 A native-looking project picker styled like the app's "Go to…" window (`cmd+p`, leader `o`). Go to… is the shipped `picker` mod with hard-coded rows (spaces, tabs, agents) and no source/provider API, so this is a sibling mod that lists `pj` projects instead. The shipped `picker` is untouched and keeps getting app updates.
 
-Opened by leader `P` (`run("mod.open", { name: "pj-picker" })`). Type to filter (case-insensitive substring over name, path and marker).
+Opened by leader `O` or `P` (`run("mod.open", { name: "pj-picker" })`; `O` pairs with `o` = Go to…, `P` is the older key). The TUI's `prefix+shift+o` (`tv herdr-worktree`) was never ported, so `O` was free. Type to filter (case-insensitive substring over name, path and marker).
 
 | Key | Action |
 |-----|--------|
@@ -89,7 +89,8 @@ Opened by leader `P` (`run("mod.open", { name: "pj-picker" })`). Type to filter 
 | `Esc` | Close |
 
 - **Open space match:** a space on this computer (`machine` null) whose `folder` equals the project path (trailing `/` ignored). Matching rows show a dot in the space's color.
-- **Data source:** `pj --json --sort alpha`, so it honors `~/.config/pj/config.yaml` (search paths, markers, excludes). `pj` only runs locally, so projects on remote machines (Crafting sandbox) aren't listed; new spaces are pinned to this computer (`machine: ""`).
+- **Icons:** each row shows `pj`'s marker icon (`pj --icons`, `%i`) and color (`%c`). The icons are Nerd Font glyphs, drawn in the app's terminal font (`settings().font`, a Nerd Font here); `pj`'s color names map onto the theme's `ansi0..15`.
+- **Data source:** `pj --icons --format '%P\t%n\t%l\t%i\t%c' --sort alpha` (one tab-separated line per project), so it honors `~/.config/pj/config.yaml` (search paths, markers, excludes). `pj` only runs locally, so projects on remote machines (Crafting sandbox) aren't listed; new spaces are pinned to this computer (`machine: ""`).
 - **Why a mod:** the only extension route in the app is a mod, which can `exec(...)`. The layout (header, filter field, fixed-height scroll strip, key handling) is copied from the shipped `picker` mod.
 - A direct shortcut is one line in `keys.json`, e.g. `"cmd-shift-o": "mod.open:pj-picker"`.
 

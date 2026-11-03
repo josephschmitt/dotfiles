@@ -15,6 +15,16 @@ const LIST_MAX = 320;
 
 const norm = (p) => (p ?? "").replace(/\/+$/, "");
 
+// pj's color names ("blue", "bright-red") -> the theme's ansi0..15, so icons follow the theme.
+const ANSI = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"];
+function iconColor(t, name) {
+  if (!name) return t.dim;
+  if (name.startsWith("#")) return name;
+  const bright = name.startsWith("bright-");
+  const i = ANSI.indexOf(bright ? name.slice(7) : name);
+  return i < 0 ? t.dim : (t[`ansi${i + (bright ? 8 : 0)}`] ?? t.dim);
+}
+
 export default class PjPicker extends View {
   init(_props, cx) {
     this.filter = "";
@@ -29,14 +39,26 @@ export default class PjPicker extends View {
     this.handle = cx.focus_handle();
     cx.spawn(async (cx) => {
       try {
-        const r = await exec("pj", ["--json", "--sort", "alpha"]);
+        // One line per project, tab-separated. --icons makes %i a Nerd Font glyph
+        // (pj's own mapping, so ~/.config/pj/config.yaml icon/color overrides apply).
+        const r = await exec("pj", ["--icons", "--format", "%P\t%n\t%l\t%i\t%c", "--sort", "alpha"]);
         if (r.code !== 0) throw new Error((r.stderr || r.stdout).trim() || `pj exited ${r.code}`);
         const h = norm(home());
-        this.projects = (JSON.parse(r.stdout).projects ?? []).map((p) => ({
-          ...p,
-          displayPath: p.path.startsWith(`${h}/`) ? `~${p.path.slice(h.length)}` : p.path,
-          hay: `${p.name} ${p.path} ${p.markerLabel ?? ""}`.toLowerCase(),
-        }));
+        this.projects = r.stdout
+          .split("\n")
+          .filter(Boolean)
+          .map((line) => {
+            const [path, name, markerLabel, icon, color] = line.split("\t");
+            return {
+              path,
+              name,
+              markerLabel,
+              icon,
+              color,
+              displayPath: path.startsWith(`${h}/`) ? `~${path.slice(h.length)}` : path,
+              hay: `${name} ${path} ${markerLabel ?? ""}`.toLowerCase(),
+            };
+          });
       } catch (e) {
         notify({ title: "pj failed", body: String(e?.message ?? e).split("\n")[0], level: "error" });
         this.close();
@@ -77,6 +99,8 @@ export default class PjPicker extends View {
 
     // Spaces by folder, for the "already open" dot (colors are read-only here:
     // the shipped picker owns assigning them).
+    // Icons are Nerd Font glyphs: draw them in the terminal font, which has them.
+    const iconFont = settings().font ?? "Monaco Nerd Font Mono";
     const colors = shared("space.colors") ?? {};
     const openBy = new Map();
     for (const s of spaces()) if (!s.machine) openBy.set(norm(s.folder), s);
@@ -118,6 +142,7 @@ export default class PjPicker extends View {
         .hover((s) => s.bg(t.hover))
         .on_click(() => this.go(r, false))
         .child(open ? div().size(8).flex_none().rounded(4).bg(dotColor(open)) : div().size(8).flex_none())
+        .child(div().w(18).flex_none().font_family(iconFont).text_size(15).text_color(iconColor(t, r.color)).child(r.icon ?? ""))
         .child(div().flex_shrink(1).min_w(0).truncate().font_semibold().text_color(t.foreground).child(r.name))
         .child(h_flex().flex_1().min_w(0).justify_end().child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(r.displayPath)))
         .when(r.markerLabel, (el) => el.child(div().flex_none().text_size(10.5).text_color(t.dim).child(r.markerLabel)));
