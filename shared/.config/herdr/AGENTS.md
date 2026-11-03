@@ -40,6 +40,10 @@ This config customizes bindings heavily. The guiding principles:
 
 When adding new bindings, follow these patterns: use `alt+<key>` for high-frequency actions, `prefix+<key>` for everything else. Document the binding's purpose with a TOML comment.
 
+## Keep In Sync With the Herdr Mac App
+
+This config (the TUI) and the Herdr Mac app (`shared/.config/herdr-app/`) are meant to share muscle memory: same action, same keys. **Any keybinding or feature change here must be mirrored in the app, or recorded as a difference.** The parity table, the rules and the open conflicts live in `shared/.config/herdr-app/README.md` under "TUI ↔ app parity". Update it in the same commit.
+
 ## CWD Policy for New Panes / Tabs / Spaces
 
 `[terminal] new_cwd` (herdr 0.8.0+) is a **single global policy** governing new

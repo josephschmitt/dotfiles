@@ -103,12 +103,60 @@ herdr-app shot /tmp/pj.png                           # then look at it
 herdr-app do overlay.close
 ```
 
-### Not ported from the TUI config
+## TUI ↔ app parity
 
-| TUI binding | Why |
-|-------------|-----|
-| `alt+backtick` pane cycling | No cycle-pane command (only directional `pane.go`) |
-| `prefix+p` rename pane | No rename-pane command |
-| `prefix+shift+o` (`tv herdr-worktree`) | Uses the TUI's `herdr worktree` CLI; use leader `w`/`W` |
-| `prefix+u` refresh PR status | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |
-| `copy_mode`, `[ui]` sidebar rows/widths, `[session]`, `[terminal] new_cwd` | Not applicable — mouse selection, layouts own the sidebar, core keeps terminals alive, new tabs/splits already follow the focused terminal's folder |
+Goal: switch between the Herdr TUI (`shared/.config/herdr/config.toml`) and the Herdr Mac app without relearning keys. **Same action, same keys, wherever the app allows it.** They can't be identical (the app has no native leader key, no plugins, a different popup mechanism), so every difference is listed here on purpose. This table is the single place to check; update it in the same commit as any keybinding or feature change on either side.
+
+`prefix` is `ctrl+s` in both. In the app it is the `leader` mod, so `prefix+x` there means `ctrl+s` then `x`.
+
+Where each side lives: TUI = `shared/.config/herdr/config.toml` (`[keys]`, `[[keys.command]]`). App = `keys.json` (single combos), `ITEMS` in `mods/leader/main.js` (prefix keys), and the other mods.
+
+### Same on both
+
+| Action | Keys (both) | TUI mechanism | App mechanism |
+|--------|-------------|---------------|---------------|
+| Focus pane | `alt+h/j/k/l`, `prefix+h/j/k/l` | native `focus_pane_*` | `keys.json` + leader |
+| Zoom pane | `alt+z` | native `zoom` | `keys.json` + leader `z` |
+| Split down / right | `prefix+\` / `prefix+\|` | native `split_*` | leader |
+| Select tab | `alt+1..9` | native `switch_tab` | `keys.json` |
+| Previous / next tab | `prefix+[` / `prefix+]` | native | leader |
+| New tab | `prefix+n` | native `new_tab` | leader |
+| Previous / next space | `alt+[` / `alt+]` | native `*_workspace` | `keys.json` |
+| Select space | `alt+shift+1..9` | native `switch_workspace` | `keys.json` |
+| Previous / next agent | `alt+shift+[` / `alt+shift+]` | native | `keys.json` |
+| Focus agent N | `prefix+1..9` | native `focus_agent` | leader |
+| Go to… (spaces, agents) | `prefix+o` | native `goto` | leader `o` runs the shipped `picker` mod |
+| New space in `~/development` | `prefix+shift+n` | `[[keys.command]]` wrapper | leader `N` |
+| Open / new / remove worktree | `prefix+w` / `prefix+shift+w` / `prefix+shift+d` | native | leader (`worktree` mod dialogs) |
+| Quick shell / mini shell | `prefix+c` / `prefix+shift+c` | popup running `quick-shell.sh` | leader popup running the same script |
+| Editor / lazygit / yazi | `prefix+shift+e` / `prefix+shift+g` / `prefix+shift+y` | popups | leader popups |
+| Project picker (`pj`) | `prefix+shift+p` | `pj` plugin (`pj-herdr`) | leader `P` opens `pj-picker`; Enter focuses an open space, else creates one |
+| Open branch's PR | `prefix+g` | `gh-pr` plugin | leader `g` runs `gh pr view --web` |
+
+### Differences (intentional or unavoidable)
+
+| Item | TUI | App | Why / status |
+|------|-----|-----|--------------|
+| `prefix+shift+o` | `tv herdr-worktree` (open a branch as a worktree) | **`pj-picker`** (also on `P`) | **Conflict: same keys, different action.** The app's `O` was bound to the project picker on request. Resolve by moving one side so the keys agree (see Open items) |
+| Cycle panes | `alt+backtick` / `alt+shift+backtick` | none | App has no cycle-pane command (only directional `pane.go`) |
+| Rename pane | `prefix+p` | none | App has no rename-pane command |
+| Refresh PR status | `prefix+u` | none | The `gh-pr` plugin labels TUI sidebar rows; no app equivalent |
+| Copy mode | `prefix+v` | none | App uses mouse selection and `cmd+c` |
+| Rename tab / close tab / close pane | herdr defaults `prefix+shift+t` / `prefix+shift+x` / `prefix+x` | leader `T` / `X` / `x` | Same keys; the TUI side is herdr's default, not set in `config.toml` (verified with `herdr --default-config`; re-check if herdr updates) |
+| Toggle sidebar / settings / keybinds | herdr defaults `prefix+b` / `prefix+s` / `prefix+?` | leader `b` / `s` / `?` | Same as above |
+| `cmd+` shortcuts, `ctrl+1..9` space select, `f2` rename | none | app defaults in `keys.json` | Native macOS app keymap; harmless extras |
+| `[ui]` sidebar rows/widths, `[session]`, `[terminal] new_cwd`, toasts | configured | n/a | Layouts own the sidebar, core keeps terminals alive, new tabs and splits already follow the focused terminal's folder |
+| Popup size | per-command `width`/`height` | per-item `width`/`height` in `leader/main.js` | Kept close, not identical |
+
+### Open items
+
+- **`prefix+shift+o`.** Pick one: (a) app `O` goes back to worktree-style behavior or is unbound, `P` stays the only `pj` key (keys match the TUI); or (b) TUI `prefix+shift+o` also becomes `pj.open-picker` and the worktree picker moves elsewhere. Until then the two disagree on `O`.
+
+### Keeping them in sync
+
+When you add, change or remove a keybinding or user-visible feature on **either** side:
+
+1. Check the other side. If it can be done there, do it with the **same keys**.
+2. If it can't, add a row to "Differences" with the reason.
+3. Never put a different action on a key the other side already uses.
+4. Update this section in the same commit. The repo-root `CLAUDE.md` and `shared/.config/herdr/AGENTS.md` point here.

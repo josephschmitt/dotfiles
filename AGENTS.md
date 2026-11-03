@@ -147,6 +147,18 @@ Profiles can define lifecycle scripts in a `.hooks/` directory. `install.sh` run
 | `crafting` | `post-stow` | Runs `bootstrap_sandbox`, then `optimize-monorepos` |
 | `work` | `post-stow` | Runs `optimize-monorepos` (narrows monorepo fetch refspecs, prunes stale tags/branches) |
 
+## Herdr TUI ↔ Herdr Mac App Parity
+
+Two Herdr setups are maintained side by side: the TUI (`shared/.config/herdr/config.toml`) and the Mac app (`shared/.config/herdr-app/`: `keys.json`, `mods/leader/` for the `ctrl+s` prefix keys, `mods/pj-picker/`, ...). The goal is to switch between them without relearning keys: **same action, same keys, wherever the app allows it.**
+
+When adding, changing or removing a Herdr keybinding or user-visible feature on **either** side:
+1. Check the other side; if it can be done there, do it with the same keys.
+2. If it can't, record the gap, with the reason, in the "Differences" table.
+3. Never put a different action on a key the other side already uses.
+4. Update the parity table in `shared/.config/herdr-app/README.md` (section "TUI ↔ app parity") in the same commit.
+
+Known mismatches the user hasn't resolved are listed under "Open items" in that section; read it before touching Herdr keys.
+
 ## Nix-Darwin (macOS System Management)
 
 ### Convenience Aliases
