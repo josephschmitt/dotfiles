@@ -206,6 +206,26 @@ It should print `~/.config/homebrew/trust.json`.
 
 Once confirmed, the stale `~/.homebrew/` store is dead weight and can be removed.
 
+### `brew cleanup` fails with `Refusing to load formula <tap>/<name> from untrusted tap`
+
+**Symptom:** After removing a third-party formula from the nix-darwin config, `nix_rebuild` ends with:
+```
+Error: Refusing to load formula raine/workmux/workmux from untrusted tap raine/workmux.
+Error: Failure while executing; `.../brew cleanup` exited with 1.
+```
+
+**Cause:** The cleanup step tries to uninstall the formula you removed, but Homebrew won't load a formula from an untrusted tap, even just to uninstall it.
+
+**Fix:** Remove it by hand, then rebuild:
+```bash
+brew uninstall --formula workmux && brew untap raine/workmux && nix_rebuild
+```
+(Or `brew trust raine/workmux` first, so cleanup can do it.)
+
+**Prevention:** `darwin.nix` now trusts every configured tap automatically during activation and
+never removes entries, so a tap stays trusted after you drop it from the config. This only
+happens to formulae installed before that change, or from a tap that was never in the config.
+
 ## Neovim (Kickstart)
 
 ### LSP servers/formatters never auto-install ("X is not executable", "vscode-json-language-server not found")

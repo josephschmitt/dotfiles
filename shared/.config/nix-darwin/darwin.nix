@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   nixpkgs.config.allowUnfree = true;
 
   # Override packages with build issues
@@ -75,6 +75,47 @@
   environment.etc."homebrew/brew.env".text = ''
     HOMEBREW_XDG_CONFIG_HOME=/Users/${config.system.primaryUser}/.config
   '';
+
+  # Declaratively `brew trust` every non-official tap this config uses: each
+  # entry in homebrew.taps plus the tap prefix of any fully-qualified brew/cask
+  # ("owner/tap/name"). Listing a tap here *is* the decision to trust it, so
+  # there's no separate `brew trust` step to forget.
+  #
+  # Taps are merged into trust.json, never removed: when a tap is dropped from
+  # the config, `brew bundle --zap` cleanup still has to load its formulae to
+  # uninstall them, which fails if the tap is no longer trusted. Manual
+  # `brew trust` entries are preserved too. Runs in preActivation, well before
+  # the Homebrew bundle step.
+  system.activationScripts.preActivation.text =
+    let
+      nameOf = x: if builtins.isString x then x else x.name;
+      tapOf =
+        n:
+        let
+          parts = lib.splitString "/" n;
+        in
+        lib.optional (builtins.length parts == 3) "${builtins.elemAt parts 0}/${builtins.elemAt parts 1}";
+      hb = config.homebrew;
+      taps = lib.unique (
+        map (t: lib.toLower (nameOf t)) hb.taps
+        ++ map lib.toLower (lib.concatMap (x: tapOf (nameOf x)) (hb.brews ++ hb.casks))
+      );
+      user = config.system.primaryUser;
+      trustTaps = pkgs.writeShellScript "brew-trust-taps" ''
+        set -eu
+        f="/Users/${user}/.config/homebrew/trust.json"
+        mkdir -p "$(dirname "$f")"
+        [ -s "$f" ] || echo '{}' > "$f"
+        tmp="$(mktemp "$f.XXXXXX")"
+        ${pkgs.jq}/bin/jq --argjson t '${builtins.toJSON taps}' \
+          '.trustedtaps = (((.trustedtaps // []) + $t) | unique)' "$f" > "$tmp"
+        mv "$tmp" "$f"
+      '';
+    in
+    lib.mkIf hb.enable ''
+      echo >&2 "trusting Homebrew taps..."
+      sudo --user=${user} --set-home ${trustTaps} || echo >&2 "warning: failed to update Homebrew trust.json"
+    '';
 
   homebrew = {
     enable = true;

@@ -57,6 +57,13 @@ variable, so `darwin.nix` sets `HOMEBREW_XDG_CONFIG_HOME` in `/etc/homebrew/brew
 interactive and activation runs pointed at the same `trust.json`. Without it, everything you
 trusted by hand reads as untrusted during `nix_rebuild`.
 
+**Taps are trusted declaratively**: an activation step (in `preActivation`, before the bundle)
+adds every tap in `homebrew.taps`, plus the tap of any fully-qualified `owner/tap/name` brew or
+cask, to `trustedtaps` in `~/.config/homebrew/trust.json`. Adding a third-party formula to
+the config is enough; you don't need to run `brew trust` by hand. Entries are only ever added,
+never removed, so `--zap` cleanup can still load (and uninstall) formulae from a tap you've
+dropped from the config.
+
 ## System Defaults
 
 ### Dock Configuration
