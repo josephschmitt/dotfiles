@@ -57,12 +57,16 @@ variable, so `darwin.nix` sets `HOMEBREW_XDG_CONFIG_HOME` in `/etc/homebrew/brew
 interactive and activation runs pointed at the same `trust.json`. Without it, everything you
 trusted by hand reads as untrusted during `nix_rebuild`.
 
-**Taps are trusted declaratively**: an activation step (in `preActivation`, before the bundle)
-adds every tap in `homebrew.taps`, plus the tap of any fully-qualified `owner/tap/name` brew or
-cask, to `trustedtaps` in `~/.config/homebrew/trust.json`. Adding a third-party formula to
-the config is enough; you don't need to run `brew trust` by hand. Entries are only ever added,
-never removed, so `--zap` cleanup can still load (and uninstall) formulae from a tap you've
-dropped from the config.
+**Mark every third-party tap `trusted = true`** (`{ name = "owner/tap"; trusted = true; }`).
+nix-darwin then writes `tap "...", trusted: true` into the Brewfile. Trust has to live there:
+`brew bundle --force-cleanup` *replaces* `trust.json` with exactly the Brewfile's trusted
+entries before it uninstalls anything, so a manual `brew trust` gets wiped on every rebuild.
+A formula that only exists in a third-party tap must use its full name
+(`rhettbull/osxphotos/osxphotos`) and have its tap listed, or cleanup will try to untap it.
+
+**Removing a tap takes two rebuilds**: first drop the formulae/casks but keep the tap entry
+(cleanup uninstalls them while the tap is still trusted), then drop the tap. Removing both at
+once leaves cleanup unable to load the leftover formula. To recover, see `TROUBLESHOOTING.md`.
 
 ## System Defaults
 

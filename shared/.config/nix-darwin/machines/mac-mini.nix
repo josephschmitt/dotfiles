@@ -39,7 +39,7 @@ in
     brews = [
       "immich-cli"
       "multica-ai/tap/multica"
-      "osxphotos"
+      "rhettbull/osxphotos/osxphotos"
     ];
 
     casks = [
@@ -51,7 +51,8 @@ in
     ];
 
     taps = [
-      "multica-ai/tap"
+      { name = "multica-ai/tap"; trusted = true; }
+      { name = "rhettbull/osxphotos"; trusted = true; }
     ];
 
     onActivation.cleanup = "zap";

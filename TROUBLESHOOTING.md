@@ -222,9 +222,14 @@ brew uninstall --formula workmux && brew untap raine/workmux && nix_rebuild
 ```
 (Or `brew trust raine/workmux` first, so cleanup can do it.)
 
-**Prevention:** `darwin.nix` now trusts every configured tap automatically during activation and
-never removes entries, so a tap stays trusted after you drop it from the config. This only
-happens to formulae installed before that change, or from a tap that was never in the config.
+**Why `brew trust` doesn't stick:** `brew bundle --force-cleanup` (what nix-darwin runs with
+`cleanup = "zap"`) replaces `trust.json` with only the Brewfile's `trusted: true` entries, *before*
+uninstalling. Any trust for a tap not in the config is gone by the time cleanup needs it.
+
+**Prevention:** List every third-party tap as `{ name = "owner/tap"; trusted = true; }`. When
+removing a tap, drop its formulae first and rebuild, then drop the tap. If a tap-only formula
+is listed by short name (e.g. `osxphotos` instead of `rhettbull/osxphotos/osxphotos`), cleanup
+tries to untap its tap every run and fails the same way.
 
 ## Neovim (Kickstart)
 
