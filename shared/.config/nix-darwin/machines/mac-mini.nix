@@ -29,6 +29,7 @@ in
     lf
     mosh
     nodejs
+    nut
     pnpm
     rustup
     tsshd
