@@ -57,12 +57,55 @@ untrack_branch() {
 
 cmd_track() {
   [ $# -ge 1 ] || { echo "track: missing <branch>" >&2; exit 2; }
-  branch="$1"
   remote="${2:-origin}"
-  if ! git config --get-all "remote.$remote.fetch" | grep -qF "$branch"; then
+  # Accept `origin/foo` (as shown by `git branch -r` / tab completion): without
+  # stripping, set-branches writes refs/heads/origin/foo, a non-wildcard refspec
+  # for a ref that doesn't exist, which wedges every later fetch/pull.
+  branch="${1#"$remote"/}"
+  branch="${branch#refs/heads/}"
+
+  # Only a single, literal branch name may become a refspec. check-ref-format
+  # (without --refspec-pattern) rejects globs (`*`), `:`, `..`, spaces, etc.;
+  # otherwise `track 'foo/*'` or `track a:b` would write a refspec that is a
+  # wildcard or remaps refs. A leading `-` is valid for check-ref-format but
+  # would be parsed as an option by the fetch/switch below.
+  case "$branch" in
+    ''|-*) echo "track: invalid branch name '$branch'" >&2; exit 2 ;;
+  esac
+  if ! git check-ref-format "refs/heads/$branch"; then
+    echo "track: '$branch' is not a valid branch name" >&2
+    exit 2
+  fi
+
+  # Refuse to write a refspec for a branch the remote doesn't have: a
+  # non-wildcard refspec for a missing ref wedges every later fetch/pull.
+  # ls-remote treats its argument as a glob/suffix match, so require an exact
+  # ref name in the output rather than trusting a non-empty result.
+  if ! remote_refs=$(git ls-remote --heads "$remote" "refs/heads/$branch" 2>/dev/null); then
+    echo "track: could not query remote '$remote'" >&2
+    exit 1
+  fi
+  if ! printf '%s\n' "$remote_refs" | awk -v want="refs/heads/$branch" '$2 == want { found = 1 } END { exit !found }'; then
+    echo "track: branch '$branch' not found on remote '$remote'" >&2
+    exit 1
+  fi
+
+  # Exact (non-regex) match on the refspec source; a substring match let an
+  # unrelated line (e.g. refs/heads/origin/<branch>) suppress adding the
+  # correct one, and branch names can contain regex metacharacters like `.`.
+  if ! git config --get-all "remote.$remote.fetch" | awk -v want="$branch" '
+      { s = $0; sub(/^\+/, "", s); sub(/:.*/, "", s); sub(/^refs\/heads\//, "", s)
+        if (s == want) found = 1 }
+      END { exit !found }'; then
     git remote set-branches --add "$remote" "$branch"
   fi
-  git fetch "$remote" "$branch" && git switch -c "$branch" "$remote/$branch"
+  git fetch "$remote" "$branch" || exit $?
+
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git switch "$branch"
+  else
+    git switch -c "$branch" --track "$remote/$branch"
+  fi
 }
 
 cmd_untrack() {
