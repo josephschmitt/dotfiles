@@ -1,7 +1,9 @@
 #!/bin/sh
-# Quick shell popup for herdr — press Ctrl-c twice within 2 seconds to close
-# the popup by exiting the shell. Mirrors shared/.config/tmux/scripts/quick-shell.sh
-# but swaps `tmux display-message` for `herdr notification show`.
+# Quick shell popup for herdr and Rex — press Ctrl-c twice within 2 seconds to
+# close the popup by exiting the shell. Mirrors shared/.config/tmux/scripts/quick-shell.sh
+# but swaps `tmux display-message` for `herdr notification show` (inside Rex,
+# where REX_SESSION is set, the hint is printed in the terminal instead; the Rex
+# popups in ~/.config/rex/popups.lua run this script).
 # Usage: quick-shell.sh [--persist]
 #   (default) exits automatically after a command completes successfully
 #   --persist stays open until explicitly closed (double Ctrl-c or `exit`)
@@ -30,7 +32,11 @@ if command -v fish >/dev/null 2>&1; then
             else
                 # First Ctrl-c - update timestamp and show hint
                 set -g __quick_shell_last_sigint \$now
-                herdr notification show 'Quick Shell' --body 'Press Ctrl-c again to close popup' >/dev/null 2>&1
+                if set -q REX_SESSION
+                    echo 'Press Ctrl-c again to close popup'
+                else
+                    herdr notification show 'Quick Shell' --body 'Press Ctrl-c again to close popup' >/dev/null 2>&1
+                end
                 commandline -f repaint
             end
         end
@@ -72,7 +78,11 @@ elif command -v zsh >/dev/null 2>&1; then
                 exit 0
             else
                 __quick_shell_last_sigint=\$now
-                herdr notification show 'Quick Shell' --body 'Press Ctrl-c again to close popup' >/dev/null 2>&1
+                if [ -n \"\$REX_SESSION\" ]; then
+                    print -r -- 'Press Ctrl-c again to close popup'
+                else
+                    herdr notification show 'Quick Shell' --body 'Press Ctrl-c again to close popup' >/dev/null 2>&1
+                fi
                 return 128
             fi
         }
@@ -107,7 +117,11 @@ else
                 exit 0
             else
                 __quick_shell_last_sigint=$now
-                herdr notification show "Quick Shell" --body "Press Ctrl-c again to close popup" >/dev/null 2>&1
+                if [ -n "$REX_SESSION" ]; then
+                    echo "Press Ctrl-c again to close popup"
+                else
+                    herdr notification show "Quick Shell" --body "Press Ctrl-c again to close popup" >/dev/null 2>&1
+                fi
             fi
         }
         trap __qs_handle_sigint INT

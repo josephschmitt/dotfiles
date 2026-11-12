@@ -26,9 +26,13 @@
 # Refs are whatever is already local (no fetch).
 #
 # The work is done by herdr-wt (shared/bin), which uses Worktrunk (`wt`) for
-# the checkouts and hooks.
+# the checkouts and hooks. The Rex config runs this same script with
+# WT_ENGINE=rex-wt, whose subcommands match herdr-wt's but drive Rex sessions
+# (~/.config/rex/popups.lua).
 
 set -u
+
+WT=${WT_ENGINE:-herdr-wt}
 
 mode=pick
 case "${1:-}" in
@@ -63,9 +67,9 @@ confirm() {
   return 1
 }
 
-# Run herdr-wt; on failure show its output and wait for a key.
+# Run the engine; on failure show its output and wait for a key.
 run() {
-  if ! herdr-wt "$@"; then
+  if ! "${WT}" "$@"; then
     pause "Failed. Press any key to close"
     exit 1
   fi
@@ -73,7 +77,7 @@ run() {
 
 # "branch<TAB>path<TAB>main" for a checkout path.
 checkout_info() {
-  herdr-wt checkouts | awk -F '\t' -v p="$1" '$2 == p { print; exit }'
+  "${WT}" checkouts | awk -F '\t' -v p="$1" '$2 == p { print; exit }'
 }
 
 # Ask, then remove a worktree (by path). Returns 1 if cancelled or refused.
@@ -89,7 +93,7 @@ remove_flow() {
   printf '\033[1mRemove worktree %s\033[0m\n\033[2m%s\033[0m\n' "${branch:-(detached)}" "$1"
   printf 'Closes its workspace and deletes the folder; the branch goes too if merged.\n\n'
   force=""
-  changes=$(herdr-wt dirty "$1")
+  changes=$("${WT}" dirty "$1")
   if [ -n "${changes}" ]; then
     printf '\033[31mUncommitted changes (will be lost):\033[0m\n%s\n\n' "${changes}"
     confirm "Discard them and remove?" || return 1
@@ -98,7 +102,7 @@ remove_flow() {
     confirm "Remove?" || return 1
   fi
   printf '\n'
-  if ! herdr-wt remove "$1" ${force}; then
+  if ! "${WT}" remove "$1" ${force}; then
     reason="failed"
     pause "Failed. Press any key to continue"
     return 1
@@ -124,17 +128,17 @@ merge_flow() {
     printf '\033[33m%s has no branch (detached HEAD).\033[0m\n' "$1"
     return 1
   fi
-  target=$(herdr-wt default-branch)
+  target=$("${WT}" default-branch)
   printf '\033[1mMerge %s into %s\033[0m\n\033[2m%s\033[0m\n' "${branch}" "${target}" "$1"
   printf 'Squashes its commits, rebases onto %s and fast-forwards it, runs the merge\n' "${target}"
   printf 'hooks, then removes the worktree and branch and closes its workspace.\n\n'
-  changes=$(herdr-wt dirty "$1")
+  changes=$("${WT}" dirty "$1")
   if [ -n "${changes}" ]; then
     printf '\033[33mUncommitted changes (committed with the merge):\033[0m\n%s\n\n' "${changes}"
   fi
   confirm "Merge?" || return 1
   printf '\n'
-  if ! herdr-wt merge-close "$1"; then
+  if ! "${WT}" merge-close "$1"; then
     reason="failed"
     pause "Failed. Press any key to continue"
     return 1
@@ -148,7 +152,7 @@ if [ "${mode}" = all ]; then
   export WT_HEADER WT_MSG
   while :; do
     # shellcheck disable=SC2016 # $WT_* expand in fzf's shell, not here
-    out=$(herdr-wt all | fzf --ansi --layout=reverse --height=100% --border=none \
+    out=$("${WT}" all | fzf --ansi --layout=reverse --height=100% --border=none \
       --delimiter='\t' --with-nth=4 --expect=ctrl-d,ctrl-g \
       --prompt='worktree ❯ ' --header="${WT_HEADER}" --header-first \
       --with-shell='sh -c' \
@@ -195,7 +199,7 @@ if [ "${mode}" = all ]; then
   done
 fi
 
-here=$(herdr-wt current 2>/dev/null)
+here=$("${WT}" current 2>/dev/null)
 [ -n "${here}" ] || fail "Not in a git repository: ${PWD}"
 
 if [ "${mode}" = remove ]; then
@@ -205,11 +209,11 @@ if [ "${mode}" = remove ]; then
 fi
 
 # The repo's name (its main checkout's folder), shown in the prompt.
-repo=$(basename "$(herdr-wt checkouts | sed -n '1p' | cut -f2)")
+repo=$(basename "$("${WT}" checkouts | sed -n '1p' | cut -f2)")
 
 # --branch: branches (local, and origin's) that have no worktree yet.
 if [ "${mode}" = branch ]; then
-  list=$(herdr-wt branches) || { pause "Failed. Press any key to close"; exit 1; }
+  list=$("${WT}" branches) || { pause "Failed. Press any key to close"; exit 1; }
   if [ -z "${list}" ]; then
     printf '\n\033[33mNo branches without a worktree in %s.\033[0m\n' "${repo}"
     pause
@@ -266,13 +270,13 @@ WT_HEADER="Enter open (or create typed name) · ctrl-n create typed name · ctrl
 WT_MSG=""
 export WT_HEADER WT_MSG
 
-main_path=$(herdr-wt checkouts | sed -n '1p' | cut -f2)
+main_path=$("${WT}" checkouts | sed -n '1p' | cut -f2)
 
 while :; do
   # Merging or removing the worktree this popup was opened in deletes our cwd.
   [ -d "${PWD}" ] || cd "${main_path}" || exit 1
   # shellcheck disable=SC2016 # $FZF_* / $WT_* expand in fzf's shell, not here
-  out=$(herdr-wt list | fzf --ansi --layout=reverse --height=100% --border=none \
+  out=$("${WT}" list | fzf --ansi --layout=reverse --height=100% --border=none \
     --delimiter='\t' --with-nth=4 --print-query --expect=ctrl-n,ctrl-d,ctrl-g \
     --prompt="worktree (${repo}) ❯ " --header="${WT_HEADER}" --header-first \
     --with-shell='sh -c' \

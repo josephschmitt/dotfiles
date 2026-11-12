@@ -1,0 +1,142 @@
+#!/bin/sh
+# rex-open — find or create the Rex session that works in a directory, and
+# switch the app to it. Used by the pj picker and rex-wt (the Rex worktree
+# engine); the Rex counterpart of "open this folder as a Herdr workspace".
+#
+#   rex-open [--label NAME] [--within] DIR   focus the session in DIR, else create it
+#   rex-open --find [--within] DIR           print its session id (exit 1: none)
+#   rex-open --close [--within] DIR          kill the session(s) in DIR
+#   rex-open --pwds                          TSV of every terminal: session id, folder
+#
+# A session "is in DIR" when one of its terminals' working directory is DIR.
+# --within also accepts folders under DIR (for worktrees: the shell may have
+# `cd`ed into a subfolder). The label defaults to DIR's folder name.
+#
+# Switching sessions goes through the `select_session` action in
+# ~/.config/rex/actions.lua, which asks the app to switch. That needs Remote
+# Control (Rex > Settings > Server > Client Info) because the request comes from
+# a script, not a key. Without it the session is still created, and the script
+# says so and exits 2.
+
+set -eu
+
+# Rex terminals have `rex` on PATH; elsewhere fall back to REX_BIN_DIR.
+if ! command -v rex >/dev/null 2>&1; then
+  for d in "${REX_BIN_DIR:-}" "${HOME}/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS"; do
+    if [ -n "${d}" ] && [ -x "${d}/rex" ]; then
+      PATH="${PATH}:${d}"
+      break
+    fi
+  done
+fi
+PATH="${PATH}:${HOME}/bin:${HOME}/.local/bin:/opt/homebrew/bin:/run/current-system/sw/bin:${HOME}/.nix-profile/bin:/usr/local/bin"
+export PATH
+
+die() {
+  printf 'rex-open: %s\n' "$*" >&2
+  exit 1
+}
+
+command -v rex >/dev/null 2>&1 || die "rex CLI not found"
+command -v jq >/dev/null 2>&1 || die "jq not found"
+
+mode=open
+within=0
+label=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --find) mode=find ;;
+    --close) mode=close ;;
+    --pwds) mode=pwds ;;
+    --within) within=1 ;;
+    --label)
+      shift
+      label=${1:-}
+      ;;
+    -h | --help)
+      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    -*) die "unknown option: $1" ;;
+    *) break ;;
+  esac
+  shift
+done
+if [ "${mode}" != pwds ]; then
+  [ $# -eq 1 ] || die "usage: rex-open [--find|--close] [--label NAME] [--within] DIR"
+fi
+
+# "session id<TAB>folder" for every terminal that has reported one (OSC 7
+# arrives as file://HOST/path: drop the scheme and host, undo %20, the only
+# escape that matters for typical folders).
+all_pwds() {
+  for s in $(rex ls --json | jq -r '.sessions[].session_id'); do
+    for b in $(rex block ls -s "${s}" --json 2>/dev/null |
+      jq -r '.blocks[] | select(.creator_name == "com.superlogical.terminal" and .placement != "detached") | .block_id'); do
+      p=$(rex block call -s "${s}" -b "${b}" pwd 2>/dev/null | jq -r '.pwd // empty') || continue
+      p=$(printf '%s' "${p}" | sed -e 's|^file://[^/]*||' -e 's|%20| |g')
+      [ -n "${p}" ] && printf '%s\t%s\n' "${s}" "${p}"
+    done
+  done
+}
+
+if [ "${mode}" = pwds ]; then
+  all_pwds
+  exit 0
+fi
+
+dir=$1
+case "${dir}" in
+  "~"/*) dir="${HOME}/${dir#"~/"}" ;;
+esac
+if [ -d "${dir}" ]; then
+  phys=$(cd "${dir}" && pwd -P)
+  dir=$(cd "${dir}" && pwd)
+elif [ "${mode}" = close ]; then
+  phys=${dir} # already deleted (rex-wt removes the checkout first)
+else
+  die "not a directory: ${dir}"
+fi
+[ -n "${label}" ] || label=$(basename "${dir}")
+
+# Session ids whose terminals are in $dir (or under it with --within); shells
+# may report either the logical or the physical path.
+find_sessions() {
+  all_pwds | while IFS="$(printf '\t')" read -r s p; do
+    if [ "${p}" = "${dir}" ] || [ "${p}" = "${phys}" ]; then
+      printf '%s\n' "${s}"
+    elif [ "${within}" = 1 ]; then
+      case "${p}" in "${dir}"/* | "${phys}"/*) printf '%s\n' "${s}" ;; esac
+    fi
+  done | awk '!seen[$0]++'
+}
+
+select_session() {
+  if ! rex do select_session "session_id=$1" >/dev/null 2>&1; then
+    printf 'rex-open: the session exists, but the app would not switch to it.\n' >&2
+    printf 'Turn on Remote Control in Rex > Settings > Server > Client Info (scripts need it\nto switch sessions); until then pick the session in the sidebar.\n' >&2
+    return 1
+  fi
+}
+
+found=$(find_sessions)
+
+case "${mode}" in
+  find)
+    [ -n "${found}" ] || exit 1
+    printf '%s\n' "${found}" | sed -n 1p
+    ;;
+  close)
+    [ -n "${found}" ] || exit 0
+    # shellcheck disable=SC2086 # one id per line, split on purpose
+    rex kill ${found} >/dev/null
+    ;;
+  open)
+    sid=$(printf '%s\n' "${found}" | sed -n 1p)
+    if [ -z "${sid}" ]; then
+      sid=$(rex new "${label}" -c "${dir}" --window shell --json | jq -r '.session_id')
+      [ -n "${sid}" ] && [ "${sid}" != null ] || die "couldn't create a session for ${dir}"
+    fi
+    select_session "${sid}" || exit 2
+    ;;
+esac

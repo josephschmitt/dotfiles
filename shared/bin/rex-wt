@@ -1,0 +1,120 @@
+#!/bin/sh
+# rex-wt — the Rex flavour of herdr-wt: find-or-create / remove git worktrees and
+# their Rex sessions. Same subcommands, so ~/.config/herdr/scripts/wt-picker.sh
+# drives either one (WT_ENGINE=rex-wt; see ~/.config/rex/init.lua).
+#
+# Everything that only needs git and Worktrunk (`checkouts`, `branches`, `current`,
+# `dirty`, `create`, `delete`, `default-branch`, `merge`, `managed`) is herdr-wt's.
+# This script adds the Rex side, using rex-open to find, switch to and kill the
+# session working in a checkout:
+#
+#   rex-wt list                 TSV for fzf: branch, path, session id, display
+#   rex-wt all                  TSV for fzf, all repos: path, main, session id, display
+#   rex-wt open <name>          switch to its session, else create one, else create the worktree
+#   rex-wt remove <target> [-f] delete the checkout, then kill its session
+#   rex-wt merge-close <target> merge, then kill its session (if the checkout is gone)
+#
+# A session is "in" a checkout when one of its terminals is in that folder or
+# below it. Exit codes as herdr-wt.
+
+set -eu
+
+here=$(cd "$(dirname "$0")" && pwd)
+PATH="${here}:${PATH}:${HOME}/bin:${HOME}/.local/bin:/opt/homebrew/bin:/run/current-system/sw/bin:${HOME}/.nix-profile/bin:/usr/local/bin"
+export PATH
+
+die() {
+  printf 'rex-wt: %s\n' "$*" >&2
+  exit 1
+}
+
+[ $# -ge 1 ] || die "usage: rex-wt <subcommand> (see the header of $0)"
+sub=$1
+shift
+
+# Branch and path of a target (a path, or a branch name) in the current repo.
+resolve() {
+  if [ -d "$1" ]; then
+    p=$(cd "$1" && pwd)
+    herdr-wt checkouts | awk -F '\t' -v p="${p}" '$2 == p { print; exit }'
+  else
+    herdr-wt checkouts | awk -F '\t' -v t="$1" '$1 == t { print; exit }'
+  fi
+}
+
+# "session id<TAB>folder" for every terminal, as JSON array of folders.
+pwds_json() {
+  rex-open --pwds 2>/dev/null | jq -R -s 'split("\n") | map(select(length > 0) | split("\t") | {sid: .[0], path: .[1]})'
+}
+
+case "${sub}" in
+  list)
+    cur=$(herdr-wt current)
+    herdr-wt checkouts | jq -R -s -r --argjson pwds "$(pwds_json)" --arg here "${cur}" --arg home "${HOME}" '
+      [split("\n")[] | select(length > 0) | split("\t")
+       | {branch: .[0], path: .[1], main: .[2], name: (if .[0] == "" then "(detached)" else .[0] end)}]
+      | (map(.name | length) | max // 0) as $w
+      | .[]
+      | . as $c
+      | ([$pwds[] | select(.path == $c.path or (.path | startswith($c.path + "/"))) | .sid] | first // "") as $sid
+      | (.path | if startswith($home + "/") then "~" + ltrimstr($home) else . end) as $short
+      | ([ (if $sid != "" then "\u001b[32m●\u001b[0m" else " " end),
+          ("\u001b[1m" + .name + "\u001b[0m" + (" " * ($w - (.name | length) + 1))),
+          ("\u001b[2m" + $short + "\u001b[0m"),
+          (if .main == "1" then "\u001b[33mmain\u001b[0m" else empty end),
+          (if .path == $here then "\u001b[36mhere\u001b[0m" else empty end)
+        ] | join(" ")) as $display
+      | [.branch, .path, $sid, $display] | join("\t")
+    '
+    ;;
+  all)
+    herdr-wt managed | jq -R -s -r --argjson pwds "$(pwds_json)" --arg home "${HOME}" '
+      [split("\n")[] | select(length > 0) | split("\t")
+       | {repo: .[0], branch: .[1], path: .[2], main: .[3], name: (if .[1] == "" then "(detached)" else .[1] end)}]
+      | (map(.repo | length) | max // 0) as $rw
+      | (map(.name | length) | max // 0) as $w
+      | .[]
+      | . as $c
+      | ([$pwds[] | select(.path == $c.path or (.path | startswith($c.path + "/"))) | .sid] | first // "") as $sid
+      | (.path | if startswith($home + "/") then "~" + ltrimstr($home) else . end) as $short
+      | ([ (if $sid != "" then "\u001b[32m●\u001b[0m" else " " end),
+          ("\u001b[35m" + .repo + "\u001b[0m" + (" " * ($rw - (.repo | length) + 1))),
+          ("\u001b[1m" + .name + "\u001b[0m" + (" " * ($w - (.name | length) + 1))),
+          ("\u001b[2m" + $short + "\u001b[0m")
+        ] | join(" ")) as $display
+      | [.path, .main, $sid, $display] | join("\t")
+    '
+    ;;
+  open)
+    [ $# -ge 1 ] || die "open: missing name"
+    path=$(herdr-wt create "$1")
+    main=$(herdr-wt checkouts | sed -n '1p' | cut -f2)
+    branch=$(resolve "${path}" | cut -f1)
+    exec rex-open --within --label "$(basename "${main}")/${branch:-$(basename "${path}")}" "${path}"
+    ;;
+  remove)
+    [ $# -ge 1 ] || die "remove: missing target"
+    hit=$(resolve "$1")
+    [ -n "${hit}" ] || die "no worktree for '$1'"
+    path=$(printf '%s' "${hit}" | cut -f2)
+    # Delete first (main-checkout and dirty checks included), then kill the
+    # session: the caller may be a popup inside that very session, and if killing
+    # it ends the caller, the checkout is already gone rather than left behind.
+    (herdr-wt delete "${path}" "${2:-}")
+    rex-open --close --within "${path}"
+    ;;
+  merge-close)
+    [ $# -ge 1 ] || die "merge-close: missing target"
+    hit=$(resolve "$1")
+    [ -n "${hit}" ] || die "no worktree for '$1'"
+    path=$(printf '%s' "${hit}" | cut -f2)
+    (herdr-wt merge "${path}")
+    # Only once the checkout is gone, so a merge that kept the worktree keeps its session.
+    if [ ! -e "${path}" ]; then
+      rex-open --close --within "${path}"
+    fi
+    ;;
+  *)
+    exec herdr-wt "${sub}" "$@"
+    ;;
+esac

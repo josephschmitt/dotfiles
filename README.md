@@ -97,7 +97,7 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
   - **Neovim (LazyVim)** - Available via `lazyvim` alias
   - **Helix** - Secondary modal editor for quick edits
 - **💻 Terminal**: Ghostty with optimized configuration
-- **🔀 Multiplexer**: tmux with plugin ecosystem, Zellij as alternative
+- **🔀 Multiplexer**: tmux with plugin ecosystem, Zellij as alternative; Herdr and [Rex](shared/.config/rex/README.md) (Lua config with the same `alt+` / `ctrl+s` muscle memory)
 - **🌳 Version Control**: Git with comprehensive aliases
 
 ### 🔧 Development Environment
@@ -106,7 +106,7 @@ See the [ubuntu-server README](ubuntu-server/README.md) for details on the Nix c
 - **📦 Package Management**: Nix packages + Homebrew integration
 - **🌐 Languages**: Node.js, Rust, Python, Go configurations
 - **🔨 Package Managers**: pnpm, bun, cargo, asdf, volta
-- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, [Worktrunk](https://worktrunk.dev) (git worktrees + hooks behind the Herdr worktree picker), and more
+- **⚡ CLI Tools**: FZF, EZA, Yazi, sesh, leader-key, ripgrep, fd, [Worktrunk](https://worktrunk.dev) (git worktrees + hooks behind the Herdr and Rex worktree pickers), and more
 
 ### ⚡ Productivity Features
 

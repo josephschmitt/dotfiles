@@ -112,6 +112,10 @@ The layers, so a fix goes in the right one:
   checkout) first, since `herdr-wt open/remove` resolve against the cwd's repo.
 - The Mac app's `mods/wt-picker` uses the same `herdr-wt` (its Herdr-independent
   subcommands) on the same keys; keep them in step (parity table).
+- `wt-picker.sh` takes its engine from `WT_ENGINE` (default `herdr-wt`). The Rex
+  config runs it with `WT_ENGINE=rex-wt` (`shared/bin/rex-wt`, which delegates the
+  git/Worktrunk subcommands to `herdr-wt`). A new `herdr-wt` subcommand the picker
+  calls needs a counterpart (or a delegation) in `rex-wt`.
 - Replaced the old `tv herdr-worktree` cable channel on `prefix+t`.
 
 ## Plugins
