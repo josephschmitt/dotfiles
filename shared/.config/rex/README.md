@@ -40,6 +40,7 @@ Rex terminology: Herdr **space** = Rex **session**, Herdr tab = Rex tab (a sessi
 | `alt+h/j/k/l` | Focus pane left/down/up/right (no wrap) |
 | `` alt+` `` / `` alt+shift+` `` | Next / previous pane |
 | `alt+z` | Zoom pane |
+| `alt+f` | Float the pane, or dock a floating one back |
 | `alt+1..9` | Go to tab N |
 | `alt+shift+1..9` | Go to session N (in `session.list` order, which may differ from the sidebar's) |
 | `alt+[` / `alt+]` | Previous / next session |
@@ -99,6 +100,7 @@ Same flow as Herdr's: the worktree pickers are the shared `wt-picker.sh`, with W
 | Copy mode (`prefix+v`) | Not carried over; Rex's own selection and copy (`pane.copy`, mouse) apply. |
 | PR status in the sidebar, `prefix+u` | None (that was the `gh-pr` plugin). `prefix+g` still opens the PR. |
 | Focus agent N (`prefix+1..9`), previous/next agent | Activity view instead (`prefix+a`). |
+| Minimizing a floating pane | `pane.minimize_floating` is listed by Rex but did nothing on any key we tried (`ctrl+s>_`, `ctrl+s>m`, `alt+_`), and it isn't in the pane's context menu. Unbound until a Rex update. |
 
 ## Unverified
 

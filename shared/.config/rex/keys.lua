@@ -13,6 +13,7 @@ for key, dir in pairs(dirs) do
   rex.bind("alt+" .. key, "pane.focus", { direction = dir, wrap = false })
 end
 rex.bind("alt+z", "pane.zoom")
+rex.bind("alt+f", "pane.float") -- float the pane, or dock a floating one back
 rex.bind("alt+[Backquote]", "pane.focus_next")
 rex.bind("alt+shift+[Backquote]", "pane.focus_previous")
 
@@ -63,8 +64,7 @@ prefix("shift+c", "popup_mini_shell")
 prefix("shift+e", "popup_editor")
 prefix("shift+g", "popup_lazygit")
 prefix("shift+y", "popup_yazi")
-prefix("shift+-", "popup_hide") -- `_`
-
+prefix("shift+-", "popup_hide") -- `_`. (pane.minimize_floating is listed by Rex but does nothing in the beta.)
 -- Other
 prefix("g", "open_pr")
 prefix("b", "client.sidebar.toggle")
