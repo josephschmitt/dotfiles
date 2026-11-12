@@ -106,6 +106,16 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Takeaway:** Time the ssh connection itself (`time ssh host true`) — a ProxyCommand that does network work on every connect is invisible interactively but breaks clients with short timeouts.
 
+### `prefix+shift+d` was bound twice in the TUI (close workspace and the remove-worktree popup)
+
+**Symptom:** `keymap-check` reported a conflict on `prefix+shift+d`: herdr's native `close_workspace` and the `[[keys.command]]` "Remove worktree" popup.
+
+**Cause:** `close_workspace` was never set in `config.toml`, so herdr's upstream default (`prefix+shift+d`) stayed active under the popup added later. The app leader `D` and Rex only have the popup.
+
+**Fix:** `close_workspace = ""` in `[keys]`, with a comment, like the other replaced natives.
+
+**Takeaway:** A `[[keys.command]]` on a key doesn't clear a native default on the same key. Run `keymap-check`, which merges `herdr --default-config` into what it reads, after binding a new prefix key.
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`

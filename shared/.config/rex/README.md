@@ -1,6 +1,6 @@
 Configuration for [Rex](https://www.superlogical.com/rex/docs) — Superlogical's multiplexer for all work (beta). `~/.config/rex/init.lua` is Lua; the files here are symlinked into `~/.config/rex` by GNU Stow.
 
-The key layout is the tmux/Herdr muscle memory: `alt+…` with no prefix, and `ctrl+s` as the prefix. (Herdr parity isn't maintained for Rex.)
+The key layout is the tmux/Herdr muscle memory: `alt+…` with no prefix, and `ctrl+s` as the prefix. The keys match the Herdr TUI and app: the shared rows are in [`shared/.config/keymap/keymap.toml`](../keymap/keymap.toml), and `keymap-check` reports drift (run `rex config reload` first, since it reads the loaded config).
 
 ## Files
 

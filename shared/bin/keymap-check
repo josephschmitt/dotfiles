@@ -1,0 +1,707 @@
+#!/usr/bin/env python3
+"""keymap-check: report where Herdr TUI, Herdr app, Rex and tmux drift from the
+canonical keymap in ~/.config/keymap/keymap.toml. Read-only.
+
+  keymap-check                 check every tool; exit 1 on drift
+  keymap-check -t rex -t app   check some tools (herdr, app, rex, tmux)
+  keymap-check -v              also list matches and honoured exceptions
+  keymap-check --table         print the parity table as markdown
+  keymap-check --table --write FILE
+                               replace the generated block in FILE
+
+Rex is read from the running server (`rex keymap --json`) and tmux from the
+running server (`tmux list-keys`); either is skipped with a warning when it
+isn't running. tmux is report-only until it moves to the canonical layout.
+See shared/.config/keymap/README.md.
+"""
+
+import sys
+
+if sys.version_info < (3, 11):
+    sys.exit(f"keymap-check: needs python3 >= 3.11 (for tomllib); this is {sys.version.split()[0]}")
+
+import argparse
+import glob
+import json
+import re
+import shutil
+import subprocess
+import tomllib
+from dataclasses import dataclass, field
+from pathlib import Path
+
+# ---- paths ------------------------------------------------------------------
+
+SHARED = Path(__file__).resolve().parent.parent  # shared/ (the script is shared/bin/keymap-check)
+REPO = SHARED.parent
+
+
+def config_path(rel: str) -> Path:
+    """The repo copy when the script runs from the repo (or its stow symlink), else ~/.config."""
+    p = SHARED / ".config" / rel
+    return p if p.exists() else Path.home() / ".config" / rel
+
+
+def show(p: Path) -> str:
+    try:
+        return str(p.relative_to(REPO))
+    except ValueError:
+        return str(p).replace(str(Path.home()), "~", 1)
+
+
+TABLE = config_path("keymap/keymap.toml")
+README = config_path("herdr-app/README.md")
+BEGIN = "<!-- BEGIN keymap-check --table -->"
+END = "<!-- END keymap-check --table -->"
+
+TOOLS = {  # id -> (name, enforced: drift fails the run)
+    "herdr": ("Herdr TUI", True),
+    "app": ("Herdr app", True),
+    "rex": ("Rex", True),
+    "tmux": ("tmux", False),
+}
+
+# Defaults `herdr --default-config` leaves out (from the 0.9.5 config reference).
+# Only used when the dump doesn't list the action.
+HERDR_EXTRA_DEFAULTS = {
+    "copy_mode": "prefix+[",
+    "swap_pane_left": "prefix+shift+h",
+    "swap_pane_down": "prefix+shift+j",
+    "swap_pane_up": "prefix+shift+k",
+    "swap_pane_right": "prefix+shift+l",
+}
+
+# ---- key notation -----------------------------------------------------------
+
+MOD_ORDER = ("cmd", "ctrl", "alt", "shift")
+MOD_NAMES = {"ctrl": "ctrl", "control": "ctrl", "c": "ctrl", "alt": "alt", "option": "alt", "opt": "alt",
+             "meta": "alt", "m": "alt", "shift": "shift", "s": "shift", "cmd": "cmd", "super": "cmd",
+             "command": "cmd", "platform": "cmd"}
+# US layout: a shifted character -> its unshifted key
+SHIFTED = {"|": "\\", "_": "-", "?": "/", "~": "`", "{": "[", "}": "]", ":": ";", '"': "'", "<": ",",
+           ">": ".", "+": "=", "!": "1", "@": "2", "#": "3", "$": "4", "%": "5", "^": "6", "&": "7",
+           "*": "8", "(": "9", ")": "0"}
+NAMED = {"backtick": "`", "grave": "`", "minus": "-", "comma": ",", "period": ".", "slash": "/",
+         "backslash": "\\", "semicolon": ";", "quote": "'", "equal": "=", "equals": "=",
+         "bracketleft": "[", "bracketright": "]", "backquote": "`", "escape": "esc", "return": "enter",
+         "btab": "shift+tab"}
+NAMED_SHIFTED = {"plus": "=", "ampersand": "7", "underscore": "-", "pipe": "\\", "question": "/", "tilde": "`"}
+
+
+def canon(mods: set, key: str, prefix: bool = False) -> str:
+    """Canonical key string: [prefix+][cmd+][ctrl+][alt+][shift+]key."""
+    mods = set(mods)
+    if len(key) > 2 and key.startswith("[") and key.endswith("]"):  # Rex physical key: [Backquote]
+        key = key[1:-1]
+        key = key[3:] if key.startswith("Key") else key[5:] if key.startswith("Digit") else key
+    low = key.lower()
+    if len(key) == 1:
+        if key in SHIFTED:
+            mods.add("shift")
+            key = SHIFTED[key]
+        elif key.isalpha() and key.isupper():
+            mods.add("shift")
+            key = low
+    elif low in NAMED_SHIFTED:
+        mods.add("shift")
+        key = NAMED_SHIFTED[low]
+    else:
+        key = NAMED.get(low, low)
+        if key.startswith("shift+"):
+            mods.add("shift")
+            key = key[6:]
+    return "+".join((["prefix"] if prefix else []) + [m for m in MOD_ORDER if m in mods] + [key])
+
+
+def parse_combo(s: str, sep: str = "+") -> str:
+    """`prefix+shift+g`, `alt+backtick`, `prefix+G` (sep "+"); `alt-shift-[` (sep "-")."""
+    toks = s.split(sep)
+    if len(toks) >= 2 and toks[-1] == "":  # the key is the separator itself
+        toks = toks[:-2] + [sep]
+    prefix, mods = False, set()
+    for t in toks[:-1]:
+        t = t.lower()
+        if t == "prefix":
+            prefix = True
+        elif t in MOD_NAMES:
+            mods.add(MOD_NAMES[t])
+        else:
+            raise ValueError(f"unknown modifier {t!r} in {s!r}")
+    return canon(mods, toks[-1], prefix)
+
+
+def parse_tmux(tok: str) -> str:
+    """tmux list-keys notation: M-h, M-~, "M-{", C-s, BTab, \\\\."""
+    if len(tok) >= 2 and tok[0] == tok[-1] == '"':
+        tok = tok[1:-1]
+    tok = re.sub(r"\\(.)", r"\1", tok)
+    mods = set()
+    while len(tok) > 2 and tok[1] == "-" and tok[0] in "CMS":
+        mods.add(MOD_NAMES[tok[0].lower()])
+        tok = tok[2:]
+    return canon(mods, tok)
+
+
+def is_core(key: str) -> bool:
+    """The layers the keymap covers: the prefix layer and the bare alt+ layer."""
+    if key.startswith("prefix+"):
+        return True
+    parts = key.split("+")[:-1]
+    return "alt" in parts and "ctrl" not in parts and "cmd" not in parts
+
+
+GROUP = re.compile(r"\{([^{}]*)\}|(\d)\.\.(\d)")
+
+
+def expand(s: str) -> list[str]:
+    """`alt+{h,j,k,l}` -> 4 strings, `alt+1..9` -> 9."""
+    m = GROUP.search(s)
+    if not m:
+        return [s]
+    if m.group(1) is not None:
+        opts = m.group(1).split(",")
+    else:
+        opts = [str(i) for i in range(int(m.group(2)), int(m.group(3)) + 1)]
+    return [x for o in opts for x in expand(s[: m.start()] + o + s[m.end():])]
+
+
+# ---- the table --------------------------------------------------------------
+
+
+class TableError(Exception):
+    pass
+
+
+@dataclass
+class Spec:
+    action: str | None = None
+    key: str | None = None  # bound on another key than the row's
+    absent: str | None = None
+    native_default: bool = False
+
+
+@dataclass
+class Row:
+    id: str
+    category: str
+    desc: str
+    key: str
+    specs: dict[str, Spec]
+
+    def pairs(self, tool: str) -> list[tuple[str, str]]:
+        """(canonical key, expected action) for every key the row expands to."""
+        spec = self.specs[tool]
+        keys = expand(spec.key or self.key)
+        acts = expand(spec.action)
+        if len(acts) == 1:
+            acts = acts * len(keys)
+        if len(acts) != len(keys):
+            raise TableError(f"{self.id}: {tool} action expands to {len(acts)} items, key to {len(keys)}")
+        return list(zip(keys, acts))
+
+
+def load_table() -> tuple[str, list[Row]]:
+    with open(TABLE, "rb") as f:
+        data = tomllib.load(f)
+    rows, seen = [], set()
+    for b in data.get("binding", []):
+        rid = b.get("id", "?")
+        for req in ("id", "category", "desc", "key"):
+            if req not in b:
+                raise TableError(f"{rid}: missing `{req}`")
+        if rid in seen:
+            raise TableError(f"{rid}: duplicate id")
+        seen.add(rid)
+        unknown = set(b) - {"id", "category", "desc", "key", *TOOLS}
+        if unknown:
+            raise TableError(f"{rid}: unknown field(s) {', '.join(sorted(unknown))}")
+        specs = {}
+        for tool in TOOLS:
+            v = b.get(tool)
+            if v is None:
+                raise TableError(f"{rid}: no entry for {tool} (give an action or {{ absent = \"why\" }})")
+            if isinstance(v, str):
+                specs[tool] = Spec(action=v)
+            else:
+                bad = set(v) - {"action", "key", "absent", "native-default"}
+                if bad:
+                    raise TableError(f"{rid}.{tool}: unknown field(s) {', '.join(sorted(bad))}")
+                spec = Spec(action=v.get("action"), key=v.get("key"), absent=v.get("absent"),
+                            native_default=v.get("native-default", False))
+                if bool(spec.absent) == bool(spec.action):
+                    raise TableError(f"{rid}.{tool}: give exactly one of `action` and `absent`")
+                if spec.native_default and tool != "herdr":
+                    raise TableError(f"{rid}.{tool}: native-default only applies to herdr")
+                specs[tool] = spec
+        row = Row(rid, b["category"], b["desc"], b["key"], specs)
+        for k in expand(row.key) + [k for s in specs.values() if s.key for k in expand(s.key)]:
+            if parse_combo(k) != k:
+                raise TableError(f"{rid}: write {k!r} as {parse_combo(k)!r}")
+        for tool, s in specs.items():
+            if s.action:
+                row.pairs(tool)  # validates the expansion
+        rows.append(row)
+    prefix = data.get("prefix", "ctrl+s")
+    return prefix, rows
+
+
+# ---- extractors -------------------------------------------------------------
+
+
+@dataclass
+class Bound:
+    action: str
+    source: str
+
+
+@dataclass
+class Bindings:
+    map: dict[str, list[Bound]] = field(default_factory=dict)
+    prefixes: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    skipped: str | None = None
+    no_defaults: bool = False  # herdr: defaults unknown, native-default rows unverifiable
+    files: dict[str, str] = field(default_factory=dict)  # layer -> where to add a binding
+
+    def add(self, key: str, action: str, source: str):
+        self.map.setdefault(key, []).append(Bound(action, source))
+
+
+def run(cmd: list[str], timeout: float = 10) -> subprocess.CompletedProcess | None:
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+def line_of(text: str, pattern: str) -> int | None:
+    rx = re.compile(pattern)
+    for i, line in enumerate(text.splitlines(), 1):
+        if rx.search(line):
+            return i
+    return None
+
+
+def herdr_defaults(b: Bindings) -> dict[str, str]:
+    if not shutil.which("herdr"):
+        b.no_defaults = True
+        b.warnings.append("herdr not on PATH: rows relying on herdr's defaults can't be checked")
+        return {}
+    r = run(["herdr", "--default-config"])
+    if not r or r.returncode != 0:
+        b.no_defaults = True
+        b.warnings.append("`herdr --default-config` failed: rows relying on herdr's defaults can't be checked")
+        return {}
+    out, in_keys = {}, False
+    for line in r.stdout.splitlines():
+        s = line.strip()
+        if s.startswith("[") or s.startswith("# ["):
+            in_keys = s.lstrip("# ").startswith("[keys]")
+            continue
+        m = re.match(r'#\s*([a-z_]+)\s*=\s*"([^"]*)"', s)
+        if in_keys and m:
+            out[m.group(1)] = m.group(2)
+    for k, v in HERDR_EXTRA_DEFAULTS.items():
+        out.setdefault(k, v)
+    return out
+
+
+def extract_herdr() -> Bindings:
+    b = Bindings()
+    path = config_path("herdr/config.toml")
+    b.files = {"root": show(path), "prefix": show(path)}
+    text = path.read_text()
+    keys = tomllib.loads(text).get("keys", {})
+    effective = {a: (v, "herdr default") for a, v in herdr_defaults(b).items()}
+    for a, v in keys.items():
+        if a in ("prefix", "command", "indexed"):
+            continue
+        n = line_of(text, rf"^\s*{re.escape(a)}\s*=")
+        effective["zoom" if a == "fullscreen" else a] = (v, f"{show(path)}:{n}")
+    for a, (v, src) in effective.items():
+        if a == "prefix" or a.startswith("navigate_") or a == "remote_image_paste":
+            continue
+        for val in v if isinstance(v, list) else [v]:
+            for k in expand(val) if val else []:
+                b.add(parse_combo(k), a, src)
+    for c in keys.get("command", []):
+        kind = c.get("type", "shell")
+        action = f"plugin:{c['command']}" if kind == "plugin_action" else f"{kind}:{c.get('description') or c['command']}"
+        n = line_of(text, rf'^\s*key\s*=\s*"{re.escape(c["key"])}"')
+        for k in expand(c["key"]):
+            b.add(parse_combo(k), action, f"{show(path)}:{n}")
+    p = keys.get("prefix", "ctrl+b")
+    b.prefixes = [parse_combo(x) for x in (p if isinstance(p, list) else [p])]
+    return b
+
+
+def extract_app() -> Bindings:
+    b = Bindings()
+    kpath = config_path("herdr-app/keys.json")
+    lpath = config_path("herdr-app/mods/leader/main.js")
+    b.files = {"root": show(kpath), "prefix": f"{show(lpath)} (ITEMS)"}
+
+    ktext = kpath.read_text()
+
+    def pairs_hook(pairs):
+        seen = {}
+        for k, v in pairs:
+            if k in seen and seen[k] != v:
+                b.warnings.append(f"{show(kpath)}: {k!r} is defined twice; JSON keeps only the last")
+            seen[k] = v
+        return seen
+
+    data = json.loads(ktext, object_pairs_hook=pairs_hook)
+    for k, action in data.get("global", {}).items():
+        key = parse_combo(k, sep="-")
+        n = line_of(ktext, rf'^\s*"{re.escape(k)}"\s*:')
+        if action == "mod.open:leader":
+            b.prefixes.append(key)
+        b.add(key, action, f"{show(kpath)}:{n}")
+
+    ltext = lpath.read_text()
+    start = ltext.find("const ITEMS = [")
+    if start < 0:
+        b.warnings.append(f"{show(lpath)}: no `const ITEMS = [` found; leader keys not checked")
+        return b
+    js_str = r'"(?:[^"\\]|\\.)*"'
+    keys_rx = re.compile(rf'keys:\s*(?:\[\s*((?:{js_str}\s*,?\s*)*)\]|({js_str})\.split\(""\))')
+    label_rx = re.compile(rf"label:\s*({js_str})")
+    end = ltext.find("\n];", start)
+    for m in keys_rx.finditer(ltext, start, end):
+        if m.group(1) is not None:
+            chars = [json.loads(s) for s in re.findall(js_str, m.group(1))]
+        else:
+            chars = list(json.loads(m.group(2)))
+        lm = label_rx.search(ltext, m.end(), end)
+        label = json.loads(lm.group(1)) if lm else "?"
+        n = ltext.count("\n", 0, m.start()) + 1
+        for ch in chars:
+            b.add(canon(set(), ch, prefix=True), f"leader:{label}", f"{show(lpath)}:{n}")
+    return b
+
+
+def rex_binary() -> str | None:
+    found = shutil.which("rex")
+    if found:
+        return found
+    for pattern in ("/Applications/Rex*.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex",
+                    str(Path.home() / "Applications/Rex*.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex")):
+        hits = sorted(glob.glob(pattern))
+        if hits:
+            return hits[0]
+    return None
+
+
+def fmt_arg(v) -> str:
+    return v if isinstance(v, str) else json.dumps(v)
+
+
+def extract_rex() -> Bindings:
+    b = Bindings()
+    rexdir = config_path("rex")
+    b.files = {"root": show(rexdir / "keys.lua"), "prefix": show(rexdir / "keys.lua")}
+    exe = rex_binary()
+    if not exe:
+        b.skipped = "rex not found (no `rex` on PATH, no Rex app in /Applications)"
+        return b
+    r = run([exe, "keymap", "--json"])
+    if not r or r.returncode != 0:
+        b.skipped = "Rex server not reachable (`rex keymap --json` failed); start Rex to check it"
+        return b
+    data = json.loads(r.stdout)
+    for d in data.get("diagnostics") or []:
+        b.warnings.append(f"rex: {d}")
+    firsts = set()
+    for x in data.get("bindings", []):
+        if x.get("mode"):
+            continue  # modes (resize) aren't in the table
+        seq = x["keys"]
+        if len(seq) == 1:
+            key = parse_combo(seq[0])
+        elif len(seq) == 2:
+            firsts.add(parse_combo(seq[0]))
+            key = "prefix+" + parse_combo(seq[1]) if seq[0] == "ctrl+s" else ">".join(seq)
+        else:
+            key = ">".join(seq)
+        args = x.get("args") or {}
+        action = " ".join([x["action"]] + [f"{k}={fmt_arg(v)}" for k, v in sorted(args.items())])
+        src = x.get("source", "?")
+        b.add(key, action, show(rexdir / src) if src != "?" else "rex")
+    b.prefixes = sorted(firsts)
+    b.warnings.append("rex: this is the server's loaded config; `rex config reload` after editing keys.lua")
+    return b
+
+
+def extract_tmux() -> Bindings:
+    b = Bindings()
+    b.files = {"root": "shared/.config/tmux/", "prefix": "shared/.config/tmux/"}
+    if not shutil.which("tmux"):
+        b.skipped = "tmux not on PATH"
+        return b
+    # Without a server, list-keys prints tmux's built-in defaults instead of failing.
+    r = run(["tmux", "list-sessions"])
+    if not r or r.returncode != 0:
+        b.skipped = "no tmux server running"
+        return b
+    rx = re.compile(r"^bind-key\s+(?:-r\s+)?(?:-N\s+\"[^\"]*\"\s+)?-T\s+(\S+)\s+(\S+)\s+(.*)$")
+    for table in ("root", "prefix"):
+        r = run(["tmux", "list-keys", "-T", table])
+        if not r or r.returncode != 0:
+            b.skipped = "no tmux server running"
+            return b
+        for line in r.stdout.splitlines():
+            m = rx.match(line.strip())
+            if not m:
+                continue
+            key = parse_tmux(m.group(2))
+            if re.search(r"mouse|wheel|click|drag", key):
+                continue
+            if table == "prefix":
+                key = "prefix+" + key
+            elif not is_core(key):
+                continue  # root keys outside the alt+ layer (C-h navigator, mouse)
+            b.add(key, m.group(3).strip(), f"tmux {table} table")
+    r = run(["tmux", "show-options", "-gv", "prefix"])
+    if r and r.returncode == 0 and r.stdout.strip():
+        b.prefixes = [parse_tmux(r.stdout.strip())]
+    return b
+
+
+EXTRACTORS = {"herdr": extract_herdr, "app": extract_app, "rex": extract_rex, "tmux": extract_tmux}
+
+# ---- checking ---------------------------------------------------------------
+
+
+def matches(tool: str, want: str, got: str) -> bool:
+    if tool == "tmux":
+        return want in got
+    if tool == "rex":
+        wname, *wargs = want.split(" ")
+        gname, *gargs = got.split(" ")
+        return wname == gname and set(wargs) <= set(gargs)
+    return want == got
+
+
+@dataclass
+class Report:
+    ok: list = field(default_factory=list)  # (row, key, action)
+    missing: list = field(default_factory=list)  # (row, key, action)
+    wrong: list = field(default_factory=list)  # (row, key, action, [Bound])
+    extra: list = field(default_factory=list)  # (key, [Bound])
+    conflict: list = field(default_factory=list)  # (key, [Bound])
+    prefix: list = field(default_factory=list)  # messages
+    absent: list = field(default_factory=list)  # (row, reason)
+    moved: list = field(default_factory=list)  # (row, key)
+    unverified: list = field(default_factory=list)  # rows
+
+    def drift(self) -> int:
+        return len(self.missing) + len(self.wrong) + len(self.extra) + len(self.conflict) + len(self.prefix)
+
+
+def check(tool: str, rows: list[Row], prefix: str, b: Bindings) -> Report:
+    rep, claimed = Report(), set()
+    for row in rows:
+        spec = row.specs[tool]
+        if spec.absent:
+            rep.absent.append((row, spec.absent))
+            continue
+        pairs = row.pairs(tool)
+        claimed.update(k for k, _ in pairs)
+        if spec.native_default and b.no_defaults:
+            rep.unverified.append(row)
+            continue
+        if spec.key:
+            rep.moved.append((row, spec.key))
+        for k, a in pairs:
+            got = b.map.get(k)
+            if not got:
+                rep.missing.append((row, k, a))
+            elif not any(matches(tool, a, g.action) for g in got):
+                rep.wrong.append((row, k, a, got))
+            else:
+                rep.ok.append((row, k, a))
+    for k, got in sorted(b.map.items()):
+        if not is_core(k):
+            continue
+        if len({g.action for g in got}) > 1:
+            rep.conflict.append((k, got))
+        if k not in claimed:
+            rep.extra.append((k, got))
+    if b.prefixes and prefix not in b.prefixes:
+        rep.prefix.append(f"prefix is {', '.join(b.prefixes)}, the table says {prefix}")
+    elif tool == "rex" and len(b.prefixes) > 1:
+        rep.prefix.append(f"key sequences start with {', '.join(b.prefixes)}; expected only {prefix}")
+    return rep
+
+
+# ---- output -----------------------------------------------------------------
+
+COLOR = sys.stdout.isatty()
+
+
+def c(code: str, s: str) -> str:
+    return f"\033[{code}m{s}\033[0m" if COLOR else s
+
+
+def bound_str(got: list[Bound]) -> str:
+    return "; ".join(f"{g.action} ({g.source})" for g in got)
+
+
+def print_report(tool: str, b: Bindings, rep: Report, verbose: bool):
+    name, enforced = TOOLS[tool]
+    print(c("1", name) + ("" if enforced else c("2", "  (report only: phase 2)")))
+    for w in b.warnings:
+        print(c("33", f"  ! {w}"))
+    if b.skipped:
+        print(c("33", f"  - skipped: {b.skipped}"))
+        return
+    bad = "31" if enforced else "33"
+    for msg in rep.prefix:
+        print(c(bad, f"  ✗ prefix    {msg}"))
+    for row, k, a in rep.missing:
+        layer = "prefix" if k.startswith("prefix+") else "root"
+        print(c(bad, f"  ✗ missing   {k:<20} {row.id}: expected {a}  → add to {b.files.get(layer, '?')}"))
+    for row, k, a, got in rep.wrong:
+        print(c(bad, f"  ✗ wrong     {k:<20} {row.id}: expected {a}, bound to {bound_str(got)}"))
+    for k, got in rep.conflict:
+        print(c(bad, f"  ✗ conflict  {k:<20} {bound_str(got)}"))
+    if enforced or verbose:
+        for k, got in rep.extra:
+            print(c(bad, f"  ✗ extra     {k:<20} {bound_str(got)}  (not in keymap.toml)"))
+    elif rep.extra:
+        print(c(bad, f"  ✗ extra     {len(rep.extra)} keys not in keymap.toml (-v lists them): ")
+              + ", ".join(k for k, _ in rep.extra))
+    for row in rep.unverified:
+        print(c("33", f"  ? unverified {row.key:<19} {row.id}: herdr default, defaults unknown"))
+    if verbose:
+        for row, k, a in rep.ok:
+            print(c("32", f"  ✓ {k:<28} {a}"))
+        for row, key in rep.moved:
+            print(c("2", f"  ~ other key {key:<20} {row.id} (table key {row.key})"))
+        for row, reason in rep.absent:
+            print(c("2", f"  - absent    {row.key:<20} {row.id}: {reason}"))
+    summary = f"  {len(rep.ok)} keys match, {len(rep.absent)} absent and {len(rep.moved)} on other keys by design"
+    print(c("32" if not rep.drift() else "2", summary))
+
+
+# ---- markdown table ---------------------------------------------------------
+
+CATEGORIES = [("navigation", "Navigation"), ("panes", "Panes"), ("workspaces", "Tabs and spaces"),
+              ("popups", "Popups"), ("other", "Other")]
+
+
+def code(s: str) -> str:
+    s = s.replace("|", "\\|")
+    return f"`` {s} ``" if "`" in s else f"`{s}`"
+
+
+def cell(spec: Spec) -> str:
+    if spec.absent:
+        return "—"
+    s = code(spec.action)
+    if spec.key:
+        s = f"on {code(spec.key)}: {s}"
+    if spec.native_default:
+        s += " (default)"
+    return s
+
+
+def markdown(rows: list[Row], prefix: str) -> str:
+    out = [
+        BEGIN,
+        f"<!-- Generated from shared/.config/keymap/keymap.toml by `keymap-check --table --write`. Don't edit by hand. -->",
+        "",
+        f"`prefix` is `{prefix}` everywhere (in the app, the `leader` mod). `—` means the tool doesn't have it; the reason is in the gap tables below. \"on `key`\" means the tool binds it on a different key.",
+    ]
+    names = [TOOLS[t][0] for t in TOOLS]
+    for cat, title in CATEGORIES:
+        sel = [r for r in rows if r.category == cat]
+        if not sel:
+            continue
+        out += ["", f"#### {title}", "", "| Action | Keys | " + " | ".join(names) + " |",
+                "|" + "---|" * (2 + len(names))]
+        for r in sel:
+            out.append(f"| {r.desc} | {code(r.key)} | " + " | ".join(cell(r.specs[t]) for t in TOOLS) + " |")
+    for title, tools in (("Gaps (Herdr TUI, Herdr app, Rex)", [t for t in TOOLS if t != "tmux"]),
+                         ("tmux differences (phase 2)", ["tmux"])):
+        out += ["", f"#### {title}", "", "| Action | Keys | Tool | Why |", "|---|---|---|---|"]
+        for r in rows:
+            for t in tools:
+                s = r.specs[t]
+                if s.absent:
+                    why = s.absent.replace("|", "\\|")
+                    out.append(f"| {r.desc} | {code(r.key)} | {TOOLS[t][0]} | {why} |")
+                elif s.key and t == "tmux":
+                    out.append(f"| {r.desc} | {code(r.key)} | {TOOLS[t][0]} | on {code(s.key)} |")
+    out.append(END)
+    return "\n".join(out) + "\n"
+
+
+def readme_block(text: str) -> str | None:
+    i, j = text.find(BEGIN), text.find(END)
+    if i < 0 or j < 0:
+        return None
+    return text[i: j + len(END)] + "\n"
+
+
+def write_table(path: Path, table: str):
+    text = path.read_text()
+    i, j = text.find(BEGIN), text.find(END)
+    if i < 0 or j < 0:
+        sys.exit(f"keymap-check: {show(path)} has no {BEGIN} … {END} block")
+    j += len(END)
+    if text[j: j + 1] == "\n":
+        j += 1
+    path.write_text(text[:i] + table + text[j:])
+    print(f"wrote the table into {show(path)}")
+
+
+# ---- main -------------------------------------------------------------------
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Check Herdr TUI, Herdr app, Rex and tmux keys against keymap.toml.")
+    ap.add_argument("-t", "--tool", action="append", choices=list(TOOLS), help="check only these tools")
+    ap.add_argument("-v", "--verbose", action="store_true", help="also list matches and exceptions")
+    ap.add_argument("--table", action="store_true", help="print the parity table as markdown")
+    ap.add_argument("--write", metavar="FILE", type=Path, help="with --table: replace the generated block in FILE")
+    args = ap.parse_args()
+
+    try:
+        prefix, rows = load_table()
+    except (TableError, ValueError, tomllib.TOMLDecodeError) as e:
+        print(f"keymap-check: {show(TABLE)}: {e}", file=sys.stderr)
+        return 2
+
+    if args.table:
+        table = markdown(rows, prefix)
+        if args.write:
+            write_table(args.write, table)
+        else:
+            sys.stdout.write(table)
+        return 0
+
+    print(c("2", f"keymap: {show(TABLE)} ({len(rows)} actions)\n"))
+    failed = False
+    for tool in args.tool or TOOLS:
+        b = EXTRACTORS[tool]()
+        rep = check(tool, rows, prefix, b) if not b.skipped else Report()
+        print_report(tool, b, rep, args.verbose)
+        print()
+        failed |= TOOLS[tool][1] and rep.drift() > 0
+
+    if README.exists() and not args.tool:
+        block = readme_block(README.read_text())
+        if block is None:
+            print(c("33", f"! {show(README)}: no generated parity table block"))
+        elif block != markdown(rows, prefix):
+            print(c("31", f"✗ {show(README)}: parity table is stale; run `keymap-check --table --write {show(README)}`"))
+            failed = True
+
+    print(c("31", "drift found") if failed else c("32", "no drift"))
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -71,3 +71,9 @@ of it, the Mac app's `wt-picker` mod uses the Herdr-independent subcommands
 a freshly fetched `origin/<default>`. Most subcommands work from any checkout
 of a repo; `managed` / `all` list the worktrees under `~/.herdr/worktrees` for
 every repo, from anywhere. `herdr-wt --help` for the subcommands.
+
+### keymap-check
+Checks the Herdr TUI, Herdr app, Rex and (report only) tmux keybindings against
+the canonical table in `~/.config/keymap/keymap.toml`, and exits non-zero on
+drift. `--table --write shared/.config/herdr-app/README.md` regenerates the
+parity table. Needs Python 3.11+. See `shared/.config/keymap/README.md`.

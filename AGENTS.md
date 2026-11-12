@@ -147,17 +147,25 @@ Profiles can define lifecycle scripts in a `.hooks/` directory. `install.sh` run
 | `crafting` | `post-stow` | Runs `bootstrap_sandbox`, then `optimize-monorepos` |
 | `work` | `post-stow` | Runs `optimize-monorepos` (narrows monorepo fetch refspecs, prunes stale tags/branches) |
 
-## Herdr TUI ↔ Herdr Mac App Parity
+## Keymap parity (Herdr TUI, Herdr app, Rex; tmux later)
 
-Two Herdr setups are maintained side by side: the TUI (`shared/.config/herdr/config.toml`) and the Mac app (`shared/.config/herdr-app/`: `keys.json`, `mods/leader/` for the `ctrl+s` prefix keys, `mods/pj-picker/`, ...). The goal is to switch between them without relearning keys: **same action, same keys, wherever the app allows it.**
+Three multiplexer setups share one muscle memory (`alt+` layer, `ctrl+s` prefix, popups):
+- the Herdr TUI (`shared/.config/herdr/config.toml`);
+- the Herdr Mac app (`shared/.config/herdr-app/`: `keys.json`, plus `mods/leader/` for the prefix keys);
+- Rex (`shared/.config/rex/keys.lua`).
 
-When adding, changing or removing a Herdr keybinding or user-visible feature on **either** side:
-1. Check the other side; if it can be done there, do it with the same keys.
-2. If it can't, record the gap, with the reason, in the "Differences" table.
-3. Never put a different action on a key the other side already uses.
-4. Update the parity table in `shared/.config/herdr-app/README.md` (section "TUI ↔ app parity") in the same commit.
+The goal is to switch between them without relearning keys: **same action, same keys, wherever the tool allows it.** Where tools disagree, the Herdr/Rex `ctrl+s` layout wins. tmux moves to this layout in a later change; for now it is report-only.
 
-Known mismatches the user hasn't resolved are listed under "Open items" in that section; read it before touching Herdr keys.
+The source of truth is `shared/.config/keymap/keymap.toml`: one row per action, with each tool's action or `{ absent = "reason" }`. Nothing is generated from it. `keymap-check` (`shared/bin/`) reads each tool's live config and reports drift. See `shared/.config/keymap/README.md`.
+
+When adding, changing or removing a keybinding or user-visible feature in **any** of them:
+1. Edit the row in `keymap.toml` first (or add one).
+2. Make the change in every tool that can do it, with the same keys. Where a tool can't, give it `{ absent = "reason" }`.
+3. Never put a different action on a key another tool already uses for a row.
+4. Run `herdr config check` / `rex config check` / `rex config reload`, then `keymap-check` until it prints "no drift".
+5. Run `keymap-check --table --write shared/.config/herdr-app/README.md` to regenerate the parity table, and commit it with the configs.
+
+Known mismatches the user hasn't resolved are listed under "Open items" in the "Keymap parity" section of `shared/.config/herdr-app/README.md`. Read it before touching these keys.
 
 ## Nix-Darwin (macOS System Management)
 

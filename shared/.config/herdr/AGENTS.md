@@ -36,13 +36,22 @@ This config customizes bindings heavily. The guiding principles:
 - **Agent/workspace navigation uses `alt+[/]` and `alt+shift+[/]`** — bracket pattern for sequential cycling
 - **Splits use `prefix+\` and `prefix+|`** — matches tmux visual split conventions
 - **Frequently-used actions skip the prefix** (`alt+z` for zoom, `` alt+` `` for pane cycling) — speed over consistency
-- **Replaced natives are blanked, never deleted** — set `key_name = ""` (e.g. `workspace_picker`, `rename_workspace`, `open_notification_target`, `new_workspace`) with a comment saying why. Deleting the line restores herdr's upstream default for that action, which in this config can silently collide with an existing binding (`prefix+v` is `copy_mode`, `prefix+c` is the Quick shell popup).
+- **Replaced natives are blanked, never deleted** — set `key_name = ""` (e.g. `workspace_picker`, `rename_workspace`, `open_notification_target`, `close_workspace`, `new_workspace`) with a comment saying why. Deleting the line restores herdr's upstream default for that action, which in this config can silently collide with an existing binding (`prefix+v` is `copy_mode`, `prefix+c` is the Quick shell popup).
 
 When adding new bindings, follow these patterns: use `alt+<key>` for high-frequency actions, `prefix+<key>` for everything else. Document the binding's purpose with a TOML comment.
 
-## Keep In Sync With the Herdr Mac App
+## Keep In Sync With the Herdr Mac App and Rex
 
-This config (the TUI) and the Herdr Mac app (`shared/.config/herdr-app/`) are meant to share muscle memory: same action, same keys. **Any keybinding or feature change here must be mirrored in the app, or recorded as a difference.** The parity table, the rules and the open conflicts live in `shared/.config/herdr-app/README.md` under "TUI ↔ app parity". Update it in the same commit.
+This config (the TUI), the Herdr Mac app (`shared/.config/herdr-app/`) and Rex (`shared/.config/rex/`) are meant to share muscle memory: same action, same keys. **Any keybinding or feature change here must be mirrored in the app and Rex, or recorded as `{ absent = "reason" }`.**
+
+The rows live in `shared/.config/keymap/keymap.toml`. Edit the row there first, then the configs. `keymap-check` must print "no drift" afterwards. Then run `keymap-check --table --write shared/.config/herdr-app/README.md` to regenerate the parity table ("Keymap parity" section), and commit it all together. Details: `shared/.config/keymap/README.md`.
+
+Some of herdr's defaults are kept on purpose because the app leader and Rex use the same keys:
+- `prefix+h/j/k/l` (next to `alt+hjkl`);
+- `prefix+z` (next to `alt+z`);
+- the `native-default` rows in `keymap.toml`, such as `prefix+x`, `prefix+shift+t` and `prefix+b`.
+
+Don't blank these without updating the table.
 
 ## CWD Policy for New Panes / Tabs / Spaces
 
@@ -111,7 +120,7 @@ The layers, so a fix goes in the right one:
 - Opening/removing from the all-repos list `cd`s into the worktree (or its main
   checkout) first, since `herdr-wt open/remove` resolve against the cwd's repo.
 - The Mac app's `mods/wt-picker` uses the same `herdr-wt` (its Herdr-independent
-  subcommands) on the same keys; keep them in step (parity table).
+  subcommands) on the same keys; keep them in step (`keymap.toml`, `keymap-check`).
 - `wt-picker.sh` takes its engine from `WT_ENGINE` (default `herdr-wt`). The Rex
   config runs it with `WT_ENGINE=rex-wt` (`shared/bin/rex-wt`, which delegates the
   git/Worktrunk subcommands to `herdr-wt`). A new `herdr-wt` subcommand the picker

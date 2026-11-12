@@ -14,11 +14,12 @@ resume_agents_on_restore = true
 [keys]
 prefix = "ctrl+s"
 
-# Pane navigation — Alt+hjkl (matches tmux-tilish / vim-tmux-navigator)
-focus_pane_left = "alt+h"
-focus_pane_down = "alt+j"
-focus_pane_up = "alt+k"
-focus_pane_right = "alt+l"
+# Pane navigation — Alt+hjkl (matches tmux-tilish / vim-tmux-navigator), and
+# herdr's default prefix+hjkl kept alongside (same keys as Rex and the app leader)
+focus_pane_left = ["alt+h", "prefix+h"]
+focus_pane_down = ["alt+j", "prefix+j"]
+focus_pane_up = ["alt+k", "prefix+k"]
+focus_pane_right = ["alt+l", "prefix+l"]
 
 # Pane cycling — Alt+`/~ (matches tmux)
 cycle_pane_next = "alt+backtick"
@@ -56,6 +57,9 @@ workspace_picker = ""
 rename_workspace = ""
 # open_notification_target disabled — no free slot
 open_notification_target = ""
+# close_workspace disabled — its default prefix+shift+d is the remove-worktree
+# popup below (same key in Rex and the app leader)
+close_workspace = ""
 # new_workspace disabled as a native binding — replaced by the [[keys.command]]
 # wrapper below (prefix+shift+n) that passes --cwd ~/development, since
 # [terminal] new_cwd is now "follow" for the sake of panes/tabs
@@ -68,8 +72,8 @@ switch_workspace = "alt+shift+1..9"
 split_horizontal = "prefix+\\"
 split_vertical = "prefix+|"
 
-# Zoom — Alt+z
-zoom = "alt+z"
+# Zoom — Alt+z, plus herdr's default prefix+z (same keys as Rex and the app leader)
+zoom = ["alt+z", "prefix+z"]
 
 # Native worktree actions disabled — prefix+w (all worktrees), prefix+shift+w
 # (find-or-create in this repo) and prefix+shift+d (remove) run the worktree
@@ -139,7 +143,7 @@ width = "80%"
 height = "80%"
 
 # pj project picker — prefix+shift+o (pj-herdr plugin). Matches the Herdr Mac app,
-# where leader O opens its pj-picker mod (see shared/.config/herdr-app/README.md, "TUI ↔ app parity")
+# where leader O opens its pj-picker mod (see shared/.config/keymap/keymap.toml)
 [[keys.command]]
 key = "prefix+shift+o"
 type = "plugin_action"

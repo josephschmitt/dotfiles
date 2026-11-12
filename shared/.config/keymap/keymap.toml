@@ -1,0 +1,488 @@
+# Canonical keymap: one row per action, shared by Herdr TUI, Herdr app, Rex and
+# (phase 2) tmux. Nothing is generated from this file. `keymap-check` reads each
+# tool's live config and reports where it drifts from these rows.
+# Schema and workflow: README.md next to this file.
+#
+# Keys: one notation everywhere. Modifiers in the order ctrl, alt, shift; a
+# shifted character is written as shift + its unshifted key (`|` is `shift+\`,
+# `_` is `shift+-`, `?` is `shift+/`, `G` is `shift+g`). `prefix+` is the prefix
+# below. `{a,b}` and `1..9` expand, and a tool's action expands in step with the
+# key (or is shared by every expanded key when it doesn't expand).
+#
+# Per tool (herdr = Herdr TUI, app = Herdr app, rex, tmux), every row says one of:
+#   "action"                              bound on the row's key
+#   { action = "...", key = "..." }       bound on a different key (an exception)
+#   { action = "...", native-default = true }  Herdr TUI only: herdr's own default,
+#                                         not written in config.toml
+#   { absent = "reason" }                 not bound, and why
+#
+# How actions are written:
+#   herdr  native action name (`zoom`); a [[keys.command]] is `plugin:<command>`
+#          for plugin_action, else `<type>:<description>`
+#   app    keys.json command (`pane.go:left`); leader keys are `leader:<label>`
+#          (the ITEMS label in mods/leader/main.js)
+#   rex    action name plus the args that matter (`pane.focus direction=left`);
+#          extra args on the binding are ignored
+#   tmux   a substring of the bound command (report only until phase 2)
+
+prefix = "ctrl+s"
+
+# ---- navigation -------------------------------------------------------------
+
+[[binding]]
+id = "focus-pane"
+category = "navigation"
+desc = "Focus pane left/down/up/right"
+key = "alt+{h,j,k,l}"
+herdr = "focus_pane_{left,down,up,right}"
+app = "pane.go:{left,down,up,right}"
+rex = "pane.focus direction={left,down,up,right}"
+tmux = "select-pane -{L,D,U,R}"
+
+[[binding]]
+id = "focus-pane-prefix"
+category = "navigation"
+desc = "Focus pane (prefix)"
+key = "prefix+{h,j,k,l}"
+herdr = "focus_pane_{left,down,up,right}"
+app = "leader:Focus pane"
+rex = "pane.focus direction={left,down,up,right}"
+tmux = { absent = "prefix+h/j/k/l resize the pane (repeatable)" }
+
+[[binding]]
+id = "cycle-pane"
+category = "navigation"
+desc = "Next / previous pane"
+key = "alt+{`,shift+`}"
+herdr = "cycle_pane_{next,previous}"
+app = { absent = "no cycle-pane command, only directional pane.go" }
+rex = "pane.focus_{next,previous}"
+tmux = "select-pane -t :.{+,-}"
+
+[[binding]]
+id = "select-tab"
+category = "navigation"
+desc = "Select tab N"
+key = "alt+1..9"
+herdr = "switch_tab"
+app = "tab.select:1..9"
+rex = "client.tab.goto index=1..9"
+tmux = "select-window -t :1..9"
+
+[[binding]]
+id = "prev-next-tab"
+category = "navigation"
+desc = "Previous / next tab"
+key = "prefix+{[,]}"
+herdr = "{previous,next}_tab"
+app = "leader:{Previous,Next} tab"
+rex = "client.tab.{previous,next}"
+tmux = { key = "alt+{[,]}", action = "{previous,next}-window" }
+
+[[binding]]
+id = "prev-next-space"
+category = "navigation"
+desc = "Previous / next space (Rex/tmux: session)"
+key = "alt+{[,]}"
+herdr = "{previous,next}_workspace"
+app = "space.{prev,next}"
+rex = "session.{previous,next}"
+tmux = { key = "alt+shift+{[,]}", action = "switch-client -{p,n}" }
+
+[[binding]]
+id = "select-space"
+category = "navigation"
+desc = "Select space N"
+key = "alt+shift+1..9"
+herdr = "switch_workspace"
+app = "space.select:1..9"
+rex = "goto_session index=1..9"
+tmux = { absent = "tilish: alt+shift+1..9 moves the pane to window N" }
+
+[[binding]]
+id = "prev-next-agent"
+category = "navigation"
+desc = "Previous / next agent"
+key = "alt+shift+{[,]}"
+herdr = "{previous,next}_agent"
+app = "agent.{prev,next}"
+rex = { absent = "no agent cycling; the activity view (prefix+a) replaces it" }
+tmux = { absent = "no agents; alt+shift+[ / ] is previous / next session" }
+
+[[binding]]
+id = "focus-agent"
+category = "navigation"
+desc = "Focus agent N"
+key = "prefix+1..9"
+herdr = "focus_agent"
+app = "leader:Focus agent"
+rex = { absent = "no numbered agent list; the activity view (prefix+a) replaces it" }
+tmux = { absent = "prefix+1..9 selects pane N" }
+
+[[binding]]
+id = "goto"
+category = "navigation"
+desc = "Go to… (spaces, agents)"
+key = "prefix+o"
+herdr = "goto"
+app = "leader:Go to…"
+rex = "session.switch"
+tmux = "Sesh"
+
+[[binding]]
+id = "activity"
+category = "navigation"
+desc = "Activity view (programs and agents)"
+key = "prefix+a"
+herdr = { absent = "no activity view; goto (prefix+o) lists agents" }
+app = { absent = "no activity view; Go to… (prefix+o) lists agents" }
+rex = "pane.view_activity"
+tmux = { absent = "no agents" }
+
+[[binding]]
+id = "activity-sidebar"
+category = "navigation"
+desc = "Toggle the sidebar's activity view"
+key = "prefix+shift+a"
+herdr = { absent = "the sidebar always lists agents" }
+app = { absent = "the sidebar always lists agents" }
+rex = "client.sidebar.activity.toggle"
+tmux = { absent = "prefix+shift+a opens Claude in a split (phase 2: move it)" }
+
+# ---- panes ------------------------------------------------------------------
+
+[[binding]]
+id = "split"
+category = "panes"
+desc = "Split down / right"
+key = 'prefix+{\,shift+\}'
+herdr = "split_{horizontal,vertical}"
+app = "leader:Split {down,right}"
+rex = "pane.split direction={down,right}"
+tmux = "split-window -{v,h}"
+
+[[binding]]
+id = "close-pane"
+category = "panes"
+desc = "Close pane"
+key = "prefix+x"
+herdr = { action = "close_pane", native-default = true }
+app = "leader:Close pane"
+rex = "pane.close"
+tmux = "kill-pane"
+
+[[binding]]
+id = "zoom"
+category = "panes"
+desc = "Zoom pane"
+key = "alt+z"
+herdr = "zoom"
+app = "pane.zoom"
+rex = "pane.zoom"
+tmux = "resize-pane -Z"
+
+[[binding]]
+id = "zoom-prefix"
+category = "panes"
+desc = "Zoom pane (prefix)"
+key = "prefix+z"
+herdr = "zoom"
+app = "leader:Zoom pane"
+rex = "pane.zoom"
+tmux = { absent = "prefix+z enters the resize table (phase 2: move it to prefix+r)" }
+
+[[binding]]
+id = "float"
+category = "panes"
+desc = "Float the pane, or dock a floating one"
+key = "alt+f"
+herdr = { absent = "no floating panes (herdr 0.9.5)" }
+app = { absent = "no floating panes; terminal.peek only previews a terminal over the tab" }
+rex = "pane.float"
+tmux = { absent = "no floating panes" }
+
+[[binding]]
+id = "rename-pane"
+category = "panes"
+desc = "Rename pane"
+key = "prefix+p"
+herdr = "rename_pane"
+app = { absent = "no rename-pane command" }
+rex = "pane.rename"
+tmux = { absent = "no pane names; prefix+p is display-panes" }
+
+[[binding]]
+id = "resize-mode"
+category = "panes"
+desc = "Resize mode (h/j/k/l until Esc)"
+key = "prefix+r"
+herdr = { action = "resize_mode", native-default = true }
+app = { absent = "no pane resize command (layout.resize sizes layout nodes)" }
+rex = "client.mode.enter name=resize"
+tmux = { key = "prefix+z", action = "switch-client -T resize" }
+
+[[binding]]
+id = "balance"
+category = "panes"
+desc = "Balance pane sizes"
+key = "prefix+="
+herdr = { absent = "no balance action" }
+app = { absent = "no balance command" }
+rex = "pane.balance"
+tmux = { absent = "not bound" }
+
+[[binding]]
+id = "swap-pane"
+category = "panes"
+desc = "Swap pane left/down/up/right"
+key = "prefix+shift+{h,j,k,l}"
+herdr = { action = "swap_pane_{left,down,up,right}", native-default = true }
+app = { absent = "not on the leader; pane.swap is on cmd+alt+shift+arrows" }
+rex = { absent = "not bound; pane.move.* moves rather than swaps" }
+tmux = { key = "alt+shift+{h,j,k,l}", action = "swap-pane" }
+
+[[binding]]
+id = "copy-mode"
+category = "panes"
+desc = "Copy mode"
+key = "prefix+v"
+herdr = "copy_mode"
+app = { absent = "mouse selection and cmd+c" }
+rex = { absent = "no copy mode; mouse selection, find with client.find.open" }
+tmux = "copy-mode"
+
+[[binding]]
+id = "edit-scrollback"
+category = "panes"
+desc = "Edit scrollback in $EDITOR"
+key = "prefix+e"
+herdr = { action = "edit_scrollback", native-default = true }
+app = { absent = "no edit-scrollback command" }
+rex = { absent = "no edit-scrollback action" }
+tmux = { absent = "not bound" }
+
+# ---- tabs and spaces --------------------------------------------------------
+
+[[binding]]
+id = "new-tab"
+category = "workspaces"
+desc = "New tab"
+key = "prefix+n"
+herdr = "new_tab"
+app = "leader:New tab"
+rex = "client.tab.new"
+tmux = "new-window"
+
+[[binding]]
+id = "rename-tab"
+category = "workspaces"
+desc = "Rename tab"
+key = "prefix+shift+t"
+herdr = { action = "rename_tab", native-default = true }
+app = "leader:Rename tab"
+rex = "client.tab.rename"
+tmux = { key = "prefix+r", action = "rename-window" }
+
+[[binding]]
+id = "close-tab"
+category = "workspaces"
+desc = "Close tab"
+key = "prefix+shift+x"
+herdr = { action = "close_tab", native-default = true }
+app = "leader:Close tab"
+rex = "client.tab.close"
+tmux = "kill-window"
+
+[[binding]]
+id = "new-space"
+category = "workspaces"
+desc = "New space in ~/development (Rex/tmux: session)"
+key = "prefix+shift+n"
+herdr = "shell:New space"
+app = "leader:New space (~/development)"
+rex = "new_session_dev"
+tmux = "tmux-new-session"
+
+[[binding]]
+id = "project-picker"
+category = "workspaces"
+desc = "Project picker (pj)"
+key = "prefix+shift+o"
+herdr = "plugin:pj.open-picker"
+app = "leader:Project picker (pj)"
+rex = "popup_pj_picker"
+tmux = { key = "prefix+shift+p", action = "tv pj" }
+
+[[binding]]
+id = "worktrees-all"
+category = "workspaces"
+desc = "All worktrees, every repo"
+key = "prefix+w"
+herdr = "popup:All worktrees"
+app = "leader:All worktrees"
+rex = "popup_wt_all"
+tmux = { absent = "prefix+w enters the workmux table" }
+
+[[binding]]
+id = "worktrees-repo"
+category = "workspaces"
+desc = "Worktree picker for this repo (find-or-create)"
+key = "prefix+shift+w"
+herdr = "popup:Worktree picker (this repo)"
+app = "leader:Worktree picker (this repo)"
+rex = "popup_wt_repo"
+tmux = { absent = "workmux table instead (prefix+w a)" }
+
+[[binding]]
+id = "branch-picker"
+category = "workspaces"
+desc = "Branch picker (existing branch → worktree)"
+key = "prefix+shift+b"
+herdr = "popup:Branch picker (worktree from branch)"
+app = "leader:Branch picker (worktree from branch)"
+rex = "popup_wt_branch"
+tmux = { absent = "not bound" }
+
+[[binding]]
+id = "remove-worktree"
+category = "workspaces"
+desc = "Remove the focused worktree"
+key = "prefix+shift+d"
+herdr = "popup:Remove worktree"
+app = "leader:Remove worktree"
+rex = "popup_wt_remove"
+tmux = { absent = "workmux table instead (prefix+w r); prefix+shift+d detaches" }
+
+# ---- popups -----------------------------------------------------------------
+
+[[binding]]
+id = "quick-shell"
+category = "popups"
+desc = "Quick shell (closes after a successful command)"
+key = "prefix+c"
+herdr = "popup:Quick shell"
+app = "leader:Quick shell"
+rex = "popup_quick_shell"
+tmux = "Quick Shell"
+
+[[binding]]
+id = "mini-shell"
+category = "popups"
+desc = "Mini shell (persists)"
+key = "prefix+shift+c"
+herdr = "popup:Mini shell"
+app = "leader:Mini shell (persists)"
+rex = "popup_mini_shell"
+tmux = "Mini Shell"
+
+[[binding]]
+id = "editor"
+category = "popups"
+desc = "$EDITOR"
+key = "prefix+shift+e"
+herdr = "popup:Editor"
+app = "leader:Editor"
+rex = "popup_editor"
+tmux = "Editor"
+
+[[binding]]
+id = "lazygit"
+category = "popups"
+desc = "Lazygit"
+key = "prefix+shift+g"
+herdr = "popup:Lazygit"
+app = "leader:Lazygit"
+rex = "popup_lazygit"
+tmux = "Lazygit"
+
+[[binding]]
+id = "yazi"
+category = "popups"
+desc = "Yazi (tmux: in a window)"
+key = "prefix+shift+y"
+herdr = "popup:Yazi file manager"
+app = "leader:Yazi"
+rex = "popup_yazi"
+tmux = "yazi"
+
+[[binding]]
+id = "hide-popup"
+category = "popups"
+desc = "Hide the open popup (persistent ones keep running)"
+key = "prefix+shift+-"
+herdr = { absent = "no command hides or closes a popup" }
+app = "leader:Hide popup (mini shell, Lazygit)"
+rex = "popup_hide"
+tmux = { absent = "not bound" }
+
+# ---- other ------------------------------------------------------------------
+
+[[binding]]
+id = "open-pr"
+category = "other"
+desc = "Open the branch's PR in the browser"
+key = "prefix+g"
+herdr = "plugin:gh-pr.open-pr"
+app = "leader:Open PR in browser"
+rex = "open_pr"
+tmux = { absent = "prefix+g opens lazygit in a window" }
+
+[[binding]]
+id = "refresh-pr"
+category = "other"
+desc = "Refresh PR status"
+key = "prefix+u"
+herdr = "plugin:gh-pr.refresh"
+app = { absent = "the gh-pr plugin labels TUI sidebar rows; no app equivalent" }
+rex = { absent = "no PR status in the sidebar" }
+tmux = { absent = "prefix+u is tmux-fzf-url" }
+
+[[binding]]
+id = "sidebar"
+category = "other"
+desc = "Toggle sidebar"
+key = "prefix+b"
+herdr = { action = "toggle_sidebar", native-default = true }
+app = "leader:Toggle sidebar"
+rex = "client.sidebar.toggle"
+tmux = { absent = "no sidebar; prefix+b toggles pane border status" }
+
+[[binding]]
+id = "settings"
+category = "other"
+desc = "Settings"
+key = "prefix+s"
+herdr = { action = "settings", native-default = true }
+app = "leader:Settings"
+rex = "client.settings"
+tmux = { absent = "prefix+s renames the session" }
+
+[[binding]]
+id = "help"
+category = "other"
+desc = "Keybinds (Rex: command palette, which lists keys)"
+key = "prefix+shift+/"
+herdr = { action = "help", native-default = true }
+app = "leader:Keybinds"
+rex = "client.palette.toggle"
+tmux = { absent = "not bound; prefix+/ opens scooter" }
+
+[[binding]]
+id = "reload-config"
+category = "other"
+desc = "Reload config"
+key = "prefix+shift+r"
+herdr = { action = "reload_config", native-default = true }
+app = { absent = "hot-reloads on save" }
+rex = "client.config.reload"
+tmux = "source-file"
+
+[[binding]]
+id = "detach"
+category = "other"
+desc = "Detach"
+key = "prefix+q"
+herdr = { action = "detach", native-default = true }
+app = { absent = "GUI app: closing the window detaches" }
+rex = { absent = "GUI app: closing the window detaches" }
+tmux = { key = "prefix+d", action = "detach-client" }
