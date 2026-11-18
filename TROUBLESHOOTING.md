@@ -102,6 +102,16 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Fix:** `cs-ssh-proxy-wrapper` caches `<id> <default-workspace>` per sandbox name in `~/.cache/cs-ssh-proxy/<name>` and goes straight to `cs ssh-proxy` on a hit (~1-2 s per connection). If the cached route fails within 10 s (stale id after the sandbox was recreated, or it's suspended) the cache entry is dropped and the slow resolve + resume path runs. Delete the file to force a re-resolve.
 
+#### Follow-up: connecting to a suspended (auto-slept) sandbox fails instead of waking it
+
+**Symptom:** After ~5 h idle the sandbox suspends. Connecting through herdr/rex fails, and you have to run `cs ssh -W joe`, exit, and reconnect.
+
+**Cause:** A suspended sandbox's proxy host returns `Fatal: 404` within ~1 s, so the cached fast path failed, dropped the cache, and fell into `cs sandbox list -o json`. `list` enumerates every sandbox in the org and took 83 s, so the client timed out and killed the wrapper before it reached `cs sandbox resume`. Nothing was ever cached either, so every retry repeated the same slow `list`.
+
+**Fix:** The wrapper no longer calls `list`. On a fast failure with a cached route it runs `cs sandbox resume <name>` (addressed by name, waits until ready, ~30 s cold) and retries the same route. If that still fails the id is stale, so it re-resolves with `cs sandbox show <name>` (one sandbox, ~15 s) instead of `list`. A cold wake still takes ~30 s, which can exceed a GUI client's timeout on the first try; the sandbox keeps waking, so a retry connects in ~1 s.
+
+**Takeaway:** Address things by name (`show`/`resume <name>`) rather than listing everything and filtering with `jq`; list cost scales with the org, not with what you asked for.
+
 **Takeaway:** `Host` patterns match the name typed on the command line, not a `HostName` rewritten by another block. An alias that sets `HostName` inherits a wildcard block's options only if the alias is also listed on that block's `Host` line. Check with `ssh -G <alias>`.
 
 **Takeaway:** Time the ssh connection itself (`time ssh host true`) — a ProxyCommand that does network work on every connect is invisible interactively but breaks clients with short timeouts.
