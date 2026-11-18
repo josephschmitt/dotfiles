@@ -345,6 +345,13 @@ mkdir -p "$HOME/.config/nix-darwin/machines"
 mkdir -p "$HOME/.config/tmux"
 mkdir -p "$HOME/.config/tmux/plugins"
 mkdir -p "$HOME/.claude"
+# Skills: link each tracked skill individually so skills installed by Claude Code,
+# plugins, or other tools land in ~/.claude/skills instead of the repo.
+# Migrate older installs where the whole dir was a symlink into the repo.
+if [ -L "$HOME/.claude/skills" ]; then
+  rm "$HOME/.claude/skills"
+fi
+mkdir -p "$HOME/.claude/skills"
 mkdir -p "$HOME/.config/herdr"
 mkdir -p "$HOME/.config/rex"
 mkdir -p "$HOME/.ssh"
