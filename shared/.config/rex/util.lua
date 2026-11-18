@@ -18,7 +18,8 @@ end
 -- Live working directory of the focused pane (`nil` when unknown). Shells
 -- that emit OSC 7 report it as file://HOST/path via `pwd`. Ours don't on
 -- Linux, so fall back to the cwd the server reads from the pane's processes
--- (foreground first, e.g. nvim's dir, then the shell).
+-- (foreground first, e.g. nvim's dir, then the shell). Workaround: see
+-- TROUBLESHOOTING.md "Rex popups open in $HOME" for when it can go.
 function M.cwd_of(ctx)
   if not ctx.block_id then return nil end
   local target = { session_id = ctx.session_id, block_id = ctx.block_id }

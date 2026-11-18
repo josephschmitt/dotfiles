@@ -136,6 +136,16 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Fix:** Never build block commands or cwds from the client's `$HOME`. `shared/.config/rex/util.lua` has `home_cmd(rel, ...)`, which returns `{ "sh", "-c", 'exec "$HOME/<rel>" "$@"', ... }` so `$HOME` expands on the server. A relative `cwd` such as `"development"` resolves against the server's home. `~` is not expanded and silently falls back to `$HOME`.
 
+### Rex popups open in `$HOME` instead of the focused pane's directory (Linux server)
+
+**Symptom:** With the Mac app attached to a Rex server on a Linux box, popups (quick/mini shell, editor, lazygit, pickers) start in `$HOME` and ignore the focused pane's directory. The same popups work against the local Mac server.
+
+**Cause:** `util.cwd_of` asked the pane for its directory with the terminal's `pwd` method. That only returns what the shell last announced with an OSC 7 escape sequence. Nothing in these dotfiles sends OSC 7. The Linux `rex` package (checked on build `0.0.1794513892-g115444`) ships no shell integration, and its panes get no `ZDOTDIR`/`ENV` hook, so `pwd` returns `{}` for every pane. Local Mac panes do report a directory, presumably because the Mac app injects its own shell integration. That's an inference; it hasn't been checked on the Mac.
+
+**Workaround:** `cwd_of` in `shared/.config/rex/util.lua` falls back to the terminal's `process` method when `pwd` is empty. That method returns the cwd of the pane's foreground process (then the shell), which the server reads from the OS.
+
+**When to remove it:** If a later Linux Rex build reports OSC 7 on its own, drop the fallback. To check, run `rex block call -b <pane> pwd` in a plain pane on the box. Removing it is optional: the fallback only runs when `pwd` is empty, so it costs nothing once `pwd` works. The alternative fix is to make bash, zsh and fish send OSC 7 at each prompt, which would also cover new splits.
+
 ### `.zprofile:15: no matches found: ~/.zprofile.d/*.sh`
 
 **Symptom:** Every login zsh prints this, for example Rex panes, which start `-zsh` as a login shell. A plain SSH shell from Herdr doesn't.
