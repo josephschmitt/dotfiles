@@ -15,14 +15,19 @@ local function url_decode(s)
   return (s:gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end))
 end
 
--- Live working directory of the focused pane (`nil` when unknown). Terminals
--- report it as file://HOST/path (OSC 7).
+-- Live working directory of the focused pane (`nil` when unknown). Shells
+-- that emit OSC 7 report it as file://HOST/path via `pwd`. Ours don't on
+-- Linux, so fall back to the cwd the server reads from the pane's processes
+-- (foreground first, e.g. nvim's dir, then the shell).
 function M.cwd_of(ctx)
   if not ctx.block_id then return nil end
-  local r = rex.block.call(M.terminal, "pwd", { session_id = ctx.session_id, block_id = ctx.block_id })
+  local target = { session_id = ctx.session_id, block_id = ctx.block_id }
+  local r = rex.block.call(M.terminal, "pwd", target)
   local url = r and (r.pwd or r.url)
-  if not url or url == "" then return nil end
-  return url_decode((url:gsub("^file://[^/]*", "")))
+  if url and url ~= "" then return url_decode((url:gsub("^file://[^/]*", ""))) end
+  local p = rex.block.call(M.terminal, "process", target)
+  local proc = p and (p.foreground or p.child)
+  return proc and proc.cwd ~= "" and proc.cwd or nil
 end
 
 -- The active window of the action's session, from `session.view`.
