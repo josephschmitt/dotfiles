@@ -12,7 +12,7 @@ if [ -f /Users/josephschmitt/.zshrc ]; then
 fi
 
 # Source profile-specific overrides from .zprofile.d/
-for config_file in "$HOME/.zprofile.d/"*.sh; do
+for config_file in "$HOME/.zprofile.d/"*.sh(N); do
   if [ -f "$config_file" ]; then
     . "$config_file"
   fi

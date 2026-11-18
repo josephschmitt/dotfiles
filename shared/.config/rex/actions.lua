@@ -14,7 +14,9 @@ rex.action{
 }
 
 -- Herdr's "new space" (prefix+N): a session that starts in ~/development.
--- Splits and new tabs keep following the focused pane's directory.
+-- Splits and new tabs keep following the focused pane's directory. The cwd is
+-- relative (resolved against the server's home) because this Lua runs in the
+-- client, whose $HOME is wrong for a remote server.
 rex.action{
   name = "new_session_dev",
   title = "New Session in ~/development",
@@ -24,7 +26,7 @@ rex.action{
       initial_windows = {
         {
           window_label = "shell",
-          layout = { block = { flavor = util.shell, options = { cwd = util.home .. "/development" } } },
+          layout = { block = { flavor = util.shell, options = { cwd = "development" } } },
         },
       },
     })

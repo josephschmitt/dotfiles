@@ -8,8 +8,10 @@
 -- whatever popup is open.
 local util = require("util")
 
-local SCRIPTS = util.home .. "/.config/herdr/scripts" -- quick-shell.sh, wt-picker.sh (shared with Herdr)
-local REX_SCRIPTS = util.home .. "/.config/rex/scripts"
+-- Script paths are relative to $HOME on the box running the session (see
+-- util.home_cmd): quick-shell.sh and wt-picker.sh are shared with Herdr.
+local SCRIPTS = ".config/herdr/scripts"
+local REX_SCRIPTS = ".config/rex/scripts"
 local PREFIX = "popup:"
 
 -- Bounds are fractions of the window: x, y, width, height.
@@ -88,25 +90,26 @@ local function toggle(ctx, spec)
   rex.session.focus_block{ session_id = ctx.session_id, block_id = block.block_id }
 end
 
-local quick_shell = SCRIPTS .. "/quick-shell.sh"
-local wt = { "env", "WT_ENGINE=rex-wt", SCRIPTS .. "/wt-picker.sh" }
 local function with(base, ...) -- base command + extra args
   local c = {}
   for _, a in ipairs(base) do c[#c + 1] = a end
   for _, a in ipairs({ ... }) do c[#c + 1] = a end
   return c
 end
+local quick_shell = util.home_cmd(SCRIPTS .. "/quick-shell.sh")
+local wt = { "env", "WT_ENGINE=rex-wt" }
+for _, a in ipairs(util.home_cmd(SCRIPTS .. "/wt-picker.sh")) do wt[#wt + 1] = a end
 
 -- name = action name, title = palette title.
 local specs = {
-  { name = "quick_shell", title = "Quick Shell", command = { quick_shell }, bounds = centered(0.6, 0.6) },
-  { name = "mini_shell", title = "Mini Shell (persists)", command = { quick_shell, "--persist" },
+  { name = "quick_shell", title = "Quick Shell", command = quick_shell, bounds = centered(0.6, 0.6) },
+  { name = "mini_shell", title = "Mini Shell (persists)", command = with(quick_shell, "--persist"),
     bounds = centered(0.6, 0.6), persist = true },
   -- $EDITOR is exported by the shell the terminal runs through, so a `sh -c` sees it.
   { name = "editor", title = "Editor", command = { "sh", "-c", "exec $EDITOR" }, bounds = centered(0.8, 0.8) },
   { name = "lazygit", title = "Lazygit", command = { "lazygit-launch" }, bounds = centered(0.9, 0.9), persist = true },
   { name = "yazi", title = "Yazi", command = { "yazi" }, bounds = centered(0.8, 0.8) },
-  { name = "pj_picker", title = "Project Picker (pj)", command = { REX_SCRIPTS .. "/pj-picker.sh" },
+  { name = "pj_picker", title = "Project Picker (pj)", command = util.home_cmd(REX_SCRIPTS .. "/pj-picker.sh"),
     bounds = centered(0.6, 0.6) },
   { name = "wt_all", title = "Worktrees: All Repos", command = with(wt, "--all"), bounds = centered(0.8, 0.6) },
   { name = "wt_repo", title = "Worktrees: This Repo", command = wt, bounds = centered(0.8, 0.6) },

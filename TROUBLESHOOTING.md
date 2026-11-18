@@ -116,6 +116,24 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Takeaway:** A `[[keys.command]]` on a key doesn't clear a native default on the same key. Run `keymap-check`, which merges `herdr --default-config` into what it reads, after binding a new prefix key.
 
+## Rex
+
+### Popups on a remote Rex server fail with `no such file or directory: /Users/…`
+
+**Symptom:** With the Mac app attached to a Rex server on a Linux box, a popup such as the mini shell exits at once with `zsh:1: no such file or directory: /Users/<you>/.config/herdr/scripts/quick-shell.sh`.
+
+**Cause:** Lua actions run inside the client (the Mac app), not on the server. `os.getenv("HOME")` therefore returns the Mac's home, and that path went into a command that runs on the box.
+
+**Fix:** Never build block commands or cwds from the client's `$HOME`. `shared/.config/rex/util.lua` has `home_cmd(rel, ...)`, which returns `{ "sh", "-c", 'exec "$HOME/<rel>" "$@"', ... }` so `$HOME` expands on the server. A relative `cwd` such as `"development"` resolves against the server's home. `~` is not expanded and silently falls back to `$HOME`.
+
+### `.zprofile:15: no matches found: ~/.zprofile.d/*.sh`
+
+**Symptom:** Every login zsh prints this, for example Rex panes, which start `-zsh` as a login shell. A plain SSH shell from Herdr doesn't.
+
+**Cause:** `.zprofile` globbed `~/.zprofile.d/*.sh` and the directory contains only `.gitkeep`. `setopt nullglob` lives in `.zshrc`, which hadn't run yet.
+
+**Fix:** The loop uses the `(N)` glob qualifier (`*.sh(N)`), which expands to nothing when there's no match.
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`

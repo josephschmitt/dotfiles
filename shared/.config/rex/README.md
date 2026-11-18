@@ -10,7 +10,7 @@ The key layout is the tmux/Herdr muscle memory: `alt+…` with no prefix, and `c
 | `keys.lua` | Every `rex.bind`: the `alt+` layer, the `ctrl+s` prefix, the resize mode. |
 | `actions.lua` | Lua actions: new session in `~/development`, session by number, open PR, `select_session` (used by scripts). |
 | `popups.lua` | Floating popups: shells, editor, lazygit, yazi, the pj and worktree pickers. |
-| `util.lua` | Shared helpers (focused pane's directory, active window). |
+| `util.lua` | Shared helpers (focused pane's directory, active window, `home_cmd` for server-side script paths). |
 | `scripts/pj-picker.sh` | fzf project picker behind `prefix+O`. |
 
 Helpers outside this folder:
@@ -109,4 +109,5 @@ Written against Rex Beta 0.1.0 (1925). Checked from the CLI: the config loads cl
 ## Troubleshooting
 
 - A key does nothing: `rex keymap --json | jq '.bindings[] | select(.keys[0] == "alt+h")'` shows what the server resolved; the client's own "Change Shortcut…" settings outrank the config file.
+- A popup on a remote server fails with `no such file or directory: /Users/…`: action Lua runs in the **client** (the Mac app), not on the server, so `os.getenv("HOME")` is the Mac's home. Block commands and cwds must resolve on the server. Use `util.home_cmd(".config/…")`, which wraps the script in `sh -c` so `$HOME` expands there, and a relative `cwd`, which resolves against the server's home.
 - `rex` isn't on `PATH` outside a Rex terminal: use `$REX_BIN_DIR/rex` (`rex-open` falls back to it).

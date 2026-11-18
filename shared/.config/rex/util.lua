@@ -1,7 +1,13 @@
 -- Helpers shared by the other config files.
 local M = {}
 
-M.home = os.getenv("HOME")
+-- Actions run in the *client's* Lua (the Mac app), not on the server, so
+-- os.getenv("HOME") is the Mac's home even when the session lives on a remote
+-- box. Never bake client paths into a block's command or cwd. home_cmd wraps a
+-- $HOME-relative script in `sh -c` so $HOME expands on the box that runs it.
+function M.home_cmd(rel, ...)
+  return { "sh", "-c", 'exec "$HOME/' .. rel .. '" "$@"', "sh", ... }
+end
 M.terminal = "com.superlogical.terminal"
 M.shell = "com.superlogical.terminal.shell"
 
