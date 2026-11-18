@@ -71,6 +71,15 @@ Then use: `lgtheme tokyonight` or `lgtheme catppuccin`
 └── README.md               # This file
 ```
 
+## Clipboard
+
+`os.copyToClipboardCmd` routes lazygit's copy actions (file path, commit hash,
+branch name, etc.) through [`clipboard-copy`](../../../shared/bin/clipboard-copy).
+lazygit's built-in clipboard support only knows xsel/xclip/wl-copy/pbcopy,
+none of which exist on the remote-sandbox boxes. `clipboard-copy` uses OSC 52
+over SSH/herdr, so copies reach the local clipboard the same way Neovim yanks
+do. Locally it uses the native tool.
+
 ## Custom Commands
 
 ### Keybindings

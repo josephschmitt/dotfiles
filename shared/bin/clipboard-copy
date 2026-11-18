@@ -1,0 +1,42 @@
+#!/bin/sh
+# Copy text to the *local* system clipboard, even from a remote session.
+#
+# Usage: clipboard-copy [text...]   (reads stdin when no args are given)
+#
+# Used by lazygit's os.copyToClipboardCmd (shared/.config/lazygit/config.yml),
+# whose built-in clipboard support only knows about xsel/xclip/wl-copy/pbcopy
+# and errors "No clipboard utilities available" on the rootless remote boxes.
+#
+# Remote detection mirrors the Neovim OSC-52 override in
+# shared/.config/nvim/lua/custom/plugins/options.lua: over SSH (SSH_TTY /
+# SSH_CONNECTION) or inside herdr (HERDR_SOCKET_PATH, set even for
+# `herdr --remote`, which bypasses sshd), emit an OSC 52 escape sequence to the
+# controlling terminal so the local terminal/herdr sets its clipboard. Local
+# sessions use the native clipboard tool, with OSC 52 as a last resort.
+
+if [ "$#" -gt 0 ]; then
+  text="$*"
+else
+  text="$(cat)"
+fi
+
+osc52() {
+  # `tr -d '\n'` instead of `base64 -w 0` -- BSD/macOS base64 has no -w.
+  # Write to the controlling terminal, not stdout: lazygit captures its
+  # subprocesses' stdout. With no tty this fails loudly instead of "succeeding".
+  printf '\033]52;c;%s\033\\' "$(printf '%s' "$text" | base64 | tr -d '\n')" >/dev/tty
+}
+
+if [ -n "${SSH_TTY}${SSH_CONNECTION}${HERDR_SOCKET_PATH}" ]; then
+  osc52
+elif command -v pbcopy >/dev/null 2>&1; then
+  printf '%s' "$text" | pbcopy
+elif [ -n "${WAYLAND_DISPLAY}" ] && command -v wl-copy >/dev/null 2>&1; then
+  printf '%s' "$text" | wl-copy
+elif [ -n "${DISPLAY}" ] && command -v xclip >/dev/null 2>&1; then
+  printf '%s' "$text" | xclip -selection clipboard
+elif [ -n "${DISPLAY}" ] && command -v xsel >/dev/null 2>&1; then
+  printf '%s' "$text" | xsel --clipboard --input
+else
+  osc52
+fi

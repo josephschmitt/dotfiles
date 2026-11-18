@@ -356,6 +356,14 @@ The `lg` alias was the only launcher that loaded the overlay correctly, because 
 
 **Takeaway:** When there's more than one entry point into the same tool (shell alias, tmux binding, herdr binding, ...), duplicated config-building logic silently drifts. Centralize it in one script on `$PATH` and have every entry point call that.
 
+### lazygit copy actions fail with "No clipboard utilities available" over SSH/herdr
+
+**Symptom:** Copy actions in lazygit (e.g. copy file path, commit hash) on a `remote-sandbox`/`rca`/`crafting` box show `No clipboard utilities available. Please install xsel, xclip, wl-clipboard or Termux:API add-on for termux-clipboard-get/set.`
+
+**Cause:** Same root cause as the Neovim yank issue above. These rootless boxes have no X/Wayland session and no clipboard binary, and lazygit's built-in clipboard only shells out to those tools. It has no OSC 52 fallback.
+
+**Fix:** `shared/.config/lazygit/config.yml` sets `os.copyToClipboardCmd: "clipboard-copy {{text}}"`. `shared/bin/clipboard-copy` uses the same remote detection as the Neovim override (`SSH_TTY`/`SSH_CONNECTION`/`HERDR_SOCKET_PATH`) and writes an OSC 52 sequence to `/dev/tty`. It writes to `/dev/tty` rather than stdout because lazygit captures the subprocess's stdout. Locally it uses pbcopy/wl-copy/xclip/xsel. The config lives in the shared base `config.yml`, so every launcher (`lg`, `lazygit-launch`, Snacks) picks it up. As with Neovim, the local terminal (herdr, Ghostty, etc.) has to support OSC 52.
+
 ### lazygit still hangs on open even with autoFetch/fetchAll disabled and the right config file loaded
 
 **Symptom:** After the fix above (all launchers loading `config-remote-sandbox.yml`), lazygit was still slow/unresponsive opening in some monorepos (e.g. urbancompass, uc-frontend) even though auto-fetch was confirmed off — the delay was lazygit loading branch/tag/ref data, not fetching.

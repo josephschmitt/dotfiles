@@ -35,6 +35,12 @@ namespace gets fetched; `untrack` / `prune-tracks` remove such refspecs so a
 merged-and-deleted branch can't wedge every `git pull` with `fatal: couldn't
 find remote ref ...`; `pl` is a self-healing pull (prune then pull).
 
+### clipboard-copy
+Copies text (args or stdin) to the *local* system clipboard. Over SSH or inside
+herdr it emits an OSC 52 escape sequence to `/dev/tty`, so it works on the
+remote boxes that have no xclip/xsel/wl-copy. Locally it uses
+pbcopy/wl-copy/xclip/xsel. Used as lazygit's `os.copyToClipboardCmd`.
+
 ### git-default-branch
 Prints the repo's default branch name (`origin/HEAD`, falling back to a local
 `main` or `master`). Exposed as `git default-branch`; used by the `br`/`plr`
