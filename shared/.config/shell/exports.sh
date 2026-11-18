@@ -68,6 +68,11 @@ esac
 export PATH="$PATH:$HOME/.opencode/bin"
 export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
+# Rex sets REX_BIN_DIR in its panes but doesn't add it to PATH. On macOS it
+# points into the app bundle, so `rex` is missing without this.
+if [ -n "${REX_BIN_DIR:-}" ] && ! command -v rex >/dev/null 2>&1; then
+  export PATH="$PATH:${REX_BIN_DIR}"
+fi
 
 # Homebrew configuration
 export HOMEBREW_NO_ENV_HINTS=1

@@ -110,4 +110,4 @@ Written against Rex Beta 0.1.0 (1925). Checked from the CLI: the config loads cl
 
 - A key does nothing: `rex keymap --json | jq '.bindings[] | select(.keys[0] == "alt+h")'` shows what the server resolved; the client's own "Change Shortcut…" settings outrank the config file.
 - A popup on a remote server fails with `no such file or directory: /Users/…`: action Lua runs in the **client** (the Mac app), not on the server, so `os.getenv("HOME")` is the Mac's home. Block commands and cwds must resolve on the server. Use `util.home_cmd(".config/…")`, which wraps the script in `sh -c` so `$HOME` expands there, and a relative `cwd`, which resolves against the server's home.
-- `rex` isn't on `PATH` outside a Rex terminal: use `$REX_BIN_DIR/rex` (`rex-open` falls back to it).
+- `rex` isn't on `PATH`: Rex sets `REX_BIN_DIR` in its panes but doesn't add it to `PATH`. On macOS that's inside the app bundle. `shared/.config/shell/exports.sh` and `fish/env.fish` append `$REX_BIN_DIR` when `rex` is missing. Outside a Rex pane, use the bundle path (`rex-open` falls back to it).

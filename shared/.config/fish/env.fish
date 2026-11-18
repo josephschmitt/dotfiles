@@ -50,6 +50,11 @@ fish_add_path --global --move --prepend "$PNPM_HOME"
 fish_add_path --global --append $HOME/.opencode/bin
 fish_add_path --global --append $HOME/.lmstudio/bin
 fish_add_path --global --append $HOME/.antigravity/antigravity/bin
+# Rex sets REX_BIN_DIR in its panes but doesn't add it to PATH (on macOS it
+# points into the app bundle).
+if set -q REX_BIN_DIR; and not command -q rex
+    fish_add_path --global --append "$REX_BIN_DIR"
+end
 
 # Homebrew configuration
 set -gx HOMEBREW_NO_ENV_HINTS 1
