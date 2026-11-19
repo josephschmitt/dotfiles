@@ -20,11 +20,24 @@ sel=$(pj --icons --ansi --sort alpha --format '%P	%i %n' |
 path=$(printf '%s' "${sel}" | cut -f1)
 [ -n "${path}" ] || exit 0
 
-if ! rex-open "${path}"; then
-  printf '\n\033[2mFailed. Press any key to close\033[0m'
+pause() {
+  printf '\n\033[2m%s\033[0m' "$1"
   old=$(stty -g 2>/dev/null)
   stty -icanon -echo 2>/dev/null
   dd bs=1 count=1 >/dev/null 2>&1 </dev/tty
   [ -n "${old}" ] && stty "${old}" 2>/dev/null
-  exit 1
-fi
+}
+
+rex-open "${path}"
+case $? in
+  0) ;;
+  # The session exists, but the app refused to switch to it (Remote Control off).
+  2)
+    printf '\n\033[33mOpened, but Rex needs Remote Control to switch to it\n(Rex > Settings > Server > Client Info). Pick it in the sidebar.\033[0m\n'
+    pause 'Press any key to close'
+    ;;
+  *)
+    pause 'Failed. Press any key to close'
+    exit 1
+    ;;
+esac

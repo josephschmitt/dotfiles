@@ -1,27 +1,39 @@
 #!/bin/sh
 # rex-wt — the Rex flavour of herdr-wt: find-or-create / remove git worktrees and
-# their Rex sessions. Same subcommands, so ~/.config/herdr/scripts/wt-picker.sh
-# drives either one (WT_ENGINE=rex-wt; see ~/.config/rex/init.lua).
+# their Rex tabs. Same subcommands, so ~/.config/herdr/scripts/wt-picker.sh
+# drives either one (WT_ENGINE=rex-wt; see ~/.config/rex/popups.lua).
 #
 # Everything that only needs git and Worktrunk (`checkouts`, `branches`, `current`,
 # `dirty`, `create`, `delete`, `default-branch`, `merge`, `managed`) is herdr-wt's.
-# This script adds the Rex side, using rex-open to find, switch to and kill the
-# session working in a checkout:
+# This script adds the Rex side, using rex-open to find, focus and close the tab
+# working in a checkout. One session per repo (labelled with the repo's folder
+# name, its first tab in the main checkout), one tab per worktree (labelled with
+# the branch):
 #
 #   rex-wt list                 TSV for fzf: branch, path, session id, display
 #   rex-wt all                  TSV for fzf, all repos: path, main, session id, display
-#   rex-wt open <name>          switch to its session, else create one, else create the worktree
-#   rex-wt remove <target> [-f] delete the checkout, then kill its session
-#   rex-wt merge-close <target> merge, then kill its session (if the checkout is gone)
+#   rex-wt open <name>          focus its tab, else open one in the repo's session
+#                               (created if needed), creating the worktree if needed
+#   rex-wt remove <target> [-f] delete the checkout, then close its tab
+#   rex-wt merge-close <target> merge, then close its tab (if the checkout is gone)
 #
-# A session is "in" a checkout when one of its terminals is in that folder or
-# below it. Exit codes as herdr-wt.
+# A tab is "in" a checkout when one of its terminals is in that folder or below
+# it; the repo's session is the one with a terminal in the main checkout. Tabs
+# and sessions are made and focused server-side; only switching the app to
+# another session needs Rex's Remote Control setting (see rex-open).
+#
+# Exit codes as herdr-wt, plus 2 from `open`: the tab is ready, but it's in
+# another session and the app refused to switch to it.
 
 set -eu
 
 here=$(cd "$(dirname "$0")" && pwd)
 PATH="${here}:${PATH}:${HOME}/bin:${HOME}/.local/bin:/opt/homebrew/bin:/run/current-system/sw/bin:${HOME}/.nix-profile/bin:/usr/local/bin"
 export PATH
+# Rex terminals have `rex` on PATH; elsewhere fall back to REX_BIN_DIR.
+if ! command -v rex >/dev/null 2>&1 && [ -x "${REX_BIN_DIR:-/nonexistent}/rex" ]; then
+  PATH="${PATH}:${REX_BIN_DIR}"
+fi
 
 die() {
   printf 'rex-wt: %s\n' "$*" >&2
@@ -42,9 +54,9 @@ resolve() {
   fi
 }
 
-# "session id<TAB>folder" for every terminal, as JSON array of folders.
+# "session id<TAB>folder<TAB>window id" for every terminal, as a JSON array.
 pwds_json() {
-  rex-open --pwds 2>/dev/null | jq -R -s 'split("\n") | map(select(length > 0) | split("\t") | {sid: .[0], path: .[1]})'
+  rex-open --pwds 2>/dev/null | jq -R -s 'split("\n") | map(select(length > 0) | split("\t") | {sid: .[0], path: .[1], win: .[2]})'
 }
 
 case "${sub}" in
@@ -88,20 +100,47 @@ case "${sub}" in
   open)
     [ $# -ge 1 ] || die "open: missing name"
     path=$(herdr-wt create "$1")
-    main=$(herdr-wt checkouts | sed -n '1p' | cut -f2)
+    first=$(herdr-wt checkouts | sed -n '1p')
+    main=$(printf '%s' "${first}" | cut -f2)
     branch=$(resolve "${path}" | cut -f1)
-    exec rex-open --within --label "$(basename "${main}")/${branch:-$(basename "${path}")}" "${path}"
+    # The repo's session: one with a terminal in the main checkout (the pj
+    # picker's sessions count), else a new one whose first tab is there.
+    created=0
+    sid=$(rex-open --find --within "${main}" 2>/dev/null) || sid=""
+    if [ -z "${sid}" ]; then
+      mbranch=$(printf '%s' "${first}" | cut -f1)
+      sid=$(rex new "$(basename "${main}")" -c "${main}" --window "${mbranch:-$(herdr-wt default-branch)}" --json |
+        jq -r '.session_id')
+      [ -n "${sid}" ] && [ "${sid}" != null ] || die "couldn't create a session for ${main}"
+      created=1
+    fi
+    # The checkout's tab: an existing one (in the repo session if there is one
+    # there; older per-worktree sessions count too), else a new one in $sid. A
+    # session made just now for the main checkout already has its tab (whose
+    # shell may not have reported its folder yet).
+    if [ "${created}" = 0 ] || [ "${path}" != "${main}" ]; then
+      tabs=$(rex-open --find-tab --within "${path}" 2>/dev/null) || tabs=""
+      tab=$(printf '%s\n' "${tabs}" | awk -F '\t' -v s="${sid}" '$1 == s { print; exit }')
+      [ -n "${tab}" ] || tab=$(printf '%s\n' "${tabs}" | sed -n 1p)
+      if [ -n "${tab}" ]; then
+        sid=$(printf '%s' "${tab}" | cut -f1)
+        rex window focus -s "${sid}" "$(printf '%s' "${tab}" | cut -f2)" >/dev/null
+      else
+        rex window new -s "${sid}" "${branch:-$(basename "${path}")}" -c "${path}" >/dev/null
+      fi
+    fi
+    exec rex-open --select "${sid}"
     ;;
   remove)
     [ $# -ge 1 ] || die "remove: missing target"
     hit=$(resolve "$1")
     [ -n "${hit}" ] || die "no worktree for '$1'"
     path=$(printf '%s' "${hit}" | cut -f2)
-    # Delete first (main-checkout and dirty checks included), then kill the
-    # session: the caller may be a popup inside that very session, and if killing
-    # it ends the caller, the checkout is already gone rather than left behind.
+    # Delete first (main-checkout and dirty checks included), then close the
+    # tab: the caller may be a popup inside that very tab, and if closing it ends
+    # the caller, the checkout is already gone rather than left behind.
     (herdr-wt delete "${path}" "${2:-}")
-    rex-open --close --within "${path}"
+    rex-open --close-tab --within "${path}"
     ;;
   merge-close)
     [ $# -ge 1 ] || die "merge-close: missing target"
@@ -109,9 +148,9 @@ case "${sub}" in
     [ -n "${hit}" ] || die "no worktree for '$1'"
     path=$(printf '%s' "${hit}" | cut -f2)
     (herdr-wt merge "${path}")
-    # Only once the checkout is gone, so a merge that kept the worktree keeps its session.
+    # Only once the checkout is gone, so a merge that kept the worktree keeps its tab.
     if [ ! -e "${path}" ]; then
-      rex-open --close --within "${path}"
+      rex-open --close-tab --within "${path}"
     fi
     ;;
   *)

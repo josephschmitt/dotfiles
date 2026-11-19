@@ -6,17 +6,25 @@
 #   rex-open [--label NAME] [--within] DIR   focus the session in DIR, else create it
 #   rex-open --find [--within] DIR           print its session id (exit 1: none)
 #   rex-open --close [--within] DIR          kill the session(s) in DIR
-#   rex-open --pwds                          TSV of every terminal: session id, folder
+#   rex-open --find-tab [--within] DIR       print "session<TAB>window" per tab in DIR
+#                                            (exit 1: none)
+#   rex-open --close-tab [--within] DIR      close the tab(s) in DIR, keep their sessions
+#   rex-open --select SESSION                switch the app to SESSION (no-op if it's ours)
+#   rex-open --pwds                          TSV of every terminal: session, folder, window
 #
-# A session "is in DIR" when one of its terminals' working directory is DIR.
-# --within also accepts folders under DIR (for worktrees: the shell may have
-# `cd`ed into a subfolder). The label defaults to DIR's folder name.
+# A session (or tab) "is in DIR" when one of its terminals' working directory is
+# DIR. --within also accepts folders under DIR (for worktrees: the shell may have
+# `cd`ed into a subfolder). Popups ("popup:*" blocks) don't count: they start in
+# whatever folder was focused. The label defaults to DIR's folder name. With
+# several matches, --find prefers the session this script runs in.
 #
 # Switching sessions goes through the `select_session` action in
 # ~/.config/rex/actions.lua, which asks the app to switch. That needs Remote
 # Control (Rex > Settings > Server > Client Info) because the request comes from
-# a script, not a key. Without it the session is still created, and the script
-# says so and exits 2.
+# a script, not a key. It's skipped when the target is the session we're already
+# in ($REX_SESSION: a popup runs inside the session you're looking at). When the
+# app refuses, the session still exists: rex's error goes to stderr and the
+# script exits 2.
 
 set -eu
 
@@ -45,8 +53,11 @@ within=0
 label=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --find) mode=find ;;
+    --find) mode="find" ;;
     --close) mode=close ;;
+    --find-tab) mode=find-tab ;;
+    --close-tab) mode=close-tab ;;
+    --select) mode=select ;;
     --pwds) mode=pwds ;;
     --within) within=1 ;;
     --label)
@@ -54,7 +65,7 @@ while [ $# -gt 0 ]; do
       label=${1:-}
       ;;
     -h | --help)
-      sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,27p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     -*) die "unknown option: $1" ;;
@@ -63,25 +74,56 @@ while [ $# -gt 0 ]; do
   shift
 done
 if [ "${mode}" != pwds ]; then
-  [ $# -eq 1 ] || die "usage: rex-open [--find|--close] [--label NAME] [--within] DIR"
+  [ $# -eq 1 ] || die "usage: rex-open [--find|--close|--find-tab|--close-tab|--select] [--label NAME] [--within] DIR"
 fi
 
-# "session id<TAB>folder" for every terminal that has reported one (OSC 7
-# arrives as file://HOST/path: drop the scheme and host, undo %20, the only
-# escape that matters for typical folders).
+TAB=$(printf '\t')
+
+# "session id<TAB>folder<TAB>window id" for every terminal that has reported a
+# folder (OSC 7 arrives as file://HOST/path: drop the scheme and host, undo %20,
+# the only escape that matters for typical folders). Hidden (detached) blocks
+# and popups are left out.
 all_pwds() {
   for s in $(rex ls --json | jq -r '.sessions[].session_id'); do
-    for b in $(rex block ls -s "${s}" --json 2>/dev/null |
-      jq -r '.blocks[] | select(.creator_name == "com.superlogical.terminal" and .placement != "detached") | .block_id'); do
-      p=$(rex block call -s "${s}" -b "${b}" pwd 2>/dev/null | jq -r '.pwd // empty') || continue
-      p=$(printf '%s' "${p}" | sed -e 's|^file://[^/]*||' -e 's|%20| |g')
-      [ -n "${p}" ] && printf '%s\t%s\n' "${s}" "${p}"
-    done
+    rex block ls -s "${s}" --json 2>/dev/null |
+      jq -r '.blocks[]
+        | select(.creator_name == "com.superlogical.terminal" and .placement != "detached")
+        | select((.label // "") | startswith("popup:") | not)
+        | [.block_id, .window_id] | @tsv' |
+      while IFS="${TAB}" read -r b w; do
+        p=$(rex block call -s "${s}" -b "${b}" pwd 2>/dev/null </dev/null | jq -r '.pwd // empty') || continue
+        p=$(printf '%s' "${p}" | sed -e 's|^file://[^/]*||' -e 's|%20| |g')
+        [ -n "${p}" ] && printf '%s\t%s\t%s\n' "${s}" "${p}" "${w}"
+      done
   done
+}
+
+# The session this script runs in: $REX_SESSION (set in every Rex terminal,
+# popups included), else whatever `rex whoami` resolves (empty outside Rex).
+current_session() {
+  if [ -n "${REX_SESSION:-}" ]; then
+    printf '%s\n' "${REX_SESSION}"
+  else
+    rex whoami --json 2>/dev/null | jq -r '.session_id // empty' || true
+  fi
+}
+
+# Ask the app to show session $1, unless it already is the one we're in.
+select_session() {
+  [ "$1" != "$(current_session)" ] || return 0
+  # shellcheck disable=SC1010 # `do` is the rex subcommand
+  if ! err=$(rex do select_session "session_id=$1" 2>&1 >/dev/null); then
+    printf 'rex-open: the session is ready, but the app would not switch to it:\n%s\n' "${err:-(no error message)}" >&2
+    return 1
+  fi
 }
 
 if [ "${mode}" = pwds ]; then
   all_pwds
+  exit 0
+fi
+if [ "${mode}" = select ]; then
+  select_session "$1" || exit 2
   exit 0
 fi
 
@@ -92,47 +134,57 @@ esac
 if [ -d "${dir}" ]; then
   phys=$(cd "${dir}" && pwd -P)
   dir=$(cd "${dir}" && pwd)
-elif [ "${mode}" = close ]; then
+elif [ "${mode}" = close ] || [ "${mode}" = close-tab ]; then
   phys=${dir} # already deleted (rex-wt removes the checkout first)
 else
   die "not a directory: ${dir}"
 fi
 [ -n "${label}" ] || label=$(basename "${dir}")
 
-# Session ids whose terminals are in $dir (or under it with --within); shells
-# may report either the logical or the physical path.
-find_sessions() {
-  all_pwds | while IFS="$(printf '\t')" read -r s p; do
+# "session id<TAB>window id" of each tab with a terminal in $dir (or under it
+# with --within), once each; shells may report the logical or the physical path.
+find_tabs() {
+  all_pwds | while IFS="${TAB}" read -r s p w; do
     if [ "${p}" = "${dir}" ] || [ "${p}" = "${phys}" ]; then
-      printf '%s\n' "${s}"
+      printf '%s\t%s\n' "${s}" "${w}"
     elif [ "${within}" = 1 ]; then
-      case "${p}" in "${dir}"/* | "${phys}"/*) printf '%s\n' "${s}" ;; esac
+      case "${p}" in "${dir}"/* | "${phys}"/*) printf '%s\t%s\n' "${s}" "${w}" ;; esac
     fi
   done | awk '!seen[$0]++'
 }
 
-select_session() {
-  if ! rex do select_session "session_id=$1" >/dev/null 2>&1; then
-    printf 'rex-open: the session exists, but the app would not switch to it.\n' >&2
-    printf 'Turn on Remote Control in Rex > Settings > Server > Client Info (scripts need it\nto switch sessions); until then pick the session in the sidebar.\n' >&2
-    return 1
-  fi
+# Session ids of those tabs, the session we're in first.
+find_sessions() {
+  cur=$(current_session)
+  find_tabs | cut -f1 | awk -v cur="${cur}" '
+    !seen[$0]++ { if ($0 == cur) first = $0; else rest[++n] = $0 }
+    END { if (first != "") print first; for (i = 1; i <= n; i++) print rest[i] }'
 }
-
-found=$(find_sessions)
 
 case "${mode}" in
   find)
+    found=$(find_sessions)
     [ -n "${found}" ] || exit 1
     printf '%s\n' "${found}" | sed -n 1p
     ;;
   close)
+    found=$(find_sessions)
     [ -n "${found}" ] || exit 0
     # shellcheck disable=SC2086 # one id per line, split on purpose
     rex kill ${found} >/dev/null
     ;;
+  find-tab)
+    tabs=$(find_tabs)
+    [ -n "${tabs}" ] || exit 1
+    printf '%s\n' "${tabs}"
+    ;;
+  close-tab)
+    find_tabs | while IFS="${TAB}" read -r s w; do
+      rex window close -s "${s}" "${w}" >/dev/null </dev/null || true
+    done
+    ;;
   open)
-    sid=$(printf '%s\n' "${found}" | sed -n 1p)
+    sid=$(find_sessions | sed -n 1p)
     if [ -z "${sid}" ]; then
       sid=$(rex new "${label}" -c "${dir}" --window shell --json | jq -r '.session_id')
       [ -n "${sid}" ] && [ "${sid}" != null ] || die "couldn't create a session for ${dir}"

@@ -11,6 +11,12 @@ new_cwd = "follow"
 [session]
 resume_agents_on_restore = true
 
+[worktrees]
+# The tool-neutral root that Worktrunk (~/.config/worktrunk/config.toml) and the
+# Rex pickers use too, instead of herdr's default ~/.herdr/worktrees. Worktrees
+# already under the old root stay there; herdr-wt still lists them.
+directory = "~/development/.worktrees"
+
 [keys]
 prefix = "ctrl+s"
 
@@ -151,7 +157,8 @@ command = "pj.open-picker"
 description = "Project picker (pj)"
 
 # All worktrees (scripts/wt-picker.sh --all) — every managed worktree
-# (~/.herdr/worktrees/<repo>/<name>) across all repos, from any pane. Enter
+# (~/development/.worktrees/<repo>/<name>, plus the older ~/.herdr/worktrees)
+# across all repos, from any pane. Enter
 # focuses its open workspace or opens one; ctrl-d offers to delete it, ctrl-g to
 # merge it into the default branch (`wt merge`). No
 # create (use prefix+shift+w in the repo). Main checkouts: the pj picker.

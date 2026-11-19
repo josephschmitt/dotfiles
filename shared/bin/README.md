@@ -75,8 +75,8 @@ of it, the Mac app's `wt-picker` mod uses the Herdr-independent subcommands
 `branches` lists the local and `origin/` branches that have no worktree yet
 (no fetch), for the branch picker. New branches start from
 a freshly fetched `origin/<default>`. Most subcommands work from any checkout
-of a repo; `managed` / `all` list the worktrees under `~/.herdr/worktrees` for
-every repo, from anywhere. `herdr-wt --help` for the subcommands.
+of a repo; `managed` / `all` list the worktrees under `~/development/.worktrees`
+(`$WT_ROOT`; plus the legacy `~/.herdr/worktrees`) for every repo, from anywhere. `herdr-wt --help` for the subcommands.
 
 ### keymap-check
 Checks the Herdr TUI, Herdr app, Rex and (report only) tmux keybindings against

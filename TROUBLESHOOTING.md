@@ -154,6 +154,14 @@ An explicit `--cwd` outranks `new_cwd`, so new spaces still land in `~/developme
 
 **Fix:** The loop uses the `(N)` glob qualifier (`*.sh(N)`), which expands to nothing when there's no match.
 
+### Worktree or project popup says "Failed" but the session exists
+
+**Symptom:** In Rex, the worktree picker (`prefix+W` / `w` / `B`) or the pj picker (`prefix+O`) creates the worktree and its session, then shows "Failed. Press any key to close".
+
+**Cause:** The last step asks the app to switch to the session (`rex do select_session`). With Remote Control off (Rex > Settings > Server > Client Info), Rex refuses: `Rex.app is not accepting actions. Turn on Remote Control in its Settings under Rex Server.` `rex-open` hid that error and exited 2, and the pickers treated any non-zero exit as a failure. Every worktree also got its own session, so every open needed that switch.
+
+**Fix:** `rex-wt` now opens each worktree as a tab in its repo's session. Tabs are made and focused server-side, and the switch is skipped when the target is the session the popup runs in (`$REX_SESSION`), so worktrees of the repo you're in no longer need Remote Control. When a switch to another session is still needed and refused, `rex-open` prints rex's real error and exits 2. The pickers show "Opened, but Rex needs Remote Control to switch to it" for that, not "Failed". Turn Remote Control on to have them switch for you.
+
 ## Homebrew / nix-darwin
 
 ### `brew bundle` fails with `undefined method 'to_sym' for nil` in `cask_struct_generator.rb`

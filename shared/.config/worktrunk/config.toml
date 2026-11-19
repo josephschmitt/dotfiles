@@ -4,9 +4,12 @@
 # (shared/bin/herdr-wt): it creates and removes checkouts and runs the hooks
 # below. Herdr has no worktree hooks of its own.
 
-# Same place Herdr's own worktree commands use ([worktrees] directory default),
-# so checkouts made by either tool live side by side and Herdr groups them.
-worktree-path = "~/.herdr/worktrees/{{ repo }}/{{ branch | sanitize }}"
+# One tool-neutral root for every repo's worktrees, whichever multiplexer (Herdr,
+# Rex, or none) is in use. Herdr's own worktree commands point at the same root
+# ([worktrees] directory in ~/.config/herdr/config.toml), and `herdr-wt managed`
+# lists it (plus the older ~/.herdr/worktrees, where existing worktrees stay).
+# A dot-folder, so pj doesn't list the worktrees as projects.
+worktree-path = "~/development/.worktrees/{{ repo }}/{{ branch | sanitize }}"
 
 # ---- hooks ---------------------------------------------------------------
 # pre-*  hooks block and a failure aborts the operation.

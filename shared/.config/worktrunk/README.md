@@ -2,7 +2,7 @@
 
 Configuration for [Worktrunk](https://worktrunk.dev) (`wt`) - git worktree management with lifecycle hooks.
 
-Here it is the worktree engine behind the Herdr worktree picker (TUI `prefix+shift+w` find-or-create in this repo / `prefix+w` all worktrees / `prefix+shift+b` existing branch -> worktree / `prefix+shift+d` remove; Mac app leader `W` / `w` / `B` / `D`). `shared/bin/herdr-wt` calls `wt switch` / `wt remove` and does the Herdr side itself (focusing, opening, closing workspaces). `wt` works standalone too.
+Here it is the worktree engine behind the Herdr and Rex worktree pickers (TUI `prefix+shift+w` find-or-create in this repo / `prefix+w` all worktrees / `prefix+shift+b` existing branch -> worktree / `prefix+shift+d` remove; Mac app leader `W` / `w` / `B` / `D`). `shared/bin/herdr-wt` calls `wt switch` / `wt remove` and does the Herdr side itself (focusing, opening, closing workspaces). `wt` works standalone too.
 
 Installed by Homebrew via nix-darwin (`"worktrunk"` in `shared/.config/nix-darwin/darwin.nix`, applied with `nix_rebuild`). `stow shared` links this directory to `~/.config/worktrunk/`.
 
@@ -12,7 +12,9 @@ Herdr creates worktrees but has no hooks for setting them up. workmux has hooks 
 
 ## Where worktrees go
 
-`worktree-path = "~/.herdr/worktrees/{{ repo }}/{{ branch | sanitize }}"`, which is Herdr's own default (`[worktrees] directory`), so checkouts made by `wt`, the picker, or Herdr's native commands all sit together and Herdr groups them under the repo. `feature/x` becomes `feature-x`.
+`worktree-path = "~/development/.worktrees/{{ repo }}/{{ branch | sanitize }}"`: one root that doesn't belong to any one multiplexer, so it makes sense with Herdr, Rex, or neither. Herdr's native worktree commands use the same root (`[worktrees] directory` in `shared/.config/herdr/config.toml`), so checkouts made by `wt`, the pickers, or Herdr all sit together and Herdr groups them under the repo. `feature/x` becomes `feature-x`.
+
+Worktrees made before this lived in `~/.herdr/worktrees/<repo>/<branch>` (Herdr's default). They stay there: `herdr-wt managed` lists both roots, so the all-repos pickers still show them and can remove them. The root is a dot-folder, which `pj` doesn't list as projects. Set `WT_ROOT` to point `herdr-wt managed` elsewhere (`HERDR_WT_ROOT`, the old name, still works).
 
 ## Hooks
 

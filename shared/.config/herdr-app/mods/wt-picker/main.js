@@ -7,8 +7,8 @@
 //     focuses a checkout's open space, opens a space for it, or (no match)
 //     creates the typed name as a new worktree and opens it. ctrl+n creates the
 //     typed name even when something matches.
-//   "all" (leader w): every managed worktree (~/.herdr/worktrees/<repo>/<name>)
-//     across all repos. Enter focuses its open space or opens one. No create.
+//   "all" (leader w): every managed worktree (~/development/.worktrees/<repo>/<name>,
+//     plus older ones in ~/.herdr/worktrees) across all repos. Enter focuses its open space or opens one. No create.
 //   "branch" (leader B): the focused space's repo's local and origin branches
 //     that have no worktree yet, newest first. Enter checks the branch out into a
 //     worktree (remote-only ones get a tracking branch) and opens a space for it.
@@ -513,7 +513,7 @@ export default class WtPicker extends View {
             .when(this.list !== null && n === 0 && !this.error, (el) =>
               el.child(line(this.branch
                 ? (this.filter.trim() ? "No matching branch" : this.scope === "all" ? "No branches without a worktree" : `No ${this.scope} branches without a worktree`)
-                : this.all ? (this.filter.trim() ? "No matching worktree" : "No worktrees in ~/.herdr/worktrees") : "Type a branch name to create a worktree")))
+                : this.all ? (this.filter.trim() ? "No matching worktree" : "No worktrees in ~/development/.worktrees") : "Type a branch name to create a worktree")))
             .children(rows.map((r, i) => (visible(i) ? placeAt(row(r, i), i) : null)).filter(Boolean)),
         ))
       .when(removing && !this.busy && !this.confirm && !this.error, (el) => el.child(line("Checking…")));

@@ -67,12 +67,23 @@ confirm() {
   return 1
 }
 
-# Run the engine; on failure show its output and wait for a key.
+# Run the engine; on failure show its output and wait for a key. Exit 2 from
+# rex-wt `open` isn't a failure: the tab is ready in another session, but Rex
+# refused to switch the app there (Remote Control is off).
 run() {
-  if ! "${WT}" "$@"; then
-    pause "Failed. Press any key to close"
-    exit 1
-  fi
+  "${WT}" "$@"
+  rc=$?
+  case "${rc}" in
+    0) ;;
+    2)
+      printf '\n\033[33mOpened, but Rex needs Remote Control to switch to it\n(Rex > Settings > Server > Client Info). Pick it in the sidebar.\033[0m\n'
+      pause
+      ;;
+    *)
+      pause "Failed. Press any key to close"
+      exit 1
+      ;;
+  esac
 }
 
 # "branch<TAB>path<TAB>main" for a checkout path.

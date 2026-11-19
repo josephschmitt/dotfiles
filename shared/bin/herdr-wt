@@ -11,7 +11,8 @@
 # the worktrees of every repo, from any directory.
 #
 # Herdr-independent (git + wt only):
-#   herdr-wt managed              TSV per worktree under $HERDR_WT_ROOT (default
+#   herdr-wt managed              TSV per worktree under $WT_ROOT (default
+#                                 ~/development/.worktrees; also the legacy
 #                                 ~/.herdr/worktrees), all repos: repo, branch,
 #                                 path, main checkout
 #   herdr-wt checkouts            TSV per checkout: branch, path, main (1/0)
@@ -120,11 +121,16 @@ default_branch() {
 # ---- all repos -------------------------------------------------------------
 
 # TSV: repo<TAB>branch<TAB>path<TAB>main, one row per linked checkout under the
-# worktree root (where Worktrunk and Herdr put them), sorted by repo, branch.
+# worktree root (where Worktrunk and Herdr put them: <root>/<repo>/<branch>),
+# sorted by repo, branch. The root is $WT_ROOT ($HERDR_WT_ROOT, its old name, is
+# still honoured), default ~/development/.worktrees. ~/.herdr/worktrees, the
+# root before that, is listed too so older worktrees stay reachable.
 # Directories that aren't checkouts (no .git file) are skipped.
 cmd_managed() {
-  root=${HERDR_WT_ROOT:-${HOME}/.herdr/worktrees}
-  for p in "${root}"/*/*; do
+  root=${WT_ROOT:-${HERDR_WT_ROOT:-${HOME}/development/.worktrees}}
+  legacy=${HOME}/.herdr/worktrees
+  [ "${legacy}" != "${root}" ] || legacy=/nonexistent
+  for p in "${root}"/*/* "${legacy}"/*/*; do
     [ -f "${p}/.git" ] || continue
     common=$(git -C "${p}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || continue
     branch=$(git -C "${p}" branch --show-current 2>/dev/null) || branch=""

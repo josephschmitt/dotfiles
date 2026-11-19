@@ -17,8 +17,8 @@ Helpers outside this folder:
 
 | File | Does |
 |------|------|
-| `shared/bin/rex-open` | Find or create the session working in a directory, switch to it, or kill it. |
-| `shared/bin/rex-wt` | Rex flavour of `herdr-wt`: the same subcommands, driving Rex sessions. Git/Worktrunk subcommands are delegated to `herdr-wt`. |
+| `shared/bin/rex-open` | Find or create the session working in a directory and switch to it; find or close the tab working in one; kill sessions. |
+| `shared/bin/rex-wt` | Rex flavour of `herdr-wt`: the same subcommands, driving Rex tabs (one session per repo, one tab per worktree). Git/Worktrunk subcommands are delegated to `herdr-wt`. |
 | `shared/.config/herdr/scripts/wt-picker.sh` | The worktree picker UI, shared with Herdr. The Rex popups run it with `WT_ENGINE=rex-wt`. |
 | `shared/.config/herdr/scripts/quick-shell.sh` | Quick/mini shell. Shared with Herdr; prints the Ctrl-c hint in the terminal when `REX_SESSION` is set. |
 
@@ -26,7 +26,7 @@ Helpers outside this folder:
 
 - **Reload** after editing: `ctrl+s>R`, or `rex config reload`. Rex doesn't watch the file. Check with `rex config check` (errors) and `rex keymap` (what every key does).
 - **Option as Alt**: the `alt+` keys need Settings → Keyboard → Option key to send Alt. "Automatic (by keyboard layout)" does on US layouts.
-- **Remote Control** (Settings → Server → Client Info) must be on for the pickers to *switch* to a session (`prefix+O`, the worktree pickers). A script can't do that without it, because the request doesn't come from a key press. Without it the session is still created, and the popup says so. Everything else works with it off.
+- **Remote Control** (Settings → Server → Client Info) must be on for the pickers to switch the app to *another* session: `prefix+O` on a project that isn't the session you're in, or a worktree of a different repo (from `prefix+w`). A script can't do that without it, because the request doesn't come from a key press. Without it the session and tab are still made, and the popup says "Opened, but Rex needs Remote Control…" (not "Failed"); pick it in the sidebar. Worktrees of the repo you're in open as tabs in your session, which needs no switch, so they work with it off. So does everything else.
 - Stow: `install.sh` pre-creates `~/.config/rex` so stow links individual files, leaving anything Rex writes there out of the repo.
 
 ## Keys
@@ -91,7 +91,12 @@ Popup commands run through the user's shell startup files (Rex's `command` optio
 
 ## Worktrees and projects
 
-Same flow as Herdr's: the worktree pickers are the shared `wt-picker.sh`, with Worktrunk making the checkouts and running the hooks (`shared/.config/worktrunk/config.toml`). Only the session side differs, and `rex-open` does it. A session counts as "in" a checkout when one of its terminals is in that folder or below it (a terminal's folder comes from the shell's OSC 7 reports). So opening a worktree focuses the session already working there instead of creating another, and removing or merging one kills its session after the checkout is gone.
+Same flow as Herdr's: the worktree pickers are the shared `wt-picker.sh`, with Worktrunk making the checkouts (in `~/development/.worktrees/<repo>/<branch>`) and running the hooks (`shared/.config/worktrunk/config.toml`). Only the Rex side differs, and `rex-wt` (on top of `rex-open`) does it:
+
+- **One session per repo.** It's labelled with the repo's folder name (`dotfiles`), and its first tab is in the main checkout, labelled with that checkout's branch. A session counts as the repo's when one of its terminals is in the main checkout or below it, so a session the pj picker (`prefix+O`) opened for the repo is reused. With none, opening a worktree creates it.
+- **One tab per worktree**, labelled with the branch. A tab counts as "in" a checkout when one of its terminals is in that folder or below it (a terminal's folder comes from the shell's OSC 7 reports; popups don't count). Opening a worktree focuses its tab if there is one (anywhere, so tabs in older per-worktree sessions are found too), else opens one in the repo's session.
+- **Switching.** Creating and focusing tabs is done server-side and needs no Remote Control. The app is only asked to switch when the tab is in a session other than the one the popup runs in (see Remote Control under Setup).
+- **Removing or merging** a worktree closes its tab after the checkout is gone. The session stays.
 
 ## Known gaps
 
@@ -104,7 +109,7 @@ Same flow as Herdr's: the worktree pickers are the shared `wt-picker.sh`, with W
 
 ## Unverified
 
-Written against Rex Beta 0.1.0 (1925). Checked from the CLI: the config loads cleanly, every binding resolves in `rex keymap`, the popups open/close/hide, `rex-open` and `rex-wt` find, create and close sessions. Confirmed in the app: the `ctrl+s` prefix and its which-key popup, which lists every binding below. Not checked, because they need keys pressed in the app: that each `alt+` combination arrives as written, that `pane.view_activity` does what the name suggests, and `client.tab.goto` after switching sessions (the community config reports it counting in another session).
+Written against Rex Beta 0.1.0 (1925). Checked from the CLI: the config loads cleanly, every binding resolves in `rex keymap`, the popups open/close/hide, `rex-open` and `rex-wt` find, create and close sessions and tabs, and report a refused switch as exit 2. Confirmed in the app: the `ctrl+s` prefix and its which-key popup, which lists every binding below. Not checked, because they need keys pressed in the app: that each `alt+` combination arrives as written, that `pane.view_activity` does what the name suggests, and `client.tab.goto` after switching sessions (the community config reports it counting in another session).
 
 ## Troubleshooting
 
