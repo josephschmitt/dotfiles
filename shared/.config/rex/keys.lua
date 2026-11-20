@@ -14,6 +14,7 @@ for key, dir in pairs(dirs) do
 end
 rex.bind("alt+z", "pane.zoom")
 rex.bind("alt+f", "pane.float") -- float the pane, or dock a floating one back
+rex.bind("alt+m", "pane.minimize_floating") -- minimize the focused floating pane
 rex.bind("alt+[Backquote]", "pane.focus_next")
 rex.bind("alt+shift+[Backquote]", "pane.focus_previous")
 
@@ -22,10 +23,14 @@ for i = 1, 9 do
   rex.bind("alt+" .. i, "client.tab.goto", { index = i })
   rex.bind("alt+shift+" .. i, "goto_session", { index = i })
 end
-rex.bind("alt+[", "session.previous")
-rex.bind("alt+]", "session.next")
--- alt+shift+[ / ] were Herdr's previous/next agent. Rex has no agent cycling;
--- the activity view (prefix+a) is the replacement.
+-- Rex's own layout (same as tmux): alt+[ / ] cycle tabs, alt+shift+[ / ] sessions.
+-- Herdr puts sessions (its workspaces) on alt+[ / ] and tabs on prefix+[ / ].
+rex.bind("alt+[", "client.tab.previous")
+rex.bind("alt+]", "client.tab.next")
+rex.bind("alt+shift+[", "session.previous")
+rex.bind("alt+shift+]", "session.next")
+-- alt+shift+[ / ] are Herdr's previous/next agent. Rex has no agent cycling (the
+-- activity view, prefix+a, replaces it), so the keys go to sessions here.
 
 -- ---- Layer 2: ctrl+s, then… ------------------------------------------------
 
@@ -40,8 +45,6 @@ prefix("=", "pane.balance")
 
 -- Tabs
 prefix("n", "client.tab.new")
-prefix("[", "client.tab.previous")
-prefix("]", "client.tab.next")
 prefix("shift+t", "client.tab.rename")
 prefix("shift+x", "client.tab.close")
 
@@ -64,7 +67,7 @@ prefix("shift+c", "popup_mini_shell")
 prefix("shift+e", "popup_editor")
 prefix("shift+g", "popup_lazygit")
 prefix("shift+y", "popup_yazi")
-prefix("shift+-", "popup_hide") -- `_`. (pane.minimize_floating is listed by Rex but does nothing in the beta.)
+prefix("shift+-", "popup_hide") -- `_`
 -- Other
 prefix("g", "open_pr")
 prefix("b", "client.sidebar.toggle")

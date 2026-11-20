@@ -76,7 +76,7 @@ desc = "Previous / next tab"
 key = "prefix+{[,]}"
 herdr = "{previous,next}_tab"
 app = "leader:{Previous,Next} tab"
-rex = "client.tab.{previous,next}"
+rex = { key = "alt+{[,]}", action = "client.tab.{previous,next}" }
 tmux = { key = "alt+{[,]}", action = "{previous,next}-window" }
 
 [[binding]]
@@ -86,7 +86,7 @@ desc = "Previous / next space (Rex/tmux: session)"
 key = "alt+{[,]}"
 herdr = "{previous,next}_workspace"
 app = "space.{prev,next}"
-rex = "session.{previous,next}"
+rex = { key = "alt+shift+{[,]}", action = "session.{previous,next}" }
 tmux = { key = "alt+shift+{[,]}", action = "switch-client -{p,n}" }
 
 [[binding]]
@@ -199,6 +199,16 @@ key = "alt+f"
 herdr = { absent = "no floating panes (herdr 0.9.5)" }
 app = { absent = "no floating panes; terminal.peek only previews a terminal over the tab" }
 rex = "pane.float"
+tmux = { absent = "no floating panes" }
+
+[[binding]]
+id = "minimize-float"
+category = "panes"
+desc = "Minimize the floating pane"
+key = "alt+m"
+herdr = { absent = "no floating panes (herdr 0.9.5)" }
+app = { absent = "no floating panes; terminal.peek only previews a terminal over the tab" }
+rex = "pane.minimize_floating"
 tmux = { absent = "no floating panes" }
 
 [[binding]]

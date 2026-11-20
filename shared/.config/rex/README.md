@@ -41,11 +41,13 @@ Rex terminology: Herdr **space** = Rex **session**, Herdr tab = Rex tab (a sessi
 | `` alt+` `` / `` alt+shift+` `` | Next / previous pane |
 | `alt+z` | Zoom pane |
 | `alt+f` | Float the pane, or dock a floating one back |
+| `alt+m` | Minimize the focused floating pane |
 | `alt+1..9` | Go to tab N |
 | `alt+shift+1..9` | Go to session N (in `session.list` order, which may differ from the sidebar's) |
-| `alt+[` / `alt+]` | Previous / next session |
+| `alt+[` / `alt+]` | Previous / next tab (Herdr: prefix+`[` / `]`) |
+| `alt+shift+[` / `alt+shift+]` | Previous / next session (Herdr: `alt+[` / `]`) |
 
-`alt+shift+[` / `]` (Herdr's previous/next agent) are unbound: Rex has no agent cycling. Use the activity view.
+Herdr's previous/next agent (`alt+shift+[` / `]`) has no Rex equivalent, since Rex has no agent cycling: those keys switch sessions instead. Use the activity view.
 
 ### Prefix: `ctrl+s`, then…
 
@@ -54,7 +56,7 @@ Rex terminology: Herdr **space** = Rex **session**, Herdr tab = Rex tab (a sessi
 | `h j k l` | Focus pane |
 | `\` / `\|` | Split down / right |
 | `x` / `z` / `p` / `=` | Close / zoom / rename / balance pane |
-| `n` / `[` / `]` | New / previous / next tab |
+| `n` | New tab |
 | `T` / `X` | Rename / close tab |
 | `N` | New session in `~/development` |
 | `o` | Switch session |
@@ -105,7 +107,6 @@ Same flow as Herdr's: the worktree pickers are the shared `wt-picker.sh`, with W
 | Copy mode (`prefix+v`) | Not carried over; Rex's own selection and copy (`pane.copy`, mouse) apply. |
 | PR status in the sidebar, `prefix+u` | None (that was the `gh-pr` plugin). `prefix+g` still opens the PR. |
 | Focus agent N (`prefix+1..9`), previous/next agent | Activity view instead (`prefix+a`). |
-| Minimizing a floating pane | `pane.minimize_floating` is listed by Rex but did nothing on any key we tried (`ctrl+s>_`, `ctrl+s>m`, `alt+_`), and it isn't in the pane's context menu. Unbound until a Rex update. |
 
 ## Unverified
 
