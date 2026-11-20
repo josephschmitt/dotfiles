@@ -52,7 +52,7 @@ rex.action{
 -- prefix+g: open the focused pane's branch PR in the browser.
 rex.action{
   name = "open_pr",
-  title = "Open PR in Browser",
+  title = "Open PR",
   category = "Git",
   run = function(ctx)
     -- A login bash, so gh is found on the PATH the profile sets (the server may
@@ -61,7 +61,11 @@ rex.action{
     if err then error(err, 0) end
     if not r.ok then
       local msg = (r.stderr ~= "" and r.stderr or r.stdout):match("[^\n]+") or "gh failed"
-      error("No PR for this branch: " .. msg, 0)
+      -- Rex's toast already says the action failed ("<title> could not be
+      -- completed.") and cuts off after one line, so keep the title and the
+      -- message short enough that the cause is visible.
+      local none = msg:match("^no pull requests found")
+      error(none and "No existing PR found for this branch" or msg, 0)
     end
   end,
 }
